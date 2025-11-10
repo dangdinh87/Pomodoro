@@ -84,6 +84,7 @@ export function BackgroundRenderer() {
             filter: `blur(${background.blur}px)`,
             // Inline transition overrides global 'video { transition: none }'
             transition: 'opacity 180ms ease',
+            willChange: 'opacity',
           }}
         />
         <video
@@ -99,6 +100,7 @@ export function BackgroundRenderer() {
             opacity: showNight ? background.opacity : 0,
             filter: `blur(${background.blur}px)`,
             transition: 'opacity 180ms ease',
+            willChange: 'opacity',
           }}
         />
         {background.showDottedMap && (
@@ -134,6 +136,7 @@ export function BackgroundRenderer() {
           style={{
             opacity: background.opacity,
             filter: `blur(${background.blur}px)`,
+            willChange: 'opacity',
           }}
         />
         {background.showDottedMap && (

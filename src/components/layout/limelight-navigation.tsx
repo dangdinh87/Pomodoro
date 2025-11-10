@@ -41,13 +41,20 @@ export function LimelightNavigation() {
         const w = window as any;
         const yt = w.__globalYTPlayer;
         // 1 === YT.PlayerState.PLAYING
-        if (yt && typeof yt.getPlayerState === 'function' && yt.getPlayerState() === 1) {
+        if (
+          yt &&
+          typeof yt.getPlayerState === 'function' &&
+          yt.getPlayerState() === 1
+        ) {
           return true;
         }
       } catch {}
       try {
-        const audios = Array.from(document.querySelectorAll('audio')) as HTMLAudioElement[];
-        if (audios.some(a => !a.paused && !a.ended && a.currentTime > 0)) return true;
+        const audios = Array.from(
+          document.querySelectorAll('audio'),
+        ) as HTMLAudioElement[];
+        if (audios.some((a) => !a.paused && !a.ended && a.currentTime > 0))
+          return true;
       } catch {}
       return false;
     };
@@ -117,47 +124,37 @@ export function LimelightNavigation() {
       </div>
       {/* Top Right Controls (vertical): Darkmode, Timer Settings, Theme, Background, Audio */}
       <div className="fixed top-4 right-4 z-50 flex flex-col items-end gap-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          title="Toggle theme"
-          className="bg-background/10 backdrop-blur-sm border border-border/20 shadow-lg"
-          asChild
-        >
+        <Button variant="transparent" size="icon" title="Toggle theme" asChild>
           <AnimatedThemeToggler />
         </Button>
         <Button
-          variant="ghost"
+          variant="transparent"
           size="icon"
           title="Timer settings"
-          className="bg-background/10 backdrop-blur-sm border border-border/20 shadow-lg"
           onClick={() => setIsTimerSettingsOpen(true)}
         >
           <Timer className="w-5 h-5" />
         </Button>
         <Button
-          variant="ghost"
+          variant="transparent"
           size="icon"
           title="Theme settings"
-          className="bg-background/10 backdrop-blur-sm border border-border/20 shadow-lg"
           onClick={() => setIsThemeOpen(true)}
         >
           <Palette className="w-5 h-5" />
         </Button>
         <Button
-          variant="ghost"
+          variant="transparent"
           size="icon"
           title="Background setup"
-          className="bg-background/10 backdrop-blur-sm border border-border/20 shadow-lg"
           onClick={() => setIsBackgroundOpen(true)}
         >
           <Image className="w-5 h-5" />
         </Button>
         <Button
-          variant="ghost"
+          variant="transparent"
           size="icon"
           title="Focus music / Nature sounds"
-          className="bg-background/10 backdrop-blur-sm border border-border/20 shadow-lg"
           onClick={() => setIsAudioOpen(true)}
         >
           {isAudioPlaying ? (

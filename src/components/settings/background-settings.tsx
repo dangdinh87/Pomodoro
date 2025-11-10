@@ -10,14 +10,20 @@ import { useBackground } from '@/contexts/background-context'
 import { toast } from 'sonner'
 
 export default function BackgroundSettings() {
-  const { background, setBackgroundImage, setBackgroundColor, setShowDottedMap, setBackgroundTemp } = useBackground()
+  const { background, setBackground, setBackgroundImage, setBackgroundColor, setShowDottedMap, setBackgroundTemp } = useBackground()
   const [styleValue, setStyleValue] = useState<string>('lofi:auto')
   const [opacity, setOpacity] = useState<number>(Math.round((background.opacity ?? 1) * 100))
   const [dotted, setDotted] = useState<boolean>(background.showDottedMap)
 
   useEffect(() => {
-    setStyleValue(background.value || 'lofi:auto')
-    setOpacity(Math.round((background.opacity ?? 1) * 100))
+    // Normalize to sentinel values for UI so Save/apply paths work from first load
+    if (background.type === 'solid' && /var\(--background\)/.test(background.value)) {
+      setStyleValue('system:auto-color')
+      setOpacity(100)
+    } else {
+      setStyleValue(background.value || 'lofi:auto')
+      setOpacity(Math.round((background.opacity ?? 1) * 100))
+    }
     setDotted(background.showDottedMap)
   }, [background])
 
@@ -62,20 +68,16 @@ export default function BackgroundSettings() {
   }
 
   const apply = () => {
-    if (styleValue.startsWith('system:')) {
-      setBackgroundColor('hsl(var(--background))')
-      setShowDottedMap(dotted)
-      toast.success('Applied system auto color background')
-      return
-    }
-    setBackgroundImage(styleValue, opacity / 100, 0)
-    setShowDottedMap(dotted)
+    const next = buildBackground()
+    // Persist atomically to avoid stale state overrides
+    setBackground(next)
     toast.success('Background saved')
   }
 
 
   const reset = () => {
-    setStyleValue('lofi:auto')
+    // Reset to app default (System Color auto) to match provider's default
+    setStyleValue('system:auto-color')
     setOpacity(100)
     setDotted(false)
     toast.success('Defaults loaded, click Save to apply')

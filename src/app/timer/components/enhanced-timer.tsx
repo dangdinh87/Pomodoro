@@ -56,6 +56,7 @@ export function EnhancedTimer() {
   const timeLeftRef = useRef<number>(timeLeft);
   const timerEndRef = useRef<number | null>(null);
   const prevRemainingRef = useRef<number>(timeLeft);
+  const initialTitleRef = useRef<string | null>(null);
 
   const [showGuide, setShowGuide] = useState<boolean>(true);
   const quotes = useMemo(
@@ -286,6 +287,28 @@ export function EnhancedTimer() {
     () => formatTime(timeLeft),
     [timeLeft, formatTime],
   );
+
+  // Capture original title on mount and restore on unmount
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (initialTitleRef.current === null) {
+      initialTitleRef.current = document.title;
+    }
+    return () => {
+      if (initialTitleRef.current !== null) {
+        document.title = initialTitleRef.current;
+      }
+    };
+  }, []);
+
+  // Reflect countdown in the browser tab title
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const prefix =
+      mode === 'work' ? 'Work' : mode === 'shortBreak' ? 'Break' : 'Long Break';
+    const paused = isRunning ? '' : ' ⏸';
+    document.title = `${formattedTime} • ${prefix}${paused}`;
+  }, [formattedTime, mode, isRunning]);
 
   const ClockDisplay = memo(() => {
     const lowWarnEnabled = settings.lowTimeWarningEnabled ?? true;
