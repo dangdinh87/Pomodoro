@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch'
 import { Clock, Timer, Activity, Zap } from 'lucide-react'
 import { toast } from 'sonner'
+import { addMinutes, format, startOfDay } from 'date-fns'
 
 type ClockType = 'digital' | 'analog' | 'progress' | 'flip'
 
@@ -31,6 +32,19 @@ interface TimerSettingsProps {
 
 export function TimerSettings({ isOpen, onClose, settings, onSettingsChange }: TimerSettingsProps) {
   const [localSettings, setLocalSettings] = useState<TimerSettingsData>(settings)
+
+  // Derived previews using date-fns
+  const clockPreviewTime = useMemo(() => {
+    const safeMinutes = Math.max(0, Number(localSettings.workDuration) || 0)
+    // Render mm:ss from start of day plus selected minutes
+    return format(addMinutes(startOfDay(new Date()), safeMinutes), 'mm:ss')
+  }, [localSettings.workDuration])
+
+  const endTimePreview = useMemo(() => {
+    const safeMinutes = Math.max(0, Number(localSettings.workDuration) || 0)
+    // If user starts now, when will the work session end?
+    return format(addMinutes(new Date(), safeMinutes), 'HH:mm')
+  }, [localSettings.workDuration])
 
   const saveSettings = () => {
     onSettingsChange(localSettings)
@@ -189,9 +203,12 @@ export function TimerSettings({ isOpen, onClose, settings, onSettingsChange }: T
           {localSettings.showClock && (
             <div className="mt-6 pt-6 border-t">
               <Label className="text-base font-medium mb-4 block">Clock Preview</Label>
-              <div className="bg-background/50 backdrop-blur-sm rounded-lg p-6 border flex justify-center">
-                <div className="text-6xl   font-bold text-center">
-                  25:00
+              <div className="bg-background/50 backdrop-blur-sm rounded-lg p-6 border flex flex-col items-center gap-2">
+                <div className="text-6xl font-bold text-center">
+                  {clockPreviewTime}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Ends around {endTimePreview}
                 </div>
               </div>
             </div>

@@ -31,6 +31,8 @@ export function LimelightNavigation() {
   const [isTimerSettingsOpen, setIsTimerSettingsOpen] = useState(false);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
+  const isTimerPage = pathname === '/timer';
+
   // Poll lightweight playback state (AudioManager, YouTube, or any <audio> elements)
   useEffect(() => {
     const check = () => {
@@ -122,67 +124,73 @@ export function LimelightNavigation() {
           iconContainerClassName=""
         />
       </div>
-      {/* Top Right Controls (vertical): Darkmode, Timer Settings, Theme, Background, Audio */}
-      <div className="fixed top-4 right-4 z-50 flex flex-col items-end gap-2">
-        <Button variant="transparent" size="icon" title="Toggle theme" asChild>
-          <AnimatedThemeToggler />
-        </Button>
-        <Button
-          variant="transparent"
-          size="icon"
-          title="Timer settings"
-          onClick={() => setIsTimerSettingsOpen(true)}
-        >
-          <Timer className="w-5 h-5" />
-        </Button>
-        <Button
-          variant="transparent"
-          size="icon"
-          title="Theme settings"
-          onClick={() => setIsThemeOpen(true)}
-        >
-          <Palette className="w-5 h-5" />
-        </Button>
-        <Button
-          variant="transparent"
-          size="icon"
-          title="Background setup"
-          onClick={() => setIsBackgroundOpen(true)}
-        >
-          <Image className="w-5 h-5" />
-        </Button>
-        <Button
-          variant="transparent"
-          size="icon"
-          title="Focus music / Nature sounds"
-          onClick={() => setIsAudioOpen(true)}
-        >
-          {isAudioPlaying ? (
-            <AnimateIcon animate>
-              <AudioLines size={20} />
-            </AnimateIcon>
-          ) : (
-            <Music className="w-5 h-5" />
-          )}
-        </Button>
-      </div>
+      {/* Top Right Controls (only on /timer): Darkmode, Timer Settings, Theme, Background, Audio */}
+      {isTimerPage && (
+        <div className="fixed top-4 right-4 z-50 flex flex-col items-end gap-2">
+          <Button variant="transparent" size="icon" title="Toggle theme" asChild>
+            <AnimatedThemeToggler />
+          </Button>
+          <Button
+            variant="transparent"
+            size="icon"
+            title="Timer settings"
+            onClick={() => setIsTimerSettingsOpen(true)}
+          >
+            <Timer className="w-5 h-5" />
+          </Button>
+          <Button
+            variant="transparent"
+            size="icon"
+            title="Theme settings"
+            onClick={() => setIsThemeOpen(true)}
+          >
+            <Palette className="w-5 h-5" />
+          </Button>
+          <Button
+            variant="transparent"
+            size="icon"
+            title="Background setup"
+            onClick={() => setIsBackgroundOpen(true)}
+          >
+            <Image className="w-5 h-5" />
+          </Button>
+          <Button
+            variant="transparent"
+            size="icon"
+            title="Focus music / Nature sounds"
+            onClick={() => setIsAudioOpen(true)}
+          >
+            {isAudioPlaying ? (
+              <AnimateIcon animate>
+                <AudioLines size={20} />
+              </AnimateIcon>
+            ) : (
+              <Music className="w-5 h-5" />
+            )}
+          </Button>
+        </div>
+      )}
 
-      <ThemeSettingsModal
-        isOpen={isThemeOpen}
-        onClose={() => setIsThemeOpen(false)}
-      />
-      <TimerSettingsModal
-        isOpen={isTimerSettingsOpen}
-        onClose={() => setIsTimerSettingsOpen(false)}
-      />
-      <AudioSettingsModal
-        isOpen={isAudioOpen}
-        onClose={() => setIsAudioOpen(false)}
-      />
-      <BackgroundSettingsModal
-        isOpen={isBackgroundOpen}
-        onClose={() => setIsBackgroundOpen(false)}
-      />
+      {isTimerPage && (
+        <>
+          <ThemeSettingsModal
+            isOpen={isThemeOpen}
+            onClose={() => setIsThemeOpen(false)}
+          />
+          <TimerSettingsModal
+            isOpen={isTimerSettingsOpen}
+            onClose={() => setIsTimerSettingsOpen(false)}
+          />
+          <AudioSettingsModal
+            isOpen={isAudioOpen}
+            onClose={() => setIsAudioOpen(false)}
+          />
+          <BackgroundSettingsModal
+            isOpen={isBackgroundOpen}
+            onClose={() => setIsBackgroundOpen(false)}
+          />
+        </>
+      )}
     </>
   );
 }

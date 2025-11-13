@@ -44,7 +44,9 @@ export function EnhancedTimer() {
     incrementSessionCount,
     incrementCompletedSessions,
     setTotalFocusTime,
+    setDeadlineAt,
     resetTimer,
+    deadlineAt,
   } = useTimerStore();
 
   const { soundSettings } = useSystemStore();
@@ -58,7 +60,7 @@ export function EnhancedTimer() {
   const prevRemainingRef = useRef<number>(timeLeft);
   const initialTitleRef = useRef<string | null>(null);
 
-  const [showGuide, setShowGuide] = useState<boolean>(true);
+  const [showGuide, setShowGuide] = useState<boolean>(false);
   const quotes = useMemo(
     () => [
       'Hãy tập trung vào điều bạn có thể kiểm soát — từng Pomodoro một.',
@@ -109,12 +111,19 @@ export function EnhancedTimer() {
         intervalRef.current = null;
       }
       timerEndRef.current = null;
+      setDeadlineAt(null);
       return;
     }
 
     // initialize deadline when starting
     if (!timerEndRef.current) {
-      timerEndRef.current = Date.now() + timeLeftRef.current * 1000;
+      // If a persisted deadline exists (page reload while running), use it
+      if (deadlineAt && deadlineAt > Date.now()) {
+        timerEndRef.current = deadlineAt;
+      } else {
+        timerEndRef.current = Date.now() + timeLeftRef.current * 1000;
+        setDeadlineAt(timerEndRef.current);
+      }
       prevRemainingRef.current = timeLeftRef.current;
     }
 
@@ -142,6 +151,7 @@ export function EnhancedTimer() {
           intervalRef.current = null;
         }
         timerEndRef.current = null;
+        setDeadlineAt(null);
         setTimeout(() => handleSessionComplete(), 0);
       }
     }, 250);
@@ -153,19 +163,6 @@ export function EnhancedTimer() {
       }
     };
   }, [isRunning, mode, setTimeLeft, setTotalFocusTime]);
-
-  // Per-second pulse synced via rAF on time change
-  useEffect(() => {
-    const el = timeRef.current;
-    if (!el) return;
-    const frame = requestAnimationFrame(() => {
-      el.classList.remove('timer-pulse');
-      // force reflow to restart animation
-      void el.offsetWidth;
-      el.classList.add('timer-pulse');
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [timeLeft]);
 
   // Keyboard shortcuts effect moved below toggleTimer to avoid "used before declaration"
 
@@ -236,11 +233,13 @@ export function EnhancedTimer() {
       // starting
       timerEndRef.current = Date.now() + timeLeftRef.current * 1000;
       prevRemainingRef.current = timeLeftRef.current;
+      setDeadlineAt(timerEndRef.current);
       setIsRunning(true);
     } else {
       // pausing
       setIsRunning(false);
       timerEndRef.current = null;
+      setDeadlineAt(null);
     }
   };
 
@@ -263,6 +262,7 @@ export function EnhancedTimer() {
     // stop and clear deadline, then set new baseline time
     setIsRunning(false);
     timerEndRef.current = null;
+    setDeadlineAt(null);
 
     setMode(newMode);
 
@@ -335,19 +335,6 @@ export function EnhancedTimer() {
             progressPercent={progressPercent}
             timeLeft={timeLeft}
           />
-        );
-      case 'ring':
-        return (
-          <div className="text-center">
-            <AnimatedCircularProgressBar
-              value={progressPercent}
-              className="my-2"
-            >
-              <div className={cn('text-3xl font-bold timer-state-transition')}>
-                {formattedTime}
-              </div>
-            </AnimatedCircularProgressBar>
-          </div>
         );
       case 'digital':
       default:

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -120,6 +120,12 @@ export function TaskManagement() {
   const [selectedProject, setSelectedProject] = useState('1')
   const [showAddTask, setShowAddTask] = useState(false)
 
+  // Filters and search
+  const [query, setQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'completed'>('all')
+  const [categoryFilter, setCategoryFilter] = useState<string>('all')
+  const [priorityFilter, setPriorityFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all')
+
   const addTask = () => {
     if (newTaskTitle.trim()) {
       const newTask: Task = {
@@ -214,14 +220,98 @@ export function TaskManagement() {
     )
   }
 
+  // Derived: projects filtered by query/status/category/priority
+  const filteredProjects = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    const matches = (t: Task) => {
+      const statusOk =
+        statusFilter === 'all' ? true : statusFilter === 'completed' ? t.completed : !t.completed
+      const categoryOk = categoryFilter === 'all' ? true : t.category === categoryFilter
+      const priorityOk = priorityFilter === 'all' ? true : t.priority === priorityFilter
+      const queryOk =
+        q.length === 0
+          ? true
+          : t.title.toLowerCase().includes(q) ||
+            (t.description ? t.description.toLowerCase().includes(q) : false)
+      return statusOk && categoryOk && priorityOk && queryOk
+    }
+
+    return projects
+      .map((p) => ({ ...p, tasks: p.tasks.filter(matches) }))
+      .filter((p) => p.tasks.length > 0)
+  }, [projects, query, statusFilter, categoryFilter, priorityFilter])
+
+  const totalFilteredTasks = useMemo(
+    () => filteredProjects.reduce((acc, p) => acc + p.tasks.length, 0),
+    [filteredProjects]
+  )
+
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold dark:text-foreground">Task Management</h2>
-        <Button onClick={() => setShowAddTask(!showAddTask)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Task
-        </Button>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-3xl font-bold dark:text-foreground">Task Management</h2>
+          <Button onClick={() => setShowAddTask(!showAddTask)}>
+            <Plus className="h-4 w-4 mr-2" />
+            {showAddTask ? 'Close' : 'Add Task'}
+          </Button>
+        </div>
+
+        {/* Filters & Search */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+          <Input
+            placeholder="Search tasks..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="lg:col-span-2"
+          />
+          <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as 'all'|'active'|'completed')}>
+            <SelectTrigger>
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger>
+              <SelectValue placeholder="Category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              {categories.map((c) => (
+                <SelectItem key={c} value={c}>{c}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <div className="flex gap-2">
+            <Select value={priorityFilter} onValueChange={(v: 'all'|'low'|'medium'|'high') => setPriorityFilter(v)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Priority" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="high">High</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setQuery('')
+                setStatusFilter('all')
+                setCategoryFilter('all')
+                setPriorityFilter('all')
+              }}
+              className="whitespace-nowrap"
+            >
+              Clear
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Overall Progress */}
@@ -403,41 +493,56 @@ export function TaskManagement() {
 
       {/* Tasks by Project */}
       <div className="space-y-6">
-        {projects.map((project) => (
-          <Card key={project.id} className="bg-background/30 backdrop-blur-md border-white/10 dark:bg-card/90 dark:border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between dark:text-card-foreground">
-                <div className="flex items-center gap-2">
+        {totalFilteredTasks === 0 ? (
+          <Card className="bg-background/30 backdrop-blur-md border-white/10 dark:bg-card/90 dark:border-border">
+            <CardContent className="p-8 text-center space-y-3">
+              <p className="text-muted-foreground">No tasks match your filters.</p>
+              <div className="flex justify-center">
+                <Button variant="outline" onClick={() => {
+                  setQuery('')
+                  setStatusFilter('all')
+                  setCategoryFilter('all')
+                  setPriorityFilter('all')
+                }}>
+                  Reset Filters
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          filteredProjects.map((project) => (
+            <Card key={project.id} className="bg-background/30 backdrop-blur-md border-white/10 dark:bg-card/90 dark:border-border">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between dark:text-card-foreground">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: project.color }}
+                    />
+                    {project.name}
+                    <Badge variant="outline" className="dark:border-border">
+                      {project.tasks.filter(task => task.completed).length}/{project.tasks.length}
+                    </Badge>
+                  </div>
+                  <AnimatedCircularProgressBar
+                    max={project.tasks.length || 1}
+                    value={project.tasks.filter(task => task.completed).length}
+                    gaugePrimaryColor={project.color}
+                    gaugeSecondaryColor="#e5e7eb"
+                    className="w-16 h-16"
+                  >
+                    <span className="text-xs font-medium">
+                      {project.tasks.length > 0 ? Math.round((project.tasks.filter(task => task.completed).length / project.tasks.length) * 100) : 0}%
+                    </span>
+                  </AnimatedCircularProgressBar>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {project.tasks.map((task) => (
                   <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: project.color }}
-                  />
-                  {project.name}
-                  <Badge variant="outline" className="dark:border-border">
-                    {project.tasks.filter(task => task.completed).length}/{project.tasks.length}
-                  </Badge>
-                </div>
-                <AnimatedCircularProgressBar
-                  max={project.tasks.length || 1}
-                  value={project.tasks.filter(task => task.completed).length}
-                  gaugePrimaryColor={project.color}
-                  gaugeSecondaryColor="#e5e7eb"
-                  className="w-16 h-16"
-                >
-                  <span className="text-xs font-medium">
-                    {project.tasks.length > 0 ? Math.round((project.tasks.filter(task => task.completed).length / project.tasks.length) * 100) : 0}%
-                  </span>
-                </AnimatedCircularProgressBar>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {project.tasks.length === 0 ? (
-                <p className="text-muted-foreground text-center py-4 dark:text-muted-foreground">
-                  No tasks in this project yet.
-                </p>
-              ) : (
-                project.tasks.map((task) => (
-                  <div key={task.id} className="flex items-center justify-between p-4 border rounded-lg dark:border-border">
+                    key={task.id}
+                    className={`flex items-center justify-between p-4 border rounded-lg dark:border-border ${task.completed ? 'bg-muted/20' : ''}`}
+                  >
                     <div className="flex items-center space-x-3 flex-1">
                       <Checkbox
                         checked={task.completed}
@@ -452,7 +557,7 @@ export function TaskManagement() {
                             {task.description}
                           </p>
                         )}
-                        <div className="flex items-center gap-2 mt-2">
+                        <div className="flex items-center flex-wrap gap-2 mt-2">
                           <Badge variant="outline" className="text-xs dark:border-border">
                             <Tag className="h-3 w-3 mr-1" />
                             {task.category}
@@ -500,11 +605,11 @@ export function TaskManagement() {
                       </Button>
                     </div>
                   </div>
-                ))
-              )}
-            </CardContent>
-          </Card>
-        ))}
+                ))}
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
     </div>
   )

@@ -31,6 +31,7 @@ import audioManager from '@/lib/audio/audio-manager';
 import { soundCatalog } from '@/lib/audio/sound-catalog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
+import SpotifyPane from '@/components/audio/spotify-pane';
 
 export function AudioSettingsModal({
   isOpen,
@@ -581,11 +582,14 @@ export function AudioSettingsModal({
 
         <Tabs defaultValue="sources" className="w-full">
           <TabsList className="w-full">
-            <TabsTrigger value="sources" className="w-1/2">
+            <TabsTrigger value="sources" className="w-1/3">
               Hệ thống
             </TabsTrigger>
-            <TabsTrigger value="player" className="w-1/2">
+            <TabsTrigger value="player" className="w-1/3">
               <YoutubeIcon className="me-2" /> YouTube
+            </TabsTrigger>
+            <TabsTrigger value="spotify" className="w-1/3">
+              Spotify
             </TabsTrigger>
           </TabsList>
 
@@ -848,6 +852,11 @@ export function AudioSettingsModal({
               </div>
             </div>
           </TabsContent>
+
+          <TabsContent value="spotify" className="mt-4">
+            <SpotifyPane />
+          </TabsContent>
+
         </Tabs>
 
         <div className="flex justify-between pt-4 border-t">

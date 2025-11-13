@@ -32,8 +32,8 @@ export function TimerSettingsModal({ isOpen, onClose }: { isOpen: boolean; onClo
     shortBreakDuration: 5,
     longBreakDuration: 15,
     longBreakInterval: 4,
-    autoStartBreak: false,
-    autoStartWork: false,
+    autoStartBreak: true,
+    autoStartWork: true,
     clockType: 'digital',
     showClock: false,
     lowTimeWarningEnabled: true,
@@ -50,19 +50,55 @@ export function TimerSettingsModal({ isOpen, onClose }: { isOpen: boolean; onClo
     const n = parseInt(v, 10)
     return isNaN(n) ? def : n
   }
+  // Normalize current form values to a valid TimerSettingsData object,
+  // ensuring numeric fields are clamped even if inputs haven't blurred yet.
+  const normalizeSettings = (): TimerSettingsData => {
+    const work = clamp(toInt(workStr, localSettings.workDuration), 1, 60)
+    const shortB = clamp(toInt(shortStr, localSettings.shortBreakDuration), 1, 30)
+    const longB = clamp(toInt(longStr, localSettings.longBreakDuration), 1, 60)
+    const interval = clamp(toInt(intervalStr, localSettings.longBreakInterval), 2, 10)
+    return {
+      workDuration: work,
+      shortBreakDuration: shortB,
+      longBreakDuration: longB,
+      longBreakInterval: interval,
+      autoStartBreak: localSettings.autoStartBreak,
+      autoStartWork: localSettings.autoStartWork,
+      clockType: localSettings.clockType,
+      showClock: localSettings.showClock,
+      lowTimeWarningEnabled: localSettings.lowTimeWarningEnabled,
+    }
+  }
 
   useEffect(() => {
-    setLocalSettings(settings as unknown as TimerSettingsData)
-    setWorkStr(String((settings as any).workDuration ?? 25))
-    setShortStr(String((settings as any).shortBreakDuration ?? 5))
-    setLongStr(String((settings as any).longBreakDuration ?? 15))
-    setIntervalStr(String((settings as any).longBreakInterval ?? 4))
+    setLocalSettings((prev) => ({
+      ...prev,
+      workDuration: settings.workDuration ?? 25,
+      shortBreakDuration: settings.shortBreakDuration ?? 5,
+      longBreakDuration: settings.longBreakDuration ?? 15,
+      longBreakInterval: settings.longBreakInterval ?? 4,
+      autoStartBreak: settings.autoStartBreak ?? true,
+      autoStartWork: settings.autoStartWork ?? true,
+      clockType: settings.clockType ?? 'digital',
+      showClock: settings.showClock ?? false,
+      lowTimeWarningEnabled: settings.lowTimeWarningEnabled ?? true,
+    }))
+    setWorkStr(String(settings.workDuration ?? 25))
+    setShortStr(String(settings.shortBreakDuration ?? 5))
+    setLongStr(String(settings.longBreakDuration ?? 15))
+    setIntervalStr(String(settings.longBreakInterval ?? 4))
   }, [settings])
 
   const saveSettings = () => {
-    updateSettings(localSettings)
+    const normalized = normalizeSettings()
+    setLocalSettings(normalized)
+    setWorkStr(String(normalized.workDuration))
+    setShortStr(String(normalized.shortBreakDuration))
+    setLongStr(String(normalized.longBreakDuration))
+    setIntervalStr(String(normalized.longBreakInterval))
+    updateSettings(normalized)
     if (typeof window !== 'undefined') {
-      localStorage.setItem('pomodoro-timer-settings', JSON.stringify(localSettings))
+      localStorage.setItem('pomodoro-timer-settings', JSON.stringify(normalized))
     }
     toast.success('Timer settings saved successfully!')
     onClose()
@@ -74,13 +110,18 @@ export function TimerSettingsModal({ isOpen, onClose }: { isOpen: boolean; onClo
       shortBreakDuration: 5,
       longBreakDuration: 15,
       longBreakInterval: 4,
-      autoStartBreak: false,
-      autoStartWork: false,
+      // Defaults aligned with store to auto-start next step
+      autoStartBreak: true,
+      autoStartWork: true,
       clockType: 'digital',
       showClock: false,
       lowTimeWarningEnabled: true,
     }
     setLocalSettings(defaults)
+    setWorkStr('25')
+    setShortStr('5')
+    setLongStr('15')
+    setIntervalStr('4')
     toast.success('Timer settings reset to defaults!')
   }
 

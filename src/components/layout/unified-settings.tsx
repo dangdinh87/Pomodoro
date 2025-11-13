@@ -53,7 +53,7 @@ interface TimerSettingsData {
   longBreakInterval: number; // number of work sessions before long break
   autoStartBreak: boolean;
   autoStartWork: boolean;
-  clockType: 'digital' | 'analog' | 'progress' | 'flip' | 'ring';
+  clockType: 'digital' | 'analog' | 'progress' | 'flip';
   showClock: boolean;
   lowTimeWarningEnabled: boolean; // low-time glow/shake under 10s
 }
@@ -68,7 +68,7 @@ interface SoundSettingsData {
 function ClockPreview({
   clockType,
 }: {
-  clockType: 'digital' | 'analog' | 'progress' | 'flip' | 'ring';
+  clockType: 'digital' | 'analog' | 'progress' | 'flip';
 }) {
   const previewTime = 1500; // 25:00 in seconds
   const formatTime = (seconds: number) => {
@@ -177,48 +177,6 @@ function ClockPreview({
           </div>
         </div>
       );
-    case 'ring':
-      // Map ring to analog for preview
-      return (
-        <div className="text-center">
-          <div
-            className="relative w-48 h-48 mx-auto"
-            style={{ color: 'hsl(var(--timer-foreground))' }}
-          >
-            <svg
-              className="w-full h-full transform -rotate-90"
-              viewBox="0 0 200 200"
-              aria-label="Ring preview"
-            >
-              <circle
-                cx="100"
-                cy="100"
-                r="90"
-                stroke="currentColor"
-                strokeWidth="8"
-                fill="none"
-                className="opacity-20"
-              />
-              <circle
-                cx="100"
-                cy="100"
-                r="90"
-                stroke="currentColor"
-                strokeWidth="8"
-                fill="none"
-                strokeDasharray={`${2 * Math.PI * 90}`}
-                strokeDashoffset={`${2 * Math.PI * 90 * 0}`}
-                strokeLinecap="round"
-              />
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-2xl font-bold text-[hsl(var(--timer-foreground))]">
-                {formatTime(previewTime)}
-              </div>
-            </div>
-          </div>
-        </div>
-      );
     default:
       return null;
   }
@@ -259,8 +217,8 @@ function TimerSettingsContent({
       shortBreakDuration: 5,
       longBreakDuration: 15,
       longBreakInterval: 4,
-      autoStartBreak: false,
-      autoStartWork: false,
+      autoStartBreak: true,
+      autoStartWork: true,
       clockType: 'digital',
       showClock: false,
       lowTimeWarningEnabled: true,
@@ -397,7 +355,7 @@ function TimerSettingsContent({
         <Select
           value={localSettings.clockType}
           onValueChange={(
-            value: 'digital' | 'analog' | 'progress' | 'flip' | 'ring',
+            value: 'digital' | 'analog' | 'progress' | 'flip',
           ) => setLocalSettings({ ...localSettings, clockType: value })}
         >
           <SelectTrigger>
@@ -420,12 +378,6 @@ function TimerSettingsContent({
               <div className="flex items-center gap-2">
                 <Activity className="h-4 w-4" />
                 Progress
-              </div>
-            </SelectItem>
-            <SelectItem value="ring">
-              <div className="flex items-center gap-2">
-                <Activity className="h-4 w-4" />
-                Ring
               </div>
             </SelectItem>
             <SelectItem value="flip">
@@ -1508,8 +1460,8 @@ export function UnifiedSettings({ isOpen, onClose }: UnifiedSettingsProps) {
     shortBreakDuration: 5,
     longBreakDuration: 15,
     longBreakInterval: 4,
-    autoStartBreak: false,
-    autoStartWork: false,
+    autoStartBreak: true,
+    autoStartWork: true,
     clockType: 'digital',
     showClock: false,
     lowTimeWarningEnabled: true,
