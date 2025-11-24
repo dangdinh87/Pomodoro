@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
-import { Clock, Timer, Gauge, FlipHorizontal } from 'lucide-react'
+import { Clock, Timer, Gauge, FlipHorizontal, X } from 'lucide-react'
 import { useTimerStore } from '@/stores/timer-store'
 import { toast } from 'sonner'
 import { Separator } from '@/components/ui/separator'
@@ -21,11 +21,12 @@ interface TimerSettingsData {
     autoStartBreak: boolean
     autoStartWork: boolean
     clockType: ClockType
+    clockSize: 'small' | 'medium' | 'large'
     showClock: boolean
     lowTimeWarningEnabled: boolean
 }
 
-export function TimerSettings() {
+export function TimerSettings({ onClose }: { onClose?: () => void }) {
     const { settings, updateSettings } = useTimerStore()
     const [localSettings, setLocalSettings] = useState<TimerSettingsData>({
         workDuration: 25,
@@ -35,6 +36,7 @@ export function TimerSettings() {
         autoStartBreak: true,
         autoStartWork: true,
         clockType: 'digital',
+        clockSize: 'medium',
         showClock: false,
         lowTimeWarningEnabled: true,
     })
@@ -64,6 +66,7 @@ export function TimerSettings() {
             autoStartBreak: localSettings.autoStartBreak,
             autoStartWork: localSettings.autoStartWork,
             clockType: localSettings.clockType,
+            clockSize: localSettings.clockSize,
             showClock: localSettings.showClock,
             lowTimeWarningEnabled: localSettings.lowTimeWarningEnabled,
         }
@@ -79,6 +82,7 @@ export function TimerSettings() {
             autoStartBreak: settings.autoStartBreak ?? true,
             autoStartWork: settings.autoStartWork ?? true,
             clockType: settings.clockType ?? 'digital',
+            clockSize: settings.clockSize ?? 'medium',
             showClock: settings.showClock ?? false,
             lowTimeWarningEnabled: settings.lowTimeWarningEnabled ?? true,
         }))
@@ -100,6 +104,7 @@ export function TimerSettings() {
             localStorage.setItem('pomodoro-timer-settings', JSON.stringify(normalized))
         }
         toast.success('Timer settings saved successfully!')
+        onClose?.()
     }
 
     const resetToDefaults = () => {
@@ -111,6 +116,7 @@ export function TimerSettings() {
             autoStartBreak: true,
             autoStartWork: true,
             clockType: 'digital',
+            clockSize: 'medium',
             showClock: false,
             lowTimeWarningEnabled: true,
         }
@@ -128,280 +134,360 @@ export function TimerSettings() {
     const [previewMM, previewSS] = previewTime.split(':');
 
     return (
-        <div className="space-y-6">
-            <div className="grid gap-8 md:grid-cols-[1fr_300px]">
-                <div className="space-y-8">
-                    {/* Durations */}
-                    <div className="space-y-4">
-                        <h2 className="text-lg font-semibold">Timer Durations</h2>
-                        <Separator />
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="work-duration">Work Duration (min)</Label>
-                                <Input
-                                    id="work-duration"
-                                    type="number"
-                                    min={1}
-                                    max={60}
-                                    value={workStr}
-                                    onChange={(e) => {
-                                        const v = e.target.value
-                                        if (v === '' || /^[0-9]{0,2}$/.test(v)) setWorkStr(v)
-                                    }}
-                                    onBlur={() => {
-                                        const n = clamp(toInt(workStr, localSettings.workDuration), 1, 60)
-                                        setWorkStr(String(n))
-                                        setLocalSettings({ ...localSettings, workDuration: n })
-                                    }}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="short-break-duration">Short Break (min)</Label>
-                                <Input
-                                    id="short-break-duration"
-                                    type="number"
-                                    min={1}
-                                    max={30}
-                                    value={shortStr}
-                                    onChange={(e) => {
-                                        const v = e.target.value
-                                        if (v === '' || /^[0-9]{0,2}$/.test(v)) setShortStr(v)
-                                    }}
-                                    onBlur={() => {
-                                        const n = clamp(toInt(shortStr, localSettings.shortBreakDuration), 1, 30)
-                                        setShortStr(String(n))
-                                        setLocalSettings({ ...localSettings, shortBreakDuration: n })
-                                    }}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="long-break-duration">Long Break (min)</Label>
-                                <Input
-                                    id="long-break-duration"
-                                    type="number"
-                                    min={1}
-                                    max={60}
-                                    value={longStr}
-                                    onChange={(e) => {
-                                        const v = e.target.value
-                                        if (v === '' || /^[0-9]{0,2}$/.test(v)) setLongStr(v)
-                                    }}
-                                    onBlur={() => {
-                                        const n = clamp(toInt(longStr, localSettings.longBreakDuration), 1, 60)
-                                        setLongStr(String(n))
-                                        setLocalSettings({ ...localSettings, longBreakDuration: n })
-                                    }}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="long-break-interval">Long Break Interval</Label>
-                                <Input
-                                    id="long-break-interval"
-                                    type="number"
-                                    min={2}
-                                    max={10}
-                                    value={intervalStr}
-                                    onChange={(e) => {
-                                        const v = e.target.value
-                                        if (v === '' || /^[0-9]{0,2}$/.test(v)) setIntervalStr(v)
-                                    }}
-                                    onBlur={() => {
-                                        const n = clamp(toInt(intervalStr, localSettings.longBreakInterval), 2, 10)
-                                        setIntervalStr(String(n))
-                                        setLocalSettings({ ...localSettings, longBreakInterval: n })
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Behavior */}
-                    <div className="space-y-4">
-                        <h2 className="text-lg font-semibold">Behavior</h2>
-                        <Separator />
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <Label htmlFor="auto-start-break" className="flex-1">Auto-start breaks</Label>
-                                <Switch
-                                    id="auto-start-break"
-                                    checked={localSettings.autoStartBreak}
-                                    onCheckedChange={(checked) =>
-                                        setLocalSettings({ ...localSettings, autoStartBreak: checked })
-                                    }
-                                />
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <Label htmlFor="auto-start-work" className="flex-1">Auto-start work sessions</Label>
-                                <Switch
-                                    id="auto-start-work"
-                                    checked={localSettings.autoStartWork}
-                                    onCheckedChange={(checked) =>
-                                        setLocalSettings({ ...localSettings, autoStartWork: checked })
-                                    }
-                                />
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <Label htmlFor="low-time-warning" className="flex-1">Low-time warning (under 10s)</Label>
-                                <Switch
-                                    id="low-time-warning"
-                                    checked={localSettings.lowTimeWarningEnabled}
-                                    onCheckedChange={(checked) =>
-                                        setLocalSettings({
-                                            ...localSettings,
-                                            lowTimeWarningEnabled: checked,
-                                        })
-                                    }
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Clock Type */}
-                    <div className="space-y-4">
-                        <h2 className="text-lg font-semibold">Clock Display</h2>
-                        <Separator />
-                        <div className="space-y-2">
-                            <Label htmlFor="clock-type">Clock Style</Label>
-                            <Select
-                                value={localSettings.clockType}
-                                onValueChange={(value: ClockType) =>
-                                    setLocalSettings({ ...localSettings, clockType: value })
-                                }
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select clock style" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="digital">
-                                        <div className="flex items-center gap-2">
-                                            <Timer className="h-4 w-4" />
-                                            Digital
-                                        </div>
-                                    </SelectItem>
-                                    <SelectItem value="analog">
-                                        <div className="flex items-center gap-2">
-                                            <Clock className="h-4 w-4" />
-                                            Analog
-                                        </div>
-                                    </SelectItem>
-                                    <SelectItem value="progress">
-                                        <div className="flex items-center gap-2">
-                                            <Gauge className="h-4 w-4" />
-                                            Progress
-                                        </div>
-                                    </SelectItem>
-                                    <SelectItem value="flip">
-                                        <div className="flex items-center gap-2">
-                                            <FlipHorizontal className="h-4 w-4" />
-                                            Flip
-                                        </div>
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
+        <div className="flex flex-col h-full">
+            {/* Fixed Header */}
+            {onClose && (
+                <div className="flex items-center justify-between px-6 py-4 border-b shrink-0">
+                    <h2 className="text-lg font-semibold">Timer Settings</h2>
+                    <div className="flex items-center gap-2">
+                        <Button variant="outline" onClick={resetToDefaults} size="sm">Reset to Defaults</Button>
+                        <Button onClick={saveSettings} size="sm">Save Settings</Button>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={onClose}
+                            className="h-8 w-8 rounded-full"
+                        >
+                            <X className="h-4 w-4" />
+                            <span className="sr-only">Close</span>
+                        </Button>
                     </div>
                 </div>
+            )}
 
-                {/* Preview */}
-                <div className="space-y-4">
-                    <h2 className="text-lg font-semibold">Preview</h2>
-                    <Separator />
-                    <div className="rounded-lg border bg-card p-6 flex items-center justify-center min-h-[200px]">
-                        {localSettings.clockType === 'digital' && (
-                            <div className="text-center">
-                                <div className="text-4xl font-bold text-[hsl(var(--timer-foreground))]">
-                                    {previewTime}
+            {/* Scrollable Content */}
+            <div className={onClose ? "flex-1 overflow-y-auto px-6 py-4" : "space-y-6"}>
+                <div className="grid gap-8 md:grid-cols-[1fr_300px]">
+                    <div className="space-y-8">
+                        {/* Durations */}
+                        <div className="space-y-4">
+                            <h2 className="text-lg font-semibold">Timer Durations</h2>
+                            <Separator />
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="work-duration">Work Duration (min)</Label>
+                                    <Input
+                                        id="work-duration"
+                                        type="number"
+                                        min={1}
+                                        max={60}
+                                        value={workStr}
+                                        onChange={(e) => {
+                                            const v = e.target.value
+                                            if (v === '' || /^[0-9]{0,2}$/.test(v)) setWorkStr(v)
+                                        }}
+                                        onBlur={() => {
+                                            const n = clamp(toInt(workStr, localSettings.workDuration), 1, 60)
+                                            setWorkStr(String(n))
+                                            setLocalSettings({ ...localSettings, workDuration: n })
+                                        }}
+                                    />
                                 </div>
-                            </div>
-                        )}
-                        {localSettings.clockType === 'progress' && (
-                            <div className="text-center w-full max-w-[200px]">
-                                <div className="text-xl font-bold text-[hsl(var(--timer-foreground))] mb-2">
-                                    {previewTime}
+                                <div className="space-y-2">
+                                    <Label htmlFor="short-break-duration">Short Break (min)</Label>
+                                    <Input
+                                        id="short-break-duration"
+                                        type="number"
+                                        min={1}
+                                        max={30}
+                                        value={shortStr}
+                                        onChange={(e) => {
+                                            const v = e.target.value
+                                            if (v === '' || /^[0-9]{0,2}$/.test(v)) setShortStr(v)
+                                        }}
+                                        onBlur={() => {
+                                            const n = clamp(toInt(shortStr, localSettings.shortBreakDuration), 1, 30)
+                                            setShortStr(String(n))
+                                            setLocalSettings({ ...localSettings, shortBreakDuration: n })
+                                        }}
+                                    />
                                 </div>
-                                <div className="w-full bg-muted rounded-full h-3">
-                                    <div
-                                        className="h-3 rounded-full"
-                                        style={{
-                                            width: '50%',
-                                            backgroundColor: 'hsl(var(--timer-foreground))',
+                                <div className="space-y-2">
+                                    <Label htmlFor="long-break-duration">Long Break (min)</Label>
+                                    <Input
+                                        id="long-break-duration"
+                                        type="number"
+                                        min={1}
+                                        max={60}
+                                        value={longStr}
+                                        onChange={(e) => {
+                                            const v = e.target.value
+                                            if (v === '' || /^[0-9]{0,2}$/.test(v)) setLongStr(v)
+                                        }}
+                                        onBlur={() => {
+                                            const n = clamp(toInt(longStr, localSettings.longBreakDuration), 1, 60)
+                                            setLongStr(String(n))
+                                            setLocalSettings({ ...localSettings, longBreakDuration: n })
+                                        }}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="long-break-interval">Long Break Interval</Label>
+                                    <Input
+                                        id="long-break-interval"
+                                        type="number"
+                                        min={2}
+                                        max={10}
+                                        value={intervalStr}
+                                        onChange={(e) => {
+                                            const v = e.target.value
+                                            if (v === '' || /^[0-9]{0,2}$/.test(v)) setIntervalStr(v)
+                                        }}
+                                        onBlur={() => {
+                                            const n = clamp(toInt(intervalStr, localSettings.longBreakInterval), 2, 10)
+                                            setIntervalStr(String(n))
+                                            setLocalSettings({ ...localSettings, longBreakInterval: n })
                                         }}
                                     />
                                 </div>
                             </div>
-                        )}
-                        {localSettings.clockType === 'analog' && (
-                            <div className="text-center">
-                                <div
-                                    className="relative w-32 h-32 mx-auto"
-                                    style={{ color: 'hsl(var(--timer-foreground))' }}
-                                >
-                                    <svg
-                                        className="w-full h-full transform -rotate-90"
-                                        viewBox="0 0 200 200"
-                                        aria-label="Analog preview"
-                                    >
-                                        <circle
-                                            cx="100"
-                                            cy="100"
-                                            r="90"
-                                            stroke="currentColor"
-                                            strokeWidth="8"
-                                            fill="none"
-                                            className="opacity-20"
-                                        />
-                                        <circle
-                                            cx="100"
-                                            cy="100"
-                                            r="90"
-                                            stroke="currentColor"
-                                            strokeWidth="8"
-                                            fill="none"
-                                            strokeDasharray={`${2 * Math.PI * 90}`}
-                                            strokeDashoffset={`${2 * Math.PI * 90 * 0.25}`}
-                                            strokeLinecap="round"
-                                        />
-                                    </svg>
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                        <div className="text-lg font-bold text-[hsl(var(--timer-foreground))]">
-                                            {previewTime}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                        {localSettings.clockType === 'flip' && (
-                            <div className="text-center">
-                                <div className="inline-flex items-center space-x-2">
-                                    <div
-                                        className="bg-background border-2 p-2 rounded"
-                                        style={{ borderColor: 'hsl(var(--timer-foreground))' }}
-                                    >
-                                        <div className="text-3xl font-bold text-[hsl(var(--timer-foreground))]">
-                                            {previewMM}
-                                        </div>
-                                    </div>
-                                    <div className="text-3xl font-bold text-[hsl(var(--timer-foreground))]">
-                                        :
-                                    </div>
-                                    <div
-                                        className="bg-background border-2 p-2 rounded"
-                                        style={{ borderColor: 'hsl(var(--timer-foreground))' }}
-                                    >
-                                        <div className="text-3xl font-bold text-[hsl(var(--timer-foreground))]">
-                                            {previewSS}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
+                        </div>
 
-            <div className="flex justify-between pt-4 border-t">
-                <Button variant="outline" onClick={resetToDefaults}>Reset to Defaults</Button>
-                <Button onClick={saveSettings}>Save Changes</Button>
+                        {/* Behavior */}
+                        <div className="space-y-4">
+                            <h2 className="text-lg font-semibold">Behavior</h2>
+                            <Separator />
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="auto-start-break" className="flex-1">Auto-start breaks</Label>
+                                    <Switch
+                                        id="auto-start-break"
+                                        checked={localSettings.autoStartBreak}
+                                        onCheckedChange={(checked) =>
+                                            setLocalSettings({ ...localSettings, autoStartBreak: checked })
+                                        }
+                                    />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="auto-start-work" className="flex-1">Auto-start work sessions</Label>
+                                    <Switch
+                                        id="auto-start-work"
+                                        checked={localSettings.autoStartWork}
+                                        onCheckedChange={(checked) =>
+                                            setLocalSettings({ ...localSettings, autoStartWork: checked })
+                                        }
+                                    />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="low-time-warning" className="flex-1">Low-time warning (under 10s)</Label>
+                                    <Switch
+                                        id="low-time-warning"
+                                        checked={localSettings.lowTimeWarningEnabled}
+                                        onCheckedChange={(checked) =>
+                                            setLocalSettings({
+                                                ...localSettings,
+                                                lowTimeWarningEnabled: checked,
+                                            })
+                                        }
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right Column: Clock Display + Preview */}
+                    <div className="space-y-6">
+                        {/* Clock Display */}
+                        <div className="space-y-4">
+                            <h2 className="text-lg font-semibold">Clock Display</h2>
+                            <Separator />
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="clock-type">Clock Style</Label>
+                                    <Select
+                                        value={localSettings.clockType}
+                                        onValueChange={(value: ClockType) =>
+                                            setLocalSettings({ ...localSettings, clockType: value })
+                                        }
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select clock style" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="digital">
+                                                <div className="flex items-center gap-2">
+                                                    <Timer className="h-4 w-4" />
+                                                    Digital
+                                                </div>
+                                            </SelectItem>
+                                            <SelectItem value="analog">
+                                                <div className="flex items-center gap-2">
+                                                    <Clock className="h-4 w-4" />
+                                                    Analog
+                                                </div>
+                                            </SelectItem>
+                                            <SelectItem value="progress">
+                                                <div className="flex items-center gap-2">
+                                                    <Gauge className="h-4 w-4" />
+                                                    Progress
+                                                </div>
+                                            </SelectItem>
+                                            <SelectItem value="flip">
+                                                <div className="flex items-center gap-2">
+                                                    <FlipHorizontal className="h-4 w-4" />
+                                                    Flip
+                                                </div>
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="clock-size">Clock Size</Label>
+                                    <Select
+                                        value={localSettings.clockSize}
+                                        onValueChange={(value: 'small' | 'medium' | 'large') =>
+                                            setLocalSettings({ ...localSettings, clockSize: value })
+                                        }
+                                    >
+                                        <SelectTrigger id="clock-size">
+                                            <SelectValue placeholder="Select size" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="small">Small</SelectItem>
+                                            <SelectItem value="medium">Medium</SelectItem>
+                                            <SelectItem value="large">Large</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Preview */}
+                        <div className="space-y-4">
+                            <h2 className="text-lg font-semibold">Preview</h2>
+                            <Separator />
+                            <div className="rounded-lg border bg-card p-6 flex items-center justify-center min-h-[200px]">
+                                {localSettings.clockType === 'digital' && (() => {
+                                    const sizeClasses = {
+                                        small: 'text-2xl',
+                                        medium: 'text-4xl',
+                                        large: 'text-5xl',
+                                    };
+                                    return (
+                                        <div className="text-center">
+                                            <div className={`${sizeClasses[localSettings.clockSize]} font-bold tabular-nums text-[hsl(var(--timer-foreground))]`}>
+                                                {previewTime}
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
+                                {localSettings.clockType === 'progress' && (() => {
+                                    const sizeClasses = {
+                                        small: { time: 'text-xl', bar: 'h-2', width: 'max-w-[150px]' },
+                                        medium: { time: 'text-2xl', bar: 'h-3', width: 'max-w-[200px]' },
+                                        large: { time: 'text-3xl', bar: 'h-4', width: 'max-w-[250px]' },
+                                    };
+                                    const size = sizeClasses[localSettings.clockSize];
+                                    return (
+                                        <div className={`text-center w-full ${size.width}`}>
+                                            <div className={`${size.time} font-bold tabular-nums text-[hsl(var(--timer-foreground))] mb-2`}>
+                                                {previewTime}
+                                            </div>
+                                            <div className={`w-full bg-muted rounded-full ${size.bar}`}>
+                                                <div
+                                                    className={`${size.bar} rounded-full`}
+                                                    style={{
+                                                        width: '50%',
+                                                        backgroundColor: 'hsl(var(--timer-foreground))',
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
+                                {localSettings.clockType === 'analog' && (() => {
+                                    const sizeClasses = {
+                                        small: { container: 'w-24 h-24', text: 'text-sm' },
+                                        medium: { container: 'w-32 h-32', text: 'text-lg' },
+                                        large: { container: 'w-40 h-40', text: 'text-xl' },
+                                    };
+                                    const size = sizeClasses[localSettings.clockSize];
+                                    return (
+                                        <div className="text-center">
+                                            <div
+                                                className={`relative ${size.container} mx-auto`}
+                                                style={{ color: 'hsl(var(--timer-foreground))' }}
+                                            >
+                                                <svg
+                                                    className="w-full h-full transform -rotate-90"
+                                                    viewBox="0 0 200 200"
+                                                    aria-label="Analog preview"
+                                                >
+                                                    <circle
+                                                        cx="100"
+                                                        cy="100"
+                                                        r="90"
+                                                        stroke="currentColor"
+                                                        strokeWidth="8"
+                                                        fill="none"
+                                                        className="opacity-20"
+                                                    />
+                                                    <circle
+                                                        cx="100"
+                                                        cy="100"
+                                                        r="90"
+                                                        stroke="currentColor"
+                                                        strokeWidth="8"
+                                                        fill="none"
+                                                        strokeDasharray={`${2 * Math.PI * 90}`}
+                                                        strokeDashoffset={`${2 * Math.PI * 90 * 0.25}`}
+                                                        strokeLinecap="round"
+                                                    />
+                                                </svg>
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                    <div className={`${size.text} font-bold tabular-nums text-[hsl(var(--timer-foreground))]`}>
+                                                        {previewTime}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
+                                {localSettings.clockType === 'flip' && (() => {
+                                    const sizeClasses = {
+                                        small: { digit: 'text-xl', padding: 'p-2' },
+                                        medium: { digit: 'text-3xl', padding: 'p-3' },
+                                        large: { digit: 'text-4xl', padding: 'p-4' },
+                                    };
+                                    const size = sizeClasses[localSettings.clockSize];
+                                    return (
+                                        <div className="text-center">
+                                            <div className="inline-flex items-center space-x-2">
+                                                <div
+                                                    className={`bg-background border-2 ${size.padding} rounded`}
+                                                    style={{ borderColor: 'hsl(var(--timer-foreground))' }}
+                                                >
+                                                    <div className={`${size.digit} font-bold tabular-nums text-[hsl(var(--timer-foreground))]`}>
+                                                        {previewMM}
+                                                    </div>
+                                                </div>
+                                                <div className={`${size.digit} font-bold tabular-nums text-[hsl(var(--timer-foreground))]`}>
+                                                    :
+                                                </div>
+                                                <div
+                                                    className={`bg-background border-2 ${size.padding} rounded`}
+                                                    style={{ borderColor: 'hsl(var(--timer-foreground))' }}
+                                                >
+                                                    <div className={`${size.digit} font-bold tabular-nums text-[hsl(var(--timer-foreground))]`}>
+                                                        {previewSS}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
+                            </div>
+                        </div>
+                    </div>
+
+                    {!onClose && (
+                        <div className="flex justify-between pt-4 border-t">
+                            <Button variant="outline" onClick={resetToDefaults}>Reset to Defaults</Button>
+                            <Button onClick={saveSettings}>Save Changes</Button>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     )

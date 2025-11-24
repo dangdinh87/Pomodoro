@@ -7,7 +7,6 @@ import { Slider } from '@/components/ui/slider';
 import { Check, X } from 'lucide-react';
 import { useBackground } from '@/contexts/background-context';
 import { toast } from 'sonner';
-import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface BackgroundSettingsProps {
   onClose?: () => void;
@@ -150,7 +149,7 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
       {/* Fixed Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b shrink-0">
         <div>
-          <DialogTitle>Background Setup</DialogTitle>
+          <h2 className="text-lg font-semibold leading-none tracking-tight">Background Setup</h2>
           <p className="text-xs text-muted-foreground mt-1">
             Customize your focus environment
           </p>

@@ -12,6 +12,7 @@ interface TimerSettings {
   autoStartBreak: boolean
   autoStartWork: boolean
   clockType: ClockType
+  clockSize: 'small' | 'medium' | 'large'
   showClock: boolean
   lowTimeWarningEnabled: boolean // enable glow/shake effects under 10s
 }
@@ -69,6 +70,7 @@ const defaultSettings: TimerSettings = {
   autoStartBreak: true,
   autoStartWork: true,
   clockType: 'digital',
+  clockSize: 'medium',
   showClock: false,
   lowTimeWarningEnabled: true,
 }

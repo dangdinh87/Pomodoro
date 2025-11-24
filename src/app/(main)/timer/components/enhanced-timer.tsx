@@ -10,6 +10,7 @@ import { TimerMode, useTimerStore } from '@/stores/timer-store';
 import {
     Briefcase,
     CheckCircle2,
+    Clock,
     Coffee,
     Image as ImageIcon,
     Music,
@@ -66,7 +67,7 @@ export function EnhancedTimer() {
         resumeTimer,
     } = useTimerStore();
 
-    const { soundSettings } = useSystemStore();
+    const { soundSettings, isFocusMode, setFocusMode } = useSystemStore();
     const { background } = useBackground();
     const { state: sidebarState, setOpen: setSidebarOpen } = useSidebar();
     const [isFullscreen, setIsFullscreen] = useState(false);
@@ -370,6 +371,7 @@ export function EnhancedTimer() {
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen().then(() => {
                 setIsFullscreen(true);
+                setFocusMode(true);
                 setSidebarOpen(false);
             }).catch((err) => {
                 console.error(`Error attempting to enable fullscreen: ${err.message}`);
@@ -378,6 +380,7 @@ export function EnhancedTimer() {
             if (document.exitFullscreen) {
                 document.exitFullscreen().then(() => {
                     setIsFullscreen(false);
+                    setFocusMode(false);
                 });
             }
         }
@@ -386,14 +389,18 @@ export function EnhancedTimer() {
     // Listen for fullscreen change events (e.g. user presses Esc)
     useEffect(() => {
         const handleFullscreenChange = () => {
-            setIsFullscreen(!!document.fullscreenElement);
+            const isNowFullscreen = !!document.fullscreenElement;
+            setIsFullscreen(isNowFullscreen);
+            setFocusMode(isNowFullscreen);
         };
         document.addEventListener('fullscreenchange', handleFullscreenChange);
         return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-    }, []);
+    }, [setFocusMode]);
 
     const ClockDisplay = memo(() => {
         const lowWarnEnabled = settings.lowTimeWarningEnabled ?? true;
+        const clockSize = settings.clockSize || 'medium';
+
         switch (settings.clockType) {
             case 'analog':
                 return (
@@ -401,6 +408,7 @@ export function EnhancedTimer() {
                         formattedTime={formattedTime}
                         totalTimeForMode={totalTimeForMode}
                         timeLeft={timeLeft}
+                        clockSize={clockSize}
                     />
                 );
             case 'progress':
@@ -408,14 +416,15 @@ export function EnhancedTimer() {
                     <ProgressBarClock
                         formattedTime={formattedTime}
                         progressPercent={progressPercent}
+                        clockSize={clockSize}
                     />
                 );
             case 'flip':
                 return (
                     <FlipClock
                         formattedTime={formattedTime}
-                        progressPercent={progressPercent}
                         timeLeft={timeLeft}
+                        clockSize={clockSize}
                     />
                 );
             case 'digital':
@@ -428,6 +437,7 @@ export function EnhancedTimer() {
                         progressPercent={progressPercent}
                         lowWarnEnabled={lowWarnEnabled}
                         timeLeft={timeLeft}
+                        clockSize={clockSize}
                     />
                 );
         }
@@ -555,36 +565,47 @@ export function EnhancedTimer() {
                         />
 
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
-                            {mode === 'work' && (
-                                <div className="w-auto">
+                            {!isFocusMode && mode === 'work' && (
+                                <>
                                     <TaskSelector />
-                                </div>
+
+                                    {dailyPomodoros > 0 && (
+                                        <div className="animate-in slide-in-from-top-2 fade-in duration-500">
+                                            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-background/80 backdrop-blur-md border border-border/50 shadow-sm hover:bg-background/90 transition-colors dark:bg-background/60 dark:hover:bg-background/80 whitespace-nowrap">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="p-1.5 rounded-full bg-primary/10 text-primary">
+                                                        <CheckCircle2 className="w-4 h-4" />
+                                                    </div>
+                                                    <div className="flex flex-row items-center gap-2">
+                                                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Hôm nay</span>
+                                                        <span className="text-sm font-bold text-foreground leading-none">
+                                                            {dailyPomodoros} <span className="text-xs font-normal text-muted-foreground">poms</span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                {dailyFocusTime > 0 && (
+                                                    <>
+                                                        <div className="w-px h-4 bg-border/50" />
+                                                        <div className="flex flex-row items-center gap-2">
+                                                            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Thời gian</span>
+                                                            <span className="text-sm font-bold text-foreground leading-none">
+                                                                {Math.floor(dailyFocusTime / 60)} <span className="text-xs font-normal text-muted-foreground">phút</span>
+                                                            </span>
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
                             )}
 
-                            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-background/80 backdrop-blur-md border border-border/50 shadow-sm hover:bg-background/90 transition-colors dark:bg-background/60 dark:hover:bg-background/80 whitespace-nowrap">
-                                <div className="flex items-center gap-2">
-                                    <div className="p-1.5 rounded-full bg-primary/10 text-primary">
-                                        <CheckCircle2 className="w-4 h-4" />
-                                    </div>
-                                    <div className="flex flex-row items-center gap-2">
-                                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Hôm nay</span>
-                                        <span className="text-sm font-bold text-foreground leading-none">
-                                            {dailyPomodoros} <span className="text-xs font-normal text-muted-foreground">poms</span>
-                                        </span>
-                                    </div>
+                            {isFocusMode && (
+                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 backdrop-blur-md border border-primary/30 animate-pulse">
+                                    <div className="w-2 h-2 rounded-full bg-primary"></div>
+                                    <span className="text-sm font-medium text-primary">Focus Mode</span>
                                 </div>
-                                {dailyFocusTime > 0 && (
-                                    <>
-                                        <div className="w-px h-4 bg-border/50" />
-                                        <div className="flex flex-row items-center gap-2">
-                                            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Thời gian</span>
-                                            <span className="text-sm font-bold text-foreground leading-none">
-                                                {Math.floor(dailyFocusTime / 60)} <span className="text-xs font-normal text-muted-foreground">phút</span>
-                                            </span>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
+                            )}
                         </div>
                     </CardContent>
                 </div>
@@ -606,55 +627,59 @@ export function EnhancedTimer() {
             </div>
 
             {/* Bottom Left Settings Controls */}
-            <div className="absolute bottom-0 left-0 z-50 flex gap-2 items-center">
+            <div className="fixed bottom-0 left-0 z-50 flex gap-2 items-center p-6">
                 <TooltipProvider>
-                    <Tooltip side="top">
-                        <TooltipTrigger asChild>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-10 w-10 rounded-full bg-background/20 backdrop-blur-sm hover:bg-background/40 border border-white/10 text-foreground"
-                                onClick={() => setBackgroundSettingsOpen(true)}
-                            >
-                                <Wallpaper className="h-5 w-5" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>Background Settings</p>
-                        </TooltipContent>
-                    </Tooltip>
+                    {!isFocusMode && (
+                        <>
+                            <Tooltip side="top">
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-10 w-10 rounded-full bg-background/20 backdrop-blur-sm hover:bg-background/40 border border-white/10 text-foreground"
+                                        onClick={() => setBackgroundSettingsOpen(true)}
+                                    >
+                                        <Wallpaper className="h-5 w-5" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Background Settings</p>
+                                </TooltipContent>
+                            </Tooltip>
 
-                    <Tooltip side="top">
-                        <TooltipTrigger asChild>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-10 w-10 rounded-full bg-background/20 backdrop-blur-sm hover:bg-background/40 border border-white/10 text-foreground"
-                                onClick={() => setAudioSettingsOpen(true)}
-                            >
-                                <Music className="h-5 w-5" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>Sound Settings</p>
-                        </TooltipContent>
-                    </Tooltip>
+                            <Tooltip side="top">
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-10 w-10 rounded-full bg-background/20 backdrop-blur-sm hover:bg-background/40 border border-white/10 text-foreground"
+                                        onClick={() => setAudioSettingsOpen(true)}
+                                    >
+                                        <Music className="h-5 w-5" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Sound Settings</p>
+                                </TooltipContent>
+                            </Tooltip>
 
-                    <Tooltip side="top">
-                        <TooltipTrigger asChild>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-10 w-10 rounded-full bg-background/20 backdrop-blur-sm hover:bg-background/40 border border-white/10 text-foreground"
-                                onClick={() => setTimerSettingsOpen(true)}
-                            >
-                                <Settings className="h-5 w-5" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>Timer Settings</p>
-                        </TooltipContent>
-                    </Tooltip>
+                            <Tooltip side="top">
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-10 w-10 rounded-full bg-background/20 backdrop-blur-sm hover:bg-background/40 border border-white/10 text-foreground"
+                                        onClick={() => setTimerSettingsOpen(true)}
+                                    >
+                                        <Clock className="h-5 w-5" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Timer Settings</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </>
+                    )}
 
                     <Tooltip side="top">
                         <TooltipTrigger asChild>
@@ -672,7 +697,7 @@ export function EnhancedTimer() {
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>{isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}</p>
+                            <p>{isFullscreen ? 'Exit Focus' : 'Enter Focus'}</p>
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>

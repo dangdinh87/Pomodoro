@@ -29,6 +29,7 @@ interface SystemState {
   isLoading: boolean
   loadingMessage?: string
   loadingSubtitle?: string
+  isFocusMode: boolean
 
   // Sound settings actions
   updateSoundSettings: (settings: Partial<SoundSettings>) => void
@@ -44,6 +45,9 @@ interface SystemState {
 
   // Loading actions
   setLoading: (isLoading: boolean, message?: string, subtitle?: string) => void
+
+  // Focus mode actions
+  setFocusMode: (isFocusMode: boolean) => void
 }
 
 const defaultSoundSettings: SoundSettings = {
@@ -74,6 +78,7 @@ export const useSystemStore = create<SystemState>()(
       backgroundSettings: defaultBackgroundSettings,
       audioSettings: defaultAudioSettings,
       isLoading: false,
+      isFocusMode: false,
 
       updateSoundSettings: (newSettings) =>
         set((state) => ({
@@ -105,6 +110,9 @@ export const useSystemStore = create<SystemState>()(
           loadingMessage: message,
           loadingSubtitle: subtitle
         }),
+
+      setFocusMode: (isFocusMode) =>
+        set({ isFocusMode }),
     }),
     {
       name: 'system-storage',

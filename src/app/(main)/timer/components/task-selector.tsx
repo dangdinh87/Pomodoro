@@ -15,15 +15,18 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/use-auth';
 
 interface TaskSelectorProps {
   className?: string;
 }
 
 export function TaskSelector({ className }: TaskSelectorProps) {
+  const { isAuthenticated } = useAuth();
   const { tasks, updateTask } = useTasks();
   const { activeTaskId, setActiveTask } = useTasksStore();
   const [isOpen, setIsOpen] = useState(false);
+
 
   const activeTask = tasks.find((task) => task.id === activeTaskId);
   const pendingTasks = tasks.filter((task) => task.status !== 'done');
@@ -106,66 +109,85 @@ export function TaskSelector({ className }: TaskSelectorProps) {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          className={cn(
-            'h-auto p-0 hover:bg-transparent',
-            className,
-          )}
-          aria-label="Select task for focus"
-        >
-          {activeTask ? (
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-background/80 backdrop-blur-md text-xs font-medium text-foreground border border-border/50 shadow-sm hover:bg-background/90 transition-colors dark:bg-background/60 dark:hover:bg-background/80">
-              <Target className="w-3.5 h-3.5 text-primary" />
-              <span className="truncate max-w-[200px]">{activeTask.title}</span>
-              <span className="bg-primary/10 px-1.5 py-0.5 rounded-full text-[10px] border border-primary/20 text-primary font-semibold">
-                {activeTask.actualPomodoros}/{activeTask.estimatePomodoros}
-              </span>
+    <>
+      {!isAuthenticated ? (
+        <Link href="/login?redirect=/timer">
+          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-background/80 backdrop-blur-md border border-border/50 shadow-sm hover:bg-background/90 transition-colors dark:bg-background/60 dark:hover:bg-background/80 cursor-pointer">
+            <div className="p-1.5 rounded-full bg-muted text-muted-foreground">
+              <Target className="w-4 h-4" />
             </div>
-          ) : (
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-background/80 backdrop-blur-md text-xs font-medium text-muted-foreground border border-border/50 shadow-sm hover:bg-background/90 transition-colors dark:bg-background/60 dark:hover:bg-background/80">
-              <Target className="w-3.5 h-3.5" />
-              <span>Select a task to focus</span>
-            </div>
-          )}
-        </Button>
-      </DialogTrigger>
-
-      <DialogContent className="max-w-2xl max-h-[80vh]">
-        <DialogHeader>
-          <DialogTitle>Select Task for Focus</DialogTitle>
-          <DialogDescription>
-            Choose a task to work on during your Pomodoro session
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="h-[400px] overflow-y-auto pr-4">
-          <div className="space-y-3">
-            {pendingTasks.length === 0 ? (
-              <div className="text-center py-8">
-                <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-sm text-muted-foreground">
-                  No pending tasks available
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Create a new task to get started
-                </p>
-              </div>
-            ) : (
-              pendingTasks.map((task) => <TaskItem key={task.id} task={task} />)
-            )}
+            <span className="text-xs font-medium text-muted-foreground">Đăng nhập để chọn công việc</span>
           </div>
-        </div>
-        <DialogFooter>
-          <Button variant="link" asChild>
-            <Link href="/tasks">
-              Go to task list <ArrowRight className="ms-1 h-4 w-4" />
-            </Link>
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </Link>
+      ) : (
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogTrigger asChild>
+            <Button
+              variant="ghost"
+              className={cn(
+                'h-auto p-0 hover:bg-transparent',
+                className,
+              )}
+              aria-label="Select task for focus"
+            >
+              {activeTask ? (
+                <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-background/80 backdrop-blur-md border border-border/50 shadow-sm hover:bg-background/90 transition-colors dark:bg-background/60 dark:hover:bg-background/80">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-full bg-primary/10 text-primary">
+                      <Target className="w-4 h-4" />
+                    </div>
+                    <span className="text-xs font-medium text-foreground truncate max-w-[200px]">{activeTask.title}</span>
+                  </div>
+                  <span className="bg-primary/10 px-1.5 py-0.5 rounded-full text-[10px] border border-primary/20 text-primary font-semibold">
+                    {activeTask.actualPomodoros}/{activeTask.estimatePomodoros}
+                  </span>
+                </div>
+              ) : (
+                <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-background/80 backdrop-blur-md border border-border/50 shadow-sm hover:bg-background/90 transition-colors dark:bg-background/60 dark:hover:bg-background/80">
+                  <div className="p-1.5 rounded-full bg-muted text-muted-foreground">
+                    <Target className="w-4 h-4" />
+                  </div>
+                  <span className="text-xs font-medium text-muted-foreground">Select a task to focus</span>
+                </div>
+              )}
+            </Button>
+          </DialogTrigger>
+
+          <DialogContent className="max-w-2xl max-h-[80vh]">
+            <DialogHeader>
+              <DialogTitle>Select Task for Focus</DialogTitle>
+              <DialogDescription>
+                Choose a task to work on during your Pomodoro session
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="h-[400px] overflow-y-auto pr-4">
+              <div className="space-y-3">
+                {pendingTasks.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-sm text-muted-foreground">
+                      No pending tasks available
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Create a new task to get started
+                    </p>
+                  </div>
+                ) : (
+                  pendingTasks.map((task) => <TaskItem key={task.id} task={task} />)
+                )}
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="link" asChild>
+                <Link href="/tasks">
+                  Go to task list <ArrowRight className="ms-1 h-4 w-4" />
+                </Link>
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   );
 }

@@ -4,7 +4,6 @@ import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from "@/compon
 import { GeneralSettings } from "@/components/settings/general-settings"
 import { TimerSettings } from "@/components/settings/timer-settings"
 import { BackgroundSettings } from "@/components/settings/background-settings"
-import { AudioSettings } from "@/components/settings/audio-settings"
 
 export default function SettingsPage() {
     return (
@@ -21,7 +20,6 @@ export default function SettingsPage() {
                     <TabsTrigger value="general" className="flex-1">General</TabsTrigger>
                     <TabsTrigger value="timer" className="flex-1">Timer</TabsTrigger>
                     <TabsTrigger value="background" className="flex-1">Background</TabsTrigger>
-                    <TabsTrigger value="audio" className="flex-1">Audio</TabsTrigger>
                 </TabsList>
                 <TabsContents className="mt-6">
                     <TabsContent value="general">
@@ -32,9 +30,6 @@ export default function SettingsPage() {
                     </TabsContent>
                     <TabsContent value="background">
                         <BackgroundSettings />
-                    </TabsContent>
-                    <TabsContent value="audio">
-                        <AudioSettings />
                     </TabsContent>
                 </TabsContents>
             </Tabs >
