@@ -16,8 +16,11 @@ import {
   endOfMonth,
   endOfWeek,
   addDays,
+  subMonths,
+  addMonths,
   isSameMonth,
   isToday,
+  isValid,
 } from 'date-fns'
 import { vi } from 'date-fns/locale'
 
@@ -28,89 +31,159 @@ type StreakStore = {
 }
 
 const STORAGE_KEY = 'pomodoro-streak'
+const MILESTONES = [7, 30, 100] as const
 
+// Utility functions
 const todayISO = () => format(new Date(), 'yyyy-MM-dd')
-const isoToDate = (iso: string) => parseISO(iso)
-const diffDays = (aISO: string, bISO: string) =>
-  differenceInCalendarDays(isoToDate(aISO), isoToDate(bISO))
-const isMilestone = (n: number) => [7, 30, 100].includes(n)
-const nextMilestone = (n: number) => [7, 30, 100].find(m => m > n) ?? null
-const uniquePush = (arr: string[], v: string) => (arr.includes(v) ? arr : [...arr, v])
+
+const isoToDate = (iso: string) => {
+  try {
+    const date = parseISO(iso)
+    return isValid(date) ? date : null
+  } catch {
+    return null
+  }
+}
+
+const diffDays = (aISO: string, bISO: string) => {
+  const dateA = isoToDate(aISO)
+  const dateB = isoToDate(bISO)
+  if (!dateA || !dateB) return 0
+  return differenceInCalendarDays(dateA, dateB)
+}
+
+const isMilestone = (n: number) => MILESTONES.includes(n as typeof MILESTONES[number])
+
+const nextMilestone = (n: number) => MILESTONES.find(m => m > n) ?? null
+
+const uniqueSortedPush = (arr: string[], v: string) => {
+  if (arr.includes(v)) return [...arr]
+  const sorted = [...arr, v].sort((a, b) => a.localeCompare(b))
+  return sorted
+}
+
+// Calculate current streak by finding consecutive days ending with today
+const calculateCurrentStreak = (history: string[], today: string): number => {
+  if (!history.includes(today)) return 0
+
+  const sortedHistory = [...history].sort((a, b) => a.localeCompare(b))
+  let streak = 0
+  let currentDate = today
+
+  while (sortedHistory.includes(currentDate)) {
+    streak++
+    const date = isoToDate(currentDate)
+    if (!date) break
+    currentDate = format(addDays(date, -1), 'yyyy-MM-dd')
+  }
+
+  return streak
+}
+
+// Validate and sanitize stored data
+const validateStreakStore = (data: any): StreakStore => {
+  const defaultData: StreakStore = { streak: 0, lastDateISO: null, history: [] }
+
+  if (!data || typeof data !== 'object') return defaultData
+
+  const { streak, lastDateISO, history } = data
+
+  // Validate streak
+  const validStreak = (typeof streak === 'number' && streak >= 0) ? streak : 0
+
+  // Validate lastDateISO
+  const validLastDate = (typeof lastDateISO === 'string' && isoToDate(lastDateISO)) ? lastDateISO : null
+
+  // Validate and sort history
+  const validHistory = Array.isArray(history)
+    ? history.filter(date => typeof date === 'string' && isoToDate(date)).sort((a, b) => a.localeCompare(b))
+    : []
+
+  return {
+    streak: validStreak,
+    lastDateISO: validLastDate,
+    history: validHistory,
+  }
+}
 
 export default function StreakTracker() {
   const [data, setData] = useState<StreakStore>(() => {
     if (typeof window !== 'undefined') {
       try {
         const raw = localStorage.getItem(STORAGE_KEY)
-        if (raw) return JSON.parse(raw) as StreakStore
-      } catch {}
+        if (raw) {
+          const parsed = JSON.parse(raw)
+          return validateStreakStore(parsed)
+        }
+      } catch (error) {
+        console.warn('Failed to load streak data:', error)
+      }
     }
     return { streak: 0, lastDateISO: null, history: [] }
   })
-  const [hasMarkedToday, setHasMarkedToday] = useState<boolean>(false)
+
   const [loaded, setLoaded] = useState(false)
   const [month, setMonth] = useState<Date>(() => startOfMonth(new Date()))
+
+  // Computed values
+  const today = useMemo(() => todayISO(), [])
+  const hasMarkedToday = useMemo(() => data.history.includes(today), [data.history, today])
+  const currentStreak = useMemo(() => calculateCurrentStreak(data.history, today), [data.history, today])
 
   // Hydrate from localStorage on mount
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY)
       if (raw) {
-        const parsed = JSON.parse(raw) as StreakStore
-        setData(parsed)
-        setHasMarkedToday(parsed.history.includes(todayISO()))
-      } else {
-        setHasMarkedToday(false)
+        const parsed = JSON.parse(raw)
+        const validated = validateStreakStore(parsed)
+        setData(validated)
       }
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to load streak data:', error)
+    }
     setLoaded(true)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Persist (only after hydration)
+  // Persist data changes (only after hydration)
   useEffect(() => {
     if (!loaded) return
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to save streak data:', error)
+    }
   }, [data, loaded])
 
-  const handlePrevMonth = () => setMonth((m) => startOfMonth(addDays(m, -1 * new Date(m.getFullYear(), m.getMonth() + 1, 0).getDate())))
-  const handleNextMonth = () => setMonth((m) => startOfMonth(addDays(m, new Date(m.getFullYear(), m.getMonth() + 1, 0).getDate())))
+  // Simplified month navigation
+  const handlePrevMonth = () => setMonth((m) => startOfMonth(subMonths(m, 1)))
+  const handleNextMonth = () => setMonth((m) => startOfMonth(addMonths(m, 1)))
 
   const handleMarkToday = () => {
-    const today = todayISO()
-    if (data.history.includes(today)) {
+    const todayDate = todayISO()
+
+    if (hasMarkedToday) {
       toast.info('Bạn đã đánh dấu hôm nay rồi')
-      setHasMarkedToday(true)
       return
     }
-    const last = data.lastDateISO
-    let nextStreak = 0
-    if (!last) {
-      nextStreak = 1
-    } else {
-      const gap = diffDays(today, last)
-      if (gap === 0) {
-        nextStreak = data.streak
-      } else if (gap === 1) {
-        nextStreak = data.streak + 1
-      } else {
-        nextStreak = 1
-      }
-    }
+
+    const newHistory = uniqueSortedPush(data.history, todayDate)
+    const newStreak = calculateCurrentStreak(newHistory, todayDate)
+
     const updated: StreakStore = {
-      streak: nextStreak,
-      lastDateISO: today,
-      history: uniquePush(data.history, today),
+      streak: newStreak,
+      lastDateISO: todayDate,
+      history: newHistory,
     }
+
     setData(updated)
-    setHasMarkedToday(true)
-    if (isMilestone(nextStreak)) {
-      toast.success(`Cột mốc ${nextStreak}!`)
+
+    if (isMilestone(newStreak)) {
+      toast.success(`Cột mốc ${newStreak}! 🎉`)
     } else {
-      toast.success(`+1 streak! Tổng: ${nextStreak}`)
+      toast.success(`+1 streak! Tổng: ${newStreak}`)
     }
+
     // Ensure calendar shows current month
     setMonth(startOfMonth(new Date()))
   }
@@ -135,7 +208,7 @@ export default function StreakTracker() {
 
   const weekdays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']
   const monthLabel = format(month, 'LLLL yyyy', { locale: vi })
-  const milestoneNext = nextMilestone(data.streak)
+  const milestoneNext = nextMilestone(currentStreak)
   const monthFocusedCount = useMemo(
     () =>
       gridDays.filter((d) => d.inMonth && d.focused).length,
@@ -144,7 +217,7 @@ export default function StreakTracker() {
 
   if (!loaded) {
     return (
-      <div className="mt-24 w-full max-w-3xl mx-auto px-4">
+      <div className="w-full max-w-3xl mx-auto px-4">
         <Card className="bg-background/50 backdrop-blur-sm border-border/20">
           <CardContent className="py-8 text-center text-sm text-muted-foreground">
             Loading...
@@ -155,7 +228,7 @@ export default function StreakTracker() {
   }
 
   return (
-    <div className="mt-24 w-full max-w-3xl mx-auto px-4">
+    <div className="w-full max-w-3xl mx-auto px-4">
       <Card className="bg-background/70 backdrop-blur-md border-white/20 dark:border-white/10 shadow-xl">
         <CardHeader className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
@@ -244,11 +317,11 @@ export default function StreakTracker() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-3 rounded-lg border bg-muted/40">
               <div className="text-sm text-muted-foreground">
-                Chuỗi hiện tại: <span className="font-semibold text-foreground">{data.streak} ngày</span>
+                Chuỗi hiện tại: <span className="font-semibold text-foreground">{currentStreak} ngày</span>
               </div>
               <div className="text-xs text-muted-foreground mt-1">
                 {milestoneNext
-                  ? <>Còn <span className="font-semibold">{milestoneNext - data.streak}</span> ngày đến mốc <span className="font-semibold">{milestoneNext}</span>.</>
+                  ? <>Còn <span className="font-semibold">{milestoneNext - currentStreak}</span> ngày đến mốc <span className="font-semibold">{milestoneNext}</span>.</>
                   : <>Bạn đã vượt qua tất cả các mốc lớn! Tiếp tục giữ phong độ.</>}
               </div>
             </div>

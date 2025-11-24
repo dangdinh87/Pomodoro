@@ -1,0 +1,232 @@
+{
+  "brand": { "title": "Focus" },
+  "nav": {
+    "timer": "Timer",
+    "focus": "Focus Mode",
+    "tasks": "Tasks",
+    "progress": "Progress",
+    "audio": "Audio"
+  },
+  "tooltips": {
+    "toggleTheme": "Toggle theme",
+    "timerSettings": "Timer settings",
+    "themeSettings": "Theme settings",
+    "backgroundSetup": "Background setup",
+    "focusAudio": "Focus music / Nature sounds"
+  },
+  "timer": {
+    "modes": {
+      "work": "Work",
+      "shortBreak": "Short Break",
+      "longBreak": "Long Break"
+    },
+    "controls": {
+      "start": "Start",
+      "pause": "Pause",
+      "reset": "Reset",
+      "skip": "Skip",
+      "start_hint": "Start (Space)",
+      "pause_hint": "Pause (Space)",
+      "reset_hint": "Reset (R)",
+      "skip_hint": "Skip session",
+      "aria": {
+        "start": "Start timer",
+        "pause": "Pause timer",
+        "reset": "Reset timer"
+      }
+    },
+    "toasts": {
+      "work_done": "Work session completed! Time for a break.",
+      "break_done": "Break completed! Time to focus."
+    },
+    "title_prefix": {
+      "work": "Work",
+      "shortBreak": "Break",
+      "longBreak": "Long Break"
+    },
+    "aria": {
+      "timeRemaining": "Time remaining: {time}"
+    },
+    "progress": {
+      "complete": "{percent}% Complete"
+    },
+    "guide": {
+      "title": "Pomodoro Guide",
+      "hide": "Hide",
+      "open": "Open Pomodoro Guide",
+      "explanationTitle": "Explanation",
+      "explanation1": "Pomodoro = work 25' and rest 5' to maintain focus and reduce distractions.",
+      "explanation2": "Complete 4 sessions \u2192 take a 15' long break to recover.",
+      "howToTitle": "How to use",
+      "how1": "Choose a task and select Work mode.",
+      "how2": "Start/Pause (Space), Reset (R), Skip to move sessions.",
+      "how3": "When a session ends \u2192 Short break; after 4 Work sessions \u2192 Long break.",
+      "how4": "Customize durations/clock in Settings.",
+      "tipsTitle": "Tips",
+      "tip1": "Set small, specific goals for each session.",
+      "tip2": "Turn off notifications and close unnecessary tabs.",
+      "tip3": "Avoid multitasking; jot down interruptions then return.",
+      "motivationTitle": "Motivation",
+      "defaultQuote": "Focus on the next step \u2014 then repeat.",
+      "aria_hide": "Hide guide",
+      "aria_open": "Open Pomodoro Guide"
+    },
+    "quotes": {
+      "list": [
+        "Focus on what you can control \u2014 one Pomodoro at a time.",
+        "Small, consistent steps make a big difference.",
+        "Discipline beats talent when talent lacks discipline.",
+        "Work deeply in the short term, achieve greatly in the long term.",
+        "Start now \u2014 action beats procrastination."
+      ]
+    }
+  },
+  "timerSettings": {
+    "title": "Timer Settings",
+    "labels": {
+      "workDuration": "Work Duration (min)",
+      "shortBreakDuration": "Short Break (min)",
+      "longBreakDuration": "Long Break (min)",
+      "longBreakInterval": "Long Break Interval",
+      "autoStartBreaks": "Auto-start breaks",
+      "autoStartWork": "Auto-start work sessions",
+      "showClock": "Show Clock",
+      "clockType": "Clock Type",
+      "selectClockType": "Select clock type",
+      "digital": "Digital",
+      "analog": "Analog",
+      "progress": "Progress",
+      "flip": "Flip",
+      "clockPreview": "Clock Preview",
+      "endsAround": "Ends around {time}"
+    },
+    "actions": {
+      "resetDefaults": "Reset to Defaults",
+      "cancel": "Cancel",
+      "save": "Save Settings"
+    },
+    "toasts": {
+      "saved": "Timer settings saved successfully!",
+      "reset": "Timer settings reset to defaults!"
+    }
+  },
+  "userGuide": {
+    "title": "User Guide",
+    "welcome": "Welcome to Pomodoro Focus App!",
+    "description": "Your complete productivity companion for focused work sessions",
+    "sections": {
+      "gettingStarted": "Getting Started",
+      "timer": "Timer & Pomodoro",
+      "tasks": "Task Management",
+      "focus": "Focus Mode",
+      "progress": "Progress Tracking",
+      "audio": "Audio Features",
+      "settings": "Settings & Customization",
+      "shortcuts": "Keyboard Shortcuts",
+      "tips": "Productivity Tips"
+    },
+    "gettingStarted": {
+      "title": "Getting Started",
+      "description": "Learn the basics of using the Pomodoro Focus App",
+      "steps": [
+        "Navigate using the sidebar menu on the left",
+        "Start with the Timer section to begin your first Pomodoro session",
+        "Create and manage tasks in the Tasks section",
+        "Track your progress in the Progress section",
+        "Customize your experience in Settings"
+      ]
+    },
+    "timer": {
+      "title": "Timer & Pomodoro Technique",
+      "description": "Master the Pomodoro Technique for maximum productivity",
+      "workMode": "Work Mode: 25-minute focused work sessions",
+      "shortBreak": "Short Break: 5-minute rest between work sessions",
+      "longBreak": "Long Break: 15-minute rest after 4 work sessions",
+      "controls": "Use Start/Pause (Space), Reset (R), and Skip buttons",
+      "autoStart": "Enable auto-start for seamless transitions",
+      "clockTypes": "Choose from Digital, Analog, Progress, or Flip clock displays"
+    },
+    "tasks": {
+      "title": "Task Management",
+      "description": "Organize and track your work tasks effectively",
+      "createTask": "Click 'Add Task' to create new tasks",
+      "editTask": "Click on any task to edit its details",
+      "deleteTask": "Use the delete button to remove tasks",
+      "completeTask": "Mark tasks as complete by checking the checkbox",
+      "prioritize": "Set priority levels (Low, Medium, High) for tasks",
+      "categories": "Organize tasks by categories",
+      "filters": "Use filters to view specific tasks"
+    },
+    "focus": {
+      "title": "Focus Mode",
+      "description": "Minimize distractions and maximize concentration",
+      "enableFocus": "Toggle Focus Mode to hide distracting elements",
+      "streakTracking": "Track your daily focus streaks",
+      "minimalInterface": "Enjoy a clean, distraction-free interface",
+      "motivation": "Stay motivated with inspirational quotes"
+    },
+    "progress": {
+      "title": "Progress Tracking",
+      "description": "Monitor your productivity and achievements",
+      "dailyStats": "View daily focus time and session counts",
+      "weeklyStats": "Track weekly productivity trends",
+      "sessionHistory": "Review completed Pomodoro sessions",
+      "achievements": "Celebrate milestones and achievements",
+      "insights": "Gain insights into your work patterns"
+    },
+    "audio": {
+      "title": "Audio Features",
+      "description": "Enhance focus with ambient sounds and music",
+      "natureSounds": "Play nature sounds (rain, waves, wind, etc.)",
+      "spotifyIntegration": "Connect Spotify for background music",
+      "volumeControl": "Adjust audio volume to your preference",
+      "soundCategories": "Choose from Nature, Urban, Transport, and Things sounds",
+      "timerSounds": "Set notification sounds for session completion"
+    },
+    "settings": {
+      "title": "Settings & Customization",
+      "description": "Personalize your Pomodoro experience",
+      "timerSettings": "Customize work/break durations and intervals",
+      "themeSettings": "Choose between light and dark themes",
+      "backgroundSettings": "Set custom backgrounds (images or videos)",
+      "audioSettings": "Configure audio preferences and integrations",
+      "language": "Switch between English and Vietnamese",
+      "keyboardShortcuts": "View and customize keyboard shortcuts"
+    },
+    "shortcuts": {
+      "title": "Keyboard Shortcuts",
+      "description": "Quick actions for efficient workflow",
+      "space": "Space: Start/Pause timer",
+      "r": "R: Reset timer",
+      "navigation": "Use number keys 1-5 for quick navigation",
+      "theme": "T: Toggle theme",
+      "focus": "F: Toggle Focus Mode"
+    },
+    "tips": {
+      "title": "Productivity Tips",
+      "description": "Maximize your focus and productivity",
+      "planSessions": "Plan your tasks before starting Pomodoro sessions",
+      "eliminateDistractions": "Turn off notifications and close unnecessary tabs",
+      "takeBreaks": "Always take your breaks - they're essential for sustainability",
+      "trackProgress": "Review your progress regularly to stay motivated",
+      "stayConsistent": "Consistency is key - use Pomodoro daily for best results",
+      "setRealisticGoals": "Set achievable goals for each work session",
+      "environment": "Create a dedicated workspace for better focus"
+    },
+    "actions": {
+      "openGuide": "Open User Guide",
+      "closeGuide": "Close Guide",
+      "next": "Next",
+      "previous": "Previous",
+      "gotIt": "Got It!",
+      "explore": "Start Exploring"
+    },
+    "welcomeModal": {
+      "title": "Welcome to Your Focus Journey! 🎯",
+      "subtitle": "Let's get you started with the Pomodoro Focus App",
+      "description": "This guide will help you understand all features and get the most out of your productivity sessions",
+      "startButton": "Start Guide",
+      "skipButton": "Skip for Now"
+    }
+  }
+}

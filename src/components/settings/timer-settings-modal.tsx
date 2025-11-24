@@ -132,7 +132,7 @@ export function TimerSettingsModal({ isOpen, onClose }: { isOpen: boolean; onClo
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[520px] md:max-w-[720px] max-h-[85vh] overflow-y-auto p-3 md:p-5">
+      <DialogContent className="sm:max-w-[900px] max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Timer Settings</DialogTitle>
         </DialogHeader>

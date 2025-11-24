@@ -8,7 +8,6 @@ interface SoundSettings {
 }
 
 interface BackgroundSettings {
-  showDottedMap: boolean
   backgroundType: 'none' | 'gradient' | 'solid' | 'image' | 'video'
   backgroundStyle: string
   backgroundOpacity: number
@@ -30,19 +29,19 @@ interface SystemState {
   isLoading: boolean
   loadingMessage?: string
   loadingSubtitle?: string
-  
+
   // Sound settings actions
   updateSoundSettings: (settings: Partial<SoundSettings>) => void
   resetSoundSettings: () => void
-  
+
   // Background settings actions
   updateBackgroundSettings: (settings: Partial<BackgroundSettings>) => void
   resetBackgroundSettings: () => void
-  
+
   // Audio settings actions
   updateAudioSettings: (settings: Partial<AudioSettings>) => void
   resetAudioSettings: () => void
-  
+
   // Loading actions
   setLoading: (isLoading: boolean, message?: string, subtitle?: string) => void
 }
@@ -54,7 +53,6 @@ const defaultSoundSettings: SoundSettings = {
 }
 
 const defaultBackgroundSettings: BackgroundSettings = {
-  showDottedMap: false,
   backgroundType: 'none',
   backgroundStyle: '',
   backgroundOpacity: 100,
@@ -76,31 +74,31 @@ export const useSystemStore = create<SystemState>()(
       backgroundSettings: defaultBackgroundSettings,
       audioSettings: defaultAudioSettings,
       isLoading: false,
-      
+
       updateSoundSettings: (newSettings) =>
         set((state) => ({
           soundSettings: { ...state.soundSettings, ...newSettings },
         })),
-      
+
       resetSoundSettings: () =>
         set({ soundSettings: defaultSoundSettings }),
-      
+
       updateBackgroundSettings: (newSettings) =>
         set((state) => ({
           backgroundSettings: { ...state.backgroundSettings, ...newSettings },
         })),
-      
+
       resetBackgroundSettings: () =>
         set({ backgroundSettings: defaultBackgroundSettings }),
-      
+
       updateAudioSettings: (newSettings) =>
         set((state) => ({
           audioSettings: { ...state.audioSettings, ...newSettings },
         })),
-      
+
       resetAudioSettings: () =>
         set({ audioSettings: defaultAudioSettings }),
-      
+
       setLoading: (isLoading, message, subtitle) =>
         set({
           isLoading,

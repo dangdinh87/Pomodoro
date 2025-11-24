@@ -7,8 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Slider } from '@/components/ui/slider'
-import { Switch } from '@/components/ui/switch'
-import { Palette, Image, Map } from 'lucide-react'
+import { Palette } from 'lucide-react'
 import { toast } from 'sonner'
 import { useBackground } from '@/contexts/background-context'
 
@@ -38,9 +37,8 @@ const solidColors = [
 ]
 
 export function BackgroundSettings({ isOpen, onClose }: BackgroundSettingsProps) {
-  const { background, setBackground, setBackgroundColor, setBackgroundImage, setGradientBackground, setShowDottedMap } = useBackground()
+  const { background, setBackground, setBackgroundColor, setBackgroundImage, setGradientBackground } = useBackground()
   const [localSettings, setLocalSettings] = useState({
-    showDottedMap: false,
     backgroundType: 'gradient' as 'gradient' | 'solid' | 'image' | 'video',
     backgroundStyle: gradientPresets[0].value,
     backgroundOpacity: 100,
@@ -49,7 +47,6 @@ export function BackgroundSettings({ isOpen, onClose }: BackgroundSettingsProps)
   // Initialize local settings from context
   useEffect(() => {
     setLocalSettings({
-      showDottedMap: background.showDottedMap,
       backgroundType: background.type === 'none' ? 'gradient' : background.type as 'gradient' | 'solid' | 'image' | 'video',
       backgroundStyle: background.value || gradientPresets[0].value,
       backgroundOpacity: Math.round(background.opacity * 100),
@@ -58,8 +55,6 @@ export function BackgroundSettings({ isOpen, onClose }: BackgroundSettingsProps)
 
   const saveSettings = () => {
     // Update the background context based on the local settings
-    setShowDottedMap(localSettings.showDottedMap)
-    
     if (localSettings.backgroundType === 'solid') {
       setBackgroundColor(localSettings.backgroundStyle)
     } else if (localSettings.backgroundType === 'gradient') {
@@ -74,13 +69,11 @@ export function BackgroundSettings({ isOpen, onClose }: BackgroundSettingsProps)
 
   const resetToDefaults = () => {
     const defaultSettings = {
-      showDottedMap: false,
       backgroundType: 'gradient' as const,
       backgroundStyle: gradientPresets[0].value,
       backgroundOpacity: 100,
     }
     setLocalSettings(defaultSettings)
-    setShowDottedMap(false)
     setGradientBackground(gradientPresets[0].value)
     toast.success('Background settings reset to defaults!')
   }
@@ -102,13 +95,6 @@ export function BackgroundSettings({ isOpen, onClose }: BackgroundSettingsProps)
       ...localSettings,
       backgroundType: type,
       backgroundStyle: newBackgroundStyle
-    })
-  }
-
-  const handleDottedMapToggle = (checked: boolean) => {
-    setLocalSettings({
-      ...localSettings,
-      showDottedMap: checked
     })
   }
 
@@ -229,22 +215,6 @@ export function BackgroundSettings({ isOpen, onClose }: BackgroundSettingsProps)
             <div className="text-sm text-muted-foreground">
               Enter a URL for your background image.
             </div>
-          </div>
-          
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="dotted-map-toggle">Show Dotted Map Background</Label>
-              <Switch
-                id="dotted-map-toggle"
-                checked={localSettings.showDottedMap}
-                onCheckedChange={(checked) => handleDottedMapToggle(checked)}
-              />
-            </div>
-            {localSettings.showDottedMap && (
-              <div className="p-4 border rounded-md bg-muted flex items-center justify-center">
-                <Map className="h-8 w-8 text-muted-foreground" />
-              </div>
-            )}
           </div>
           
           <div className="space-y-2">

@@ -83,24 +83,47 @@ model Project {
 }
 
 model Task {
-  id                String   @id @default(cuid())
-  title             String
-  description       String?
-  completed         Boolean  @default(false)
-  priority          Priority @default(MEDIUM)
-  category          String?
-  estimatedPomodoros Int      @default(1)
-  actualPomodoros   Int      @default(0)
-  projectId         String?
-  project           Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
-  userId            String
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  completedAt       DateTime?
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title       String
+  description String?
+
+  /// Task priority (LOW/MEDIUM/HIGH)
+  priority    Priority @default(MEDIUM)
+
+  /// Estimated number of Pomodoro sessions for this task
+  estimatedPomodoros Int    @default(1) @map("estimate_pomodoros")
+
+  /// Actual number of completed Pomodoro sessions for this task
+  actualPomodoros    Int    @default(0) @map("actual_pomodoros")
+
+  /// Total focused work time spent on this task in milliseconds
+  timeSpentMs        Int    @default(0) @map("time_spent")
+
+  /// Current status of the task in the workflow
+  status     TaskStatus @default(PENDING)
+
+  /// Optional tags for grouping and filtering
+  tags       String[]   @default([])
+
+  /// Optional category / project grouping (kept for backwards compatibility)
+  category   String?
+
+  /// Optional relation to a project
+  projectId  String?
+  project    Project?   @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  /// Soft delete flag – when true, task is hidden from normal queries
+  isDeleted  Boolean    @default(false) @map("is_deleted")
+
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt      @map("updated_at")
+  completedAt DateTime?
 
   // Relations
-  sessions          Session[]
+  sessions   Session[]
 
   @@map("tasks")
 }
@@ -168,6 +191,12 @@ enum Priority {
   LOW
   MEDIUM
   HIGH
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  DONE
 }
 
 enum SessionType {

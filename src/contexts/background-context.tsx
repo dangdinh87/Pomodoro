@@ -8,81 +8,109 @@ import React, {
   ReactNode,
 } from 'react';
 
+type BGType = 'none' | 'solid' | 'image' | 'gradient' | 'random';
+
 interface BackgroundSettings {
-  showDottedMap: boolean;
-  type: 'none' | 'solid' | 'image' | 'gradient' | 'random';
+  type: BGType;
   value: string;
   opacity: number;
   blur: number;
+  brightness: number;
 }
 
 interface BackgroundContextType {
   background: BackgroundSettings;
   isLoading: boolean;
-  setBackground: (background: BackgroundSettings) => void;
-  // Apply without persisting (temporary for current session)
-  setBackgroundTemp: (background: BackgroundSettings) => void;
+  setBackground: (bg: BackgroundSettings) => void;
+  setBackgroundTemp: (bg: BackgroundSettings) => void;
   setBackgroundColor: (color: string) => void;
-  setBackgroundImage: (image: string, opacity?: number, blur?: number) => void;
+  setBackgroundImage: (image: string, opacity?: number, blur?: number, brightness?: number) => void;
   setGradientBackground: (gradient: string, opacity?: number) => void;
-  setBackgroundType: (
-    type: 'none' | 'solid' | 'image' | 'gradient' | 'random',
-  ) => void;
-  setShowDottedMap: (show: boolean) => void;
+  setBackgroundType: (type: BGType) => void;
 }
 
 const defaultBackground: BackgroundSettings = {
-  showDottedMap: false,
   type: 'image',
   value: 'lofi:auto',
   opacity: 0.9,
   blur: 0,
+  brightness: 100,
 };
 
 const BackgroundContext = createContext<BackgroundContextType | undefined>(
   undefined,
 );
 
+// ---------------------------------------------------------------
+// Utilities
+// ---------------------------------------------------------------
+
+/** Detect lightweight mode: slow device or data-saver */
+const shouldUseLightweightBackground = () => {
+  const nav: any = navigator;
+
+  const prefersReducedData =
+    !!nav?.connection?.saveData ||
+    ['slow-2g', '2g'].includes(nav?.connection?.effectiveType || '');
+
+  const isLowEnd =
+    typeof nav?.deviceMemory === 'number' && nav.deviceMemory <= 4;
+
+  return prefersReducedData || isLowEnd;
+};
+
+/** Migrate old or broken configs to safe defaults */
+const migrateBackground = (bg: BackgroundSettings): BackgroundSettings => {
+  if (!bg?.value || bg.type === 'none') {
+    return {
+      ...bg,
+      type: 'solid',
+      value: 'hsl(var(--background))',
+      opacity: 1,
+      blur: 0,
+      brightness: 100,
+    };
+  }
+
+  if (bg.type === 'random') {
+    return {
+      ...bg,
+      type: 'solid',
+      value: 'hsl(var(--background))',
+      opacity: bg.opacity ?? 1,
+      blur: bg.blur ?? 0,
+      brightness: bg.brightness ?? 100,
+    };
+  }
+
+  return bg;
+};
+
+// ---------------------------------------------------------------
+// Provider
+// ---------------------------------------------------------------
+
 export function BackgroundProvider({ children }: { children: ReactNode }) {
   const [background, setBackgroundState] =
     useState<BackgroundSettings>(defaultBackground);
+
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load background settings from localStorage on mount + migrate to "lofi:auto" if unset/legacy
+  // Load config on mount
   useEffect(() => {
-    const savedBackground = localStorage.getItem('background-settings');
-    if (savedBackground) {
+    const saved = localStorage.getItem('background-settings');
+
+    // Case 1: saved config exists
+    if (saved) {
       try {
-        const parsed = JSON.parse(savedBackground) as BackgroundSettings;
-        let next = parsed;
+        const parsed = JSON.parse(saved) as BackgroundSettings;
+        const migrated = migrateBackground(parsed);
 
-        // Migrations / sane defaults:
-        // - If missing value or type is 'none' -> set System Color (Auto) using theme background
-        // - If legacy type 'random' -> map to 'solid' with system auto color
-        if (!parsed.value || parsed.type === 'none') {
-          next = {
-            ...parsed,
-            type: 'solid',
-            value: 'hsl(var(--background))',
-            opacity: 1,
-            blur: 0,
-          };
-        } else if (parsed.type === 'random') {
-          next = {
-            ...parsed,
-            type: 'solid',
-            value: 'hsl(var(--background))',
-            opacity: parsed.opacity ?? 1,
-            blur: parsed.blur ?? 0,
-          };
+        setBackgroundState(migrated);
+        if (migrated !== parsed) {
+          localStorage.setItem('background-settings', JSON.stringify(migrated));
         }
-
-        setBackgroundState(next);
-        if (next !== parsed) {
-          localStorage.setItem('background-settings', JSON.stringify(next));
-        }
-      } catch (error) {
-        console.error('Error parsing background settings:', error);
+      } catch {
         setBackgroundState(defaultBackground);
         localStorage.setItem(
           'background-settings',
@@ -90,18 +118,35 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
         );
       }
     } else {
-      // No saved config: initialize with Lofi Chill (Auto)
-      setBackgroundState(defaultBackground);
-      localStorage.setItem(
-        'background-settings',
-        JSON.stringify(defaultBackground),
-      );
+      // Case 2: First time user → choose lightweight or default
+      const firstBG = shouldUseLightweightBackground()
+        ? {
+          showDottedMap: false,
+          type: 'solid' as const,
+          value: 'hsl(var(--background))',
+          opacity: 1,
+          blur: 0,
+          brightness: 100,
+        }
+        : defaultBackground;
+
+      setBackgroundState(firstBG);
+      localStorage.setItem('background-settings', JSON.stringify(firstBG));
     }
+
     setIsLoading(false);
   }, []);
 
-  // Internal helper to safely persist updates based on previous state
-  const updateBackground = (
+  // ---------------------------------------------------------------
+  // Update helpers
+  // ---------------------------------------------------------------
+
+  const persist = (next: BackgroundSettings) => {
+    setBackgroundState(next);
+    localStorage.setItem('background-settings', JSON.stringify(next));
+  };
+
+  const update = (
     updater: (prev: BackgroundSettings) => BackgroundSettings,
   ) => {
     setBackgroundState((prev) => {
@@ -111,62 +156,54 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  // Save background settings to localStorage whenever they change
-  const setBackground = (newBackground: BackgroundSettings) => {
-    setBackgroundState(newBackground);
-    localStorage.setItem('background-settings', JSON.stringify(newBackground));
-  };
+  // ---------------------------------------------------------------
+  // Public API
+  // ---------------------------------------------------------------
 
-  // Non-persistent update (temporary preview)
-  const setBackgroundTemp = (newBackground: BackgroundSettings) => {
-    setBackgroundState(newBackground);
+  const setBackground = persist;
+
+  const setBackgroundTemp = (bg: BackgroundSettings) => {
+    setBackgroundState(bg);
   };
 
   const setBackgroundColor = (color: string) => {
-    updateBackground((prev) => ({
-      ...prev,
+    update((p) => ({
+      ...p,
       type: 'solid',
       value: color,
       opacity: 1,
       blur: 0,
+      brightness: 100,
     }));
   };
 
-  const setBackgroundImage = (image: string, opacity = 0.8, blur = 0) => {
-    updateBackground((prev) => ({
-      ...prev,
+  const setBackgroundImage = (image: string, opacity = 0.8, blur = 0, brightness = 100) => {
+    update((p) => ({
+      ...p,
       type: 'image',
       value: image,
       opacity,
       blur,
+      brightness,
     }));
   };
 
   const setGradientBackground = (gradient: string, opacity = 1) => {
-    updateBackground((prev) => ({
-      ...prev,
+    update((p) => ({
+      ...p,
       type: 'gradient',
       value: gradient,
       opacity,
       blur: 0,
+      brightness: 100,
     }));
   };
 
-  const setBackgroundType = (
-    type: 'none' | 'solid' | 'image' | 'gradient' | 'random',
-  ) => {
-    updateBackground((prev) => ({
-      ...prev,
+  const setBackgroundType = (type: BGType) => {
+    update((p) => ({
+      ...p,
       type,
-      // Keep current value unless explicitly switching to none
-      value: type === 'none' ? '' : prev.value,
-    }));
-  };
-
-  const setShowDottedMap = (show: boolean) => {
-    updateBackground((prev) => ({
-      ...prev,
-      showDottedMap: show,
+      value: type === 'none' ? '' : p.value,
     }));
   };
 
@@ -181,7 +218,6 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
         setBackgroundImage,
         setGradientBackground,
         setBackgroundType,
-        setShowDottedMap,
       }}
     >
       {children}
@@ -189,10 +225,14 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// ---------------------------------------------------------------
+// Hook
+// ---------------------------------------------------------------
+
 export function useBackground() {
-  const context = useContext(BackgroundContext);
-  if (context === undefined) {
-    throw new Error('useBackground must be used within a BackgroundProvider');
+  const ctx = useContext(BackgroundContext);
+  if (!ctx) {
+    throw new Error('useBackground must be used within BackgroundProvider');
   }
-  return context;
+  return ctx;
 }

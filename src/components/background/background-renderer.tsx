@@ -1,20 +1,20 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef } from 'react';
 import { useBackground } from '@/contexts/background-context';
-import { DottedMap } from '@/components/ui/dotted-map';
 import { useTheme } from 'next-themes';
+import { usePathname } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 
 export function BackgroundRenderer() {
   const { background, isLoading } = useBackground();
   const { theme: currentTheme } = useTheme();
+  const [loaded, setLoaded] = useState(false);
 
-  // Hooks must be called consistently; loading check moved below hooks to avoid hook order issues.
-  // Predeclare refs used for auto day/night videos to keep hook order stable
-  const dayRef = useRef<HTMLVideoElement | null>(null);
-  const nightRef = useRef<HTMLVideoElement | null>(null);
+  const pathname = usePathname();
+  const isTimerPage = pathname === '/timer';
 
-  // Resolve theme (light/dark) for automatic media choice
+
+  // Resolve theme (light/dark)
   const resolvedTheme = useMemo<'light' | 'dark'>(() => {
     if (currentTheme === 'dark') return 'dark';
     if (currentTheme === 'light') return 'light';
@@ -27,9 +27,7 @@ export function BackgroundRenderer() {
     return 'light';
   }, [currentTheme]);
 
-  // Resolve media src:
-  // - Special sentinel "lofi:auto" picks day/night from /public/backgrounds by theme
-  // - Otherwise return the provided value
+  // Resolve media src
   const resolvedSrc = useMemo(() => {
     if (background.value === 'lofi:auto') {
       return resolvedTheme === 'dark'
@@ -38,185 +36,117 @@ export function BackgroundRenderer() {
     }
     return background.value;
   }, [background.value, resolvedTheme]);
- 
+
   const isVideo =
     typeof resolvedSrc === 'string' &&
     resolvedSrc.toLowerCase().endsWith('.mp4');
-  const isAutoLofi = background.value === 'lofi:auto';
-  useEffect(() => {
-    if (!(background.type === 'image' && isAutoLofi)) return;
-    const day = dayRef.current;
-    const night = nightRef.current;
-    if (!day || !night) return;
-    const showNight = resolvedTheme === 'dark';
-    if (showNight) {
-      try { day.pause(); } catch {}
-      try { night.play(); } catch {}
-    } else {
-      try { night.pause(); } catch {}
-      try { day.play(); } catch {}
-    }
-  }, [resolvedTheme, isAutoLofi, background.type]);
 
-  if (isLoading) {
+  useEffect(() => {
+    setLoaded(false);
+
+    if (background.type !== 'image') {
+      setLoaded(true);
+      return;
+    }
+
+    if (isVideo) {
+      return;
+    }
+
+    if (typeof resolvedSrc !== 'string') {
+      setLoaded(true);
+      return;
+    }
+
+    let isMounted = true;
+    const img = new Image();
+    img.src = resolvedSrc;
+    const handleComplete = () => {
+      if (isMounted) setLoaded(true);
+    };
+
+    img.addEventListener('load', handleComplete);
+    img.addEventListener('error', handleComplete);
+
+    return () => {
+      isMounted = false;
+      img.removeEventListener('load', handleComplete);
+      img.removeEventListener('error', handleComplete);
+    };
+  }, [background.type, isVideo, resolvedSrc]);
+
+  if (isLoading) return null;
+
+  // If not on timer page, render nothing (or let default theme background show)
+  if (!isTimerPage) {
     return null;
   }
 
-
-
-  // Special handling for auto day/night video to avoid remount jank on theme switch
-  if (background.type === 'image' && isAutoLofi) {
-    const showNight = resolvedTheme === 'dark';
-
-    return (
-      <>
-        <video
-          ref={dayRef}
-          className="fixed inset-0 w-full h-full object-cover -z-10"
-          autoPlay
-          muted
-          playsInline
-          loop
-          preload="auto"
-          src="/backgrounds/day.mp4"
-          style={{
-            opacity: showNight ? 0 : background.opacity,
-            filter: `blur(${background.blur}px)`,
-            // Inline transition overrides global 'video { transition: none }'
-            transition: 'opacity 180ms ease',
-            willChange: 'opacity',
-          }}
-        />
-        <video
-          ref={nightRef}
-          className="fixed inset-0 w-full h-full object-cover -z-10"
-          autoPlay
-          muted
-          playsInline
-          loop
-          preload="auto"
-          src="/backgrounds/night.mp4"
-          style={{
-            opacity: showNight ? background.opacity : 0,
-            filter: `blur(${background.blur}px)`,
-            transition: 'opacity 180ms ease',
-            willChange: 'opacity',
-          }}
-        />
-        {background.showDottedMap && (
-          <div className="fixed inset-0 w-full h-full -z-10 pointer-events-none">
-            <DottedMap
-              className="w-full h-full"
-              width={1920}
-              height={1080}
-              dotColor="currentColor"
-              markerColor="#FF6900"
-              dotRadius={0.5}
-            />
-          </div>
-        )}
-      </>
-    );
-  }
-
-  // Render based on background type and resolved media
+  // --- VIDEO BACKGROUND ---
   if (background.type === 'image' && isVideo) {
-    // Video background (single source)
     return (
-      <>
-        <video
-          key={resolvedSrc}
-          className="fixed inset-0 w-full h-full object-cover -z-10"
-          autoPlay
-          muted
-          playsInline
-          loop
-          preload="auto"
-          src={resolvedSrc}
-          style={{
-            opacity: background.opacity,
-            filter: `blur(${background.blur}px)`,
-            willChange: 'opacity',
-          }}
-        />
-        {background.showDottedMap && (
-          <div className="fixed inset-0 w-full h-full -z-10 pointer-events-none">
-            <DottedMap
-              className="w-full h-full"
-              width={1920}
-              height={1080}
-              dotColor="currentColor"
-              markerColor="#FF6900"
-              dotRadius={0.5}
-            />
-          </div>
-        )}
-      </>
+      <video
+        key={resolvedSrc}
+        className="fixed inset-0 w-full h-full object-cover -z-10"
+        autoPlay
+        muted
+        playsInline
+        loop
+        src={resolvedSrc}
+        onCanPlay={() => setLoaded(true)}
+        style={{
+          opacity: loaded ? background.opacity : 0,
+          filter: `blur(${background.blur}px) brightness(${background.brightness ?? 100}%)`,
+          transition: 'opacity 800ms ease',
+        }}
+      />
     );
   }
 
-  // Solid, Gradient or Image (static) backgrounds
-  const style = (() => {
-    switch (background.type) {
-      case 'solid':
-        return {
-          position: 'fixed' as const,
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          backgroundColor: background.value,
-          zIndex: -10,
-        };
-      case 'gradient':
-        return {
-          position: 'fixed' as const,
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          background: background.value,
-          opacity: background.opacity,
-          zIndex: -10,
-        };
-      case 'image':
-        return {
-          position: 'fixed' as const,
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          backgroundImage: `url(${resolvedSrc})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          opacity: background.opacity,
-          filter: `blur(${background.blur}px)`,
-          zIndex: -10,
-        };
-      case 'none':
-      default:
-        return {
-          display: 'none',
-        };
-    }
-  })();
-  
+  // --- STATIC BACKGROUND ---
+  const base = {
+    position: 'fixed' as const,
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    opacity: loaded ? background.opacity : 0,
+    transition: 'opacity 800ms ease',
+    zIndex: -10,
+  };
+
+  let style: React.CSSProperties = {};
+
+  switch (background.type) {
+    case 'solid':
+      style = {
+        ...base,
+        backgroundColor: background.value,
+      };
+      break;
+    case 'gradient':
+      style = {
+        ...base,
+        background: background.value,
+      };
+      break;
+    case 'image':
+      style = {
+        ...base,
+        backgroundImage: `url(${resolvedSrc})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        filter: `blur(${background.blur}px) brightness(${background.brightness ?? 100}%)`,
+      };
+      break;
+    case 'none':
+    default:
+      style = { display: 'none' };
+      break;
+  }
+
   return (
-    <>
-      <div style={style} />
-      {background.showDottedMap && (
-        <div className="fixed inset-0 w-full h-full -z-10 pointer-events-none">
-          <DottedMap
-            className="w-full h-full"
-            width={1920}
-            height={1080}
-            dotColor="currentColor"
-            markerColor="#FF6900"
-            dotRadius={0.5}
-          />
-        </div>
-      )}
-    </>
+    <div style={style} />
   );
 }

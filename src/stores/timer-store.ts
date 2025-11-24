@@ -49,6 +49,8 @@ interface TimerState {
   setTotalFocusTime: (time: number) => void
   updateSettings: (settings: Partial<TimerSettings>) => void
   resetTimer: () => void
+  pauseTimer: () => void
+  resumeTimer: () => void
 
   // Plan actions
   setPlan: (plan: TimerPlanStep[]) => void
@@ -194,6 +196,25 @@ export const useTimerStore = create<TimerState>()(
             timeLeft: step.minutes * 60,
           }
         }),
+
+      // Pause timer functionality
+      pauseTimer: () => {
+        set((state: TimerState) => ({
+          isRunning: false,
+          deadlineAt: null,
+        }))
+      },
+
+      // Resume timer functionality
+      resumeTimer: () => {
+        set((state: TimerState) => {
+          if (state.timeLeft <= 0) return state
+          return {
+            isRunning: true,
+            deadlineAt: Date.now() + state.timeLeft * 1000,
+          }
+        })
+      },
     }),
     {
       name: 'timer-storage',

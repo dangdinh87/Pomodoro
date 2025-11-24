@@ -387,53 +387,103 @@ export function ThemeSettingsModal({
       },
     },
     {
-      name: 'Pink',
-      key: 'pink',
+      name: 'Hồng bánh bèo',
+      key: 'pink-light',
       light: {
-        background: '0 0% 100%',
-        foreground: '240 10% 3.9%',
+        background: '0 0% 100%', // vẫn trắng
+        foreground: '240 10% 10%', // tăng sáng nhẹ
         card: '0 0% 100%',
-        'card-foreground': '240 10% 3.9%',
+        'card-foreground': '240 10% 10%',
         popover: '0 0% 100%',
-        'popover-foreground': '240 10% 3.9%',
-        primary: '330 81% 60%',
+        'popover-foreground': '240 10% 10%',
+        primary: '330 60% 80%', // hồng nhạt hơn
         'primary-foreground': '0 0% 98%',
-        secondary: '240 4.8% 95.9%',
-        'secondary-foreground': '240 5.9% 10%',
-        muted: '240 4.8% 95.9%',
-        'muted-foreground': '240 3.8% 46.1%',
-        accent: '240 4.8% 95.9%',
-        'accent-foreground': '240 5.9% 10%',
-        destructive: '0 84.2% 60.2%',
+        secondary: '240 4.8% 97%',
+        'secondary-foreground': '240 5.9% 15%',
+        muted: '240 4.8% 97%',
+        'muted-foreground': '240 3.8% 50%',
+        accent: '240 4.8% 97%',
+        'accent-foreground': '240 5.9% 15%',
+        destructive: '0 70% 75%', // nhạt hơn
         'destructive-foreground': '0 0% 98%',
-        border: '240 5.9% 90%',
-        input: '240 5.9% 90%',
-        ring: '330 81% 60%',
-        'timer-foreground': '330 81% 60%',
+        border: '240 5.9% 93%',
+        input: '240 5.9% 93%',
+        ring: '330 60% 80%',
+        'timer-foreground': '330 60% 80%',
       },
       dark: {
-        background: '222.2 84% 4.9%',
+        background: '222.2 84% 7%', // sáng hơn tí
         foreground: '210 40% 98%',
-        card: '222.2 84% 4.9%',
+        card: '222.2 84% 7%',
         'card-foreground': '210 40% 98%',
-        popover: '222.2 84% 4.9%',
+        popover: '222.2 84% 7%',
         'popover-foreground': '210 40% 98%',
-        primary: '330 85% 62%',
-        'primary-foreground': '222.2 47.4% 11.2%',
-        secondary: '217.2 32.6% 17.5%',
+        primary: '330 60% 82%', // hồng nhạt hơn
+        'primary-foreground': '222.2 47.4% 12%',
+        secondary: '217.2 30% 25%',
         'secondary-foreground': '210 40% 98%',
-        muted: '217.2 32.6% 17.5%',
-        'muted-foreground': '215 20.2% 65.1%',
-        accent: '217.2 32.6% 17.5%',
+        muted: '217.2 30% 25%',
+        'muted-foreground': '215 20.2% 70%',
+        accent: '217.2 30% 25%',
         'accent-foreground': '210 40% 98%',
-        destructive: '0 62.8% 30.6%',
+        destructive: '0 55% 50%', // nhạt hơn
         'destructive-foreground': '210 40% 98%',
-        border: '217.2 32.6% 17.5%',
-        input: '217.2 32.6% 17.5%',
-        ring: '330 85% 62%',
+        border: '217.2 30% 25%',
+        input: '217.2 30% 25%',
+        ring: '330 60% 82%',
+        'timer-foreground': '210 40% 98%',
+      },
+    },
+    {
+      name: 'Pink-Mild',
+      key: 'pink-mild',
+      light: {
+        background: '0 0% 100%',
+        foreground: '240 10% 5%',
+        card: '0 0% 100%',
+        'card-foreground': '240 10% 5%',
+        popover: '0 0% 100%',
+        'popover-foreground': '240 10% 5%',
+        primary: '330 75% 70%', // tăng saturation + giảm lightness
+        'primary-foreground': '0 0% 98%',
+        secondary: '240 4.8% 96%',
+        'secondary-foreground': '240 5.9% 12%',
+        muted: '240 4.8% 96%',
+        'muted-foreground': '240 3.8% 48%',
+        accent: '240 4.8% 96%',
+        'accent-foreground': '240 5.9% 12%',
+        destructive: '0 80% 65%', // hồng đậm hơn tí
+        'destructive-foreground': '0 0% 98%',
+        border: '240 5.9% 91%',
+        input: '240 5.9% 91%',
+        ring: '330 75% 70%',
+        'timer-foreground': '330 75% 70%',
+      },
+      dark: {
+        background: '222.2 84% 6%',
+        foreground: '210 40% 98%',
+        card: '222.2 84% 6%',
+        'card-foreground': '210 40% 98%',
+        popover: '222.2 84% 6%',
+        'popover-foreground': '210 40% 98%',
+        primary: '330 75% 72%', // nhấn màu hơn
+        'primary-foreground': '222.2 47.4% 12%',
+        secondary: '217.2 32% 22%',
+        'secondary-foreground': '210 40% 98%',
+        muted: '217.2 32% 22%',
+        'muted-foreground': '215 20.2% 68%',
+        accent: '217.2 32% 22%',
+        'accent-foreground': '210 40% 98%',
+        destructive: '0 65% 45%', // nhấn màu hồng
+        'destructive-foreground': '210 40% 98%',
+        border: '217.2 32% 22%',
+        input: '217.2 32% 22%',
+        ring: '330 75% 72%',
         'timer-foreground': '210 40% 98%',
       },
     }
+
+
   ];
 
   const styleTagId = 'app-theme-vars';
@@ -583,11 +633,10 @@ ${optionalDark}
                   key={t.key}
                   type="button"
                   onClick={() => applyTheme(t.key)}
-                  className={`relative p-3 rounded-lg border text-left transition-all duration-150 hover:scale-105 ${
-                    selected
-                      ? 'border-primary bg-primary/10 ring-2 ring-primary/20'
-                      : 'border-border hover:bg-muted'
-                  }`}
+                  className={`relative p-3 rounded-lg border text-left transition-all duration-150 hover:scale-105 ${selected
+                    ? 'border-primary bg-primary/10 ring-2 ring-primary/20'
+                    : 'border-border hover:bg-muted'
+                    }`}
                   title={t.name}
                   aria-label={`Chọn theme ${t.name}`}
                 >
