@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -58,7 +60,7 @@ export async function GET(request: Request) {
 
     // Create a response that sets the access token in a cookie
     const response = NextResponse.redirect(new URL('/?spotify_success=true', request.url));
-    
+
     // Set the access token in a secure, http-only cookie
     // Note: In production, you should also store refresh token and implement proper token refresh logic
     response.cookies.set('spotify_access_token', tokenData.access_token, {

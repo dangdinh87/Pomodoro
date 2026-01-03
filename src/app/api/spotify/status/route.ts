@@ -1,12 +1,14 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     // Check if Spotify access token exists in cookies
     const cookieStore = await cookies();
     const accessToken = cookieStore.get('spotify_access_token');
-    
+
     if (!accessToken) {
       return NextResponse.json({ connected: false });
     }
