@@ -57,9 +57,8 @@ export function FocusChart({ data }: FocusChartProps) {
                         />
                         <Bar
                             dataKey="minutes"
-                            fill="currentColor"
+                            fill="hsl(var(--primary))"
                             radius={[4, 4, 0, 0]}
-                            className="fill-primary"
                         />
                     </BarChart>
                 </ResponsiveContainer>

@@ -3,14 +3,13 @@ import { ThemeProvider } from '@/components/layout/theme-provider';
 import { QueryProvider } from '@/components/providers/query-provider';
 import GATracker from '@/components/trackings/ga';
 import { I18nProvider } from '@/contexts/i18n-context';
-import { UserGuideModal } from '@/components/user-guide/user-guide-modal';
 import type { Metadata } from 'next';
 import { Be_Vietnam_Pro, Space_Grotesk } from 'next/font/google';
 import Script from 'next/script';
 import { Toaster } from 'sonner';
 import './globals.css';
 import { SupabaseAuthProvider } from '@/components/providers/supabase-auth-provider';
-import { AudioInitializer } from '@/components/audio/audio-initializer';
+
 import Head from 'next/head';
 import NextTopLoader from 'nextjs-toploader';
 
@@ -81,12 +80,10 @@ export default function RootLayout({
           <I18nProvider>
             <QueryProvider>
               <SupabaseAuthProvider />
-              <AudioInitializer />
               <BackgroundRenderer />
               {process.env.NEXT_PUBLIC_GA_ID ? <GATracker /> : null}
               {children}
               <Toaster />
-              {/* <UserGuideModal /> */}
             </QueryProvider>
           </I18nProvider>
         </ThemeProvider>

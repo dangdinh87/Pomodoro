@@ -15,9 +15,9 @@ export const AnalogClock = memo(
 
     // Size mappings
     const sizeClasses = {
-      small: { container: 'w-64 h-64 md:w-72 md:h-72', text: 'text-5xl md:text-6xl' },
-      medium: { container: 'w-80 h-80 md:w-96 md:h-96', text: 'text-7xl md:text-8xl' },
-      large: { container: 'w-96 h-96 md:w-[28rem] md:h-[28rem]', text: 'text-8xl md:text-9xl' },
+      small: { container: 'w-56 h-56 md:w-64 md:h-64', text: 'text-4xl md:text-5xl' },
+      medium: { container: 'w-72 h-72 md:w-80 md:h-80', text: 'text-6xl md:text-7xl' },
+      large: { container: 'w-80 h-80 md:w-96 md:h-96', text: 'text-7xl md:text-8xl' },
     };
 
     const size = sizeClasses[clockSize];

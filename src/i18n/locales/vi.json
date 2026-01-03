@@ -1,18 +1,57 @@
 {
-  "brand": { "title": "Tập trung" },
-  "nav": {
-    "timer": "Hẹn giờ",
-    "focus": "Chế độ tập trung",
-    "tasks": "Công việc",
-    "progress": "Tiến độ",
-    "audio": "Âm thanh"
+  "brand": {
+    "title": "StudyBro",
+    "subtitle": "Hẹn giờ Pomodoro Tập trung"
   },
-  "tooltips": {
-    "toggleTheme": "Chuyển chủ đề",
-    "timerSettings": "Cài đặt hẹn giờ",
-    "themeSettings": "Cài đặt giao diện",
-    "backgroundSetup": "Thiết lập hình nền",
-    "focusAudio": "Nhạc tập trung / Âm thanh thiên nhiên"
+  "common": {
+    "loading": "Đang tải...",
+    "error": "Lỗi",
+    "success": "Thành công",
+    "cancel": "Hủy",
+    "noResults": "Không tìm thấy kết quả",
+    "save": "Lưu",
+    "delete": "Xóa",
+    "edit": "Chỉnh sửa",
+    "add": "Thêm",
+    "close": "Đóng",
+    "confirm": "Xác nhận",
+    "retry": "Thử lại",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "previous": "Trước",
+    "submit": "Gửi",
+    "search": "Tìm kiếm",
+    "filter": "Lọc",
+    "sort": "Sắp xếp",
+    "actions": "Hành động",
+    "settings": "Cài đặt",
+    "language": "Ngôn ngữ"
+  },
+  "nav": {
+    "navigation": "Điều hướng",
+    "system": "Hệ thống",
+    "timer": "Hẹn giờ",
+    "tasks": "Công việc",
+    "history": "Lịch sử",
+    "leaderboard": "Bảng xếp hạng",
+    "chatAI": "Chat AI",
+    "settings": "Cài đặt",
+    "guide": "Hướng dẫn",
+    "feedback": "Phản hồi",
+    "login": "Đăng nhập",
+    "logout": "Đăng xuất",
+    "loginNow": "Đăng nhập ngay"
+  },
+  "auth": {
+    "pleaseLogin": "Vui lòng đăng nhập để tiếp tục",
+    "signInToManageTasks": "Vui lòng đăng nhập để quản lý công việc",
+    "signInToViewStats": "Vui lòng đăng nhập để xem thống kê",
+    "signInButton": "Đăng nhập",
+    "signOutSuccess": "Đã đăng xuất",
+    "signOutError": "Không thể đăng xuất",
+    "signOutConfirm": "Bạn có chắc muốn đăng xuất?",
+    "supabaseNotConfigured": "Supabase chưa được cấu hình",
+    "signOutUnexpectedError": "Có lỗi xảy ra khi đăng xuất"
   },
   "timer": {
     "modes": {
@@ -50,36 +89,13 @@
     "progress": {
       "complete": "{percent}% Hoàn thành"
     },
-    "guide": {
-      "title": "Hướng dẫn Pomodoro",
-      "hide": "Ẩn",
-      "open": "Mở hướng dẫn Pomodoro",
-      "explanationTitle": "Giải thích",
-      "explanation1": "Pomodoro = làm 25' nghỉ 5' để giữ tập trung và giảm xao nhãng.",
-      "explanation2": "Hoàn thành 4 phiên → nghỉ dài 15' để hồi sức.",
-      "howToTitle": "Cách dùng",
-      "how1": "Chọn một công việc và bật chế độ Làm việc.",
-      "how2": "Start/Pause (Space), Reset (R), Skip để chuyển phiên.",
-      "how3": "Kết thúc phiên → Nghỉ ngắn; sau 4 phiên → Nghỉ dài.",
-      "how4": "Tùy chỉnh thời lượng & đồng hồ trong Cài đặt.",
-      "tipsTitle": "Mẹo",
-      "tip1": "Đặt mục tiêu nhỏ, rõ ràng cho từng phiên.",
-      "tip2": "Tắt thông báo và đóng tab không cần thiết.",
-      "tip3": "Tránh đa nhiệm; ghi chú xao nhãng rồi quay lại.",
-      "motivationTitle": "Động lực",
-      "defaultQuote": "Tập trung vào bước tiếp theo — rồi lặp lại.",
-      "aria_hide": "Ẩn hướng dẫn",
-      "aria_open": "Mở hướng dẫn Pomodoro"
+    "stats": {
+      "today": "Hôm nay",
+      "poms": "poms",
+      "time": "Thời gian",
+      "minutes": "phút"
     },
-    "quotes": {
-      "list": [
-        "Tập trung vào thứ bạn kiểm soát — từng Pomodoro một.",
-        "Nhỏ nhưng đều đặn tạo nên khác biệt lớn.",
-        "Kỷ luật ăn đứt tài năng khi tài năng thiếu kỷ luật.",
-        "Làm sâu trong ngắn hạn, đạt lớn trong dài hạn.",
-        "Bắt đầu ngay — hành động thắng trì hoãn."
-      ]
-    }
+    "focusMode": "Chế độ tập trung"
   },
   "timerSettings": {
     "title": "Cài đặt Hẹn giờ",
@@ -98,7 +114,11 @@
       "progress": "Tiến độ",
       "flip": "Lật",
       "clockPreview": "Xem trước đồng hồ",
-      "endsAround": "Kết thúc khoảng {time}"
+      "endsAround": "Kết thúc khoảng {time}",
+      "clockSize": "Kích thước đồng hồ",
+      "small": "Nhỏ",
+      "medium": "Trung bình",
+      "large": "Lớn"
     },
     "actions": {
       "resetDefaults": "Khôi phục mặc định",
@@ -110,123 +130,361 @@
       "reset": "Đã khôi phục cài đặt mặc định!"
     }
   },
-  "userGuide": {
-    "title": "Hướng dẫn sử dụng",
-    "welcome": "Chào mừng đến Ứng dụng Tập trung Pomodoro!",
-    "description": "Trợ thủ đầy đủ cho năng suất của bạn trong các phiên làm việc tập trung",
-    "sections": {
-      "gettingStarted": "Bắt đầu",
-      "timer": "Hẹn giờ & Pomodoro",
-      "tasks": "Quản lý công việc",
-      "focus": "Chế độ tập trung",
-      "progress": "Theo dõi tiến độ",
-      "audio": "Tính năng âm thanh",
-      "settings": "Cài đặt & Tùy chỉnh",
-      "shortcuts": "Phím tắt",
-      "tips": "Mẹo năng suất"
+  "tasks": {
+    "title": "Công việc",
+    "addTask": "Thêm công việc",
+    "editTask": "Chỉnh sửa công việc",
+    "deleteTask": "Xóa công việc",
+    "noTasks": "Chưa có công việc nào",
+    "createFirst": "Tạo công việc đầu tiên để bắt đầu",
+    "taskName": "Tên công việc",
+    "taskDescription": "Mô tả",
+    "priority": "Độ ưu tiên",
+    "dueDate": "Hạn chót",
+    "status": "Trạng thái",
+    "estimated": "Pomodoro dự kiến",
+    "completed": "Đã hoàn thành",
+    "pending": "Chờ xử lý",
+    "inProgress": "Đang thực hiện",
+    "priorityLevels": {
+      "low": "Thấp",
+      "medium": "Trung bình",
+      "high": "Cao"
     },
-    "gettingStarted": {
-      "title": "Bắt đầu",
-      "description": "Tìm hiểu cơ bản sử dụng Ứng dụng Tập trung Pomodoro",
-      "steps": [
-        "Điều hướng bằng menu bên trái",
-        "Bắt đầu với phần Hẹn giờ để bắt đầu phiên Pomodoro đầu tiên",
-        "Tạo và quản lý công việc trong phần Công việc",
-        "Theo dõi tiến độ trong phần Tiến độ",
-        "Tùy chỉnh trải nghiệm trong Cài đặt"
-      ]
-    },
-    "timer": {
-      "title": "Hẹn giờ & Kỹ thuật Pomodoro",
-      "description": "Thành thạo Kỹ thuật Pomodoro để đạt năng suất tối đa",
-      "workMode": "Chế độ Làm việc: Phiên làm việc tập trung 25 phút",
-      "shortBreak": "Nghỉ ngắn: Nghỉ 5 phút giữa các phiên làm việc",
-      "longBreak": "Nghỉ dài: Nghỉ 15 phút sau 4 phiên làm việc",
-      "controls": "Dùng Bắt đầu/Tạm dừng (Space), Đặt lại (R), và nút Bỏ qua",
-      "autoStart": "Bật tự động bắt đầu cho chuyển tiếp liền mạch",
-      "clockTypes": "Chọn từ Đồng hồ Kỹ thuật số, Kim, Tiến độ, hoặc Lật"
-    },
-    "tasks": {
-      "title": "Quản lý công việc",
-      "description": "Tổ chức và theo dõi công việc của bạn hiệu quả",
-      "createTask": "Nhấn 'Thêm công việc' để tạo công việc mới",
-      "editTask": "Nhấn vào bất kỳ công việc để chỉnh sửa chi tiết",
-      "deleteTask": "Dùng nút xóa để loại bỏ công việc",
-      "completeTask": "Đánh dấu công việc hoàn thành bằng cách chọn hộp kiểm",
-      "prioritize": "Đặt mức độ ưu tiên (Thấp, Trung bình, Cao) cho công việc",
-      "categories": "Tổ chức công việc theo danh mục",
-      "filters": "Dùng bộ lọc để xem công việc cụ thể"
-    },
-    "focus": {
-      "title": "Chế độ tập trung",
-      "description": "Giảm thiểu xao nhãng và tối đa hóa tập trung",
-      "enableFocus": "Bật Chế độ tập trung để ẩn yếu tố gây xao nhãng",
-      "streakTracking": "Theo dõi chuỗi tập trung hàng ngày của bạn",
-      "minimalInterface": "Tận hưởng giao diện sạch sẽ, không xao nhãng",
-      "motivation": "Giữ động lực với các câu trích dẫn truyền cảm hứng"
-    },
-    "progress": {
-      "title": "Theo dõi tiến độ",
-      "description": "Giám sát năng suất và thành tích của bạn",
-      "dailyStats": "Xem thời gian tập trung và số phiên hàng ngày",
-      "weeklyStats": "Theo dõi xu hướng năng suất hàng tuần",
-      "sessionHistory": "Xem lại các phiên Pomodoro đã hoàn thành",
-      "achievements": "Tôn vinh các cột mốc và thành tích",
-      "insights": "Có được hiểu biết về mô hình làm việc của bạn"
-    },
-    "audio": {
-      "title": "Tính năng âm thanh",
-      "description": "Tăng cường tập trung với âm thanh nền và nhạc",
-      "natureSounds": "Phát âm thanh thiên nhiên (mưa, sóng, gió, v.v.)",
-      "spotifyIntegration": "Kết nối Spotify để nghe nhạc nền",
-      "volumeControl": "Điều chỉnh âm lượng theo ý thích",
-      "soundCategories": "Chọn từ âm thanh Thiên nhiên, Đô thị, Giao thông, và Đồ vật",
-      "timerSounds": "Đặt âm thanh thông báo cho phiên hoàn thành"
-    },
-    "settings": {
-      "title": "Cài đặt & Tùy chỉnh",
-      "description": "Cá nhân hóa trải nghiệm Pomodoro của bạn",
-      "timerSettings": "Tùy chỉnh thời lượng làm việc/nghỉ và khoảng cách",
-      "themeSettings": "Chọn giữa chủ đề sáng và tối",
-      "backgroundSettings": "Đặt hình nền tùy chỉnh (hình ảnh hoặc video)",
-      "audioSettings": "Cấu hình tùy chọn âm thanh và tích hợp",
-      "language": "Chuyển giữa Tiếng Anh và Tiếng Việt",
-      "keyboardShortcuts": "Xem và tùy chỉnh phím tắt"
-    },
-    "shortcuts": {
-      "title": "Phím tắt",
-      "description": "Hành động nhanh cho quy trình hiệu quả",
-      "space": "Space: Bắt đầu/Tạm dừng hẹn giờ",
-      "r": "R: Đặt lại hẹn giờ",
-      "navigation": "Dùng phím số 1-5 để điều hướng nhanh",
-      "theme": "T: Chuyển chủ đề",
-      "focus": "F: Bật Chế độ tập trung"
-    },
-    "tips": {
-      "title": "Mẹo năng suất",
-      "description": "Tối đa hóa tập trung và năng suất của bạn",
-      "planSessions": "Lập kế hoạch công việc trước khi bắt đầu phiên Pomodoro",
-      "eliminateDistractions": "Tắt thông báo và đóng tab không cần thiết",
-      "takeBreaks": "Luôn nghỉ ngơi - điều này rất cần thiết cho sự bền vững",
-      "trackProgress": "Xem lại tiến độ thường xuyên để giữ động lực",
-      "stayConsistent": "Nhất quán là chìa khóa - dùng Pomodoro hàng ngày để có kết quả tốt nhất",
-      "setRealisticGoals": "Đặt mục tiêu thực tế cho mỗi phiên làm việc",
-      "environment": "Tạo không gian làm việc riêng để tập trung tốt hơn"
+    "filters": {
+      "all": "Tất cả",
+      "today": "Hôm nay",
+      "week": "Tuần này",
+      "completed": "Đã hoàn thành",
+      "pending": "Chờ xử lý"
     },
     "actions": {
-      "openGuide": "Mở hướng dẫn",
-      "closeGuide": "Đóng hướng dẫn",
-      "next": "Tiếp",
-      "previous": "Trước",
-      "gotIt": "Đã hiểu!",
-      "explore": "Bắt đầu khám phá"
+      "markComplete": "Đánh dấu hoàn thành",
+      "markIncomplete": "Đánh dấu chưa hoàn thành",
+      "startPomodoro": "Bắt đầu Pomodoro"
+    }
+  },
+  "history": {
+    "title": "Lịch sử & Thống kê",
+    "subtitle": "Xem lại hiệu suất tập trung của bạn theo thời gian",
+    "startNewSession": "Bắt đầu phiên mới",
+    "errorLoading": "Đã xảy ra lỗi khi tải dữ liệu",
+    "noData": "Không có dữ liệu",
+    "noDataDescription": "Bắt đầu phiên Pomodoro đầu tiên để xem thống kê tại đây",
+    "stats": {
+      "totalFocusTime": "Tổng thời gian tập trung",
+      "completedSessions": "Phiên đã hoàn thành",
+      "currentStreak": "Chuỗi hiện tại",
+      "days": "ngày",
+      "hours": "giờ",
+      "minutes": "phút",
+      "sessions": "phiên"
     },
-    "welcomeModal": {
-      "title": "Chào mừng hành trình tập trung của bạn! 🎯",
-      "subtitle": "Hãy bắt đầu với Ứng dụng Tập trung Pomodoro",
-      "description": "Hướng dẫn này sẽ giúp bạn hiểu tất cả tính năng và tận dụng tối đa các phiên năng suất của bạn",
-      "startButton": "Bắt đầu hướng dẫn",
-      "skipButton": "Bỏ qua"
+    "charts": {
+      "focusOverview": "Tổng quan Thời gian Tập trung",
+      "distribution": "Phân bổ Phiên",
+      "sessionHistory": "Lịch sử Phiên",
+      "noTask": "Không có công việc"
+    },
+    "dateRange": {
+      "today": "Hôm nay",
+      "yesterday": "Hôm qua",
+      "last7Days": "7 ngày qua",
+      "last30Days": "30 ngày qua",
+      "custom": "Tùy chỉnh",
+      "selectDate": "Chọn khoảng thời gian"
+    }
+  },
+  "leaderboard": {
+    "title": "Bảng xếp hạng",
+    "comingSoon": "Tính năng sắp ra mắt",
+    "description": "Bảng xếp hạng sẽ giúp bạn so sánh thành tích với các người dùng khác và tạo động lực học tập."
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "subtitle": "Quản lý tùy chọn, cài đặt hẹn giờ và giao diện.",
+    "tabs": {
+      "general": "Chung",
+      "timer": "Hẹn giờ",
+      "background": "Hình nền",
+      "audio": "Âm thanh"
+    },
+    "general": {
+      "title": "Cài đặt Chung",
+      "language": {
+        "title": "Ngôn ngữ",
+        "description": "Chọn ngôn ngữ ưa thích của bạn",
+        "english": "Tiếng Anh",
+        "vietnamese": "Tiếng Việt"
+      },
+      "theme": {
+        "title": "Giao diện",
+        "description": "Chọn chủ đề ứng dụng",
+        "light": "Sáng",
+        "dark": "Tối",
+        "system": "Hệ thống"
+      },
+      "notifications": {
+        "title": "Thông báo",
+        "description": "Quản lý tùy chọn thông báo",
+        "enable": "Bật thông báo",
+        "sound": "Phát âm thanh khi hoàn thành"
+      }
+    },
+    "background": {
+      "title": "Cài đặt Hình nền",
+      "chooseBackground": "Chọn hình nền",
+      "uploadCustom": "Tải lên tùy chỉnh",
+      "backgroundType": "Loại hình nền",
+      "image": "Hình ảnh",
+      "video": "Video",
+      "solid": "Màu đơn sắc",
+      "gradient": "Gradient",
+      "blur": "Độ mờ",
+      "opacity": "Độ trong suốt",
+      "brightness": "Độ sáng"
+    },
+    "audio": {
+      "title": "Cài đặt Âm thanh",
+      "volume": "Âm lượng",
+      "backgroundMusic": "Nhạc nền",
+      "natureSounds": "Âm thanh thiên nhiên",
+      "connectSpotify": "Kết nối Spotify",
+      "connectYouTube": "Kết nối YouTube"
+    }
+  },
+  "guide": {
+    "title": "Hướng dẫn Sử dụng",
+    "subtitle": "Tìm hiểu về phương pháp Pomodoro và cách sử dụng Study Bro để tối ưu hóa năng suất học tập và làm việc của bạn",
+    "pomodoro": {
+      "badge": "Phương Pháp Pomodoro",
+      "title": "Pomodoro là gì?",
+      "description": "<strong>Pomodoro</strong> là phương pháp quản lý thời gian đơn giản giúp bạn làm việc và học tập hiệu quả bằng cách chia nhỏ công việc thành các phiên <strong>25 phút</strong> gọi là một Pomodoro. Trong mỗi phiên, bạn tập trung hoàn toàn vào một việc duy nhất. Sau đó, nghỉ ngơi <strong>5 phút</strong> để thư giãn và nạp lại năng lượng.",
+      "imageAlt": "Minh họa phương pháp Pomodoro"
+    },
+    "howToApply": {
+      "badge": "Cách Thực Hiện",
+      "title": "Cách áp dụng Pomodoro",
+      "steps": {
+        "step1": {
+          "title": "Chọn công việc & đặt hẹn giờ",
+          "description": "Chọn công việc cần làm và đặt hẹn giờ 25 phút để bắt đầu phiên Pomodoro."
+        },
+        "step2": {
+          "title": "Tập trung làm việc",
+          "description": "Tập trung làm việc đến khi đồng hồ báo hết giờ, không bị gián đoạn."
+        },
+        "step3": {
+          "title": "Nghỉ ngơi ngắn",
+          "description": "Nghỉ 5 phút, có thể đứng dậy vận động nhẹ hoặc thư giãn đầu óc."
+        },
+        "step4": {
+          "title": "Lặp lại & nghỉ dài",
+          "description": "Lặp lại chu trình. Sau 4 phiên Pomodoro, nghỉ dài hơn khoảng 15-30 phút."
+        }
+      }
+    },
+    "benefits": {
+      "badge": "Lợi Ích",
+      "title": "Tại sao nên dùng Pomodoro?",
+      "list": [
+        "Tăng sự tập trung và hiệu suất làm việc",
+        "Tránh bị quá tải khi làm việc lâu",
+        "Dễ đo lường và quản lý tiến độ công việc",
+        "Phù hợp với những ai hay bị mất tập trung",
+        "Giúp duy trì năng lượng và hiệu quả làm việc lâu dài"
+      ],
+      "tip": "💡 <strong>Mẹo:</strong> Bạn hoàn toàn có thể điều chỉnh thời gian làm việc và nghỉ ngơi cho phù hợp với bản thân, miễn sao giữ nguyên nguyên tắc \"chia nhỏ khoảng thời gian để tập trung và nghỉ ngơi đều đặn.\""
+    },
+    "howToUse": {
+      "badge": "Hướng Dẫn Website",
+      "title": "Cách sử dụng Study Bro",
+      "description": "Study Bro cung cấp các công cụ giúp bạn áp dụng phương pháp Pomodoro một cách hiệu quả.",
+      "features": {
+        "timer": {
+          "title": "Timer",
+          "subtitle": "Đồng hồ đếm ngược Pomodoro",
+          "description": "Trang Timer là trung tâm của ứng dụng, nơi bạn:",
+          "points": [
+            "Bắt đầu/tạm dừng các phiên Pomodoro",
+            "Chọn task để focus vào",
+            "Theo dõi thời gian làm việc",
+            "Tự động chuyển sang break khi hết giờ"
+          ],
+          "cta": "Đi đến Timer"
+        },
+        "tasks": {
+          "title": "Tasks",
+          "subtitle": "Quản lý công việc của bạn",
+          "description": "Trang Tasks giúp bạn tổ chức công việc:",
+          "points": [
+            "Tạo, chỉnh sửa và xóa tasks",
+            "Đặt độ ưu tiên và thời hạn",
+            "Lọc tasks theo trạng thái, ngày",
+            "Estimate số Pomodoro cần thiết"
+          ],
+          "cta": "Đi đến Tasks"
+        },
+        "history": {
+          "title": "History",
+          "subtitle": "Theo dõi tiến độ của bạn",
+          "description": "Trang History giúp bạn xem lại:",
+          "points": [
+            "Lịch sử các phiên Pomodoro",
+            "Thống kê theo ngày, tuần, tháng",
+            "Tổng thời gian đã làm việc",
+            "Biểu đồ năng suất"
+          ],
+          "cta": "Đi đến History"
+        },
+        "settings": {
+          "title": "Settings",
+          "subtitle": "Tùy chỉnh trải nghiệm",
+          "description": "Trang Settings cho phép bạn:",
+          "points": [
+            "Điều chỉnh thời gian Pomodoro & break",
+            "Chọn background & theme",
+            "Cài đặt âm thanh thông báo",
+            "Tùy chỉnh preferences cá nhân"
+          ],
+          "cta": "Đi đến Settings"
+        }
+      }
+    },
+    "getStarted": {
+      "badge": "Bắt Đầu Ngay",
+      "title": "Sẵn sàng bắt đầu chưa?",
+      "description": "Hãy bắt đầu hành trình làm việc hiệu quả với Study Bro!",
+      "steps": [
+        "Tạo task đầu tiên của bạn trong trang <link>Tasks</link>",
+        "Điều chỉnh Settings theo sở thích (tùy chọn)",
+        "Bật <link>Timer</link> và bắt đầu Pomodoro đầu tiên!"
+      ],
+      "cta": "Bắt đầu ngay"
+    }
+  },
+  "feedback": {
+    "title": "Gửi ý kiến phản hồi",
+    "subtitle": "Giúp chúng tôi cải thiện ứng dụng bằng cách gửi báo cáo lỗi hoặc đề xuất tính năng mới.",
+    "form": {
+      "name": "Tên của bạn (Tùy chọn)",
+      "namePlaceholder": "Nhập tên...",
+      "email": "Email (Tùy chọn)",
+      "emailPlaceholder": "example@email.com",
+      "type": "Loại phản hồi",
+      "typeOptions": {
+        "feature": "✨ Đề xuất tính năng",
+        "bug": "🐛 Báo cáo lỗi",
+        "other": "📝 Khác"
+      },
+      "message": "Nội dung",
+      "messagePlaceholder": "Mô tả chi tiết ý kiến của bạn...",
+      "required": "*",
+      "submit": "Gửi phản hồi"
+    },
+    "success": {
+      "title": "Cảm ơn bạn!",
+      "message": "Ý kiến đóng góp của bạn đã được ghi nhận. Chúng tôi sẽ xem xét và cải thiện ứng dụng tốt hơn.",
+      "cta": "Gửi ý kiến khác"
+    },
+    "errors": {
+      "submitFailed": "Có lỗi xảy ra. Vui lòng thử lại sau.",
+      "fieldRequired": "Trường này là bắt buộc"
+    },
+    "toast": {
+      "success": "Cảm ơn bạn đã đóng góp ý kiến!",
+      "error": "Có lỗi xảy ra. Vui lòng thử lại sau."
+    }
+  },
+  "chat": {
+    "title": "Chat AI",
+    "subtitle": "Trò chuyện với trợ lý AI",
+    "placeholder": "Nhập tin nhắn của bạn...",
+    "send": "Gửi",
+    "clear": "Xóa cuộc trò chuyện",
+    "newChat": "Cuộc trò chuyện mới",
+    "historyTitle": "Lịch sử trò chuyện",
+    "noConversations": "Chưa có cuộc trò chuyện nào. Bắt đầu chat mới nhé!",
+    "deleteConfirmTitle": "Xóa cuộc trò chuyện?",
+    "deleteConfirmDescription": "Hành động này không thể hoàn tác. Cuộc trò chuyện và tất cả tin nhắn sẽ bị xóa vĩnh viễn.",
+    "thread": {
+      "welcome": "Yo! Chào bạn 👋",
+      "welcomeSubtitle": "Mình là Bro Chat - người bạn đồng hành của bạn!",
+      "scrollToBottom": "Cuộn xuống cuối",
+      "inputPlaceholder": "Hỏi mình bất cứ điều gì...",
+      "sendMessage": "Gửi tin nhắn",
+      "stopGenerating": "Dừng tạo",
+      "error": "⚠️ Lỗi",
+      "copy": "Sao chép",
+      "exportMarkdown": "Xuất dạng Markdown",
+      "refresh": "Làm mới",
+      "edit": "Chỉnh sửa",
+      "previous": "Trước",
+      "next": "Tiếp theo",
+      "cancel": "Hủy",
+      "update": "Cập nhật",
+      "instruction": "Mình có thể giúp bạn về: phương pháp Pomodoro 🍅, mẹo học tập 📚, quản lý thời gian ⏰, và cách dùng app này. Cứ hỏi thoải mái nhé!",
+      "conversationGroups": {
+        "older": "Cũ hơn"
+      },
+      "suggestions": {
+        "pomodoro": {
+          "title": "Giải thích kỹ thuật Pomodoro",
+          "label": "và cách nó tăng năng suất",
+          "prompt": "Giải thích kỹ thuật Pomodoro và cách nó giúp tăng năng suất và tập trung"
+        },
+        "studyTips": {
+          "title": "Cho tôi mẹo học tập",
+          "label": "để tập trung lâu hơn",
+          "prompt": "Cho tôi một số mẹo học tập để tập trung trong thời gian dài hơn và tránh mất tập trung"
+        },
+        "studyPlan": {
+          "title": "Tạo kế hoạch học tập",
+          "label": "cho mục tiêu của tôi",
+          "prompt": "Giúp tôi tạo một kế hoạch học tập hiệu quả với các phiên Pomodoro cho mục tiêu học tập của tôi"
+        },
+        "breakActivities": {
+          "title": "Đề xuất hoạt động nghỉ ngơi",
+          "label": "cho giờ nghỉ Pomodoro",
+          "prompt": "Đề xuất một số hoạt động thư giãn tôi có thể làm trong 5 phút nghỉ ngơi Pomodoro"
+        }
+      }
+    }
+  },
+  "tooltips": {
+    "toggleTheme": "Chuyển đổi giao diện",
+    "timerSettings": "Cài đặt hẹn giờ",
+    "themeSettings": "Cài đặt giao diện",
+    "backgroundSetup": "Thiết lập hình nền",
+    "backgroundSettings": "Cài đặt hình nền",
+    "soundSettings": "Cài đặt âm thanh",
+    "focusAudio": "Nhạc tập trung / Âm thanh thiên nhiên",
+    "enterFocus": "Bật chế độ tập trung",
+    "exitFocus": "Thoát chế độ tập trung"
+  },
+  "errors": {
+    "generic": "Đã xảy ra lỗi",
+    "network": "Lỗi mạng. Vui lòng kiểm tra kết nối của bạn.",
+    "notFound": "Không tìm thấy",
+    "unauthorized": "Chưa được ủy quyền. Vui lòng đăng nhập.",
+    "forbidden": "Bạn không có quyền truy cập tài nguyên này"
+  },
+  "metadata": {
+    "timer": {
+      "title": "Hẹn giờ • Study Bro App",
+      "description": "Quản lý các phiên làm việc và nghỉ ngơi với hẹn giờ Pomodoro tinh tế và cài đặt thống nhất."
+    },
+    "tasks": {
+      "title": "Công việc • Study Bro App",
+      "description": "Tổ chức và quản lý công việc của bạn một cách hiệu quả với hệ thống quản lý công việc của chúng tôi."
+    },
+    "history": {
+      "title": "Lịch sử • Study Bro App",
+      "description": "Xem lại hiệu suất tập trung và thống kê năng suất của bạn theo thời gian."
+    },
+    "guide": {
+      "title": "Hướng dẫn Sử dụng • Study Bro App",
+      "description": "Tìm hiểu về phương pháp Pomodoro và cách sử dụng các tính năng của Study Bro."
     }
   }
 }

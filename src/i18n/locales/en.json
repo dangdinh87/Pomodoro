@@ -1,18 +1,57 @@
 {
-  "brand": { "title": "Focus" },
-  "nav": {
-    "timer": "Timer",
-    "focus": "Focus Mode",
-    "tasks": "Tasks",
-    "progress": "Progress",
-    "audio": "Audio"
+  "brand": {
+    "title": "StudyBro",
+    "subtitle": "Pomodoro Timer Focus"
   },
-  "tooltips": {
-    "toggleTheme": "Toggle theme",
-    "timerSettings": "Timer settings",
-    "themeSettings": "Theme settings",
-    "backgroundSetup": "Background setup",
-    "focusAudio": "Focus music / Nature sounds"
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "noResults": "No results found",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "confirm": "Confirm",
+    "retry": "Retry",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "actions": "Actions",
+    "settings": "Settings",
+    "language": "Language"
+  },
+  "nav": {
+    "navigation": "Navigation",
+    "system": "System",
+    "timer": "Timer",
+    "tasks": "Tasks",
+    "history": "History",
+    "leaderboard": "Leaderboard",
+    "chatAI": "Chat AI",
+    "settings": "Settings",
+    "guide": "Guide",
+    "feedback": "Feedback",
+    "login": "Sign In",
+    "logout": "Sign Out",
+    "loginNow": "Sign in now"
+  },
+  "auth": {
+    "pleaseLogin": "Please sign in to continue",
+    "signInToManageTasks": "Please sign in to manage tasks",
+    "signInToViewStats": "Please sign in to view statistics",
+    "signInButton": "Sign In",
+    "signOutSuccess": "Successfully signed out",
+    "signOutError": "Unable to sign out",
+    "signOutConfirm": "Are you sure you want to sign out?",
+    "supabaseNotConfigured": "Supabase is not configured yet",
+    "signOutUnexpectedError": "An error occurred while signing out"
   },
   "timer": {
     "modes": {
@@ -50,36 +89,13 @@
     "progress": {
       "complete": "{percent}% Complete"
     },
-    "guide": {
-      "title": "Pomodoro Guide",
-      "hide": "Hide",
-      "open": "Open Pomodoro Guide",
-      "explanationTitle": "Explanation",
-      "explanation1": "Pomodoro = work 25' and rest 5' to maintain focus and reduce distractions.",
-      "explanation2": "Complete 4 sessions \u2192 take a 15' long break to recover.",
-      "howToTitle": "How to use",
-      "how1": "Choose a task and select Work mode.",
-      "how2": "Start/Pause (Space), Reset (R), Skip to move sessions.",
-      "how3": "When a session ends \u2192 Short break; after 4 Work sessions \u2192 Long break.",
-      "how4": "Customize durations/clock in Settings.",
-      "tipsTitle": "Tips",
-      "tip1": "Set small, specific goals for each session.",
-      "tip2": "Turn off notifications and close unnecessary tabs.",
-      "tip3": "Avoid multitasking; jot down interruptions then return.",
-      "motivationTitle": "Motivation",
-      "defaultQuote": "Focus on the next step \u2014 then repeat.",
-      "aria_hide": "Hide guide",
-      "aria_open": "Open Pomodoro Guide"
+    "stats": {
+      "today": "Today",
+      "poms": "poms",
+      "time": "Time",
+      "minutes": "min"
     },
-    "quotes": {
-      "list": [
-        "Focus on what you can control \u2014 one Pomodoro at a time.",
-        "Small, consistent steps make a big difference.",
-        "Discipline beats talent when talent lacks discipline.",
-        "Work deeply in the short term, achieve greatly in the long term.",
-        "Start now \u2014 action beats procrastination."
-      ]
-    }
+    "focusMode": "Focus Mode"
   },
   "timerSettings": {
     "title": "Timer Settings",
@@ -98,7 +114,11 @@
       "progress": "Progress",
       "flip": "Flip",
       "clockPreview": "Clock Preview",
-      "endsAround": "Ends around {time}"
+      "endsAround": "Ends around {time}",
+      "clockSize": "Clock Size",
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large"
     },
     "actions": {
       "resetDefaults": "Reset to Defaults",
@@ -110,123 +130,361 @@
       "reset": "Timer settings reset to defaults!"
     }
   },
-  "userGuide": {
-    "title": "User Guide",
-    "welcome": "Welcome to Pomodoro Focus App!",
-    "description": "Your complete productivity companion for focused work sessions",
-    "sections": {
-      "gettingStarted": "Getting Started",
-      "timer": "Timer & Pomodoro",
-      "tasks": "Task Management",
-      "focus": "Focus Mode",
-      "progress": "Progress Tracking",
-      "audio": "Audio Features",
-      "settings": "Settings & Customization",
-      "shortcuts": "Keyboard Shortcuts",
-      "tips": "Productivity Tips"
+  "tasks": {
+    "title": "Tasks",
+    "addTask": "Add Task",
+    "editTask": "Edit Task",
+    "deleteTask": "Delete Task",
+    "noTasks": "No tasks yet",
+    "createFirst": "Create your first task to get started",
+    "taskName": "Task Name",
+    "taskDescription": "Description",
+    "priority": "Priority",
+    "dueDate": "Due Date",
+    "status": "Status",
+    "estimated": "Estimated Pomodoros",
+    "completed": "Completed",
+    "pending": "Pending",
+    "inProgress": "In Progress",
+    "priorityLevels": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
     },
-    "gettingStarted": {
-      "title": "Getting Started",
-      "description": "Learn the basics of using the Pomodoro Focus App",
-      "steps": [
-        "Navigate using the sidebar menu on the left",
-        "Start with the Timer section to begin your first Pomodoro session",
-        "Create and manage tasks in the Tasks section",
-        "Track your progress in the Progress section",
-        "Customize your experience in Settings"
-      ]
-    },
-    "timer": {
-      "title": "Timer & Pomodoro Technique",
-      "description": "Master the Pomodoro Technique for maximum productivity",
-      "workMode": "Work Mode: 25-minute focused work sessions",
-      "shortBreak": "Short Break: 5-minute rest between work sessions",
-      "longBreak": "Long Break: 15-minute rest after 4 work sessions",
-      "controls": "Use Start/Pause (Space), Reset (R), and Skip buttons",
-      "autoStart": "Enable auto-start for seamless transitions",
-      "clockTypes": "Choose from Digital, Analog, Progress, or Flip clock displays"
-    },
-    "tasks": {
-      "title": "Task Management",
-      "description": "Organize and track your work tasks effectively",
-      "createTask": "Click 'Add Task' to create new tasks",
-      "editTask": "Click on any task to edit its details",
-      "deleteTask": "Use the delete button to remove tasks",
-      "completeTask": "Mark tasks as complete by checking the checkbox",
-      "prioritize": "Set priority levels (Low, Medium, High) for tasks",
-      "categories": "Organize tasks by categories",
-      "filters": "Use filters to view specific tasks"
-    },
-    "focus": {
-      "title": "Focus Mode",
-      "description": "Minimize distractions and maximize concentration",
-      "enableFocus": "Toggle Focus Mode to hide distracting elements",
-      "streakTracking": "Track your daily focus streaks",
-      "minimalInterface": "Enjoy a clean, distraction-free interface",
-      "motivation": "Stay motivated with inspirational quotes"
-    },
-    "progress": {
-      "title": "Progress Tracking",
-      "description": "Monitor your productivity and achievements",
-      "dailyStats": "View daily focus time and session counts",
-      "weeklyStats": "Track weekly productivity trends",
-      "sessionHistory": "Review completed Pomodoro sessions",
-      "achievements": "Celebrate milestones and achievements",
-      "insights": "Gain insights into your work patterns"
-    },
-    "audio": {
-      "title": "Audio Features",
-      "description": "Enhance focus with ambient sounds and music",
-      "natureSounds": "Play nature sounds (rain, waves, wind, etc.)",
-      "spotifyIntegration": "Connect Spotify for background music",
-      "volumeControl": "Adjust audio volume to your preference",
-      "soundCategories": "Choose from Nature, Urban, Transport, and Things sounds",
-      "timerSounds": "Set notification sounds for session completion"
-    },
-    "settings": {
-      "title": "Settings & Customization",
-      "description": "Personalize your Pomodoro experience",
-      "timerSettings": "Customize work/break durations and intervals",
-      "themeSettings": "Choose between light and dark themes",
-      "backgroundSettings": "Set custom backgrounds (images or videos)",
-      "audioSettings": "Configure audio preferences and integrations",
-      "language": "Switch between English and Vietnamese",
-      "keyboardShortcuts": "View and customize keyboard shortcuts"
-    },
-    "shortcuts": {
-      "title": "Keyboard Shortcuts",
-      "description": "Quick actions for efficient workflow",
-      "space": "Space: Start/Pause timer",
-      "r": "R: Reset timer",
-      "navigation": "Use number keys 1-5 for quick navigation",
-      "theme": "T: Toggle theme",
-      "focus": "F: Toggle Focus Mode"
-    },
-    "tips": {
-      "title": "Productivity Tips",
-      "description": "Maximize your focus and productivity",
-      "planSessions": "Plan your tasks before starting Pomodoro sessions",
-      "eliminateDistractions": "Turn off notifications and close unnecessary tabs",
-      "takeBreaks": "Always take your breaks - they're essential for sustainability",
-      "trackProgress": "Review your progress regularly to stay motivated",
-      "stayConsistent": "Consistency is key - use Pomodoro daily for best results",
-      "setRealisticGoals": "Set achievable goals for each work session",
-      "environment": "Create a dedicated workspace for better focus"
+    "filters": {
+      "all": "All",
+      "today": "Today",
+      "week": "This Week",
+      "completed": "Completed",
+      "pending": "Pending"
     },
     "actions": {
-      "openGuide": "Open User Guide",
-      "closeGuide": "Close Guide",
-      "next": "Next",
-      "previous": "Previous",
-      "gotIt": "Got It!",
-      "explore": "Start Exploring"
+      "markComplete": "Mark as Complete",
+      "markIncomplete": "Mark as Incomplete",
+      "startPomodoro": "Start Pomodoro"
+    }
+  },
+  "history": {
+    "title": "History & Statistics",
+    "subtitle": "Review your focus performance over time",
+    "startNewSession": "Start New Session",
+    "errorLoading": "An error occurred while loading data",
+    "noData": "No data available",
+    "noDataDescription": "Start your first Pomodoro session to see your statistics here",
+    "stats": {
+      "totalFocusTime": "Total Focus Time",
+      "completedSessions": "Completed Sessions",
+      "currentStreak": "Current Streak",
+      "days": "days",
+      "hours": "hours",
+      "minutes": "minutes",
+      "sessions": "sessions"
     },
-    "welcomeModal": {
-      "title": "Welcome to Your Focus Journey! 🎯",
-      "subtitle": "Let's get you started with the Pomodoro Focus App",
-      "description": "This guide will help you understand all features and get the most out of your productivity sessions",
-      "startButton": "Start Guide",
-      "skipButton": "Skip for Now"
+    "charts": {
+      "focusOverview": "Focus Time Overview",
+      "distribution": "Session Distribution",
+      "sessionHistory": "Session History",
+      "noTask": "No task"
+    },
+    "dateRange": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "last7Days": "Last 7 Days",
+      "last30Days": "Last 30 Days",
+      "custom": "Custom Range",
+      "selectDate": "Select date range"
+    }
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "comingSoon": "Coming Soon",
+    "description": "Leaderboard will help you compare your achievements with other users and motivate your learning."
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your preferences, timer settings, and appearance.",
+    "tabs": {
+      "general": "General",
+      "timer": "Timer",
+      "background": "Background",
+      "audio": "Audio"
+    },
+    "general": {
+      "title": "General Settings",
+      "language": {
+        "title": "Language",
+        "description": "Choose your preferred language",
+        "english": "English",
+        "vietnamese": "Vietnamese"
+      },
+      "theme": {
+        "title": "Theme",
+        "description": "Choose your app theme",
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      },
+      "notifications": {
+        "title": "Notifications",
+        "description": "Manage notification preferences",
+        "enable": "Enable notifications",
+        "sound": "Play sound on completion"
+      }
+    },
+    "background": {
+      "title": "Background Settings",
+      "chooseBackground": "Choose Background",
+      "uploadCustom": "Upload Custom",
+      "backgroundType": "Background Type",
+      "image": "Image",
+      "video": "Video",
+      "solid": "Solid Color",
+      "gradient": "Gradient",
+      "blur": "Blur Amount",
+      "opacity": "Opacity",
+      "brightness": "Brightness"
+    },
+    "audio": {
+      "title": "Audio Settings",
+      "volume": "Volume",
+      "backgroundMusic": "Background Music",
+      "natureSounds": "Nature Sounds",
+      "connectSpotify": "Connect Spotify",
+      "connectYouTube": "Connect YouTube"
+    }
+  },
+  "guide": {
+    "title": "User Guide",
+    "subtitle": "Learn about the Pomodoro method and how to use Study Bro to optimize your learning and work productivity",
+    "pomodoro": {
+      "badge": "Pomodoro Method",
+      "title": "What is Pomodoro?",
+      "description": "<strong>Pomodoro</strong> is a simple time management method that helps you work and study efficiently by breaking work into <strong>25-minute</strong> sessions called a Pomodoro. In each session, you focus completely on a single task. Then, take a <strong>5-minute</strong> break to relax and recharge.",
+      "imageAlt": "Pomodoro method illustration"
+    },
+    "howToApply": {
+      "badge": "How To Apply",
+      "title": "How to apply Pomodoro",
+      "steps": {
+        "step1": {
+          "title": "Choose task & set timer",
+          "description": "Choose a task to do and set a 25-minute timer to start the Pomodoro session."
+        },
+        "step2": {
+          "title": "Focus on work",
+          "description": "Focus on work until the timer rings, without interruption."
+        },
+        "step3": {
+          "title": "Short break",
+          "description": "Take a 5-minute break, you can stand up and move lightly or relax your mind."
+        },
+        "step4": {
+          "title": "Repeat & long break",
+          "description": "Repeat the cycle. After 4 Pomodoro sessions, take a longer break of about 15-30 minutes."
+        }
+      }
+    },
+    "benefits": {
+      "badge": "Benefits",
+      "title": "Why use Pomodoro?",
+      "list": [
+        "Increase focus and work efficiency",
+        "Avoid being overwhelmed when working long hours",
+        "Easy to measure and manage work progress",
+        "Suitable for those who are easily distracted",
+        "Helps maintain energy and work efficiency in the long run"
+      ],
+      "tip": "💡 <strong>Tip:</strong> You can completely adjust work and rest time to suit yourself, as long as you keep the principle of \"breaking time into small chunks to focus and rest regularly.\""
+    },
+    "howToUse": {
+      "badge": "Website Guide",
+      "title": "How to use Study Bro",
+      "description": "Study Bro provides tools to help you apply the Pomodoro method effectively.",
+      "features": {
+        "timer": {
+          "title": "Timer",
+          "subtitle": "Pomodoro countdown clock",
+          "description": "The Timer page is the center of the app, where you:",
+          "points": [
+            "Start/pause Pomodoro sessions",
+            "Choose task to focus on",
+            "Track work time",
+            "Automatically switch to break when time is up"
+          ],
+          "cta": "Go to Timer"
+        },
+        "tasks": {
+          "title": "Tasks",
+          "subtitle": "Manage your tasks",
+          "description": "Tasks page helps you organize work:",
+          "points": [
+            "Create, edit and delete tasks",
+            "Set priority and deadline",
+            "Filter tasks by status, date",
+            "Estimate required Pomodoros"
+          ],
+          "cta": "Go to Tasks"
+        },
+        "history": {
+          "title": "History",
+          "subtitle": "Track your progress",
+          "description": "History page helps you review:",
+          "points": [
+            "Pomodoro session history",
+            "Statistics by day, week, month",
+            "Total working time",
+            "Productivity charts"
+          ],
+          "cta": "Go to History"
+        },
+        "settings": {
+          "title": "Settings",
+          "subtitle": "Customize experience",
+          "description": "Settings page allows you to:",
+          "points": [
+            "Adjust Pomodoro & break time",
+            "Choose background & theme",
+            "Set notification sounds",
+            "Customize personal preferences"
+          ],
+          "cta": "Go to Settings"
+        }
+      }
+    },
+    "getStarted": {
+      "badge": "Get Started",
+      "title": "Ready to start?",
+      "description": "Start your productive work journey with Study Bro!",
+      "steps": [
+        "Create your first task in the <link>Tasks</link> page",
+        "Adjust Settings to your liking (optional)",
+        "Turn on <link>Timer</link> and start your first Pomodoro!"
+      ],
+      "cta": "Start Now"
+    }
+  },
+  "feedback": {
+    "title": "Send Feedback",
+    "subtitle": "Help us improve the app by submitting bug reports or suggesting new features.",
+    "form": {
+      "name": "Your Name (Optional)",
+      "namePlaceholder": "Enter your name...",
+      "email": "Email (Optional)",
+      "emailPlaceholder": "example@email.com",
+      "type": "Feedback Type",
+      "typeOptions": {
+        "feature": "✨ Feature Suggestion",
+        "bug": "🐛 Bug Report",
+        "other": "📝 Other"
+      },
+      "message": "Content",
+      "messagePlaceholder": "Describe your feedback in detail...",
+      "required": "*",
+      "submit": "Send Feedback"
+    },
+    "success": {
+      "title": "Thank you!",
+      "message": "Your feedback has been recorded. We will review and improve the app better.",
+      "cta": "Send Another Feedback"
+    },
+    "errors": {
+      "submitFailed": "An error occurred. Please try again later.",
+      "fieldRequired": "This field is required"
+    },
+    "toast": {
+      "success": "Thank you for your feedback!",
+      "error": "An error occurred. Please try again later."
+    }
+  },
+  "chat": {
+    "title": "Chat AI",
+    "subtitle": "Chat with AI assistant",
+    "placeholder": "Type your message...",
+    "send": "Send",
+    "clear": "Clear Chat",
+    "newChat": "New Chat",
+    "historyTitle": "Chat History",
+    "noConversations": "No conversations yet. Start a new chat!",
+    "deleteConfirmTitle": "Delete Conversation?",
+    "deleteConfirmDescription": "This action cannot be undone. This will permanently delete this conversation and all its messages.",
+    "thread": {
+      "welcome": "Hey there! 👋",
+      "welcomeSubtitle": "I'm Bro Chat - your study buddy!",
+      "scrollToBottom": "Scroll to bottom",
+      "inputPlaceholder": "Ask me anything...",
+      "sendMessage": "Send message",
+      "stopGenerating": "Stop generating",
+      "error": "⚠️ Error",
+      "copy": "Copy",
+      "exportMarkdown": "Export as Markdown",
+      "refresh": "Refresh",
+      "edit": "Edit",
+      "previous": "Previous",
+      "next": "Next",
+      "cancel": "Cancel",
+      "update": "Update",
+      "instruction": "I can help you with: Pomodoro method 🍅, study tips 📚, time management ⏰, and using this app. Feel free to ask!",
+      "conversationGroups": {
+        "older": "Older"
+      },
+      "suggestions": {
+        "pomodoro": {
+          "title": "Explain the Pomodoro Technique",
+          "label": "and how it boosts productivity",
+          "prompt": "Explain the Pomodoro Technique and how it helps boost productivity and focus"
+        },
+        "studyTips": {
+          "title": "Give me study tips",
+          "label": "for staying focused longer",
+          "prompt": "Give me some study tips for staying focused for longer periods and avoiding distractions"
+        },
+        "studyPlan": {
+          "title": "Create a study plan",
+          "label": "for my goals",
+          "prompt": "Help me create an effective study plan with Pomodoro sessions for my learning goals"
+        },
+        "breakActivities": {
+          "title": "Suggest break activities",
+          "label": "for Pomodoro breaks",
+          "prompt": "Suggest some relaxing activities I can do during my 5-minute Pomodoro breaks"
+        }
+      }
+    }
+  },
+  "tooltips": {
+    "toggleTheme": "Toggle theme",
+    "timerSettings": "Timer Settings",
+    "themeSettings": "Theme settings",
+    "backgroundSetup": "Background setup",
+    "backgroundSettings": "Background Settings",
+    "soundSettings": "Sound Settings",
+    "focusAudio": "Focus music / Nature sounds",
+    "enterFocus": "Enter Focus",
+    "exitFocus": "Exit Focus"
+  },
+  "errors": {
+    "generic": "An error occurred",
+    "network": "Network error. Please check your connection.",
+    "notFound": "Not found",
+    "unauthorized": "Unauthorized. Please sign in.",
+    "forbidden": "You don't have permission to access this resource"
+  },
+  "metadata": {
+    "timer": {
+      "title": "Timer • Study Bro App",
+      "description": "Manage work and break sessions with a refined Pomodoro timer and unified settings."
+    },
+    "tasks": {
+      "title": "Tasks • Study Bro App",
+      "description": "Organize and manage your tasks efficiently with our task management system."
+    },
+    "history": {
+      "title": "History • Study Bro App",
+      "description": "Review your focus performance and productivity statistics over time."
+    },
+    "guide": {
+      "title": "User Guide • Study Bro App",
+      "description": "Learn about the Pomodoro method and how to use Study Bro features."
     }
   }
 }

@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 export type TimerMode = 'work' | 'shortBreak' | 'longBreak'
-export type ClockType = 'digital' | 'analog' | 'progress' | 'flip'
+export type ClockType = 'digital' | 'analog' | 'progress' | 'flip' | 'animated'
 
 interface TimerSettings {
   workDuration: number // in minutes
@@ -97,7 +97,11 @@ export const useTimerStore = create<TimerState>()(
       repeatPlan: true,
 
       setMode: (mode: TimerMode) => set({ mode }),
-      setTimeLeft: (timeLeft: number) => set({ timeLeft }),
+      setTimeLeft: (timeLeft: number) => {
+        // Validate to prevent NaN or negative values
+        const validTimeLeft = Number.isFinite(timeLeft) && timeLeft >= 0 ? timeLeft : 0;
+        set({ timeLeft: validTimeLeft });
+      },
       setIsRunning: (isRunning: boolean) => set({ isRunning }),
       setDeadlineAt: (deadlineAt) => set({ deadlineAt }),
       incrementSessionCount: () => set((state: TimerState) => ({ sessionCount: state.sessionCount + 1 })),

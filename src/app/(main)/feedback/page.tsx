@@ -13,8 +13,10 @@ import {
 } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Loader2, CheckCircle2 } from 'lucide-react';
+import { useI18n } from '@/contexts/i18n-context';
 
 export default function FeedbackPage() {
+    const { t } = useI18n();
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [formData, setFormData] = useState({
@@ -38,9 +40,9 @@ export default function FeedbackPage() {
             if (!res.ok) throw new Error('Failed to submit feedback');
 
             setSuccess(true);
-            toast.success('Cảm ơn bạn đã đóng góp ý kiến!');
+            toast.success(t('feedback.toast.success'));
         } catch (error) {
-            toast.error('Có lỗi xảy ra. Vui lòng thử lại sau.');
+            toast.error(t('feedback.toast.error'));
         } finally {
             setLoading(false);
         }
@@ -52,9 +54,9 @@ export default function FeedbackPage() {
                 <div className="mb-4 rounded-full bg-green-100 p-3 text-green-600 dark:bg-green-900/30">
                     <CheckCircle2 className="h-12 w-12" />
                 </div>
-                <h2 className="mb-2 text-2xl font-bold">Cảm ơn bạn!</h2>
+                <h2 className="mb-2 text-2xl font-bold">{t('feedback.success.title')}</h2>
                 <p className="mb-6 max-w-md text-muted-foreground">
-                    Ý kiến đóng góp của bạn đã được ghi nhận. Chúng tôi sẽ xem xét và cải thiện ứng dụng tốt hơn.
+                    {t('feedback.success.message')}
                 </p>
                 <Button
                     onClick={() => {
@@ -62,18 +64,18 @@ export default function FeedbackPage() {
                         setFormData({ ...formData, message: '' });
                     }}
                 >
-                    Gửi ý kiến khác
+                    {t('feedback.success.cta')}
                 </Button>
             </div>
         );
     }
 
     return (
-        <div className="container max-w-2xl py-8">
+        <div className="max-w-2xl mx-auto">
             <div className="mb-8 space-y-2">
-                <h1 className="text-3xl font-bold tracking-tight">Gửi ý kiến phản hồi</h1>
+                <h1 className="text-3xl font-bold tracking-tight">{t('feedback.title')}</h1>
                 <p className="text-muted-foreground">
-                    Giúp chúng tôi cải thiện ứng dụng bằng cách gửi báo cáo lỗi hoặc đề xuất tính năng mới.
+                    {t('feedback.subtitle')}
                 </p>
             </div>
 
@@ -81,23 +83,23 @@ export default function FeedbackPage() {
                 <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
                         <label htmlFor="name" className="text-sm font-medium">
-                            Tên của bạn (Tùy chọn)
+                            {t('feedback.form.name')}
                         </label>
                         <Input
                             id="name"
-                            placeholder="Nhập tên..."
+                            placeholder={t('feedback.form.namePlaceholder')}
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         />
                     </div>
                     <div className="space-y-2">
                         <label htmlFor="email" className="text-sm font-medium">
-                            Email (Tùy chọn)
+                            {t('feedback.form.email')}
                         </label>
                         <Input
                             id="email"
                             type="email"
-                            placeholder="example@email.com"
+                            placeholder={t('feedback.form.emailPlaceholder')}
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         />
@@ -106,7 +108,7 @@ export default function FeedbackPage() {
 
                 <div className="space-y-2">
                     <label htmlFor="type" className="text-sm font-medium">
-                        Loại phản hồi
+                        {t('feedback.form.type')}
                     </label>
                     <Select
                         value={formData.type}
@@ -116,20 +118,20 @@ export default function FeedbackPage() {
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="feature">✨ Đề xuất tính năng</SelectItem>
-                            <SelectItem value="bug">🐛 Báo cáo lỗi</SelectItem>
-                            <SelectItem value="other">📝 Khác</SelectItem>
+                            <SelectItem value="feature">{t('feedback.form.typeOptions.feature')}</SelectItem>
+                            <SelectItem value="bug">{t('feedback.form.typeOptions.bug')}</SelectItem>
+                            <SelectItem value="other">{t('feedback.form.typeOptions.other')}</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
 
                 <div className="space-y-2">
                     <label htmlFor="message" className="text-sm font-medium">
-                        Nội dung <span className="text-red-500">*</span>
+                        {t('feedback.form.message')} <span className="text-red-500">{t('feedback.form.required')}</span>
                     </label>
                     <Textarea
                         id="message"
-                        placeholder="Mô tả chi tiết ý kiến của bạn..."
+                        placeholder={t('feedback.form.messagePlaceholder')}
                         className="min-h-[150px] resize-none"
                         required
                         value={formData.message}
@@ -140,7 +142,7 @@ export default function FeedbackPage() {
                 <div className="flex justify-end">
                     <Button type="submit" disabled={loading || !formData.message.trim()}>
                         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Gửi phản hồi
+                        {t('feedback.form.submit')}
                     </Button>
                 </div>
             </form>

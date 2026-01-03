@@ -22,16 +22,29 @@ function safeGet(obj: any, path: string): any {
   }, obj);
 }
 
-function detectInitialLang(): Lang {
-  if (typeof window === 'undefined') return DEFAULT_LANG;
+// Helper to get saved lang from localStorage synchronously during initialization
+function getSavedLang(): Lang | null {
+  if (typeof window === 'undefined') return null;
   try {
     const saved = window.localStorage.getItem(I18N_STORAGE_KEY) as Lang | null;
     if (saved === 'en' || saved === 'vi') return saved;
   } catch {}
+  return null;
+}
+
+function detectInitialLang(): Lang {
+  if (typeof window === 'undefined') return DEFAULT_LANG;
+
+  // First priority: saved preference
+  const saved = getSavedLang();
+  if (saved) return saved;
+
+  // Second priority: browser language
   try {
     const n = navigator?.language?.toLowerCase?.() || '';
     if (n.startsWith('vi')) return 'vi';
   } catch {}
+
   return DEFAULT_LANG;
 }
 
@@ -47,7 +60,20 @@ export interface I18nContextValue {
 const I18nContext = createContext<I18nContextValue | undefined>(undefined);
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(detectInitialLang());
+  // Initialize with saved language or default (synchronous check during render)
+  const [lang, setLangState] = useState<Lang>(() => {
+    // This runs only once during initial render on client
+    // On server, it will always return DEFAULT_LANG
+    if (typeof window === 'undefined') return DEFAULT_LANG;
+    return getSavedLang() || DEFAULT_LANG;
+  });
+
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Mark as hydrated after first render
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   useEffect(() => {
     try {

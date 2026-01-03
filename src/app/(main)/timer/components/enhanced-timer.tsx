@@ -627,7 +627,7 @@ export function EnhancedTimer() {
             </div>
 
             {/* Bottom Left Settings Controls */}
-            <div className="fixed bottom-0 left-0 z-50 flex gap-2 items-center p-6">
+            <div className="absolute bottom-0 left-0 z-10 flex gap-2 items-center ps-4">
                 <TooltipProvider>
                     {!isFocusMode && (
                         <>

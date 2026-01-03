@@ -278,6 +278,9 @@ function TooltipOverlay() {
 
   const ready = x != null && y != null;
   const Component = rendered.data?.contentAsChild ? Slot : motion.div;
+
+  if (!rendered.data || !ready) return null;
+
   const resolvedSide = getResolvedSide(context.placement);
 
   return (
@@ -501,17 +504,17 @@ function TooltipTrigger({
     [onPointerDown, currentTooltip?.id, id, hideImmediate],
   );
 
-  const handleMouseEnter = React.useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      onMouseEnter?.(e);
+  const handlePointerEnter = React.useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      onMouseEnter?.(e as unknown as React.MouseEvent<HTMLDivElement>);
       handleOpen();
     },
     [handleOpen, onMouseEnter],
   );
 
-  const handleMouseLeave = React.useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      onMouseLeave?.(e);
+  const handlePointerLeave = React.useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      onMouseLeave?.(e as unknown as React.MouseEvent<HTMLDivElement>);
       hideTooltip();
     },
     [hideTooltip, onMouseLeave],
@@ -540,8 +543,8 @@ function TooltipTrigger({
     <Component
       ref={triggerRef}
       onPointerDown={handlePointerDown}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
       onFocus={handleFocus}
       onBlur={handleBlur}
       data-slot="tooltip-trigger"

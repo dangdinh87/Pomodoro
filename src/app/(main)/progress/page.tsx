@@ -5,7 +5,7 @@ import Link from 'next/link'
 
 export default function ProgressPage() {
   return (
-    <div className="container mx-auto px-4 min-h-screen grid place-items-center">
+    <div className="h-full grid place-items-center">
       <Card className="w-full max-w-2xl bg-background/70 backdrop-blur-md border-white/10">
         <CardHeader className="text-center">
           <div className="mx-auto mb-3 h-10 w-10 grid place-items-center rounded-full bg-primary/10 text-primary">

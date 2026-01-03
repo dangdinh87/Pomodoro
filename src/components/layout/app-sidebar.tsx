@@ -13,6 +13,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { useAuthStore } from '@/stores/auth-store';
 import { supabase } from '@/lib/supabase-client';
@@ -21,6 +22,7 @@ import {
   LogOut,
   MessageSquare,
 } from 'lucide-react';
+import { BotMessageSquare } from '@/components/animate-ui/icons/bot-message-square';
 import {
   AnimatedTimer,
   AnimatedTasks,
@@ -33,27 +35,29 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Image from 'next/image';
 import { AnimateIcon } from '../animate-ui/icons/icon';
 import { Clock } from '../animate-ui/icons/clock';
+import { useI18n } from '@/contexts/i18n-context';
 
 export function AppSidebar() {
   const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
+  const { t } = useI18n();
 
   const handleSignOut = async () => {
     if (!supabase) {
-      toast.error('Supabase chưa được cấu hình.');
+      toast.error(t('auth.supabaseNotConfigured'));
       return;
     }
 
     try {
       const { error } = await supabase.auth.signOut();
       if (error) {
-        toast.error('Không thể đăng xuất.');
+        toast.error(t('auth.signOutError'));
         return;
       }
-      toast.success('Đã đăng xuất.');
+      toast.success(t('auth.signOutSuccess'));
     } catch (error) {
       console.error(error);
-      toast.error('Có lỗi xảy ra khi đăng xuất.');
+      toast.error(t('auth.signOutUnexpectedError'));
     }
   };
 
@@ -68,8 +72,8 @@ export function AppSidebar() {
                   <Image alt="StudyBro" width={40} height={40} src="/images/logo.png" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">StudyBro</span>
-                  <span className="truncate text-xs">Pomodoro Timer Focus</span>
+                  <span className="truncate font-semibold" suppressHydrationWarning>{t('brand.title')}</span>
+                  <span className="truncate text-xs" suppressHydrationWarning>{t('brand.subtitle')}</span>
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -78,14 +82,14 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel suppressHydrationWarning>{t('nav.navigation')}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={pathname === '/timer'}>
                   <Link href="/timer">
                     <AnimatedTimer isActive={pathname === '/timer'} />
-                    <span>Timer</span>
+                    <span suppressHydrationWarning>{t('nav.timer')}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -93,7 +97,7 @@ export function AppSidebar() {
                 <SidebarMenuButton asChild isActive={pathname === '/tasks'}>
                   <Link href="/tasks">
                     <AnimatedTasks isActive={pathname === '/tasks'} />
-                    <span>Tasks</span>
+                    <span suppressHydrationWarning>{t('nav.tasks')}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -104,7 +108,7 @@ export function AppSidebar() {
                 >
                   <Link href="/history">
                     <AnimatedHistory isActive={pathname === '/history'} />
-                    <span>History</span>
+                    <span suppressHydrationWarning>{t('nav.history')}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -112,7 +116,17 @@ export function AppSidebar() {
                 <SidebarMenuButton asChild isActive={pathname === '/leaderboard'}>
                   <Link href="/leaderboard">
                     <AnimatedLeaderboard isActive={pathname === '/leaderboard'} />
-                    <span>Leaderboard</span>
+                    <span suppressHydrationWarning>{t('nav.leaderboard')}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === '/chat'}>
+                  <Link href="/chat" className="group/chat">
+                    <AnimateIcon animateOnHover className="group-hover/chat:text-primary">
+                      <BotMessageSquare animate={pathname === '/chat'} loop={pathname === '/chat'} className="size-5" />
+                    </AnimateIcon>
+                    <span suppressHydrationWarning>Bro Chat</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -121,14 +135,14 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>System</SidebarGroupLabel>
+          <SidebarGroupLabel suppressHydrationWarning>{t('nav.system')}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={pathname === '/settings'}>
                   <Link href="/settings">
                     <AnimatedSettings isActive={pathname === '/settings'} />
-                    <span>Settings</span>
+                    <span suppressHydrationWarning>{t('nav.settings')}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -142,7 +156,7 @@ export function AppSidebar() {
             <SidebarMenuButton asChild isActive={pathname === '/guide'}>
               <Link href="/guide">
                 <AnimatedGuide isActive={pathname === '/guide'} />
-                <span>Guide</span>
+                <span suppressHydrationWarning>{t('nav.guide')}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -150,17 +164,22 @@ export function AppSidebar() {
             <SidebarMenuButton asChild isActive={pathname === '/feedback'}>
               <Link href="/feedback">
                 <MessageSquare className="size-5" />
-                <span>Feedback</span>
+                <span suppressHydrationWarning>{t('nav.feedback')}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+        </SidebarMenu>
+
+        <SidebarSeparator className="mx-0" />
+
+        <SidebarMenu>
           <SidebarMenuItem>
             {user ? (
               <SidebarMenuButton
                 size="lg"
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               >
-                <Avatar className="h-8 w-8 rounded-lg">
+                <Avatar className="h-8 w-8 rounded-lg shrink-0">
                   <AvatarImage
                     src={user.avatarUrl || ''}
                     alt={user.name || ''}
@@ -169,19 +188,28 @@ export function AppSidebar() {
                     {user.name?.charAt(0)?.toUpperCase() ?? 'U'}
                   </AvatarFallback>
                 </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
+                <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
                   <span className="truncate font-semibold">{user.name}</span>
                   <span className="truncate text-xs">{user.email}</span>
                 </div>
                 <div
                   onClick={handleSignOut}
+                  className="group-data-[collapsible=icon]:hidden"
                 >
                   <LogOut className="ml-auto size-4" />
                 </div>
               </SidebarMenuButton>
             ) : (
-              <SidebarMenuButton className="py-3 bg-primary text-primary-foreground hover:bg-primary/90 justify-center" asChild>
-                <Link href="/login" className="font-semibold">Đăng nhập ngay</Link>
+              <SidebarMenuButton
+                variant="outline"
+                asChild
+                size="lg"
+
+              >
+                <Link href="/login" className="font-bold justify-center">
+                  <span className="group-data-[collapsible=icon]:hidden" suppressHydrationWarning>{t('nav.loginNow')}</span>
+                  <LogOut className="hidden group-data-[collapsible=icon]:block size-4 rotate-180" />
+                </Link>
               </SidebarMenuButton>
             )}
           </SidebarMenuItem>

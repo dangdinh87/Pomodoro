@@ -9,6 +9,9 @@ export interface Session {
     mode: 'work' | 'shortBreak' | 'longBreak'
     completed: boolean
     task_id?: string
+    tasks?: {
+        title: string
+    } | null
 }
 
 export interface HistoryData {

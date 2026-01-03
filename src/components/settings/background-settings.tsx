@@ -103,6 +103,11 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
         value: '/backgrounds/landscape-cartoon.jpg',
         kind: 'image',
       },
+      {
+        name: 'Chill Shiba',
+        value: '/backgrounds/xmas/chill-shiba-sleeping-christmas-room.jpg',
+        kind: 'image',
+      }
     ];
 
   const buildBackground = () => {
@@ -149,17 +154,17 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
       {/* Fixed Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b shrink-0">
         <div>
-          <h2 className="text-lg font-semibold leading-none tracking-tight">Background Setup</h2>
+          <h2 className="text-lg font-semibold leading-none tracking-tight">Lựa ảnh</h2>
           <p className="text-xs text-muted-foreground mt-1">
-            Customize your focus environment
+            Chọn ảnh phù hợp với màu hệ thống
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={reset}>
-            Reset
+            Đặt lại
           </Button>
           <Button size="sm" onClick={apply}>
-            Save Changes
+            Lưu thay đổi
           </Button>
           {onClose && (
             <Button variant="ghost" size="icon" className="ml-2" onClick={onClose}>
@@ -175,7 +180,7 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
         <div className="col-span-8 overflow-y-auto p-6 border-r space-y-8">
           {/* System Auto Color */}
           <div className="space-y-3">
-            <Label className="text-base font-medium">System & Auto</Label>
+            <Label className="text-base font-medium">Hệ thống & Tự động</Label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {presets
                 .filter((p) => p.kind === 'system')
@@ -215,7 +220,7 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
 
           {/* Video Presets */}
           <div className="space-y-3">
-            <Label className="text-base font-medium">Live Wallpapers</Label>
+            <Label className="text-base font-medium">Hình nền động</Label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {presets
                 .filter((p) => p.kind === 'video' || p.kind === 'auto')
@@ -278,7 +283,7 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
 
           {/* Image Presets */}
           <div className="space-y-3">
-            <Label className="text-base font-medium">Images</Label>
+            <Label className="text-base font-medium">Hình ảnh</Label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {presets
                 .filter((p) => p.kind === 'image')
@@ -315,9 +320,9 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
 
         {/* Right Column: Sliders (Fixed) */}
         <div className="col-span-4 p-6 bg-muted/10 space-y-8">
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label htmlFor="bg-opacity" className="text-base">Opacity</Label>
+              <Label htmlFor="bg-opacity" className="text-base">Độ mờ</Label>
               <span className="text-sm font-mono text-muted-foreground">{opacity}%</span>
             </div>
             <Slider
@@ -344,13 +349,13 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
               className="py-2"
             />
             <p className="text-xs text-muted-foreground">
-              Adjust the transparency of the background image or video.
+              Điều chỉnh độ trong suốt của hình nền hoặc video.
             </p>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label htmlFor="bg-brightness" className="text-base">Brightness</Label>
+              <Label htmlFor="bg-brightness" className="text-base">Độ sáng</Label>
               <span className="text-sm font-mono text-muted-foreground">{brightness}%</span>
             </div>
             <Slider
@@ -377,7 +382,7 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
               className="py-2"
             />
             <p className="text-xs text-muted-foreground">
-              Adjust the brightness level to match your environment.
+              Điều chỉnh độ sáng để phù hợp với môi trường của bạn.
             </p>
           </div>
         </div>

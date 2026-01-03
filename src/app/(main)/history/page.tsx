@@ -10,7 +10,8 @@ import { DateRangePicker } from "./components/date-range-picker"
 import { useAuth } from "@/hooks/use-auth"
 import { useRouter } from "next/navigation"
 import { DateRange } from "react-day-picker"
-import { subDays } from "date-fns"
+import { useI18n } from '@/contexts/i18n-context'
+
 import { useStats } from "@/hooks/use-stats"
 import { useHistory } from "@/hooks/use-history"
 import { StatsLoading } from "./components/stats-loading"
@@ -19,8 +20,9 @@ import { StatsEmpty } from "./components/stats-empty"
 export default function HistoryPage() {
     const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
     const router = useRouter()
+    const { t } = useI18n()
     const [dateRange, setDateRange] = useState<DateRange | undefined>({
-        from: subDays(new Date(), 2), // Last 3 days
+        from: new Date(),
         to: new Date()
     })
 
@@ -45,23 +47,23 @@ export default function HistoryPage() {
                 className="container mx-auto px-4 py-8 md:py-12 min-h-screen flex flex-col items-center justify-center space-y-4"
                 aria-label="History and statistics page"
             >
-                <h2 className="text-xl font-semibold text-center">Vui lòng đăng nhập để xem thống kê</h2>
-                <Button onClick={() => router.push('/login?redirect=/history')}>Đăng nhập</Button>
+                <h2 className="text-xl font-semibold text-center">{t('auth.signInToViewStats')}</h2>
+                <Button onClick={() => router.push('/login?redirect=/history')}>{t('auth.signInButton')}</Button>
             </main>
         )
     }
 
     return (
         <main
-            className="container mx-auto px-4 py-8 md:py-12 min-h-screen w-full"
+            className="w-full h-full p-4 md:p-8"
             aria-label="History and statistics page"
         >
             <div className="max-w-5xl mx-auto space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold">Lịch sử & Thống kê</h1>
+                        <h1 className="text-2xl font-bold">{t('history.title')}</h1>
                         <p className="text-sm text-muted-foreground">
-                            Xem lại hiệu suất tập trung của bạn theo thời gian
+                            {t('history.subtitle')}
                         </p>
                     </div>
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
@@ -71,7 +73,7 @@ export default function HistoryPage() {
                             className="w-full sm:w-auto"
                         />
                         <Button onClick={() => router.push('/timer')} className="w-full sm:w-auto">
-                            Bắt đầu phiên mới
+                            {t('history.startNewSession')}
                         </Button>
                     </div>
                 </div>
@@ -81,9 +83,9 @@ export default function HistoryPage() {
                 ) : isError ? (
                     <div className="flex h-64 items-center justify-center rounded-xl border bg-card/70 backdrop-blur">
                         <div className="text-center space-y-2">
-                            <p className="text-destructive font-medium">Đã xảy ra lỗi khi tải dữ liệu</p>
+                            <p className="text-destructive font-medium">{t('history.errorLoading')}</p>
                             <Button variant="outline" onClick={() => window.location.reload()}>
-                                Thử lại
+                                {t('common.retry')}
                             </Button>
                         </div>
                     </div>
@@ -101,7 +103,7 @@ export default function HistoryPage() {
 
                         <section className="rounded-xl border bg-card/70 backdrop-blur p-4 md:p-6 space-y-8">
                             <div className="space-y-4">
-                                <h3 className="text-xl font-semibold">Tổng quan Thời gian Tập trung</h3>
+                                <h3 className="text-xl font-semibold">{t('history.charts.focusOverview')}</h3>
                                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
                                     <div className="lg:col-span-4">
                                         <FocusChart data={statsData.dailyFocus} />
@@ -113,7 +115,14 @@ export default function HistoryPage() {
                             </div>
 
                             <div className="space-y-4">
-                                <SessionHistory sessions={historyData.sessions} />
+                                <SessionHistory sessions={historyData.sessions
+                                    .map(s => ({
+                                        id: s.id,
+                                        taskName: s.tasks?.title || t('history.charts.noTask'),
+                                        mode: s.mode,
+                                        date: s.created_at,
+                                        duration: s.duration
+                                    }))} />
                             </div>
                         </section>
                     </>

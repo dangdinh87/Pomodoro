@@ -14,3 +14,6 @@ export {
     FlipClock,
     type FlipClockProps,
 } from './flip-clock';
+export {
+    AnimatedCountdown,
+} from './animated-countdown';

@@ -28,7 +28,7 @@ export function DateRangePicker({
 }: DateRangePickerProps) {
     const [date, setDate] = React.useState<DateRange | undefined>(value)
     const [open, setOpen] = React.useState(false)
-    const [presetName, setPresetName] = React.useState<string | null>('3 ngày qua') // Default to match initial state in page
+    const [presetName, setPresetName] = React.useState<string | null>('Hôm nay') // Default to match initial state in page
 
     // Update internal state when value prop changes
     React.useEffect(() => {

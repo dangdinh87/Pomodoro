@@ -11,7 +11,7 @@ import { useTimerStore } from '@/stores/timer-store'
 import { toast } from 'sonner'
 import { Separator } from '@/components/ui/separator'
 
-type ClockType = 'digital' | 'analog' | 'progress' | 'flip'
+type ClockType = 'digital' | 'analog' | 'progress' | 'flip' | 'animated'
 
 interface TimerSettingsData {
     workDuration: number
@@ -328,6 +328,7 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                                                     Flip
                                                 </div>
                                             </SelectItem>
+
                                         </SelectContent>
                                     </Select>
                                 </div>

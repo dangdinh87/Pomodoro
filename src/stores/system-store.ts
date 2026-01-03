@@ -13,19 +13,11 @@ interface BackgroundSettings {
   backgroundOpacity: number
 }
 
-interface AudioSettings {
-  selectedAmbientSound: string
-  volume: number
-  fadeInOut: boolean
-  selectedNotificationSound: string
-  notificationVolume: number
-  youtubeUrl?: string
-}
+
 
 interface SystemState {
   soundSettings: SoundSettings
   backgroundSettings: BackgroundSettings
-  audioSettings: AudioSettings
   isLoading: boolean
   loadingMessage?: string
   loadingSubtitle?: string
@@ -38,10 +30,6 @@ interface SystemState {
   // Background settings actions
   updateBackgroundSettings: (settings: Partial<BackgroundSettings>) => void
   resetBackgroundSettings: () => void
-
-  // Audio settings actions
-  updateAudioSettings: (settings: Partial<AudioSettings>) => void
-  resetAudioSettings: () => void
 
   // Loading actions
   setLoading: (isLoading: boolean, message?: string, subtitle?: string) => void
@@ -62,21 +50,13 @@ const defaultBackgroundSettings: BackgroundSettings = {
   backgroundOpacity: 100,
 }
 
-const defaultAudioSettings: AudioSettings = {
-  selectedAmbientSound: '',
-  volume: 50,
-  fadeInOut: true,
-  selectedNotificationSound: 'alarm',
-  notificationVolume: 70,
-  youtubeUrl: '',
-}
+
 
 export const useSystemStore = create<SystemState>()(
   persist(
     (set) => ({
       soundSettings: defaultSoundSettings,
       backgroundSettings: defaultBackgroundSettings,
-      audioSettings: defaultAudioSettings,
       isLoading: false,
       isFocusMode: false,
 
@@ -96,13 +76,7 @@ export const useSystemStore = create<SystemState>()(
       resetBackgroundSettings: () =>
         set({ backgroundSettings: defaultBackgroundSettings }),
 
-      updateAudioSettings: (newSettings) =>
-        set((state) => ({
-          audioSettings: { ...state.audioSettings, ...newSettings },
-        })),
 
-      resetAudioSettings: () =>
-        set({ audioSettings: defaultAudioSettings }),
 
       setLoading: (isLoading, message, subtitle) =>
         set({
@@ -120,7 +94,6 @@ export const useSystemStore = create<SystemState>()(
       partialize: (state) => ({
         soundSettings: state.soundSettings,
         backgroundSettings: state.backgroundSettings,
-        audioSettings: state.audioSettings,
       }),
     }
   )

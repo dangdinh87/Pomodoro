@@ -1,11 +1,14 @@
 "use client"
 
 import { Trophy } from "lucide-react"
+import { useI18n } from '@/contexts/i18n-context'
 
 export default function LeaderboardPage() {
+    const { t } = useI18n()
+
     return (
         <main
-            className="container mx-auto px-4 py-12 min-h-screen flex items-center justify-center"
+            className="h-full flex items-center justify-center"
             aria-label="Leaderboard page"
         >
             <div className="max-w-md mx-auto text-center space-y-6">
@@ -13,13 +16,13 @@ export default function LeaderboardPage() {
                     <Trophy className="h-12 w-12 text-primary" />
                 </div>
                 <div className="space-y-2">
-                    <h1 className="text-3xl font-bold">Leaderboard</h1>
+                    <h1 className="text-3xl font-bold">{t('leaderboard.title')}</h1>
                     <p className="text-muted-foreground text-lg">
-                        Tính năng sắp ra mắt
+                        {t('leaderboard.comingSoon')}
                     </p>
                 </div>
                 <div className="text-sm text-muted-foreground max-w-sm mx-auto">
-                    Bảng xếp hạng sẽ giúp bạn so sánh thành tích với các người dùng khác và tạo động lực học tập.
+                    {t('leaderboard.description')}
                 </div>
             </div>
         </main>

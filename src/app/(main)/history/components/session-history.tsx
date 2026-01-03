@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { cn } from "@/lib/utils"
 
 interface SessionHistoryProps {
     sessions: {
@@ -56,7 +57,7 @@ export function SessionHistory({ sessions }: SessionHistoryProps) {
                     <TableBody>
                         {sessions.map((session) => (
                             <TableRow key={session.id}>
-                                <TableCell className="font-medium">{session.taskName}</TableCell>
+                                <TableCell className={cn("font-medium", session.taskName === 'Không có công việc' && "text-muted-foreground italic")}>{session.taskName}</TableCell>
                                 <TableCell>
                                     <Badge variant={getModeColor(session.mode) as any}>
                                         {getModeLabel(session.mode)}

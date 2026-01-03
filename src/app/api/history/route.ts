@@ -24,7 +24,7 @@ export async function GET(request: Request) {
 
         let query = supabase
             .from('sessions')
-            .select('*')
+            .select('*, tasks(title)')
             .eq('user_id', userId)
             .order('created_at', { ascending: false })
 
@@ -32,13 +32,10 @@ export async function GET(request: Request) {
             query = query.gte('created_at', startDate)
         }
         if (endDate) {
-            // Add one day to include the end date fully if it's just a date string
-            // But usually the client sends a specific timestamp or we handle it here.
-            // Assuming client sends ISO strings or YYYY-MM-DD.
-            // If YYYY-MM-DD, we might want to go to the end of that day.
-            // For now, let's assume the client handles the exact range or we just use as is.
-            // If it's just a date, we might want to add time 23:59:59
-            query = query.lte('created_at', endDate)
+            // Add one day to include the end date fully
+            const endDateTime = new Date(endDate)
+            endDateTime.setDate(endDateTime.getDate() + 1)
+            query = query.lt('created_at', endDateTime.toISOString())
         } else {
             // Default limit if no date range? Or maybe just limit to recent 50?
             // Let's stick to date range if provided, otherwise maybe last 30 days?

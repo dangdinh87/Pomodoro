@@ -18,7 +18,7 @@ const EnhancedTimer = dynamic(
 export default function TimerPage() {
   return (
     <main
-      className="container mx-auto px-4 py-12 min-h-screen flex items-center justify-center relative"
+      className="h-full flex items-center justify-center relative"
       aria-label="Pomodoro timer page"
     >
       <Suspense fallback={null}>
