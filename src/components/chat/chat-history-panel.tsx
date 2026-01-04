@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { MessageSquare, Trash2, Search, MoreHorizontal } from "lucide-react";
+import { MessageSquare, Trash2, Search, MoreHorizontal, Plus } from "lucide-react";
 import { isToday, isYesterday, isWithinInterval, subDays, startOfDay } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -43,6 +43,7 @@ interface ChatHistoryPanelProps {
     conversations: Conversation[];
     currentConversationId: string | null;
     onSelect: (id: string) => void;
+    onNewChat: () => void;
     onDelete: (id: string) => void;
 }
 
@@ -89,6 +90,7 @@ export function ChatHistoryPanel({
     conversations,
     currentConversationId,
     onSelect,
+    onNewChat,
     onDelete,
 }: ChatHistoryPanelProps) {
     const { t } = useI18n();
@@ -119,6 +121,8 @@ export function ChatHistoryPanel({
 
     const handleDeleteClick = (conversation: Conversation, e: React.MouseEvent) => {
         e.stopPropagation();
+        // Don't allow deleting the currently selected conversation
+        if (currentConversationId === conversation.id) return;
         setConversationToDelete(conversation);
         setDeleteDialogOpen(true);
     };
@@ -156,30 +160,33 @@ export function ChatHistoryPanel({
                 </span>
             </div>
 
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 min-w-[28px] shrink-0 text-muted-foreground hover:text-foreground"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                    <DropdownMenuItem
-                        className="text-destructive focus:text-destructive"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteClick(conversation, e);
-                        }}
-                    >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        {t('common.delete')}
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+            {/* Hide delete button for currently selected conversation */}
+            {currentConversationId !== conversation.id && (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 min-w-[28px] shrink-0 text-muted-foreground hover:text-foreground"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                            className="text-destructive focus:text-destructive"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteClick(conversation, e);
+                            }}
+                        >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            {t('common.delete')}
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            )}
         </div>
     );
 
@@ -204,9 +211,23 @@ export function ChatHistoryPanel({
             <Sheet open={open} onOpenChange={onOpenChange}>
                 <SheetContent side="right" className="w-72 sm:w-80 p-0">
                     <SheetHeader className="px-3 py-3 border-b">
-                        <SheetTitle className="text-base">
-                            {t('chat.historyTitle')}
-                        </SheetTitle>
+                        <div className="flex items-center justify-between">
+                            <SheetTitle className="text-base">
+                                {t('chat.historyTitle')}
+                            </SheetTitle>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-primary hover:text-primary"
+                                onClick={() => {
+                                    onNewChat();
+                                    onOpenChange(false);
+                                }}
+                                title={t('chat.newChat')}
+                            >
+                                <Plus className="h-5 w-5" />
+                            </Button>
+                        </div>
                     </SheetHeader>
 
                     {/* Search Input */}

@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { useAudioStore } from '@/stores/audio-store';
 import { fetchYouTubeOEmbed } from '@/lib/youtube-utils';
 
-// Type definitions for better type safety
+// Type definitions
 export interface YouTubeSource {
   videoId?: string;
   listId?: string;
@@ -34,7 +34,6 @@ const YT_STATE_MAP: Record<number, YouTubePlayerState['status']> = {
   3: 'buffering',
 };
 
-// Window interface extension for type safety
 declare global {
   interface Window {
     [GLOBAL_YT_PLAYER_KEY]?: any;
@@ -44,18 +43,20 @@ declare global {
   }
 }
 
-// Helper functions for global YouTube player management
+// Helper functions
 const getOrCreateGlobalYTContainer = (): HTMLDivElement => {
   let el = document.getElementById(GLOBAL_YT_CONTAINER_ID) as HTMLDivElement | null;
   if (!el) {
     el = document.createElement('div');
     el.id = GLOBAL_YT_CONTAINER_ID;
-    el.style.position = 'fixed';
-    el.style.width = '0px';
-    el.style.height = '0px';
-    el.style.left = '-9999px';
-    el.style.top = '0';
-    el.style.display = 'none';
+    Object.assign(el.style, {
+      position: 'fixed',
+      width: '0px',
+      height: '0px',
+      left: '-9999px',
+      top: '0',
+      display: 'none',
+    });
     document.body.appendChild(el);
   }
   return el;
@@ -71,9 +72,7 @@ const setGlobalYTSource = (source: YouTubeSource | null): void => {
   window[GLOBAL_YT_SOURCE_KEY] = source;
 };
 
-const getGlobalYTSource = (): YouTubeSource | null => {
-  return window[GLOBAL_YT_SOURCE_KEY] || null;
-};
+const getGlobalYTSource = (): YouTubeSource | null => window[GLOBAL_YT_SOURCE_KEY] || null;
 
 // YouTube URL parsing utility
 export const parseYouTubeUrl = (url: string): ParsedYouTubeUrl => {
@@ -82,45 +81,29 @@ export const parseYouTubeUrl = (url: string): ParsedYouTubeUrl => {
   try {
     const u = new URL(url);
 
-    // Handle youtu.be short URLs
     if (u.hostname === 'youtu.be') {
       const id = u.pathname.split('/').filter(Boolean)[0];
       return id ? { videoId: id } : {};
     }
 
-    // Handle youtube.com URLs
     if (u.hostname.includes('youtube.com')) {
-      // Regular video URLs
       if (u.pathname.startsWith('/watch')) {
-        const vid = u.searchParams.get('v') || undefined;
-        const list = u.searchParams.get('list') || undefined;
-        return { videoId: vid, listId: list };
+        return {
+          videoId: u.searchParams.get('v') || undefined,
+          listId: u.searchParams.get('list') || undefined
+        };
       }
-
-      // Shorts
-      if (u.pathname.startsWith('/shorts/')) {
+      if (u.pathname.startsWith('/shorts/') || u.pathname.startsWith('/live/')) {
         const id = u.pathname.split('/').filter(Boolean)[1];
         return id ? { videoId: id } : {};
       }
-
-      // Live streams
-      if (u.pathname.startsWith('/live/')) {
-        const id = u.pathname.split('/').filter(Boolean)[1];
-        return id ? { videoId: id } : {};
-      }
-
-      // Playlists
       if (u.pathname.startsWith('/playlist')) {
-        const list = u.searchParams.get('list') || undefined;
-        return { listId: list };
+        return { listId: u.searchParams.get('list') || undefined };
       }
-
-      // Channels
       if (u.pathname.startsWith('/c/') || u.pathname.startsWith('/channel/')) {
         return { isChannel: true };
       }
     }
-
     return {};
   } catch {
     return {};
@@ -130,22 +113,51 @@ export const parseYouTubeUrl = (url: string): ParsedYouTubeUrl => {
 // YouTube API loading utility
 const ensureYouTubeAPI = (): Promise<any> => {
   return new Promise((resolve) => {
-    if (window.YT && window.YT.Player) {
+    if (window.YT?.Player) {
       resolve(window.YT);
       return;
     }
 
-    const existingScript = document.getElementById('youtube-iframe-api') as HTMLScriptElement | null;
-    if (!existingScript) {
+    if (!document.getElementById('youtube-iframe-api')) {
       const script = document.createElement('script');
       script.id = 'youtube-iframe-api';
       script.src = 'https://www.youtube.com/iframe_api';
       document.body.appendChild(script);
     }
 
-    window.onYouTubeIframeAPIReady = () => {
-      resolve(window.YT);
-    };
+    window.onYouTubeIframeAPIReady = () => resolve(window.YT);
+  });
+};
+
+// Helper to update audio store with YouTube info
+const updateAudioStoreForYouTube = (
+  source: YouTubeSource,
+  isPlaying: boolean,
+  setCurrentlyPlaying: (audio: any) => void
+) => {
+  const id = source.videoId ? `video-${source.videoId}` : source.listId ? `playlist-${source.listId}` : '';
+  const name = source.videoId ? 'YouTube Video' : 'YouTube Playlist';
+  const url = source.videoId
+    ? `https://www.youtube.com/watch?v=${source.videoId}`
+    : `https://www.youtube.com/playlist?list=${source.listId}`;
+
+  setCurrentlyPlaying({
+    type: 'youtube',
+    id,
+    name,
+    volume: 50,
+    isPlaying,
+    source: { type: 'youtube', id, name, url, volume: 50, loop: false }
+  });
+
+  // Fetch real title
+  fetchYouTubeOEmbed(url).then(data => {
+    if (data?.title) {
+      const current = useAudioStore.getState().currentlyPlaying;
+      if (current?.id === id) {
+        setCurrentlyPlaying({ ...current, name: data.title });
+      }
+    }
   });
 };
 
@@ -173,36 +185,21 @@ export const useYouTubePlayer = () => {
         currentSource: source,
       });
 
-      // Sync with audio store
+      const currentPlaying = useAudioStore.getState().currentlyPlaying;
+
+      // Sync audio store with YouTube player state
       if (mappedStatus === 'stopped' || !source) {
-        clearCurrentlyPlaying();
+        // Only clear if current audio is YouTube
+        if (currentPlaying?.type === 'youtube') {
+          clearCurrentlyPlaying();
+        }
       } else if (mappedStatus === 'playing' || mappedStatus === 'paused') {
-        // Check if we need to set currentlyPlaying
-        const currentPlaying = useAudioStore.getState().currentlyPlaying;
-
-        // If no currentlyPlaying or it's not YouTube, set it
-        if (!currentPlaying || currentPlaying.type !== 'youtube') {
-          const id = source.videoId ? `video-${source.videoId}` : source.listId ? `playlist-${source.listId}` : '';
-          const name = source.videoId ? `YouTube Video` : `YouTube Playlist`;
-
-          setCurrentlyPlaying({
-            type: 'youtube',
-            id,
-            name,
-            volume: 50,
-            isPlaying: mappedStatus === 'playing',
-            source: {
-              type: 'youtube',
-              id,
-              name,
-              url: '',
-              volume: 50,
-              loop: false
-            }
-          });
-        } else {
-          // Just update playing status
+        if (currentPlaying?.type === 'youtube') {
+          // Update playing status for existing YouTube audio
           updatePlayingStatus(mappedStatus === 'playing');
+        } else if (!currentPlaying) {
+          // No audio playing - set YouTube as current
+          updateAudioStoreForYouTube(source, mappedStatus === 'playing', setCurrentlyPlaying);
         }
       }
     } catch {
@@ -225,98 +222,45 @@ export const useYouTubePlayer = () => {
     try {
       const YT = await ensureYouTubeAPI();
       const existingPlayer = getGlobalYT();
+      const isPlaylist = options?.isPlaylist;
+      const source: YouTubeSource = isPlaylist
+        ? { listId: videoIdOrListId }
+        : { videoId: videoIdOrListId };
 
       if (existingPlayer) {
-        // Update existing player
         if (autoPlay) {
-          try {
-            existingPlayer.unMute?.();
-          } catch {
-            // Ignore errors when unmuting
-          }
+          try { existingPlayer.unMute?.(); } catch { /* ignore */ }
         }
 
-        if (options?.isPlaylist) {
-          if (typeof existingPlayer.loadPlaylist === 'function') {
-            existingPlayer.loadPlaylist({ list: videoIdOrListId });
-          } else if (typeof existingPlayer.cuePlaylist === 'function') {
-            existingPlayer.cuePlaylist({ list: videoIdOrListId });
-          }
-          if (autoPlay) existingPlayer.playVideo?.();
-          setGlobalYTSource({ listId: videoIdOrListId });
-          // Update audio store
-          setCurrentlyPlaying({
-            type: 'youtube',
-            id: `playlist-${videoIdOrListId}`,
-            name: `YouTube Playlist`,
-            volume: 50,
-            isPlaying: autoPlay,
-            source: { type: 'youtube', id: `playlist-${videoIdOrListId}`, name: 'YouTube Playlist', url: '', volume: 50, loop: false }
-          });
-
-          // Fetch real title
-          fetchYouTubeOEmbed(`https://www.youtube.com/playlist?list=${videoIdOrListId}`).then(data => {
-            if (data && data.title) {
-              const current = useAudioStore.getState().currentlyPlaying;
-              if (current && current.id === `playlist-${videoIdOrListId}`) {
-                setCurrentlyPlaying({ ...current, name: data.title });
-              }
-            }
-          });
+        if (isPlaylist) {
+          existingPlayer.loadPlaylist?.({ list: videoIdOrListId }) ||
+            existingPlayer.cuePlaylist?.({ list: videoIdOrListId });
         } else {
           existingPlayer.loadVideoById(videoIdOrListId);
-          if (autoPlay) existingPlayer.playVideo?.();
-          setGlobalYTSource({ videoId: videoIdOrListId });
-          // Update audio store
-          setCurrentlyPlaying({
-            type: 'youtube',
-            id: `video-${videoIdOrListId}`,
-            name: `YouTube Video`,
-            volume: 50,
-            isPlaying: autoPlay,
-            source: { type: 'youtube', id: `video-${videoIdOrListId}`, name: 'YouTube Video', url: '', volume: 50, loop: false }
-          });
-
-          // Fetch real title
-          fetchYouTubeOEmbed(`https://www.youtube.com/watch?v=${videoIdOrListId}`).then(data => {
-            if (data && data.title) {
-              const current = useAudioStore.getState().currentlyPlaying;
-              if (current && current.id === `video-${videoIdOrListId}`) {
-                setCurrentlyPlaying({ ...current, name: data.title });
-              }
-            }
-          });
         }
+
+        if (autoPlay) existingPlayer.playVideo?.();
+        setGlobalYTSource(source);
+        updateAudioStoreForYouTube(source, autoPlay, setCurrentlyPlaying);
         return;
       }
 
       // Create new player
       const container = getOrCreateGlobalYTContainer();
       const player = new YT.Player(container, {
-        videoId: options?.isPlaylist ? undefined : videoIdOrListId,
-        playerVars: options?.isPlaylist
-          ? { rel: 0, list: videoIdOrListId, modestbranding: 1, controls: 1 }
-          : { rel: 0, modestbranding: 1, controls: 1 },
+        videoId: isPlaylist ? undefined : videoIdOrListId,
+        playerVars: {
+          rel: 0,
+          modestbranding: 1,
+          controls: 1,
+          ...(isPlaylist && { list: videoIdOrListId })
+        },
         events: {
           onReady: () => {
             if (autoPlay) {
-              (async () => {
-                try {
-                  try {
-                    player.unMute?.();
-                  } catch {
-                    // Ignore errors when unmuting
-                  }
-                  try {
-                    player.playVideo?.();
-                  } catch {
-                    // Ignore errors when playing
-                  }
-                  toast.success('Đang phát nền • Nhạc sẽ tiếp tục khi đóng cửa sổ 🎧');
-                } catch {
-                  // Ignore all errors in the ready handler
-                }
-              })();
+              try { player.unMute?.(); } catch { /* ignore */ }
+              try { player.playVideo?.(); } catch { /* ignore */ }
+              toast.success('Đang phát nền • Nhạc sẽ tiếp tục khi đóng cửa sổ 🎧');
             }
           },
           onStateChange: (e: any) => {
@@ -328,64 +272,30 @@ export const useYouTubePlayer = () => {
       });
 
       setGlobalYT(player);
-
-      // Record current source and update audio store
-      if (options?.isPlaylist) {
-        setGlobalYTSource({ listId: videoIdOrListId });
-        setCurrentlyPlaying({
-          type: 'youtube',
-          id: `playlist-${videoIdOrListId}`,
-          name: `YouTube Playlist`,
-          volume: 50,
-          isPlaying: autoPlay,
-          source: { type: 'youtube', id: `playlist-${videoIdOrListId}`, name: 'YouTube Playlist', url: '', volume: 50, loop: false }
-        });
-
-        // Fetch real title
-        fetchYouTubeOEmbed(`https://www.youtube.com/playlist?list=${videoIdOrListId}`).then(data => {
-          if (data && data.title) {
-            const current = useAudioStore.getState().currentlyPlaying;
-            if (current && current.id === `playlist-${videoIdOrListId}`) {
-              setCurrentlyPlaying({ ...current, name: data.title });
-            }
-          }
-        });
-      } else {
-        setGlobalYTSource({ videoId: videoIdOrListId });
-        setCurrentlyPlaying({
-          type: 'youtube',
-          id: `video-${videoIdOrListId}`,
-          name: `YouTube Video`,
-          volume: 50,
-          isPlaying: autoPlay,
-          source: { type: 'youtube', id: `video-${videoIdOrListId}`, name: 'YouTube Video', url: '', volume: 50, loop: false }
-        });
-
-        // Fetch real title
-        fetchYouTubeOEmbed(`https://www.youtube.com/watch?v=${videoIdOrListId}`).then(data => {
-          if (data && data.title) {
-            const current = useAudioStore.getState().currentlyPlaying;
-            if (current && current.id === `video-${videoIdOrListId}`) {
-              setCurrentlyPlaying({ ...current, name: data.title });
-            }
-          }
-        });
-      }
+      setGlobalYTSource(source);
+      updateAudioStoreForYouTube(source, autoPlay, setCurrentlyPlaying);
     } catch (error) {
       console.error('Failed to create or update YouTube player:', error);
       toast.error('Không thể tạo trình phát YouTube. Vui lòng thử lại.');
     }
-  }, []);
+  }, [setCurrentlyPlaying]);
 
-  // Toggle playback
+  // Toggle playback - only toggle if same source, otherwise play new source
   const togglePlayback = useCallback(async (videoId?: string, listId?: string, isChannel?: boolean) => {
     if (isChannel || (!videoId && !listId)) return;
 
     try {
       const yt = getGlobalYT();
+      const currentSource = getGlobalYTSource();
 
-      if (!yt) {
-        // Create new player if none exists
+      // Check if requested source matches current source
+      const isSameSource = currentSource && (
+        (videoId && currentSource.videoId === videoId) ||
+        (listId && !videoId && currentSource.listId === listId)
+      );
+
+      if (!yt || !isSameSource) {
+        // No player or different source -> play new source
         if (listId && !videoId) {
           await createOrUpdatePlayer(listId, true, { isPlaylist: true });
         } else if (videoId) {
@@ -394,21 +304,12 @@ export const useYouTubePlayer = () => {
         return;
       }
 
+      // Same source - toggle play/pause
       const state = yt.getPlayerState?.();
-
       if (state === 1) {
-        // Playing -> Pause
         yt.pauseVideo();
-      } else if (state === 2) {
-        // Paused -> Play
-        yt.playVideo();
       } else {
-        // Stopped or other state -> Create new player
-        if (listId && !videoId) {
-          await createOrUpdatePlayer(listId, true, { isPlaylist: true });
-        } else if (videoId) {
-          await createOrUpdatePlayer(videoId, true);
-        }
+        yt.playVideo();
       }
     } catch (error) {
       console.error('Failed to toggle playback:', error);

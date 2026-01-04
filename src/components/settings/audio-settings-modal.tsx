@@ -38,6 +38,7 @@ import SpotifyPane from '@/components/audio/spotify/spotify-pane';
 import YouTubePane from '@/components/audio/youtube/youtube-pane';
 import { AudioLines } from '@/components/animate-ui/icons/audio-lines';
 import { getYouTubeThumbnailUrl } from '@/data/youtube-suggestions';
+import { useShallow } from 'zustand/react/shallow';
 
 export function AudioSettingsModal({
   isOpen,
@@ -46,7 +47,9 @@ export function AudioSettingsModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const { updateSoundSettings } = useSystemStore(); // Keep if still needed for bell sound settings
+  const { updateSoundSettings } = useSystemStore();
+
+  // Use useShallow for object selectors to ensure proper re-renders
   const {
     audioSettings,
     currentlyPlaying,
@@ -58,7 +61,20 @@ export function AudioSettingsModal({
     stopAllAmbient,
     updateAudioSettings,
     updateCurrentlyPlayingForAmbients,
-  } = useAudioStore();
+  } = useAudioStore(
+    useShallow((state) => ({
+      audioSettings: state.audioSettings,
+      currentlyPlaying: state.currentlyPlaying,
+      activeAmbientSounds: state.activeAmbientSounds,
+      updateVolume: state.updateVolume,
+      toggleMute: state.toggleMute,
+      toggleAmbient: state.toggleAmbient,
+      togglePlayPause: state.togglePlayPause,
+      stopAllAmbient: state.stopAllAmbient,
+      updateAudioSettings: state.updateAudioSettings,
+      updateCurrentlyPlayingForAmbients: state.updateCurrentlyPlayingForAmbients,
+    }))
+  );
 
   const ambientSounds = soundCatalog.ambient;
 
@@ -68,14 +84,21 @@ export function AudioSettingsModal({
   // Loading state to prevent user interaction during audio initialization
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
 
-  // Restore ambient sounds display on mount and when activeAmbientSounds changes
+  // Restore ambient sounds display on mount if needed (using store directly to avoid stale closures)
   useEffect(() => {
-    console.log('[AudioModal] useEffect triggered, activeAmbientSounds:', activeAmbientSounds);
+    const state = useAudioStore.getState();
+    const { activeAmbientSounds, currentlyPlaying, updateCurrentlyPlayingForAmbients } = state;
+
     if (activeAmbientSounds.length > 0) {
-      console.log('[AudioModal] Calling updateCurrentlyPlayingForAmbients');
-      updateCurrentlyPlayingForAmbients();
+      const needsUpdate = !currentlyPlaying ||
+        (activeAmbientSounds.length === 1 && currentlyPlaying.id !== activeAmbientSounds[0]) ||
+        (activeAmbientSounds.length > 1 && currentlyPlaying.id !== 'mixed-ambient');
+
+      if (needsUpdate) {
+        updateCurrentlyPlayingForAmbients();
+      }
     }
-  }, [activeAmbientSounds.length, updateCurrentlyPlayingForAmbients]); // Run when ambient sounds change
+  }, []); // Empty deps - only run on mount
 
   // Save selected tab when it changes
   const handleTabChange = (value: string) => {

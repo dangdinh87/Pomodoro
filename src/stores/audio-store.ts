@@ -95,6 +95,15 @@ export const useAudioStore = create<AudioState>()(
       activeAmbientSounds: [],
 
       setCurrentlyPlaying: (audio) => {
+        const current = get().currentlyPlaying
+
+        // Skip update if already playing the same audio with same state
+        if (audio && current &&
+          current.id === audio.id &&
+          current.isPlaying === audio.isPlaying) {
+          return
+        }
+
         const timestamp = Date.now()
         const audioWithTimestamp = audio ? { ...audio, timestamp } : null
 
@@ -128,7 +137,7 @@ export const useAudioStore = create<AudioState>()(
         const sound = soundCatalog.ambient.find(s => s.id === soundId)
         if (!sound) return
 
-        const { audioSettings } = get()
+        const { audioSettings, activeAmbientSounds } = get()
         const source: AudioSource = {
           id: sound.id,
           type: 'ambient',
@@ -142,16 +151,40 @@ export const useAudioStore = create<AudioState>()(
         const success = await audioManager.playAmbient(source)
 
         if (success) {
-          // Add to active ambient sounds
+          const newActiveAmbientSounds = [...activeAmbientSounds, soundId]
+          const soundCount = newActiveAmbientSounds.length
+
+          // Calculate new currentlyPlaying based on new ambient sounds
+          let newCurrentlyPlaying: CurrentlyPlayingAudio
+          if (soundCount === 1) {
+            newCurrentlyPlaying = {
+              type: 'ambient',
+              id: sound.id,
+              name: sound.label,
+              vn: sound.vn,
+              volume: audioSettings.volume,
+              isPlaying: true,
+              timestamp: Date.now()
+            }
+          } else {
+            newCurrentlyPlaying = {
+              type: 'ambient',
+              id: 'mixed-ambient',
+              name: `Mixed Ambient (${soundCount} sounds)`,
+              volume: audioSettings.volume,
+              isPlaying: true,
+              timestamp: Date.now()
+            }
+          }
+
+          // BATCH all updates into single set() to prevent multiple re-renders
           set((state) => ({
-            activeAmbientSounds: [...state.activeAmbientSounds, soundId]
+            activeAmbientSounds: newActiveAmbientSounds,
+            audioSettings: { ...state.audioSettings, selectedAmbientSound: soundId },
+            currentlyPlaying: newCurrentlyPlaying,
+            audioHistory: [newCurrentlyPlaying, ...state.audioHistory.filter(item => item.id !== newCurrentlyPlaying.id)].slice(0, 20),
+            recentlyPlayed: [newCurrentlyPlaying.id, ...state.recentlyPlayed.filter(id => id !== newCurrentlyPlaying.id)].slice(0, 10)
           }))
-
-          // Update selected ambient sound in settings
-          get().updateAudioSettings({ selectedAmbientSound: soundId })
-
-          // Update currently playing to show mixed status
-          get().updateCurrentlyPlayingForAmbients()
         }
       },
 
@@ -167,33 +200,60 @@ export const useAudioStore = create<AudioState>()(
       },
 
       stopAmbient: async (soundId) => {
+        const { activeAmbientSounds, audioSettings } = get()
         await audioManager.stopAmbient(soundId)
 
-        set((state) => ({
-          activeAmbientSounds: state.activeAmbientSounds.filter(id => id !== soundId)
-        }))
+        const newActiveAmbientSounds = activeAmbientSounds.filter(id => id !== soundId)
+        const soundCount = newActiveAmbientSounds.length
 
-        // Update currently playing status
-        get().updateCurrentlyPlayingForAmbients()
+        // Calculate new currentlyPlaying
+        let newCurrentlyPlaying: CurrentlyPlayingAudio | null = null
+        if (soundCount === 0) {
+          newCurrentlyPlaying = null
+        } else if (soundCount === 1) {
+          const sound = soundCatalog.ambient.find(s => s.id === newActiveAmbientSounds[0])
+          if (sound) {
+            newCurrentlyPlaying = {
+              type: 'ambient',
+              id: sound.id,
+              name: sound.label,
+              vn: sound.vn,
+              volume: audioSettings.volume,
+              isPlaying: true,
+              timestamp: Date.now()
+            }
+          }
+        } else {
+          newCurrentlyPlaying = {
+            type: 'ambient',
+            id: 'mixed-ambient',
+            name: `Mixed Ambient (${soundCount} sounds)`,
+            volume: audioSettings.volume,
+            isPlaying: true,
+            timestamp: Date.now()
+          }
+        }
+
+        // BATCH update
+        set({
+          activeAmbientSounds: newActiveAmbientSounds,
+          currentlyPlaying: newCurrentlyPlaying
+        })
       },
 
       stopAllAmbient: async () => {
         await audioManager.stopAllAmbient()
-        set({ activeAmbientSounds: [] })
-        get().clearCurrentlyPlaying()
+        set({ activeAmbientSounds: [], currentlyPlaying: null })
       },
 
       updateCurrentlyPlayingForAmbients: () => {
         const { activeAmbientSounds } = get()
-        console.log('[AudioStore] updateCurrentlyPlayingForAmbients called, activeAmbientSounds:', activeAmbientSounds);
 
         if (activeAmbientSounds.length === 0) {
-          console.log('[AudioStore] No ambient sounds, clearing');
           get().clearCurrentlyPlaying()
         } else if (activeAmbientSounds.length === 1) {
           const sound = soundCatalog.ambient.find(s => s.id === activeAmbientSounds[0])
           if (sound) {
-            console.log('[AudioStore] Single ambient sound, setting:', sound.label);
             get().setCurrentlyPlaying({
               type: 'ambient',
               id: sound.id,
@@ -205,7 +265,6 @@ export const useAudioStore = create<AudioState>()(
           }
         } else {
           // Multiple ambients - show mixed status
-          console.log('[AudioStore] Multiple ambient sounds:', activeAmbientSounds.length);
           get().setCurrentlyPlaying({
             type: 'ambient',
             id: 'mixed-ambient',
@@ -253,22 +312,22 @@ export const useAudioStore = create<AudioState>()(
         // Handle YouTube separately
         if (currentlyPlaying?.type === 'youtube') {
           try {
-            // Access global YouTube player
-            const yt = (window as any).__globalYTPlayer;
+            // Access global YouTube player (matches use-youtube-player.ts)
+            const yt = (window as any).__globalYTPlayer
             if (yt) {
-              const state = yt.getPlayerState?.();
-              if (state === 1) { // Playing
-                yt.pauseVideo();
-                get().updatePlayingStatus(false);
-              } else { // Paused or other
-                yt.playVideo();
-                get().updatePlayingStatus(true);
+              const state = yt.getPlayerState?.()
+              if (state === 1) {
+                yt.pauseVideo()
+                get().updatePlayingStatus(false)
+              } else {
+                yt.playVideo()
+                get().updatePlayingStatus(true)
               }
             }
           } catch (error) {
-            console.error('Error toggling YouTube playback:', error);
+            console.error('Error toggling YouTube playback:', error)
           }
-          return;
+          return
         }
 
         // Handle other audio types
@@ -389,73 +448,26 @@ export const useAudioStore = create<AudioState>()(
     {
       name: 'audio-storage-v2',
       partialize: (state) => ({
+        // Only persist settings and history, NOT runtime state like currentlyPlaying
         audioHistory: state.audioHistory,
         audioSettings: state.audioSettings,
         favorites: state.favorites,
         recentlyPlayed: state.recentlyPlayed,
         activeAmbientSounds: state.activeAmbientSounds,
-        currentlyPlaying: state.currentlyPlaying,
+        // currentlyPlaying is NOT persisted - it's runtime state
       }),
+      merge: (persistedState, currentState) => {
+        // Merge persisted state with current state, keeping currentlyPlaying from current
+        return {
+          ...currentState,
+          ...(persistedState as object),
+          // Always use current runtime currentlyPlaying, not persisted
+          currentlyPlaying: currentState.currentlyPlaying,
+        }
+      },
     }
   )
 )
-
-// Helper hook for audio controls
-export const useAudioControls = () => {
-  const { currentlyPlaying, audioSettings } = useAudioStore()
-
-  const isPlaying = currentlyPlaying?.isPlaying || false
-  const volume = audioSettings.volume
-  const isMuted = audioSettings.isMuted
-
-  const handlePlayPause = async () => {
-    try {
-      if (isPlaying) {
-        await audioManager.pause()
-      } else {
-        await audioManager.resume()
-      }
-    } catch (error) {
-      console.error('Error toggling playback:', error)
-    }
-  }
-
-  const handleStop = async () => {
-    try {
-      await audioManager.stop()
-    } catch (error) {
-      console.error('Error stopping audio:', error)
-    }
-  }
-
-  const handleVolumeChange = (newVolume: number) => {
-    try {
-      setAudioVolume(newVolume)
-      useAudioStore.getState().updateVolume(newVolume)
-    } catch (error) {
-      console.error('Error changing volume:', error)
-    }
-  }
-
-  const handleMuteToggle = () => {
-    const newMuted = !isMuted
-    setAudioMute(newMuted)
-    useAudioStore.getState().updateAudioSettings({ isMuted: newMuted })
-  }
-
-  const currentPlaying = currentlyPlaying
-
-  return {
-    isPlaying,
-    volume,
-    isMuted,
-    currentPlaying,
-    handlePlayPause,
-    handleStop,
-    handleVolumeChange,
-    handleMuteToggle,
-  }
-}
 
 // Export audio manager functions
 export { audioManager, playAmbientSound, playYouTube, stopAllAudio, setAudioVolume, setAudioMute } from '@/lib/audio/audio-manager'

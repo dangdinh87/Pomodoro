@@ -1,7 +1,7 @@
 "use client"
 
 import { motion, Variants } from "framer-motion"
-import { Timer, CheckSquare, BarChart3, Trophy, Settings, BookOpen, LucideIcon } from "lucide-react"
+import { Timer, CheckSquare, BarChart3, Trophy, Settings, BookOpen, MessageSquare, LucideIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const iconVariants: Variants = {
@@ -59,4 +59,8 @@ export const AnimatedSettings = (props: Omit<AnimatedIconProps, "Icon">) => (
 
 export const AnimatedGuide = (props: Omit<AnimatedIconProps, "Icon">) => (
     <AnimatedIcon Icon={BookOpen} {...props} />
+)
+
+export const AnimatedFeedback = (props: Omit<AnimatedIconProps, "Icon">) => (
+    <AnimatedIcon Icon={MessageSquare} {...props} />
 )

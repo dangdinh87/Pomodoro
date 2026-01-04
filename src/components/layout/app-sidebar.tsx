@@ -20,7 +20,6 @@ import { supabase } from '@/lib/supabase-client';
 import { toast } from 'sonner';
 import {
   LogOut,
-  MessageSquare,
 } from 'lucide-react';
 import { BotMessageSquare } from '@/components/animate-ui/icons/bot-message-square';
 import {
@@ -30,6 +29,7 @@ import {
   AnimatedLeaderboard,
   AnimatedSettings,
   AnimatedGuide,
+  AnimatedFeedback,
 } from '@/components/ui/animated-sidebar-icons';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Image from 'next/image';
@@ -163,7 +163,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton asChild isActive={pathname === '/feedback'}>
               <Link href="/feedback">
-                <MessageSquare className="size-5" />
+                <AnimatedFeedback isActive={pathname === '/feedback'} />
                 <span suppressHydrationWarning>{t('nav.feedback')}</span>
               </Link>
             </SidebarMenuButton>

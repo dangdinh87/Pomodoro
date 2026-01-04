@@ -116,6 +116,7 @@ export default function ChatPage() {
     const handleNewChat = useCallback(() => {
         setCurrentConversationId(null);
         setInitialMessages([]);
+        setIsHistoryLoading(false);
     }, []);
 
     const handleDeleteConversation = useCallback(async (id: string) => {
@@ -279,6 +280,7 @@ export default function ChatPage() {
                         setCurrentConversationId(id);
                         setIsHistoryPanelOpen(false);
                     }}
+                    onNewChat={handleNewChat}
                     onDelete={handleDeleteConversation}
                 />
             </div>
