@@ -1,4 +1,7 @@
+'use client';
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useI18n } from "@/contexts/i18n-context"
 
 interface StatsCardsProps {
     totalFocusTime: number // in seconds
@@ -10,6 +13,7 @@ interface StatsCardsProps {
 }
 
 export function StatsCards({ totalFocusTime, completedSessions, streak }: StatsCardsProps) {
+    const { t } = useI18n();
     const hours = Math.floor(totalFocusTime / 3600)
     const minutes = Math.floor((totalFocusTime % 3600) / 60)
 
@@ -18,19 +22,19 @@ export function StatsCards({ totalFocusTime, completedSessions, streak }: StatsC
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium text-muted-foreground">
-                        Tổng thời gian tập trung
+                        {t('historyComponents.statsCards.totalFocusTime')}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">
-                        {hours > 0 ? `${hours} giờ ` : ''}{minutes} phút
+                        {t('historyComponents.statsCards.timeFormat', { hours, minutes })}
                     </div>
                 </CardContent>
             </Card>
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium text-muted-foreground">
-                        Số phiên hoàn thành
+                        {t('historyComponents.statsCards.completedSessions')}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -40,13 +44,13 @@ export function StatsCards({ totalFocusTime, completedSessions, streak }: StatsC
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium text-muted-foreground">
-                        Chuỗi ngày dài nhất
+                        {t('historyComponents.statsCards.longestStreak')}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">{streak.longest} ngày</div>
+                    <div className="text-2xl font-bold">{t('historyComponents.statsCards.days', { days: streak.longest })}</div>
                     <p className="text-xs text-muted-foreground">
-                        Hiện tại: {streak.current} ngày
+                        {t('historyComponents.statsCards.currentStreak', { current: streak.current })}
                     </p>
                 </CardContent>
             </Card>

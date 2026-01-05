@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch'
 import { Clock, Timer, Activity, Zap } from 'lucide-react'
 import { toast } from 'sonner'
 import { addMinutes, format, startOfDay } from 'date-fns'
+import { useI18n } from '@/contexts/i18n-context'
 
 type ClockType = 'digital' | 'analog' | 'progress' | 'flip'
 
@@ -31,6 +32,7 @@ interface TimerSettingsProps {
 }
 
 export function TimerSettings({ isOpen, onClose, settings, onSettingsChange }: TimerSettingsProps) {
+  const { t } = useI18n();
   const [localSettings, setLocalSettings] = useState<TimerSettingsData>(settings)
 
   // Derived previews using date-fns
@@ -51,7 +53,7 @@ export function TimerSettings({ isOpen, onClose, settings, onSettingsChange }: T
     if (typeof window !== 'undefined') {
       localStorage.setItem('pomodoro-timer-settings', JSON.stringify(localSettings))
     }
-    toast.success('Timer settings saved successfully!')
+    toast.success(t('timerSettings.toasts.saved'))
     onClose()
   }
 
@@ -67,7 +69,7 @@ export function TimerSettings({ isOpen, onClose, settings, onSettingsChange }: T
       showClock: false,
     }
     setLocalSettings(defaultSettings)
-    toast.success('Timer settings reset to defaults!')
+    toast.success(t('timerSettings.toasts.reset'))
   }
 
   return (
@@ -76,14 +78,14 @@ export function TimerSettings({ isOpen, onClose, settings, onSettingsChange }: T
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Timer className="h-5 w-5" />
-            Timer Settings
+            {t('timerSettings.title')}
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-6 py-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="work-duration">Work Duration (min)</Label>
+              <Label htmlFor="work-duration">{t('timerSettings.labels.workDuration')}</Label>
               <input
                 id="work-duration"
                 type="number"
@@ -94,9 +96,9 @@ export function TimerSettings({ isOpen, onClose, settings, onSettingsChange }: T
                 className="w-full p-2 border rounded-md"
               />
             </div>
-            
+
             <div className="space-y-2">
-              <Label htmlFor="short-break-duration">Short Break (min)</Label>
+              <Label htmlFor="short-break-duration">{t('timerSettings.labels.shortBreakDuration')}</Label>
               <input
                 id="short-break-duration"
                 type="number"
@@ -107,9 +109,9 @@ export function TimerSettings({ isOpen, onClose, settings, onSettingsChange }: T
                 className="w-full p-2 border rounded-md"
               />
             </div>
-            
+
             <div className="space-y-2">
-              <Label htmlFor="long-break-duration">Long Break (min)</Label>
+              <Label htmlFor="long-break-duration">{t('timerSettings.labels.longBreakDuration')}</Label>
               <input
                 id="long-break-duration"
                 type="number"
@@ -120,9 +122,9 @@ export function TimerSettings({ isOpen, onClose, settings, onSettingsChange }: T
                 className="w-full p-2 border rounded-md"
               />
             </div>
-            
+
             <div className="space-y-2">
-              <Label htmlFor="long-break-interval">Long Break Interval</Label>
+              <Label htmlFor="long-break-interval">{t('timerSettings.labels.longBreakInterval')}</Label>
               <input
                 id="long-break-interval"
                 type="number"
@@ -142,57 +144,57 @@ export function TimerSettings({ isOpen, onClose, settings, onSettingsChange }: T
                 checked={localSettings.autoStartBreak}
                 onCheckedChange={(checked) => setLocalSettings({...localSettings, autoStartBreak: checked})}
               />
-              <Label htmlFor="auto-start-break">Auto-start breaks</Label>
+              <Label htmlFor="auto-start-break">{t('timerSettings.labels.autoStartBreaks')}</Label>
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <Switch
                 id="auto-start-work"
                 checked={localSettings.autoStartWork}
                 onCheckedChange={(checked) => setLocalSettings({...localSettings, autoStartWork: checked})}
               />
-              <Label htmlFor="auto-start-work">Auto-start work sessions</Label>
+              <Label htmlFor="auto-start-work">{t('timerSettings.labels.autoStartWork')}</Label>
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <Switch
               id="show-clock"
               checked={localSettings.showClock}
               onCheckedChange={(checked) => setLocalSettings({...localSettings, showClock: checked})}
             />
-            <Label htmlFor="show-clock">Show Clock</Label>
+            <Label htmlFor="show-clock">{t('timerSettings.labels.showClock')}</Label>
           </div>
-          
+
           <div className="space-y-2">
-            <Label htmlFor="clock-type">Clock Type</Label>
+            <Label htmlFor="clock-type">{t('timerSettings.labels.clockType')}</Label>
             <Select value={localSettings.clockType} onValueChange={(value: ClockType) => setLocalSettings({...localSettings, clockType: value})}>
               <SelectTrigger>
-                <SelectValue placeholder="Select clock type" />
+                <SelectValue placeholder={t('timerSettings.labels.selectClockType')} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="digital">
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4" />
-                    Digital
+                    {t('timerSettings.labels.digital')}
                   </div>
                 </SelectItem>
                 <SelectItem value="analog">
                   <div className="flex items-center gap-2">
                     <Timer className="h-4 w-4" />
-                    Analog
+                    {t('timerSettings.labels.analog')}
                   </div>
                 </SelectItem>
                 <SelectItem value="progress">
                   <div className="flex items-center gap-2">
                     <Activity className="h-4 w-4" />
-                    Progress
+                    {t('timerSettings.labels.progress')}
                   </div>
                 </SelectItem>
                 <SelectItem value="flip">
                   <div className="flex items-center gap-2">
                     <Zap className="h-4 w-4" />
-                    Flip
+                    {t('timerSettings.labels.flip')}
                   </div>
                 </SelectItem>
               </SelectContent>
@@ -202,29 +204,29 @@ export function TimerSettings({ isOpen, onClose, settings, onSettingsChange }: T
           {/* Clock Preview Section */}
           {localSettings.showClock && (
             <div className="mt-6 pt-6 border-t">
-              <Label className="text-base font-medium mb-4 block">Clock Preview</Label>
+              <Label className="text-base font-medium mb-4 block">{t('timerSettings.labels.clockPreview')}</Label>
               <div className="bg-background/50 backdrop-blur-sm rounded-lg p-6 border flex flex-col items-center gap-2">
                 <div className="text-6xl font-bold text-center">
                   {clockPreviewTime}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  Ends around {endTimePreview}
+                  {t('timerSettings.labels.endsAround', { time: endTimePreview })}
                 </div>
               </div>
             </div>
           )}
         </div>
-        
+
         <div className="flex justify-between pt-4 border-t">
           <Button variant="outline" onClick={resetToDefaults}>
-            Reset to Defaults
+            {t('timerSettings.actions.resetDefaults')}
           </Button>
           <div className="flex space-x-2">
             <Button variant="outline" onClick={onClose}>
-              Cancel
+              {t('timerSettings.actions.cancel')}
             </Button>
             <Button onClick={saveSettings}>
-              Save Settings
+              {t('timerSettings.actions.save')}
             </Button>
           </div>
         </div>

@@ -1,5 +1,6 @@
-import { TaskPriority, TaskStatus } from '@/stores/task-store'
-import { Button } from '@/components/ui/button'
+"use client"
+
+import React from 'react'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -8,12 +9,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Search, Filter, RotateCcw, RefreshCw, SlidersHorizontal, X } from 'lucide-react'
-import { Separator } from '@/components/ui/separator'
-import { useDebouncedCallback } from 'use-debounce'
-import { useEffect, useState } from 'react'
-import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Search, FilterX } from 'lucide-react'
 import { DateRange } from 'react-day-picker'
+import { useI18n } from '@/contexts/i18n-context'
+import { TaskStatus, TaskPriority } from '@/stores/task-store'
 import { DateRangePicker } from '@/app/(main)/history/components/date-range-picker'
 
 interface TaskFiltersProps {
@@ -21,9 +21,9 @@ interface TaskFiltersProps {
   statusFilter: 'all' | TaskStatus
   priorityFilter: 'all' | TaskPriority
   dateRange: DateRange | undefined
-  onQueryChange: (value: string) => void
-  onStatusChange: (value: 'all' | TaskStatus) => void
-  onPriorityChange: (value: 'all' | TaskPriority) => void
+  onQueryChange: (query: string) => void
+  onStatusChange: (status: 'all' | TaskStatus) => void
+  onPriorityChange: (priority: 'all' | TaskPriority) => void
   onDateRangeChange: (range: DateRange | undefined) => void
   onReload: () => void
   onResetFilters: () => void
@@ -38,131 +38,63 @@ export function TaskFilters({
   onStatusChange,
   onPriorityChange,
   onDateRangeChange,
-  onReload,
   onResetFilters,
 }: TaskFiltersProps) {
-  const [localQuery, setLocalQuery] = useState(query)
-
-  // Sync local query with prop query when it changes externally (e.g. reset)
-  useEffect(() => {
-    setLocalQuery(query)
-  }, [query])
-
-  const debouncedQueryChange = useDebouncedCallback((value: string) => {
-    onQueryChange(value)
-  }, 300)
-
-  const handleQueryChange = (value: string) => {
-    setLocalQuery(value)
-    debouncedQueryChange(value)
-  }
-
-  const hasActiveFilter =
-    query.trim().length > 0 ||
-    statusFilter !== 'all' ||
-    priorityFilter !== 'all'
+  const { t } = useI18n()
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col md:flex-row gap-3 items-start md:items-center justify-between">
-        <div className="relative w-full md:w-64 lg:w-80">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            id="task-search"
-            placeholder="Search tasks..."
-            value={localQuery}
-            onChange={(event) => handleQueryChange(event.target.value)}
-            className="pl-9 bg-background/50 focus:bg-background transition-colors"
-            aria-label="Search tasks"
-          />
-        </div>
+    <div className="flex flex-col md:flex-row gap-3 items-center">
+      <div className="relative flex-1 w-full">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder={t('tasks.filters.searchPlaceholder')}
+          value={query}
+          onChange={(e) => onQueryChange(e.target.value)}
+          className="pl-9 h-10 bg-card/50"
+        />
+      </div>
 
-        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-          {hasActiveFilter && (
-            <Button
-              variant="ghost"
-              onClick={() => {
-                setLocalQuery('')
-                onResetFilters()
-              }}
-              size="icon"
-              className="h-9 w-9 text-muted-foreground hover:text-foreground"
-              title="Clear all filters"
-            >
-              <X className="h-4 w-4" />
-              <span className="sr-only">Clear Filters</span>
-            </Button>
-          )}
-          <DateRangePicker
-            value={dateRange}
-            onChange={onDateRangeChange}
-            className="w-full sm:w-auto"
-          />
+      <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+        <Select value={statusFilter} onValueChange={(val: any) => onStatusChange(val)}>
+          <SelectTrigger className="w-full md:w-[130px] h-10 bg-card/50">
+            <SelectValue placeholder={t('tasks.filters.status')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t('tasks.filters.all')}</SelectItem>
+            <SelectItem value="pending">{t('tasks.statuses.pending')}</SelectItem>
+            <SelectItem value="in_progress">{t('tasks.statuses.in_progress')}</SelectItem>
+            <SelectItem value="done">{t('tasks.statuses.done')}</SelectItem>
+            <SelectItem value="cancelled">{t('tasks.statuses.cancelled')}</SelectItem>
+          </SelectContent>
+        </Select>
 
-          <Select
-            value={statusFilter}
-            onValueChange={(value) => onStatusChange(value as 'all' | TaskStatus)}
-          >
-            <SelectTrigger className="w-[130px] bg-background/50">
-              <div className="flex items-center gap-2 truncate">
-                <Filter className="h-3.5 w-3.5 text-muted-foreground" />
-                <span className="truncate">
-                  {statusFilter === 'all' ? 'Status' :
-                    statusFilter === 'pending' ? 'Pending' :
-                      statusFilter === 'in_progress' ? 'In Progress' :
-                        statusFilter === 'done' ? 'Completed' : 'Cancelled'}
-                </span>
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="in_progress">In Progress</SelectItem>
-              <SelectItem value="done">Completed</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
-            </SelectContent>
-          </Select>
+        <Select value={priorityFilter} onValueChange={(val: any) => onPriorityChange(val)}>
+          <SelectTrigger className="w-full md:w-[130px] h-10 bg-card/50">
+            <SelectValue placeholder={t('tasks.filters.priority')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t('tasks.filters.all')}</SelectItem>
+            <SelectItem value="low">{t('tasks.priorityLevels.low')}</SelectItem>
+            <SelectItem value="medium">{t('tasks.priorityLevels.medium')}</SelectItem>
+            <SelectItem value="high">{t('tasks.priorityLevels.high')}</SelectItem>
+          </SelectContent>
+        </Select>
 
-          <Select
-            value={priorityFilter}
-            onValueChange={(value) =>
-              onPriorityChange(value as 'all' | TaskPriority)
-            }
-          >
-            <SelectTrigger className="w-[130px] bg-background/50">
-              <div className="flex items-center gap-2 truncate">
-                <SlidersHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
-                <span className="truncate">
-                  {priorityFilter === 'all' ? 'Priority' :
-                    priorityFilter.charAt(0).toUpperCase() + priorityFilter.slice(1)}
-                </span>
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Priorities</SelectItem>
-              <SelectItem value="high">High</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="low">Low</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <DateRangePicker
+          value={dateRange}
+          onChange={onDateRangeChange}
+          className="h-10"
+        />
 
-        <div className="flex items-center gap-1 ml-auto md:ml-0">
-
-
-          <Separator orientation="vertical" className="h-6 mx-1 hidden md:block" />
-
-          <Button
-            variant="ghost"
-            onClick={onReload}
-            size="icon"
-            className="h-9 w-9 text-muted-foreground hover:text-foreground"
-            title="Reload tasks"
-          >
-            <RefreshCw className="h-4 w-4" />
-            <span className="sr-only">Reload</span>
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={onResetFilters}
+          title={t('tasks.filters.reset')}
+          className="h-10 w-10 shrink-0 bg-card/50"
+        >
+          <FilterX className="h-4 w-4" />
+        </Button>
       </div>
     </div>
   )

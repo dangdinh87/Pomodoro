@@ -102,13 +102,6 @@ export function EnhancedTimer() {
     const [audioSettingsOpen, setAudioSettingsOpen] = useState(false);
     const [backgroundSettingsOpen, setBackgroundSettingsOpen] = useState(false);
 
-    const quotes = useMemo(
-        () =>
-            t('timer.quotes.list', { returnObjects: true }) as unknown as string[],
-        [t],
-    );
-    const [quote, setQuote] = useState<string>('');
-
     const queryClient = useQueryClient();
 
     const todayRange = useMemo(() => {
@@ -123,10 +116,6 @@ export function EnhancedTimer() {
 
     const dailyPomodoros = statsData?.summary.completedSessions || 0;
     const dailyFocusTime = statsData?.summary.totalFocusTime || 0;
-
-    useEffect(() => {
-        setQuote(quotes[Math.floor(Math.random() * quotes.length)]);
-    }, []);
 
     useEffect(() => {
         timeLeftRef.current = timeLeft;
@@ -240,6 +229,8 @@ export function EnhancedTimer() {
                 });
 
                 queryClient.invalidateQueries({ queryKey: ['stats'] });
+                queryClient.invalidateQueries({ queryKey: ['tasks'] });
+                queryClient.invalidateQueries({ queryKey: ['history'] });
             } catch (error) {
                 console.error('Failed to record session completion:', error);
             }
@@ -586,9 +577,9 @@ export function EnhancedTimer() {
                                                         <CheckCircle2 className="w-4 h-4" />
                                                     </div>
                                                     <div className="flex flex-row items-center gap-2">
-                                                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Hôm nay</span>
+                                                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{t('timerComponents.enhancedTimer.today')}</span>
                                                         <span className="text-sm font-bold text-foreground leading-none">
-                                                            {dailyPomodoros} <span className="text-xs font-normal text-muted-foreground">poms</span>
+                                                            {dailyPomodoros} <span className="text-xs font-normal text-muted-foreground">{t('timerComponents.enhancedTimer.poms')}</span>
                                                         </span>
                                                     </div>
                                                 </div>
@@ -596,9 +587,9 @@ export function EnhancedTimer() {
                                                     <>
                                                         <div className="w-px h-4 bg-border/50" />
                                                         <div className="flex flex-row items-center gap-2">
-                                                            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Thời gian</span>
+                                                            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{t('timerComponents.enhancedTimer.time')}</span>
                                                             <span className="text-sm font-bold text-foreground leading-none">
-                                                                {Math.floor(dailyFocusTime / 60)} <span className="text-xs font-normal text-muted-foreground">phút</span>
+                                                                {Math.floor(dailyFocusTime / 60)} <span className="text-xs font-normal text-muted-foreground">{t('timerComponents.enhancedTimer.minutes')}</span>
                                                             </span>
                                                         </div>
                                                     </>
@@ -612,7 +603,7 @@ export function EnhancedTimer() {
                             {isFocusMode && (
                                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 backdrop-blur-md border border-primary/30 animate-pulse">
                                     <div className="w-2 h-2 rounded-full bg-primary"></div>
-                                    <span className="text-sm font-medium text-primary">Focus Mode</span>
+                                    <span className="text-sm font-medium text-primary">{t('timerComponents.enhancedTimer.focusMode')}</span>
                                 </div>
                             )}
                         </div>
@@ -662,7 +653,7 @@ export function EnhancedTimer() {
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                           
+
                                     {hasActiveAudio && currentlyPlaying ? (
                                         <div className="flex items-center gap-2">
                                             {currentlyPlaying.type === 'youtube' ? (
@@ -679,7 +670,7 @@ export function EnhancedTimer() {
                                             <span className="max-w-[180px] truncate">{currentlyPlaying.name}</span>
                                         </div>
                                     ) : (
-                                        <p>Sound Settings</p>
+                                        <p>{t('timerComponents.enhancedTimer.soundSettings')}</p>
                                     )}
                                 </TooltipContent>
                             </Tooltip>
@@ -696,7 +687,7 @@ export function EnhancedTimer() {
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p>Background Settings</p>
+                                    <p>{t('timerComponents.enhancedTimer.backgroundSettings')}</p>
                                 </TooltipContent>
                             </Tooltip>
 
@@ -712,7 +703,7 @@ export function EnhancedTimer() {
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p>Timer Settings</p>
+                                    <p>{t('timerComponents.enhancedTimer.timerSettings')}</p>
                                 </TooltipContent>
                             </Tooltip>
                         </>
@@ -734,7 +725,7 @@ export function EnhancedTimer() {
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>{isFullscreen ? 'Exit Focus' : 'Enter Focus'}</p>
+                            <p>{isFullscreen ? t('timerComponents.enhancedTimer.exitFocus') : t('timerComponents.enhancedTimer.enterFocus')}</p>
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>

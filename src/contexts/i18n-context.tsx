@@ -28,7 +28,7 @@ function getSavedLang(): Lang | null {
   try {
     const saved = window.localStorage.getItem(I18N_STORAGE_KEY) as Lang | null;
     if (saved === 'en' || saved === 'vi') return saved;
-  } catch {}
+  } catch { }
   return null;
 }
 
@@ -43,7 +43,7 @@ function detectInitialLang(): Lang {
   try {
     const n = navigator?.language?.toLowerCase?.() || '';
     if (n.startsWith('vi')) return 'vi';
-  } catch {}
+  } catch { }
 
   return DEFAULT_LANG;
 }
@@ -60,30 +60,26 @@ export interface I18nContextValue {
 const I18nContext = createContext<I18nContextValue | undefined>(undefined);
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  // Initialize with saved language or default (synchronous check during render)
-  const [lang, setLangState] = useState<Lang>(() => {
-    // This runs only once during initial render on client
-    // On server, it will always return DEFAULT_LANG
-    if (typeof window === 'undefined') return DEFAULT_LANG;
-    return getSavedLang() || DEFAULT_LANG;
-  });
+  // Always start with DEFAULT_LANG for the first render to match Server result
+  const [lang, setLangState] = useState<Lang>(DEFAULT_LANG);
 
-  const [isHydrated, setIsHydrated] = useState(false);
-
-  // Mark as hydrated after first render
+  // Apply saved language ONLY after hydration
   useEffect(() => {
-    setIsHydrated(true);
+    const saved = getSavedLang();
+    if (saved && saved !== DEFAULT_LANG) {
+      setLangState(saved);
+    }
   }, []);
 
   useEffect(() => {
     try {
       window.localStorage.setItem(I18N_STORAGE_KEY, lang);
-    } catch {}
+    } catch { }
     try {
       if (typeof document !== 'undefined') {
         document.documentElement.setAttribute('lang', lang);
       }
-    } catch {}
+    } catch { }
   }, [lang]);
 
   const dict = useMemo(() => dictionaries[lang], [lang]);
@@ -96,8 +92,8 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
         typeof fromCurrent === 'string'
           ? fromCurrent
           : typeof fromEn === 'string'
-          ? fromEn
-          : key;
+            ? fromEn
+            : key;
 
       if (!vars) return String(template);
 

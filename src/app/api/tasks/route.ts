@@ -1,15 +1,11 @@
 import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase-client'
+import { createClient } from '@/lib/supabase-server'
 import {
   validateCreateTask,
   type CreateTaskPayload,
 } from './task-schemas'
 
 const API_ROUTE_TOKEN = process.env.API_ROUTE_TOKEN
-
-function getCurrentUserId() {
-  return 'demo-user'
-}
 
 function missingSupabaseResponse() {
   return NextResponse.json(
@@ -30,12 +26,7 @@ function isAuthorized(request: Request) {
   return token === API_ROUTE_TOKEN
 }
 
-type ValidationDetails = {
-  message: string
-  details?: Record<string, string[]>
-}
-
-function validationErrorResponse(error: ValidationDetails) {
+function validationErrorResponse(error: { message: string; details?: Record<string, string[]> }) {
   return NextResponse.json(
     { error: error.message, details: error.details },
     { status: 400 },
@@ -57,11 +48,14 @@ function buildInsertPayload(
 }
 
 export async function GET() {
-  const userId = getCurrentUserId()
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
-  if (!supabase) {
-    return missingSupabaseResponse()
+  if (!user) {
+    return unauthorizedResponse()
   }
+
+  const userId = user.id
 
   const { data, error } = await supabase
     .from('tasks')
@@ -86,11 +80,14 @@ export async function POST(request: Request) {
     return unauthorizedResponse()
   }
 
-  const userId = getCurrentUserId()
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
-  if (!supabase) {
-    return missingSupabaseResponse()
+  if (!user) {
+    return unauthorizedResponse()
   }
+
+  const userId = user.id
 
   try {
     const body = await request.json()

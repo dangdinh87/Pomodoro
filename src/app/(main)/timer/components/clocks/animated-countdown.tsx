@@ -3,6 +3,7 @@
 import NumberFlow from '@number-flow/react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useI18n } from '@/contexts/i18n-context';
 
 interface AnimatedCountdownProps {
   timeLeft: number; // in seconds
@@ -24,6 +25,8 @@ export function AnimatedCountdown({
   mode,
   isRunning,
 }: AnimatedCountdownProps) {
+  const { t } = useI18n();
+
   // Validate inputs to prevent NaN display
   const validTimeLeft = Number.isFinite(timeLeft) && timeLeft >= 0 ? timeLeft : 0;
 
@@ -97,7 +100,7 @@ export function AnimatedCountdown({
         animate={{ opacity: 0.6 }}
         className="mt-8 text-sm uppercase tracking-wider text-muted-foreground"
       >
-        {mode === 'work' ? 'Focus' : mode === 'shortBreak' ? 'Short Break' : 'Long Break'}
+        {mode === 'work' ? t('timerComponents.animatedCountdown.modes.focus') : mode === 'shortBreak' ? t('timerComponents.animatedCountdown.modes.shortBreak') : t('timerComponents.animatedCountdown.modes.longBreak')}
       </motion.div>
     </div>
   );

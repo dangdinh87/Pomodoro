@@ -210,5 +210,9 @@ export function useTasks() {
         updateTask: updateTaskMutation.mutateAsync,
         softDeleteTask: softDeleteTaskMutation.mutateAsync,
         hardDeleteTask: hardDeleteTaskMutation.mutateAsync,
+        isCreating: createTaskMutation.isPending,
+        isUpdating: updateTaskMutation.isPending,
+        isDeleting: softDeleteTaskMutation.isPending,
+        isHardDeleting: hardDeleteTaskMutation.isPending,
     }
 }

@@ -10,6 +10,7 @@ import { Clock, Timer, Gauge, FlipHorizontal, X } from 'lucide-react'
 import { useTimerStore } from '@/stores/timer-store'
 import { toast } from 'sonner'
 import { Separator } from '@/components/ui/separator'
+import { useI18n } from '@/contexts/i18n-context'
 
 type ClockType = 'digital' | 'analog' | 'progress' | 'flip' | 'animated'
 
@@ -27,6 +28,7 @@ interface TimerSettingsData {
 }
 
 export function TimerSettings({ onClose }: { onClose?: () => void }) {
+    const { t } = useI18n()
     const { settings, updateSettings } = useTimerStore()
     const [localSettings, setLocalSettings] = useState<TimerSettingsData>({
         workDuration: 25,
@@ -103,7 +105,7 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
         if (typeof window !== 'undefined') {
             localStorage.setItem('pomodoro-timer-settings', JSON.stringify(normalized))
         }
-        toast.success('Timer settings saved successfully!')
+        toast.success(t('timerSettings.toasts.saved'))
         onClose?.()
     }
 
@@ -125,7 +127,7 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
         setShortStr('5')
         setLongStr('15')
         setIntervalStr('4')
-        toast.success('Timer settings reset to defaults!')
+        toast.success(t('timerSettings.toasts.reset'))
     }
 
     const formatPreview = (mins: number) =>
@@ -138,10 +140,10 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
             {/* Fixed Header */}
             {onClose && (
                 <div className="flex items-center justify-between px-6 py-4 border-b shrink-0">
-                    <h2 className="text-lg font-semibold">Timer Settings</h2>
+                    <h2 className="text-lg font-semibold">{t('timerSettings.title')}</h2>
                     <div className="flex items-center gap-2">
-                        <Button variant="outline" onClick={resetToDefaults} size="sm">Reset to Defaults</Button>
-                        <Button onClick={saveSettings} size="sm">Save Settings</Button>
+                        <Button variant="outline" onClick={resetToDefaults} size="sm">{t('timerSettings.actions.resetDefaults')}</Button>
+                        <Button onClick={saveSettings} size="sm">{t('timerSettings.actions.save')}</Button>
                         <Button
                             variant="ghost"
                             size="icon"
@@ -149,7 +151,7 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                             className="h-8 w-8 rounded-full"
                         >
                             <X className="h-4 w-4" />
-                            <span className="sr-only">Close</span>
+                            <span className="sr-only">{t('common.close')}</span>
                         </Button>
                     </div>
                 </div>
@@ -161,11 +163,11 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                     <div className="space-y-8">
                         {/* Durations */}
                         <div className="space-y-4">
-                            <h2 className="text-lg font-semibold">Timer Durations</h2>
+                            <h2 className="text-lg font-semibold">{t('timerSettings.labels.timerDurations')}</h2>
                             <Separator />
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="work-duration">Work Duration (min)</Label>
+                                    <Label htmlFor="work-duration">{t('timerSettings.labels.workDuration')}</Label>
                                     <Input
                                         id="work-duration"
                                         type="number"
@@ -184,7 +186,7 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="short-break-duration">Short Break (min)</Label>
+                                    <Label htmlFor="short-break-duration">{t('timerSettings.labels.shortBreakDuration')}</Label>
                                     <Input
                                         id="short-break-duration"
                                         type="number"
@@ -203,7 +205,7 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="long-break-duration">Long Break (min)</Label>
+                                    <Label htmlFor="long-break-duration">{t('timerSettings.labels.longBreakDuration')}</Label>
                                     <Input
                                         id="long-break-duration"
                                         type="number"
@@ -222,7 +224,7 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="long-break-interval">Long Break Interval</Label>
+                                    <Label htmlFor="long-break-interval">{t('timerSettings.labels.longBreakInterval')}</Label>
                                     <Input
                                         id="long-break-interval"
                                         type="number"
@@ -245,11 +247,11 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
 
                         {/* Behavior */}
                         <div className="space-y-4">
-                            <h2 className="text-lg font-semibold">Behavior</h2>
+                            <h2 className="text-lg font-semibold">{t('timerSettings.labels.behavior')}</h2>
                             <Separator />
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
-                                    <Label htmlFor="auto-start-break" className="flex-1">Auto-start breaks</Label>
+                                    <Label htmlFor="auto-start-break" className="flex-1">{t('timerSettings.labels.autoStartBreaks')}</Label>
                                     <Switch
                                         id="auto-start-break"
                                         checked={localSettings.autoStartBreak}
@@ -259,7 +261,7 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                                     />
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <Label htmlFor="auto-start-work" className="flex-1">Auto-start work sessions</Label>
+                                    <Label htmlFor="auto-start-work" className="flex-1">{t('timerSettings.labels.autoStartWork')}</Label>
                                     <Switch
                                         id="auto-start-work"
                                         checked={localSettings.autoStartWork}
@@ -269,7 +271,7 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                                     />
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <Label htmlFor="low-time-warning" className="flex-1">Low-time warning (under 10s)</Label>
+                                    <Label htmlFor="low-time-warning" className="flex-1">{t('timerSettings.labels.lowTimeWarning')}</Label>
                                     <Switch
                                         id="low-time-warning"
                                         checked={localSettings.lowTimeWarningEnabled}
@@ -289,11 +291,11 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                     <div className="space-y-6">
                         {/* Clock Display */}
                         <div className="space-y-4">
-                            <h2 className="text-lg font-semibold">Clock Display</h2>
+                            <h2 className="text-lg font-semibold">{t('timerSettings.labels.clockDisplay')}</h2>
                             <Separator />
                             <div className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="clock-type">Clock Style</Label>
+                                    <Label htmlFor="clock-type">{t('timerSettings.labels.clockStyle')}</Label>
                                     <Select
                                         value={localSettings.clockType}
                                         onValueChange={(value: ClockType) =>
@@ -301,31 +303,31 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                                         }
                                     >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select clock style" />
+                                            <SelectValue placeholder={t('timerSettings.labels.selectClockType')} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="digital">
                                                 <div className="flex items-center gap-2">
                                                     <Timer className="h-4 w-4" />
-                                                    Digital
+                                                    {t('timerSettings.labels.digital')}
                                                 </div>
                                             </SelectItem>
                                             <SelectItem value="analog">
                                                 <div className="flex items-center gap-2">
                                                     <Clock className="h-4 w-4" />
-                                                    Analog
+                                                    {t('timerSettings.labels.analog')}
                                                 </div>
                                             </SelectItem>
                                             <SelectItem value="progress">
                                                 <div className="flex items-center gap-2">
                                                     <Gauge className="h-4 w-4" />
-                                                    Progress
+                                                    {t('timerSettings.labels.progress')}
                                                 </div>
                                             </SelectItem>
                                             <SelectItem value="flip">
                                                 <div className="flex items-center gap-2">
                                                     <FlipHorizontal className="h-4 w-4" />
-                                                    Flip
+                                                    {t('timerSettings.labels.flip')}
                                                 </div>
                                             </SelectItem>
 
@@ -334,7 +336,7 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="clock-size">Clock Size</Label>
+                                    <Label htmlFor="clock-size">{t('timerSettings.labels.clockSize')}</Label>
                                     <Select
                                         value={localSettings.clockSize}
                                         onValueChange={(value: 'small' | 'medium' | 'large') =>
@@ -342,12 +344,12 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                                         }
                                     >
                                         <SelectTrigger id="clock-size">
-                                            <SelectValue placeholder="Select size" />
+                                            <SelectValue placeholder={t('timerSettings.labels.selectSize')} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="small">Small</SelectItem>
-                                            <SelectItem value="medium">Medium</SelectItem>
-                                            <SelectItem value="large">Large</SelectItem>
+                                            <SelectItem value="small">{t('timerSettings.labels.small')}</SelectItem>
+                                            <SelectItem value="medium">{t('timerSettings.labels.medium')}</SelectItem>
+                                            <SelectItem value="large">{t('timerSettings.labels.large')}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -356,7 +358,7 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
 
                         {/* Preview */}
                         <div className="space-y-4">
-                            <h2 className="text-lg font-semibold">Preview</h2>
+                            <h2 className="text-lg font-semibold">{t('timerSettings.labels.preview')}</h2>
                             <Separator />
                             <div className="rounded-lg border bg-card p-6 flex items-center justify-center min-h-[200px]">
                                 {localSettings.clockType === 'digital' && (() => {
@@ -484,8 +486,8 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
 
                     {!onClose && (
                         <div className="flex justify-between pt-4 border-t">
-                            <Button variant="outline" onClick={resetToDefaults}>Reset to Defaults</Button>
-                            <Button onClick={saveSettings}>Save Changes</Button>
+                            <Button variant="outline" onClick={resetToDefaults}>{t('timerSettings.actions.resetDefaults')}</Button>
+                            <Button onClick={saveSettings}>{t('timerSettings.actions.saveChanges')}</Button>
                         </div>
                     )}
                 </div>

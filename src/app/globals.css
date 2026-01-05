@@ -217,7 +217,8 @@ html.dark ::-webkit-scrollbar-thumb:hover {
 
 /* Mini Player Card Animations */
 @keyframes gradient-x {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 50%;
   }
   50% {
@@ -226,7 +227,8 @@ html.dark ::-webkit-scrollbar-thumb:hover {
 }
 
 @keyframes pulse-slow {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -293,3 +295,18 @@ html.dark .custom-scrollbar {
   scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
+/* Border Beam Animation */
+@keyframes border-beam {
+  0% {
+    offset-distance: var(--initial-offset, 0%);
+  }
+  100% {
+    offset-distance: calc(var(--initial-offset, 0%) + 100%);
+  }
+}
+
+.animate-border-beam {
+  animation: border-beam var(--duration) linear infinite;
+  animation-delay: var(--delay);
+  animation-direction: var(--direction);
+}

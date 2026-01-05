@@ -487,7 +487,7 @@ const FONTS = [
 
 export function GeneralSettings() {
     const { theme, setTheme } = useTheme()
-    const { lang, setLang } = useI18n()
+    const { lang, setLang, t } = useI18n()
     const [selectedThemeKey, setSelectedThemeKey] = useState<string>('default')
     const [selectedFont, setSelectedFont] = useState<string>('Inter')
 
@@ -598,15 +598,15 @@ ${optionalDark}
             }
             localStorage.removeItem('ui-theme-key')
             setSelectedThemeKey('default')
-            toast.success('Theme "Default" applied')
+            toast.success(t('settings.general.theme.themeApplied', { name: 'Default' }))
             return
         }
-        const t = themePresets.find((t) => t.key === key)
-        if (!t) return
-        injectTheme(t)
+        const themeData = themePresets.find((theme) => theme.key === key)
+        if (!themeData) return
+        injectTheme(themeData)
         localStorage.setItem('ui-theme-key', key)
         setSelectedThemeKey(key)
-        toast.success('Theme "' + t.name + '" applied')
+        toast.success(t('settings.general.theme.themeApplied', { name: themeData.name }))
     }
 
     const handleFontChange = (fontName: string) => {
@@ -629,46 +629,46 @@ ${optionalDark}
             // Let's assume I'll fix layout.tsx to expose it as --font-be-vietnam-pro
             document.body.style.fontFamily = 'var(--font-be-vietnam-pro)'
         }
-        toast.success(`Font changed to ${fontName}`)
+        toast.success(t('settings.general.theme.fontChanged', { font: fontName }))
     }
 
     return (
         <div className="space-y-8">
             {/* Appearance Section */}
             <div className="space-y-4">
-                <h2 className="text-lg font-semibold">Appearance</h2>
+                <h2 className="text-lg font-semibold">{t('settings.general.appearance')}</h2>
                 <Separator />
 
                 <div className="grid gap-6">
                     {/* Dark Mode */}
                     <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                            <Label>Theme Mode</Label>
+                            <Label>{t('settings.general.theme.mode')}</Label>
                             <p className="text-sm text-muted-foreground">
-                                Select your preferred theme mode.
+                                {t('settings.general.theme.modeDescription')}
                             </p>
                         </div>
                         <Select value={theme} onValueChange={(value) => setTheme(value)}>
                             <SelectTrigger className="w-[200px]">
-                                <SelectValue placeholder="Select theme mode" />
+                                <SelectValue placeholder={t('settings.general.theme.selectModePlaceholder')} />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="light">
                                     <div className="flex items-center gap-2">
                                         <Sun className="h-4 w-4" />
-                                        <span>Light</span>
+                                        <span>{t('settings.general.theme.light')}</span>
                                     </div>
                                 </SelectItem>
                                 <SelectItem value="dark">
                                     <div className="flex items-center gap-2">
                                         <Moon className="h-4 w-4" />
-                                        <span>Dark</span>
+                                        <span>{t('settings.general.theme.dark')}</span>
                                     </div>
                                 </SelectItem>
                                 <SelectItem value="system">
                                     <div className="flex items-center gap-2">
                                         <Laptop className="h-4 w-4" />
-                                        <span>System</span>
+                                        <span>{t('settings.general.theme.system')}</span>
                                     </div>
                                 </SelectItem>
                             </SelectContent>
@@ -678,14 +678,14 @@ ${optionalDark}
                     {/* Color Theme */}
                     <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                            <Label>Color Theme</Label>
+                            <Label>{t('settings.general.theme.colorTheme')}</Label>
                             <p className="text-sm text-muted-foreground">
-                                Choose your preferred color palette.
+                                {t('settings.general.theme.colorThemeDescription')}
                             </p>
                         </div>
                         <Select value={selectedThemeKey} onValueChange={applyTheme}>
                             <SelectTrigger className="w-[200px]">
-                                <SelectValue placeholder="Select color theme" />
+                                <SelectValue placeholder={t('settings.general.theme.selectColorPlaceholder')} />
                             </SelectTrigger>
                             <SelectContent>
                                 {[defaultTheme, ...themePresets].map((t) => (
@@ -712,14 +712,14 @@ ${optionalDark}
                     {/* Font */}
                     <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                            <Label>Font Family</Label>
+                            <Label>{t('settings.general.theme.fontFamily')}</Label>
                             <p className="text-sm text-muted-foreground">
-                                Choose your preferred font for the application.
+                                {t('settings.general.theme.fontDescription')}
                             </p>
                         </div>
                         <Select value={selectedFont} onValueChange={handleFontChange}>
                             <SelectTrigger className="w-[200px]">
-                                <SelectValue placeholder="Select a font" />
+                                <SelectValue placeholder={t('settings.general.theme.selectFontPlaceholder')} />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="Inter">
@@ -748,22 +748,22 @@ ${optionalDark}
 
             {/* Language Section */}
             <div className="space-y-4">
-                <h2 className="text-lg font-semibold">Language</h2>
+                <h2 className="text-lg font-semibold">{t('settings.general.language.sectionTitle')}</h2>
                 <Separator />
 
                 <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                        <Label>Language</Label>
+                        <Label>{t('settings.general.language.title')}</Label>
                         <p className="text-sm text-muted-foreground">
-                            Select your preferred language.
+                            {t('settings.general.language.description')}
                         </p>
                     </div>
                     <Select value={lang} onValueChange={(value) => {
                         setLang(value as any)
-                        toast.success('Language updated')
+                        toast.success(t('settings.general.language.updated'))
                     }}>
                         <SelectTrigger className="w-[200px]">
-                            <SelectValue placeholder="Select language" />
+                            <SelectValue placeholder={t('settings.general.language.selectPlaceholder')} />
                         </SelectTrigger>
                         <SelectContent>
                             {LANGS.map((item) => (

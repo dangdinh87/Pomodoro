@@ -2,6 +2,7 @@
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useI18n } from "@/contexts/i18n-context"
 
 interface DistributionChartProps {
     data: {
@@ -12,6 +13,7 @@ interface DistributionChartProps {
 }
 
 export function DistributionChart({ data }: DistributionChartProps) {
+    const { t } = useI18n();
     const totalDuration = data.reduce((acc, curr) => acc + curr.value, 0)
     const totalMinutes = Math.round(totalDuration / 60)
 
@@ -21,7 +23,7 @@ export function DistributionChart({ data }: DistributionChartProps) {
     return (
         <Card className="col-span-3">
             <CardHeader>
-                <CardTitle className="text-base font-normal">Phân bổ thời gian</CardTitle>
+                <CardTitle className="text-base font-normal">{t('historyComponents.distributionChart.title')}</CardTitle>
             </CardHeader>
             <CardContent>
                 <div className="h-[250px] relative">
@@ -42,13 +44,13 @@ export function DistributionChart({ data }: DistributionChartProps) {
                                 ))}
                             </Pie>
                             <Tooltip
-                                formatter={(value: number) => [`${Math.round(value / 60)} phút`, 'Thời gian']}
+                                formatter={(value: number) => [t('historyComponents.distributionChart.minutes', { minutes: Math.round(value / 60) }), t('historyComponents.distributionChart.time')]}
                             />
                         </PieChart>
                     </ResponsiveContainer>
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                        <span className="text-xs text-muted-foreground">Tổng cộng</span>
-                        <span className="text-2xl font-bold">{totalMinutes} phút</span>
+                        <span className="text-xs text-muted-foreground">{t('historyComponents.distributionChart.total')}</span>
+                        <span className="text-2xl font-bold">{t('historyComponents.distributionChart.minutes', { minutes: totalMinutes })}</span>
                     </div>
                 </div>
                 <div className="mt-4 flex flex-wrap justify-center gap-4">

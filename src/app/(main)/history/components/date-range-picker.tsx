@@ -14,6 +14,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import { useI18n } from "@/contexts/i18n-context"
 
 interface DateRangePickerProps {
     value?: DateRange
@@ -26,9 +27,10 @@ export function DateRangePicker({
     onChange,
     className,
 }: DateRangePickerProps) {
+    const { t } = useI18n();
     const [date, setDate] = React.useState<DateRange | undefined>(value)
     const [open, setOpen] = React.useState(false)
-    const [presetName, setPresetName] = React.useState<string | null>('Hôm nay') // Default to match initial state in page
+    const [presetName, setPresetName] = React.useState<string | null>(t('historyComponents.dateRangePicker.presets.today')) // Default to match initial state in page
 
     // Update internal state when value prop changes
     React.useEffect(() => {
@@ -49,23 +51,23 @@ export function DateRangePicker({
         switch (preset) {
             case 'today':
                 range = { from: today, to: today }
-                name = 'Hôm nay'
+                name = t('historyComponents.dateRangePicker.presets.today')
                 break
             case 'last3days':
                 range = { from: subDays(today, 2), to: today }
-                name = '3 ngày qua'
+                name = t('historyComponents.dateRangePicker.presets.last3Days')
                 break
             case 'last7days':
                 range = { from: subDays(today, 6), to: today }
-                name = '7 ngày qua'
+                name = t('historyComponents.dateRangePicker.presets.last7Days')
                 break
             case 'last30days':
                 range = { from: subDays(today, 29), to: today }
-                name = '30 ngày qua'
+                name = t('historyComponents.dateRangePicker.presets.last30Days')
                 break
             case 'thisMonth':
                 range = { from: startOfMonth(today), to: today }
-                name = 'Tháng này'
+                name = t('historyComponents.dateRangePicker.presets.thisMonth')
                 break
         }
 
@@ -100,7 +102,7 @@ export function DateRangePicker({
                                 format(date.from, "dd LLL, y", { locale: vi })
                             )
                         ) : (
-                            <span>Chọn khoảng thời gian</span>
+                            <span>{t('historyComponents.dateRangePicker.selectRange')}</span>
                         )}
                     </Button>
                 </PopoverTrigger>
@@ -112,35 +114,35 @@ export function DateRangePicker({
                                 className="justify-start"
                                 onClick={() => handlePreset('today')}
                             >
-                                Hôm nay
+                                {t('historyComponents.dateRangePicker.presets.today')}
                             </Button>
                             <Button
                                 variant="ghost"
                                 className="justify-start"
                                 onClick={() => handlePreset('last3days')}
                             >
-                                3 ngày qua
+                                {t('historyComponents.dateRangePicker.presets.last3Days')}
                             </Button>
                             <Button
                                 variant="ghost"
                                 className="justify-start"
                                 onClick={() => handlePreset('last7days')}
                             >
-                                7 ngày qua
+                                {t('historyComponents.dateRangePicker.presets.last7Days')}
                             </Button>
                             <Button
                                 variant="ghost"
                                 className="justify-start"
                                 onClick={() => handlePreset('last30days')}
                             >
-                                30 ngày qua
+                                {t('historyComponents.dateRangePicker.presets.last30Days')}
                             </Button>
                             <Button
                                 variant="ghost"
                                 className="justify-start"
                                 onClick={() => handlePreset('thisMonth')}
                             >
-                                Tháng này
+                                {t('historyComponents.dateRangePicker.presets.thisMonth')}
                             </Button>
                         </div>
                         <div>

@@ -30,9 +30,9 @@ interface BackgroundContextType {
 }
 
 const defaultBackground: BackgroundSettings = {
-  type: 'image',
-  value: 'lofi:auto',
-  opacity: 0.9,
+  type: 'solid',
+  value: 'hsl(var(--background))',
+  opacity: 1,
   blur: 0,
   brightness: 100,
 };

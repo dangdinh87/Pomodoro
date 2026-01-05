@@ -20,10 +20,12 @@ import {
 } from '@/components/ui/card';
 import { supabase } from '@/lib/supabase-client';
 import { useAuthStore } from '@/stores/auth-store';
+import { useI18n } from '@/contexts/i18n-context';
 
 import { BorderBeam } from '@/components/ui/border-beam';
 
 export default function SignupPage() {
+  const { t } = useI18n();
   const router = useRouter();
   const searchParams = useSearchParams();
   const user = useAuthStore((state) => state.user);
@@ -41,9 +43,7 @@ export default function SignupPage() {
 
   const getSupabaseClient = () => {
     if (!supabase) {
-      toast.error(
-        'Supabase chưa được cấu hình. Vui lòng bổ sung biến môi trường.',
-      );
+      toast.error(t('signup.errors.supabaseNotConfigured'));
       return null;
     }
     return supabase;
@@ -54,7 +54,7 @@ export default function SignupPage() {
     const client = getSupabaseClient();
     if (!client) return;
     if (!email || !password) {
-      toast.error('Vui lòng nhập email và mật khẩu để đăng ký.');
+      toast.error(t('signup.errors.emailPasswordRequired'));
       return;
     }
     setSignupLoading(true);
@@ -67,13 +67,13 @@ export default function SignupPage() {
         },
       });
       if (error) {
-        toast.error(error.message || 'Không thể đăng ký.');
+        toast.error(error.message || t('signup.errors.signupFailed'));
       } else {
-        toast.success('Vui lòng kiểm tra email để xác nhận tài khoản.');
+        toast.success(t('signup.success.checkEmail'));
       }
     } catch (error) {
       console.error(error);
-      toast.error('Có lỗi xảy ra khi đăng ký.');
+      toast.error(t('signup.errors.signupError'));
     } finally {
       setSignupLoading(false);
     }
@@ -94,13 +94,13 @@ export default function SignupPage() {
         },
       });
       if (error) {
-        toast.error('Không thể kết nối Google. Thử lại sau.');
+        toast.error(t('signup.errors.googleConnectionFailed'));
       } else {
-        toast.message('Đang chuyển hướng đến Google…');
+        toast.message(t('signup.success.redirectingToGoogle'));
       }
     } catch (error) {
       console.error(error);
-      toast.error('Có lỗi xảy ra khi khởi tạo đăng nhập.');
+      toast.error(t('signup.errors.googleAuthError'));
     } finally {
       setGoogleLoading(false);
     }
@@ -112,33 +112,32 @@ export default function SignupPage() {
         <BorderBeam size={250} duration={12} delay={0} />
         <CardHeader className="space-y-2 text-center">
           <CardTitle className="text-2xl font-semibold">
-            Đăng ký với Study Bro
+            {t('signup.title')}
           </CardTitle>
           <CardDescription className="text-sm text-muted-foreground">
-            Đăng ký miễn phí để lưu preset, lịch sử tập trung và đồng bộ nhiệm
-            vụ giữa các thiết bị.
+            {t('signup.description')}
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4">
           <form className="space-y-4" onSubmit={handleEmailSignup}>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('signup.form.email')}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="your@email.com"
+                placeholder={t('signup.form.emailPlaceholder')}
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 disabled={isBusy}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Mật khẩu</Label>
+              <Label htmlFor="password">{t('signup.form.password')}</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="••••••••"
+                placeholder={t('signup.form.passwordPlaceholder')}
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 disabled={isBusy}
@@ -148,17 +147,17 @@ export default function SignupPage() {
               {signupLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Đang đăng ký...
+                  {t('signup.form.signingUp')}
                 </>
               ) : (
-                'Đăng ký'
+                t('signup.form.signUp')
               )}
             </Button>
           </form>
 
           <div className="flex items-center gap-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">
             <Separator className="flex-1" />
-            hoặc
+            {t('signup.form.or')}
             <Separator className="flex-1" />
           </div>
 
@@ -203,7 +202,7 @@ export default function SignupPage() {
                     fill="#EA4335"
                   />
                 </svg>
-                Đăng ký với Google
+                {t('signup.form.signUpWithGoogle')}
               </>
             )}
           </Button>
@@ -211,15 +210,15 @@ export default function SignupPage() {
 
         <CardFooter className="flex flex-col gap-3 text-sm text-muted-foreground">
           <p className="text-center">
-            Đã có tài khoản?{' '}
+            {t('signup.form.haveAccount')}{' '}
             <Link href="/login" className="text-primary hover:underline">
-              Đăng nhập ngay
+              {t('signup.form.signInNow')}
             </Link>
           </p>
           <Button variant="ghost" asChild>
             <Link href="/timer">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Quay lại ứng dụng
+              {t('signup.form.backToApp')}
             </Link>
           </Button>
         </CardFooter>

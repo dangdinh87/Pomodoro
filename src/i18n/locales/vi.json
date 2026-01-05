@@ -118,12 +118,20 @@
       "clockSize": "Kích thước đồng hồ",
       "small": "Nhỏ",
       "medium": "Trung bình",
-      "large": "Lớn"
+      "large": "Lớn",
+      "timerDurations": "Thời lượng Hẹn giờ",
+      "behavior": "Hành vi",
+      "clockDisplay": "Hiển thị Đồng hồ",
+      "clockStyle": "Kiểu Đồng hồ",
+      "preview": "Xem trước",
+      "selectSize": "Chọn kích thước",
+      "lowTimeWarning": "Cảnh báo thời gian thấp (dưới 10s)"
     },
     "actions": {
       "resetDefaults": "Khôi phục mặc định",
       "cancel": "Hủy",
-      "save": "Lưu cài đặt"
+      "save": "Lưu cài đặt",
+      "saveChanges": "Lưu thay đổi"
     },
     "toasts": {
       "saved": "Đã lưu cài đặt hẹn giờ!",
@@ -131,37 +139,65 @@
     }
   },
   "tasks": {
-    "title": "Công việc",
-    "addTask": "Thêm công việc",
+    "title": "Quản lý công việc",
+    "subtitle": "Quản lý công việc và theo dõi tiến độ với phương pháp Pomodoro",
+    "addTask": "Thêm công việc mới",
     "editTask": "Chỉnh sửa công việc",
     "deleteTask": "Xóa công việc",
-    "noTasks": "Chưa có công việc nào",
+    "noTasks": "Không tìm thấy công việc nào",
+    "noTasksDescription": "Bạn chưa có công việc nào. Hãy tạo một công việc để bắt đầu phiên tập trung.",
     "createFirst": "Tạo công việc đầu tiên để bắt đầu",
     "taskName": "Tên công việc",
+    "taskNamePlaceholder": "Bạn đang định làm gì?",
     "taskDescription": "Mô tả",
+    "taskDescriptionPlaceholder": "Thêm ghi chú...",
     "priority": "Độ ưu tiên",
     "dueDate": "Hạn chót",
     "status": "Trạng thái",
     "estimated": "Pomodoro dự kiến",
-    "completed": "Đã hoàn thành",
+    "actual": "Thực tế",
+    "completed": "Hoàn thành",
     "pending": "Chờ xử lý",
-    "inProgress": "Đang thực hiện",
+    "inProgress": "Đang làm",
+    "cancelled": "Đã hủy",
+    "progress": "Tiến độ",
+    "time": "Thời gian",
     "priorityLevels": {
       "low": "Thấp",
       "medium": "Trung bình",
       "high": "Cao"
     },
+    "statuses": {
+      "pending": "Chờ xử lý",
+      "in_progress": "Đang làm",
+      "done": "Hoàn thành",
+      "cancelled": "Đã hủy"
+    },
     "filters": {
-      "all": "Tất cả",
+      "searchPlaceholder": "Tìm kiếm công việc...",
+      "status": "Trạng thái",
+      "priority": "Độ ưu tiên",
+      "dateRange": "Khoảng ngày",
       "today": "Hôm nay",
-      "week": "Tuần này",
-      "completed": "Đã hoàn thành",
-      "pending": "Chờ xử lý"
+      "all": "Tất cả",
+      "reset": "Đặt lại bộ lọc"
     },
     "actions": {
       "markComplete": "Đánh dấu hoàn thành",
       "markIncomplete": "Đánh dấu chưa hoàn thành",
-      "startPomodoro": "Bắt đầu Pomodoro"
+      "startFocus": "Tập trung vào việc này",
+      "stopFocus": "Dừng tập trung",
+      "edit": "Sửa công việc",
+      "delete": "Xóa công việc",
+      "save": "Lưu công việc",
+      "create": "Tạo công việc",
+      "deleting": "Đang xóa..."
+    },
+    "count": "công việc",
+    "confirmDelete": {
+      "title": "Bạn có chắc chắn?",
+      "description": "Hành động này không thể hoàn tác. Việc này sẽ xóa vĩnh viễn công việc và dữ liệu phiên liên quan.",
+      "action": "Xóa vĩnh viễn"
     }
   },
   "history": {
@@ -211,15 +247,30 @@
     },
     "general": {
       "title": "Cài đặt Chung",
+      "appearance": "Giao diện",
       "language": {
         "title": "Ngôn ngữ",
-        "description": "Chọn ngôn ngữ ưa thích của bạn",
+        "description": "Chọn ngôn ngữ hiển thị trên giao diện",
+        "sectionTitle": "Ngôn ngữ",
+        "selectPlaceholder": "Chọn ngôn ngữ",
+        "updated": "Đã cập nhật ngôn ngữ",
         "english": "Tiếng Anh",
         "vietnamese": "Tiếng Việt"
       },
       "theme": {
         "title": "Giao diện",
         "description": "Chọn chủ đề ứng dụng",
+        "mode": "Chế độ giao diện",
+        "modeDescription": "Chọn chế độ giao diện ưa thích.",
+        "colorTheme": "Bảng màu",
+        "colorThemeDescription": "Chọn bảng màu sắc cho giao diện người dùng.",
+        "fontFamily": "Phông chữ",
+        "fontDescription": "Chọn phông chữ phù hợp để tăng trải nghiệm đọc.",
+        "selectModePlaceholder": "Chọn chế độ giao diện",
+        "selectColorPlaceholder": "Chọn màu giao diện",
+        "selectFontPlaceholder": "Chọn phông chữ",
+        "fontChanged": "Đã đổi phông chữ thành {font}",
+        "themeApplied": "Đã áp dụng giao diện \"{name}\"",
         "light": "Sáng",
         "dark": "Tối",
         "system": "Hệ thống"
@@ -242,7 +293,37 @@
       "gradient": "Gradient",
       "blur": "Độ mờ",
       "opacity": "Độ trong suốt",
-      "brightness": "Độ sáng"
+      "brightness": "Độ sáng",
+      "selectImage": "Lựa ảnh",
+      "description": "Chọn ảnh phù hợp với màu hệ thống",
+      "reset": "Đặt lại",
+      "saveChanges": "Lưu thay đổi",
+      "systemAuto": "Hệ thống & Tự động",
+      "videoBackgrounds": "Hình nền động",
+      "images": "Hình ảnh",
+      "opacityDescription": "Điều chỉnh độ trong suốt của hình nền hoặc video.",
+      "brightnessDescription": "Điều chỉnh độ sáng để phù hợp với môi trường của bạn.",
+      "presets": {
+        "systemAutoColor": "System Color (Auto)",
+        "lofiChillAuto": "Lofi Chill (Auto)",
+        "dayChill": "Day Chill",
+        "nightChill": "Night Chill",
+        "travelling1": "Travelling 1",
+        "travelling2": "Travelling 2",
+        "travelling3": "Travelling 3",
+        "travelling4": "Travelling 4",
+        "travelling5": "Travelling 5",
+        "travelling6": "Travelling 6",
+        "travelling7": "Travelling 7",
+        "travelling8": "Travelling 8",
+        "travelling9": "Travelling 9",
+        "background1": "Background 1",
+        "chillShiba": "Chill Shiba"
+      },
+      "toasts": {
+        "saved": "Đã lưu hình nền",
+        "resetInfo": "Đã tải mặc định, nhấn Lưu để áp dụng"
+      }
     },
     "audio": {
       "title": "Cài đặt Âm thanh",
@@ -485,6 +566,243 @@
     "guide": {
       "title": "Hướng dẫn Sử dụng • Study Bro App",
       "description": "Tìm hiểu về phương pháp Pomodoro và cách sử dụng các tính năng của Study Bro."
+    }
+  },
+  "login": {
+    "title": "Đăng nhập với Study Bro",
+    "description": "Đăng nhập để giữ nhịp học và đồng bộ mọi phiên Pomodoro.",
+    "form": {
+      "email": "Email",
+      "emailPlaceholder": "email@example.com",
+      "password": "Mật khẩu",
+      "passwordPlaceholder": "Nhập mật khẩu",
+      "forgotPassword": "Quên mật khẩu?",
+      "signingIn": "Đang đăng nhập...",
+      "signIn": "Đăng nhập",
+      "or": "hoặc",
+      "continueWithGoogle": "Tiếp tục với Google",
+      "noAccount": "Chưa có tài khoản?",
+      "signUpNow": "Đăng ký ngay",
+      "backToApp": "Quay lại ứng dụng"
+    },
+    "errors": {
+      "supabaseNotConfigured": "Supabase chưa được cấu hình. Vui lòng bổ sung biến môi trường.",
+      "emailPasswordRequired": "Vui lòng nhập email và mật khẩu.",
+      "loginFailed": "Không thể đăng nhập.",
+      "loginError": "Có lỗi xảy ra khi đăng nhập.",
+      "googleConnectionFailed": "Không thể kết nối Google. Thử lại sau.",
+      "googleAuthError": "Có lỗi xảy ra khi khởi tạo đăng nhập."
+    },
+    "success": {
+      "loginSuccess": "Đăng nhập thành công!",
+      "redirectingToGoogle": "Đang chuyển hướng đến Google…"
+    }
+  },
+  "signup": {
+    "title": "Đăng ký với Study Bro",
+    "description": "Đăng ký miễn phí để lưu preset, lịch sử tập trung và đồng bộ nhiệm vụ giữa các thiết bị.",
+    "form": {
+      "email": "Email",
+      "emailPlaceholder": "email@example.com",
+      "password": "Mật khẩu",
+      "passwordPlaceholder": "Tạo mật khẩu",
+      "signingUp": "Đang đăng ký...",
+      "signUp": "Đăng ký",
+      "or": "hoặc",
+      "signUpWithGoogle": "Đăng ký với Google",
+      "haveAccount": "Đã có tài khoản?",
+      "signInNow": "Đăng nhập ngay",
+      "backToApp": "Quay lại ứng dụng"
+    },
+    "errors": {
+      "supabaseNotConfigured": "Supabase chưa được cấu hình. Vui lòng bổ sung biến môi trường.",
+      "emailPasswordRequired": "Vui lòng nhập email và mật khẩu để đăng ký.",
+      "signupFailed": "Không thể đăng ký.",
+      "signupError": "Có lỗi xảy ra khi đăng ký.",
+      "googleConnectionFailed": "Không thể kết nối Google. Thử lại sau.",
+      "googleAuthError": "Có lỗi xảy ra khi khởi tạo đăng nhập."
+    },
+    "success": {
+      "checkEmail": "Vui lòng kiểm tra email để xác nhận tài khoản.",
+      "redirectingToGoogle": "Đang chuyển hướng đến Google…"
+    }
+  },
+  "notFound": {
+    "title": "Không tìm thấy trang này",
+    "description": "Trang bạn đang tìm không tồn tại hoặc đã được di chuyển.",
+    "backToTimer": "Quay lại Timer",
+    "home": "Trang chủ",
+    "goBack": "Quay lại"
+  },
+  "progress": {
+    "comingSoon": "Tính năng sắp ra mắt",
+    "description": "Trang thống kê đang được hoàn thiện. Bạn sẽ sớm theo dõi tiến độ tập trung, chuỗi ngày, và thời gian làm việc.",
+    "features": {
+      "focusTime": {
+        "title": "Thời gian tập trung",
+        "description": "Theo ngày/tuần/tháng"
+      },
+      "pomodoroSessions": {
+        "title": "Pomodoro & phiên",
+        "description": "Số phiên, tỉ lệ hoàn thành"
+      },
+      "streaks": {
+        "title": "Chuỗi ngày",
+        "description": "Giữ streak, nhận huy hiệu"
+      }
+    },
+    "backToTimer": "Quay lại Timer"
+  },
+  "clockDemo": {
+    "title": "Demo Đồng hồ",
+    "subtitle": "Kiểm tra và so sánh tất cả các loại đồng hồ với hiệu ứng động",
+    "controls": {
+      "title": "Điều khiển Hẹn giờ",
+      "description": "Điều khiển hẹn giờ demo cho tất cả đồng hồ",
+      "pause": "Tạm dừng",
+      "start": "Bắt đầu",
+      "reset": "Đặt lại",
+      "timeProgress": "Thời gian: {time} | Tiến độ: {progress}%"
+    },
+    "modes": {
+      "work": "Làm việc",
+      "shortBreak": "Nghỉ ngắn",
+      "longBreak": "Nghỉ dài"
+    },
+    "tabs": {
+      "animated": "Động",
+      "digital": "Kỹ thuật số",
+      "analog": "Kim",
+      "progress": "Tiến độ",
+      "flip": "Lật"
+    },
+    "clockTypes": {
+      "digital": {
+        "title": "Đồng hồ Kỹ thuật số",
+        "description": "Hiển thị kỹ thuật số cổ điển với vòng tiến độ và cảnh báo thời gian thấp"
+      },
+      "analog": {
+        "title": "Đồng hồ Kim",
+        "description": "Mặt đồng hồ truyền thống với kim quét"
+      },
+      "progress": {
+        "title": "Đồng hồ Thanh Tiến độ",
+        "description": "Thanh tiến độ tuyến tính với hiển thị thời gian"
+      },
+      "flip": {
+        "title": "Đồng hồ Lật",
+        "description": "Hoạt ảnh đồng hồ kỹ thuật số kiểu lật cổ điển"
+      },
+      "animated": {
+        "title": "Đếm ngược Động",
+        "description": "Đếm ngược động hiện đại với chuyển cảnh mượt mà"
+      }
+    },
+    "animationFeatures": {
+      "title": "Tính năng Hoạt ảnh",
+      "breathing": {
+        "title": "Hiệu ứng Nhịp thở",
+        "description": "Hoạt ảnh nhịp nhàng tạo cảm giác bình yên"
+      },
+      "colorTransition": {
+        "title": "Chuyển Màu",
+        "description": "Chuyển màu mượt mà dựa trên thời gian còn lại và chế độ"
+      },
+      "progressRing": {
+        "title": "Vòng Tiến độ",
+        "description": "Chỉ báo tiến độ hình tròn xung quanh đồng hồ"
+      },
+      "glowEffect": {
+        "title": "Hiệu ứng Phát sáng",
+        "description": "Ánh sáng mờ tăng dần khi thời gian sắp hết"
+      },
+      "modeIndicator": {
+        "title": "Chỉ báo Chế độ",
+        "description": "Huy hiệu hiển thị loại phiên hiện tại (Tập trung/Nghỉ)"
+      }
+    }
+  },
+  "timerComponents": {
+    "taskSelector": {
+      "loginToSelect": "Đăng nhập để chọn công việc",
+      "selectToFocus": "Chọn công việc để tập trung",
+      "dialogTitle": "Chọn Công việc để Tập trung",
+      "dialogDescription": "Chọn công việc để làm trong phiên Pomodoro của bạn",
+      "noPendingTasks": "Không có công việc chờ xử lý",
+      "noPendingTasksToday": "Không có công việc nào trong hôm nay. Hãy tập trung vào mục tiêu của bạn!",
+      "createTaskPrompt": "Tạo công việc mới để bắt đầu",
+      "goToTaskList": "Đi đến danh sách công việc"
+    },
+    "enhancedTimer": {
+      "today": "Hôm nay",
+      "poms": "poms",
+      "time": "Thời gian",
+      "minutes": "phút",
+      "focusMode": "Chế độ tập trung",
+      "soundSettings": "Cài đặt âm thanh",
+      "backgroundSettings": "Cài đặt hình nền",
+      "timerSettings": "Cài đặt hẹn giờ",
+      "exitFocus": "Thoát chế độ tập trung",
+      "enterFocus": "Bật chế độ tập trung"
+    },
+    "animatedCountdown": {
+      "modes": {
+        "focus": "Tập trung",
+        "shortBreak": "Nghỉ ngắn",
+        "longBreak": "Nghỉ dài"
+      }
+    }
+  },
+  "historyComponents": {
+    "dateRangePicker": {
+      "selectRange": "Chọn khoảng thời gian",
+      "presets": {
+        "today": "Hôm nay",
+        "last3Days": "3 ngày qua",
+        "last7Days": "7 ngày qua",
+        "last30Days": "30 ngày qua",
+        "thisMonth": "Tháng này"
+      }
+    },
+    "distributionChart": {
+      "title": "Phân bổ thời gian",
+      "time": "Thời gian",
+      "total": "Tổng cộng",
+      "minutes": "{minutes} phút"
+    },
+    "focusChart": {
+      "title": "Thời gian tập trung hàng ngày",
+      "minutes": "{minutes} phút"
+    },
+    "sessionHistory": {
+      "title": "Chi tiết các Phiên đã Hoàn thành",
+      "modes": {
+        "focus": "Tập trung",
+        "shortBreak": "Nghỉ ngắn",
+        "longBreak": "Nghỉ dài"
+      },
+      "tableHeaders": {
+        "task": "Công việc",
+        "sessionType": "Loại phiên",
+        "dateTime": "Ngày & Giờ",
+        "duration": "Thời lượng"
+      },
+      "noTask": "Không có công việc",
+      "minutes": "{minutes} phút",
+      "noData": "Chưa có dữ liệu phiên làm việc nào."
+    },
+    "statsCards": {
+      "totalFocusTime": "Tổng thời gian tập trung",
+      "timeFormat": "{hours} giờ {minutes} phút",
+      "completedSessions": "Số phiên hoàn thành",
+      "longestStreak": "Chuỗi ngày dài nhất",
+      "days": "{days} ngày",
+      "currentStreak": "Hiện tại: {current} ngày"
+    },
+    "statsEmpty": {
+      "title": "Chưa có dữ liệu",
+      "description": "Không có phiên tập trung nào được ghi nhận trong khoảng thời gian này. Hãy bắt đầu một phiên mới!",
+      "startFocus": "Bắt đầu tập trung"
     }
   }
 }

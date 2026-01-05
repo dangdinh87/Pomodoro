@@ -45,8 +45,8 @@ const defaultSoundSettings: SoundSettings = {
 }
 
 const defaultBackgroundSettings: BackgroundSettings = {
-  backgroundType: 'none',
-  backgroundStyle: '',
+  backgroundType: 'solid',
+  backgroundStyle: 'hsl(var(--background))',
   backgroundOpacity: 100,
 }
 

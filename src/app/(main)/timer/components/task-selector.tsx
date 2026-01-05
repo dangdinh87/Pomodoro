@@ -16,12 +16,14 @@ import {
 } from '@/components/ui/dialog';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
+import { useI18n } from '@/contexts/i18n-context';
 
 interface TaskSelectorProps {
   className?: string;
 }
 
 export function TaskSelector({ className }: TaskSelectorProps) {
+  const { t } = useI18n();
   const { isAuthenticated } = useAuth();
   const { tasks, updateTask } = useTasks();
   const { activeTaskId, setActiveTask } = useTasksStore();
@@ -29,7 +31,17 @@ export function TaskSelector({ className }: TaskSelectorProps) {
 
 
   const activeTask = tasks.find((task) => task.id === activeTaskId);
-  const pendingTasks = tasks.filter((task) => task.status !== 'done');
+
+  const todayTasks = tasks.filter((task) => {
+    if (task.status === 'done' || task.status === 'cancelled') return false;
+    const taskDate = new Date(task.createdAt);
+    const today = new Date();
+    return (
+      taskDate.getDate() === today.getDate() &&
+      taskDate.getMonth() === today.getMonth() &&
+      taskDate.getFullYear() === today.getFullYear()
+    );
+  });
 
   const handleSelectTask = (taskId: string) => {
     setActiveTask(taskId);
@@ -37,10 +49,10 @@ export function TaskSelector({ className }: TaskSelectorProps) {
     if (task && task.status === 'pending') {
       updateTask({ id: taskId, input: { status: 'in_progress' } });
     }
-    setIsOpen(false);
+    // Removed setIsOpen(false) to keep modal open as per user request
   };
 
-  const TaskItem = ({ task }: { task: Task }) => {
+  const TaskItemInternal = ({ task }: { task: Task }) => {
     const isActive = task.id === activeTaskId;
     const progress = Math.min(
       100,
@@ -50,15 +62,18 @@ export function TaskSelector({ className }: TaskSelectorProps) {
     return (
       <div
         className={cn(
-          'flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer',
-          'hover:border-primary/50 hover:bg-primary/5',
-          isActive && 'border-primary bg-primary/10',
+          'group relative flex items-start gap-4 p-4 rounded-xl border transition-all cursor-pointer overflow-hidden',
+          'bg-card/40 backdrop-blur-sm border-muted/40 hover:border-primary/40 hover:shadow-lg hover:bg-primary/5',
+          isActive && 'border-primary ring-1 ring-primary/30 bg-primary/10 shadow-md',
         )}
         onClick={() => handleSelectTask(task.id)}
       >
-        <div className="flex-1 space-y-2">
-          <div className="flex items-center gap-2">
-            <h4 className="font-medium text-sm">{task.title}</h4>
+        <div className="flex-1 space-y-2.5 min-w-0">
+          <div className="flex items-center flex-wrap gap-2">
+            <h4 className={cn(
+              "font-bold text-sm uppercase tracking-tight truncate",
+              isActive && "text-primary"
+            )}>{task.title}</h4>
             <Badge
               variant={
                 task.priority === 'high'
@@ -67,34 +82,32 @@ export function TaskSelector({ className }: TaskSelectorProps) {
                     ? 'default'
                     : 'secondary'
               }
+              className="text-[9px] h-4.5 px-1.5 rounded-full font-bold uppercase tracking-wider"
             >
-              {task.priority}
+              {t(`tasks.priorityLevels.${task.priority}`)}
             </Badge>
           </div>
 
-          {task.description && (
-            <p className="text-xs text-muted-foreground line-clamp-2">
-              {task.description}
-            </p>
-          )}
-
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <span>Pomodoro:</span>
-              <div className="w-12 h-1.5 bg-secondary rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-primary transition-all"
-                  style={{ width: `${progress}%` }}
-                />
+          <div className="flex items-center gap-4 text-[11px] text-muted-foreground font-medium">
+            <div className="flex items-center gap-2">
+              <span className="opacity-70">Pomodoro:</span>
+              <div className="flex items-center gap-1.5 bg-secondary/30 px-2 py-0.5 rounded-full">
+                <div className="w-16 h-1 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-primary transition-all duration-500"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+                <span className="tabular-nums font-bold">
+                  {task.actualPomodoros}/{task.estimatePomodoros}
+                </span>
               </div>
-              <span>
-                {task.actualPomodoros}/{task.estimatePomodoros}
-              </span>
             </div>
+
             {task.tags.length > 0 && (
-              <div className="flex gap-1">
-                {task.tags.slice(0, 2).map((tag) => (
-                  <Badge key={tag} variant="outline" className="text-xs">
+              <div className="flex flex-wrap gap-1">
+                {task.tags.slice(0, 3).map((tag) => (
+                  <Badge key={tag} variant="secondary" className="text-[9px] h-4.5 px-2 bg-secondary/50 text-secondary-foreground border-none font-normal leading-none py-0">
                     {tag}
                   </Badge>
                 ))}
@@ -103,7 +116,17 @@ export function TaskSelector({ className }: TaskSelectorProps) {
           </div>
         </div>
 
-        {isActive && <Play className="h-4 w-4 text-primary" />}
+        <div className="shrink-0 pt-1">
+          {isActive ? (
+            <div className="p-1.5 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-110 transition-transform">
+              <Play className="h-3 w-3 fill-current" />
+            </div>
+          ) : (
+            <div className="p-1.5 rounded-full bg-muted/50 text-muted-foreground group-hover:bg-primary/20 group-hover:text-primary transition-colors">
+              <Play className="h-3 w-3" />
+            </div>
+          )}
+        </div>
       </div>
     );
   };
@@ -116,7 +139,7 @@ export function TaskSelector({ className }: TaskSelectorProps) {
             <div className="p-1.5 rounded-full bg-muted text-muted-foreground">
               <Target className="w-4 h-4" />
             </div>
-            <span className="text-xs font-medium text-muted-foreground">Đăng nhập để chọn công việc</span>
+            <span className="text-xs font-medium text-muted-foreground">{t('timerComponents.taskSelector.loginToSelect')}</span>
           </div>
         </Link>
       ) : (
@@ -147,7 +170,7 @@ export function TaskSelector({ className }: TaskSelectorProps) {
                   <div className="p-1.5 rounded-full bg-muted text-muted-foreground">
                     <Target className="w-4 h-4" />
                   </div>
-                  <span className="text-xs font-medium text-muted-foreground">Select a task to focus</span>
+                  <span className="text-xs font-medium text-muted-foreground">{t('timerComponents.taskSelector.selectToFocus')}</span>
                 </div>
               )}
             </Button>
@@ -155,33 +178,40 @@ export function TaskSelector({ className }: TaskSelectorProps) {
 
           <DialogContent className="max-w-2xl max-h-[80vh]">
             <DialogHeader>
-              <DialogTitle>Select Task for Focus</DialogTitle>
+              <DialogTitle>{t('timerComponents.taskSelector.dialogTitle')}</DialogTitle>
               <DialogDescription>
-                Choose a task to work on during your Pomodoro session
+                {t('timerComponents.taskSelector.dialogDescription')}
               </DialogDescription>
             </DialogHeader>
 
-            <div className="h-[400px] overflow-y-auto pr-4">
-              <div className="space-y-3">
-                {pendingTasks.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-sm text-muted-foreground">
-                      No pending tasks available
+            <div className="h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between mb-1">
+                  <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-widest text-primary border-primary/30 bg-primary/5">
+                    {t('tasks.filters.today') || "Today's Tasks"}
+                  </Badge>
+                  <span className="text-[10px] text-muted-foreground italic">{todayTasks.length} {t('tasks.count') || "tasks"}</span>
+                </div>
+
+                {todayTasks.length === 0 ? (
+                  <div className="text-center py-12 bg-muted/10 rounded-2xl border border-dashed border-muted/50">
+                    <Target className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+                    <p className="text-sm font-semibold text-muted-foreground">
+                      {t('timerComponents.taskSelector.noPendingTasksToday') || t('timerComponents.taskSelector.noPendingTasks')}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Create a new task to get started
+                    <p className="text-xs text-muted-foreground/70 mt-2 px-8">
+                      {t('timerComponents.taskSelector.createTaskPrompt')}
                     </p>
                   </div>
                 ) : (
-                  pendingTasks.map((task) => <TaskItem key={task.id} task={task} />)
+                  todayTasks.map((task) => <TaskItemInternal key={task.id} task={task} />)
                 )}
               </div>
             </div>
             <DialogFooter>
               <Button variant="link" asChild>
                 <Link href="/tasks">
-                  Go to task list <ArrowRight className="ms-1 h-4 w-4" />
+                  {t('timerComponents.taskSelector.goToTaskList')} <ArrowRight className="ms-1 h-4 w-4" />
                 </Link>
               </Button>
             </DialogFooter>

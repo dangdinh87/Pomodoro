@@ -1,25 +1,21 @@
 import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase-client'
-
-function getCurrentUserId() {
-  return 'demo-user'
-}
+import { createClient } from '@/lib/supabase-server'
 
 function startOfDay(date: Date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate())
 }
 
 export async function GET(request: Request) {
-  const userId = getCurrentUserId()
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const userId = user.id
   const { searchParams } = new URL(request.url)
   const range = searchParams.get('range') ?? 'week'
-
-  if (!supabase) {
-    return NextResponse.json(
-      { error: 'Supabase client is not configured' },
-      { status: 500 },
-    )
-  }
 
   const now = new Date()
   let from: Date

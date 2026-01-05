@@ -13,8 +13,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TimerMode } from '@/stores/timer-store';
 import { Play, Pause, RotateCcw } from 'lucide-react';
+import { useI18n } from '@/contexts/i18n-context';
 
 export default function ClockDemoPage() {
+  const { t } = useI18n();
   const [timeLeft, setTimeLeft] = useState(25 * 60); // 25 minutes in seconds
   const [isRunning, setIsRunning] = useState(false);
   const [mode, setMode] = useState<TimerMode>('work');
@@ -65,17 +67,17 @@ export default function ClockDemoPage() {
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2">Clock Components Demo</h1>
+        <h1 className="text-4xl font-bold mb-2">{t('clockDemo.title')}</h1>
         <p className="text-muted-foreground">
-          Test and compare all timer clock types with live animations
+          {t('clockDemo.subtitle')}
         </p>
       </div>
 
       {/* Controls */}
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>Timer Controls</CardTitle>
-          <CardDescription>Control the demo timer for all clocks</CardDescription>
+          <CardTitle>{t('clockDemo.controls.title')}</CardTitle>
+          <CardDescription>{t('clockDemo.controls.description')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-4">
@@ -84,21 +86,21 @@ export default function ClockDemoPage() {
                 {isRunning ? (
                   <>
                     <Pause className="h-4 w-4 mr-2" />
-                    Pause
+                    {t('clockDemo.controls.pause')}
                   </>
                 ) : (
                   <>
                     <Play className="h-4 w-4 mr-2" />
-                    Start
+                    {t('clockDemo.controls.start')}
                   </>
                 )}
               </Button>
               <Button onClick={resetTimer} variant="outline">
                 <RotateCcw className="h-4 w-4 mr-2" />
-                Reset
+                {t('clockDemo.controls.reset')}
               </Button>
               <div className="text-sm text-muted-foreground">
-                Time: {formattedTime} | Progress: {Math.round(progressPercent)}%
+                {t('clockDemo.controls.timeProgress', { time: formattedTime, progress: Math.round(progressPercent) })}
               </div>
             </div>
 
@@ -108,21 +110,21 @@ export default function ClockDemoPage() {
                 variant={mode === 'work' ? 'default' : 'outline'}
                 size="sm"
               >
-                Work
+                {t('clockDemo.modes.work')}
               </Button>
               <Button
                 onClick={() => setMode('shortBreak')}
                 variant={mode === 'shortBreak' ? 'default' : 'outline'}
                 size="sm"
               >
-                Short Break
+                {t('clockDemo.modes.shortBreak')}
               </Button>
               <Button
                 onClick={() => setMode('longBreak')}
                 variant={mode === 'longBreak' ? 'default' : 'outline'}
                 size="sm"
               >
-                Long Break
+                {t('clockDemo.modes.longBreak')}
               </Button>
             </div>
           </div>
@@ -132,22 +134,41 @@ export default function ClockDemoPage() {
       {/* Clock Tabs */}
       <Tabs defaultValue="animated" className="w-full">
         <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="animated">Animated</TabsTrigger>
-          <TabsTrigger value="digital">Digital</TabsTrigger>
-          <TabsTrigger value="analog">Analog</TabsTrigger>
-          <TabsTrigger value="progress">Progress</TabsTrigger>
-          <TabsTrigger value="flip">Flip</TabsTrigger>
+          <TabsTrigger value="animated">{t('clockDemo.tabs.animated')}</TabsTrigger>
+          <TabsTrigger value="digital">{t('clockDemo.tabs.digital')}</TabsTrigger>
+          <TabsTrigger value="analog">{t('clockDemo.tabs.analog')}</TabsTrigger>
+          <TabsTrigger value="progress">{t('clockDemo.tabs.progress')}</TabsTrigger>
+          <TabsTrigger value="flip">{t('clockDemo.tabs.flip')}</TabsTrigger>
         </TabsList>
 
 
+
+        {/* Animated Countdown */}
+        <TabsContent value="animated">
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('clockDemo.clockTypes.animated.title')}</CardTitle>
+              <CardDescription>
+                {t('clockDemo.clockTypes.animated.description')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="min-h-[500px] flex items-center justify-center">
+              <AnimatedCountdown
+                formattedTime={formattedTime}
+                mode={mode}
+                clockSize={clockSize}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         {/* Digital Clock */}
         <TabsContent value="digital">
           <Card>
             <CardHeader>
-              <CardTitle>Digital Clock</CardTitle>
+              <CardTitle>{t('clockDemo.clockTypes.digital.title')}</CardTitle>
               <CardDescription>
-                Classic digital display with progress ring and low-time warning
+                {t('clockDemo.clockTypes.digital.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="min-h-[500px] flex items-center justify-center">
@@ -168,8 +189,8 @@ export default function ClockDemoPage() {
         <TabsContent value="analog">
           <Card>
             <CardHeader>
-              <CardTitle>Analog Clock</CardTitle>
-              <CardDescription>Traditional clock face with sweeping hand</CardDescription>
+              <CardTitle>{t('clockDemo.clockTypes.analog.title')}</CardTitle>
+              <CardDescription>{t('clockDemo.clockTypes.analog.description')}</CardDescription>
             </CardHeader>
             <CardContent className="min-h-[500px] flex items-center justify-center">
               <AnalogClock
@@ -186,8 +207,8 @@ export default function ClockDemoPage() {
         <TabsContent value="progress">
           <Card>
             <CardHeader>
-              <CardTitle>Progress Bar Clock</CardTitle>
-              <CardDescription>Linear progress bar with time display</CardDescription>
+              <CardTitle>{t('clockDemo.clockTypes.progress.title')}</CardTitle>
+              <CardDescription>{t('clockDemo.clockTypes.progress.description')}</CardDescription>
             </CardHeader>
             <CardContent className="min-h-[500px] flex items-center justify-center">
               <ProgressBarClock
@@ -203,8 +224,8 @@ export default function ClockDemoPage() {
         <TabsContent value="flip">
           <Card>
             <CardHeader>
-              <CardTitle>Flip Clock</CardTitle>
-              <CardDescription>Retro flip-style digital clock animation</CardDescription>
+              <CardTitle>{t('clockDemo.clockTypes.flip.title')}</CardTitle>
+              <CardDescription>{t('clockDemo.clockTypes.flip.description')}</CardDescription>
             </CardHeader>
             <CardContent className="min-h-[500px] flex items-center justify-center">
               <FlipClock

@@ -7,18 +7,20 @@ import { Slider } from '@/components/ui/slider';
 import { Check, X } from 'lucide-react';
 import { useBackground } from '@/contexts/background-context';
 import { toast } from 'sonner';
+import { useI18n } from '@/contexts/i18n-context';
 
 interface BackgroundSettingsProps {
   onClose?: () => void;
 }
 
 export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
+  const { t } = useI18n();
   const {
     background,
     setBackground,
     setBackgroundTemp,
   } = useBackground();
-  const [styleValue, setStyleValue] = useState<string>('lofi:auto');
+  const [styleValue, setStyleValue] = useState<string>('system:auto-color');
   const [opacity, setOpacity] = useState<number>(
     Math.round((background.opacity ?? 1) * 100),
   );
@@ -43,68 +45,66 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
   }, [background]);
 
   const presets: {
-    name: string;
+    nameKey: string;
     value: string;
     kind: 'system' | 'auto' | 'video' | 'image';
   }[] = [
-      { name: 'System Color (Auto)', value: 'system:auto-color', kind: 'system' },
-      { name: 'Lofi Chill (Auto)', value: 'lofi:auto', kind: 'auto' },
-      { name: 'Day Chill', value: '/backgrounds/day.mp4', kind: 'video' },
-      { name: 'Night Chill', value: '/backgrounds/night.mp4', kind: 'video' },
-      // More curated images
+      { nameKey: 'settings.background.presets.systemAutoColor', value: 'system:auto-color', kind: 'system' },
+      { nameKey: 'settings.background.presets.lofiChillAuto', value: 'lofi:auto', kind: 'auto' },
+      { nameKey: 'settings.background.presets.dayChill', value: '/backgrounds/day.mp4', kind: 'video' },
+      { nameKey: 'settings.background.presets.nightChill', value: '/backgrounds/night.mp4', kind: 'video' },
       {
-        name: 'Travelling 1',
+        nameKey: 'settings.background.presets.travelling1',
         value: '/backgrounds/travelling.jpg',
         kind: 'image',
       },
       {
-        name: 'Travelling 2',
+        nameKey: 'settings.background.presets.travelling2',
         value: '/backgrounds/travelling2.jpg',
         kind: 'image',
       },
       {
-        name: 'Travelling 3',
+        nameKey: 'settings.background.presets.travelling3',
         value: '/backgrounds/travelling3.jpg',
         kind: 'image',
       },
       {
-        name: 'Travelling 4',
+        nameKey: 'settings.background.presets.travelling4',
         value: '/backgrounds/travelling4.jpg',
         kind: 'image',
       },
       {
-        name: 'Travelling 5',
+        nameKey: 'settings.background.presets.travelling5',
         value: '/backgrounds/travelling5.jpg',
         kind: 'image',
       },
       {
-        name: 'Travelling 6',
+        nameKey: 'settings.background.presets.travelling6',
         value: '/backgrounds/travelling6.jpg',
         kind: 'image',
       },
       {
-        name: 'Travelling 7',
+        nameKey: 'settings.background.presets.travelling7',
         value: '/backgrounds/travelling7.jpg',
         kind: 'image',
       },
       {
-        name: 'Travelling 8',
+        nameKey: 'settings.background.presets.travelling8',
         value: '/backgrounds/travelling8.jpg',
         kind: 'image',
       },
       {
-        name: 'Travelling 9',
+        nameKey: 'settings.background.presets.travelling9',
         value: '/backgrounds/travelling9.jpg',
         kind: 'image',
       },
-
       {
-        name: 'Background 1',
+        nameKey: 'settings.background.presets.background1',
         value: '/backgrounds/landscape-cartoon.jpg',
         kind: 'image',
       },
       {
-        name: 'Chill Shiba',
+        nameKey: 'settings.background.presets.chillShiba',
         value: '/backgrounds/xmas/chill-shiba-sleeping-christmas-room.jpg',
         kind: 'image',
       }
@@ -137,7 +137,7 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
     const next = buildBackground();
     // Persist atomically to avoid stale state overrides
     setBackground(next);
-    toast.success('Background saved');
+    toast.success(t('settings.background.toasts.saved'));
     onClose?.();
   };
 
@@ -146,7 +146,7 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
     setStyleValue('system:auto-color');
     setOpacity(100);
     setBrightness(100);
-    toast.success('Defaults loaded, click Save to apply');
+    toast.success(t('settings.background.toasts.resetInfo'));
   };
 
   return (
@@ -154,17 +154,17 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
       {/* Fixed Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b shrink-0">
         <div>
-          <h2 className="text-lg font-semibold leading-none tracking-tight">Lựa ảnh</h2>
+          <h2 className="text-lg font-semibold leading-none tracking-tight">{t('settings.background.selectImage')}</h2>
           <p className="text-xs text-muted-foreground mt-1">
-            Chọn ảnh phù hợp với màu hệ thống
+            {t('settings.background.description')}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={reset}>
-            Đặt lại
+            {t('settings.background.reset')}
           </Button>
           <Button size="sm" onClick={apply}>
-            Lưu thay đổi
+            {t('settings.background.saveChanges')}
           </Button>
           {onClose && (
             <Button variant="ghost" size="icon" className="ml-2" onClick={onClose}>
@@ -180,7 +180,7 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
         <div className="col-span-8 overflow-y-auto p-6 border-r space-y-8">
           {/* System Auto Color */}
           <div className="space-y-3">
-            <Label className="text-base font-medium">Hệ thống & Tự động</Label>
+            <Label className="text-base font-medium">{t('settings.background.systemAuto')}</Label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {presets
                 .filter((p) => p.kind === 'system')
@@ -193,7 +193,7 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
                       className={`relative h-24 rounded-lg overflow-hidden border-2 transition-all hover:scale-105 ${selected ? 'border-primary ring-2 ring-primary/20' : 'border-border'
                         }`}
                       onClick={() => setStyleValue(p.value)}
-                      title={p.name}
+                      title={t(p.nameKey)}
                     >
                       <div className="absolute inset-0 flex items-center justify-center bg-muted/20">
                         <div
@@ -210,7 +210,7 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
                         </div>
                       )}
                       <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-[1px] text-white text-xs py-1.5 text-center font-medium">
-                        {p.name}
+                        {t(p.nameKey)}
                       </div>
                     </button>
                   );
@@ -220,7 +220,7 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
 
           {/* Video Presets */}
           <div className="space-y-3">
-            <Label className="text-base font-medium">Hình nền động</Label>
+            <Label className="text-base font-medium">{t('settings.background.videoBackgrounds')}</Label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {presets
                 .filter((p) => p.kind === 'video' || p.kind === 'auto')
@@ -233,7 +233,7 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
                       className={`relative h-24 rounded-lg overflow-hidden border-2 transition-all hover:scale-105 ${selected ? 'border-primary ring-2 ring-primary/20' : 'border-border'
                         }`}
                       onClick={() => setStyleValue(p.value)}
-                      title={p.name}
+                      title={t(p.nameKey)}
                     >
                       {p.kind === 'auto' ? (
                         <div className="absolute inset-0 flex">
@@ -273,7 +273,7 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
                         </div>
                       )}
                       <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-[1px] text-white text-xs py-1.5 text-center font-medium">
-                        {p.name}
+                        {t(p.nameKey)}
                       </div>
                     </button>
                   );
@@ -283,7 +283,7 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
 
           {/* Image Presets */}
           <div className="space-y-3">
-            <Label className="text-base font-medium">Hình ảnh</Label>
+            <Label className="text-base font-medium">{t('settings.background.images')}</Label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {presets
                 .filter((p) => p.kind === 'image')
@@ -296,11 +296,11 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
                       className={`relative h-24 rounded-lg overflow-hidden border-2 transition-all hover:scale-105 ${selected ? 'border-primary ring-2 ring-primary/20' : 'border-border'
                         }`}
                       onClick={() => setStyleValue(p.value)}
-                      title={p.name}
+                      title={t(p.nameKey)}
                     >
                       <img
                         src={p.value}
-                        alt={p.name}
+                        alt={t(p.nameKey)}
                         className="h-full w-full object-cover"
                       />
                       {selected && (
@@ -309,7 +309,7 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
                         </div>
                       )}
                       <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-[1px] text-white text-xs py-1.5 text-center font-medium">
-                        {p.name}
+                        {t(p.nameKey)}
                       </div>
                     </button>
                   );
@@ -322,7 +322,7 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
         <div className="col-span-4 p-6 bg-muted/10 space-y-8">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label htmlFor="bg-opacity" className="text-base">Độ mờ</Label>
+              <Label htmlFor="bg-opacity" className="text-base">{t('settings.background.opacity')}</Label>
               <span className="text-sm font-mono text-muted-foreground">{opacity}%</span>
             </div>
             <Slider
@@ -349,13 +349,13 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
               className="py-2"
             />
             <p className="text-xs text-muted-foreground">
-              Điều chỉnh độ trong suốt của hình nền hoặc video.
+              {t('settings.background.opacityDescription')}
             </p>
           </div>
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label htmlFor="bg-brightness" className="text-base">Độ sáng</Label>
+              <Label htmlFor="bg-brightness" className="text-base">{t('settings.background.brightness')}</Label>
               <span className="text-sm font-mono text-muted-foreground">{brightness}%</span>
             </div>
             <Slider
@@ -382,7 +382,7 @@ export function BackgroundSettings({ onClose }: BackgroundSettingsProps) {
               className="py-2"
             />
             <p className="text-xs text-muted-foreground">
-              Điều chỉnh độ sáng để phù hợp với môi trường của bạn.
+              {t('settings.background.brightnessDescription')}
             </p>
           </div>
         </div>

@@ -1,8 +1,12 @@
+"use client"
+
 import { Task } from '@/stores/task-store'
 import { TaskItem } from './task-item'
-import { ClipboardList, Loader2 } from 'lucide-react'
-import { AnimatePresence } from 'framer-motion'
 import { AnimatedListItem } from '@/components/ui/animated-list'
+import { Skeleton } from '@/components/ui/skeleton'
+import { LayoutList } from 'lucide-react'
+import { useI18n } from '@/contexts/i18n-context'
+import { AnimatePresence } from 'motion/react'
 
 interface TaskListProps {
   tasks: Task[]
@@ -23,25 +27,28 @@ export function TaskList({
   onEdit,
   onDelete,
 }: TaskListProps) {
+  const { t } = useI18n()
+
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 space-y-4 text-muted-foreground">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-sm font-medium">Loading tasks...</p>
+      <div className="space-y-3">
+        {[...Array(3)].map((_, i) => (
+          <Skeleton key={i} className="h-16 w-full rounded-lg" />
+        ))}
       </div>
     )
   }
 
   if (tasks.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 space-y-4 text-center border-2 border-dashed rounded-xl bg-muted/10">
-        <div className="p-4 rounded-full bg-muted/30">
-          <ClipboardList className="h-8 w-8 text-muted-foreground" />
+      <div className="flex flex-col items-center justify-center py-16 px-4 bg-muted/20 border border-dashed rounded-xl space-y-3">
+        <div className="h-12 w-12 rounded-full bg-muted/50 flex items-center justify-center">
+          <LayoutList className="h-6 w-6 text-muted-foreground" />
         </div>
-        <div className="space-y-1">
-          <h3 className="font-semibold text-lg">No tasks found</h3>
-          <p className="text-muted-foreground text-sm max-w-xs mx-auto">
-            You don't have any tasks yet. Create one to get started with your focus session.
+        <div className="text-center">
+          <h3 className="text-base font-semibold">{t('tasks.noTasks')}</h3>
+          <p className="text-sm text-muted-foreground max-w-[250px] mx-auto">
+            {t('tasks.noTasksDescription')}
           </p>
         </div>
       </div>
@@ -49,8 +56,8 @@ export function TaskList({
   }
 
   return (
-    <div className="space-y-3">
-      <AnimatePresence mode="popLayout">
+    <div className="grid gap-3">
+      <AnimatePresence mode="popLayout" initial={false}>
         {tasks.map((task) => (
           <AnimatedListItem key={task.id}>
             <TaskItem

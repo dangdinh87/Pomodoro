@@ -1,15 +1,11 @@
 import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase-client'
+import { createClient } from '@/lib/supabase-server'
 import {
   validateUpdateTask,
   type UpdateTaskPayload,
 } from '../task-schemas'
 
 const API_ROUTE_TOKEN = process.env.API_ROUTE_TOKEN
-
-function getCurrentUserId() {
-  return 'demo-user'
-}
 
 function unauthorizedResponse() {
   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -22,19 +18,7 @@ function isAuthorized(request: Request) {
   return header.slice(7) === API_ROUTE_TOKEN
 }
 
-function missingSupabaseResponse() {
-  return NextResponse.json(
-    { error: 'Supabase client is not configured' },
-    { status: 500 },
-  )
-}
-
-type ValidationDetails = {
-  message: string
-  details?: Record<string, string[]>
-}
-
-function validationErrorResponse(error: ValidationDetails) {
+function validationErrorResponse(error: { message: string; details?: Record<string, string[]> }) {
   return NextResponse.json(
     { error: error.message, details: error.details },
     { status: 400 },
@@ -66,12 +50,15 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     return unauthorizedResponse()
   }
 
-  const userId = getCurrentUserId()
-  const { id } = params
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
-  if (!supabase) {
-    return missingSupabaseResponse()
+  if (!user) {
+    return unauthorizedResponse()
   }
+
+  const userId = user.id
+  const { id } = params
 
   try {
     const body = await request.json()
@@ -114,14 +101,17 @@ export async function DELETE(request: Request, { params }: RouteParams) {
     return unauthorizedResponse()
   }
 
-  const userId = getCurrentUserId()
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return unauthorizedResponse()
+  }
+
+  const userId = user.id
   const { id } = params
   const { searchParams } = new URL(request.url)
   const hard = searchParams.get('hard') === 'true'
-
-  if (!supabase) {
-    return missingSupabaseResponse()
-  }
 
   try {
     if (hard) {

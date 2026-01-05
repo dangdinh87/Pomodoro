@@ -20,11 +20,13 @@ import {
 } from '@/components/ui/card';
 import { supabase } from '@/lib/supabase-client';
 import { useAuthStore } from '@/stores/auth-store';
+import { useI18n } from '@/contexts/i18n-context';
 
 import { BorderBeam } from '@/components/ui/border-beam';
 import Image from 'next/image';
 
 export default function LoginPage() {
+  const { t } = useI18n();
   const router = useRouter();
   const searchParams = useSearchParams();
   const user = useAuthStore((state) => state.user);
@@ -34,17 +36,23 @@ export default function LoginPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const isBusy = emailLoading || googleLoading;
 
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
-    if (!user) return;
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || !user) return;
     const redirectUrl = searchParams.get('redirect') ?? '/timer';
     router.replace(redirectUrl);
-  }, [user, router, searchParams]);
+  }, [user, router, searchParams, mounted]);
+
+  if (!mounted) return null;
 
   const getSupabaseClient = () => {
     if (!supabase) {
-      toast.error(
-        'Supabase chưa được cấu hình. Vui lòng bổ sung biến môi trường.',
-      );
+      toast.error(t('login.errors.supabaseNotConfigured'));
       return null;
     }
     return supabase;
@@ -55,7 +63,7 @@ export default function LoginPage() {
     const client = getSupabaseClient();
     if (!client) return;
     if (!email || !password) {
-      toast.error('Vui lòng nhập email và mật khẩu.');
+      toast.error(t('login.errors.emailPasswordRequired'));
       return;
     }
     setEmailLoading(true);
@@ -65,15 +73,15 @@ export default function LoginPage() {
         password,
       });
       if (error) {
-        toast.error(error.message || 'Không thể đăng nhập.');
+        toast.error(error.message || t('login.errors.loginFailed'));
         setEmailLoading(false);
       } else {
-        toast.success('Đăng nhập thành công!');
+        toast.success(t('login.success.loginSuccess'));
         // Don't set loading to false here, let the redirect happen
       }
     } catch (error) {
       console.error(error);
-      toast.error('Có lỗi xảy ra khi đăng nhập.');
+      toast.error(t('login.errors.loginError'));
       setEmailLoading(false);
     }
   };
@@ -93,13 +101,13 @@ export default function LoginPage() {
         },
       });
       if (error) {
-        toast.error('Không thể kết nối Google. Thử lại sau.');
+        toast.error(t('login.errors.googleConnectionFailed'));
       } else {
-        toast.message('Đang chuyển hướng đến Google…');
+        toast.message(t('login.success.redirectingToGoogle'));
       }
     } catch (error) {
       console.error(error);
-      toast.error('Có lỗi xảy ra khi khởi tạo đăng nhập.');
+      toast.error(t('login.errors.googleAuthError'));
     } finally {
       setGoogleLoading(false);
     }
@@ -111,22 +119,22 @@ export default function LoginPage() {
         <BorderBeam size={250} duration={12} delay={0} />
         <CardHeader className="space-y-2 text-center">
           <CardTitle className="text-2xl font-semibold flex flex-col items-center gap-2">
-            <Image src="/images/logo.svg" alt="Study Bro" width={52} height={52} />
-            Đăng nhập với Study Bro
+            <Image src="/images/logo.svg" alt={t('brand.title')} width={52} height={52} />
+            {t('login.title')}
           </CardTitle>
           <CardDescription className="text-sm text-muted-foreground">
-            Đăng nhập để giữ nhịp học và đồng bộ mọi phiên Pomodoro.
+            {t('login.description')}
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4">
           <form className="space-y-4" onSubmit={handleEmailLogin}>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('login.form.email')}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="your@email.com"
+                placeholder={t('login.form.emailPlaceholder')}
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 disabled={isBusy}
@@ -134,18 +142,18 @@ export default function LoginPage() {
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Mật khẩu</Label>
+                <Label htmlFor="password">{t('login.form.password')}</Label>
                 <button
                   type="button"
                   className="text-xs text-muted-foreground hover:text-foreground"
                 >
-                  Quên mật khẩu?
+                  {t('login.form.forgotPassword')}
                 </button>
               </div>
               <Input
                 id="password"
                 type="password"
-                placeholder="••••••••"
+                placeholder={t('login.form.passwordPlaceholder')}
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 disabled={isBusy}
@@ -155,12 +163,12 @@ export default function LoginPage() {
               {emailLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Đang đăng nhập...
+                  {t('login.form.signingIn')}
                 </>
               ) : (
                 <>
                   <LogIn className="mr-2 h-4 w-4" />
-                  Đăng nhập
+                  {t('login.form.signIn')}
                 </>
               )}
             </Button>
@@ -168,7 +176,7 @@ export default function LoginPage() {
 
           <div className="flex items-center gap-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">
             <Separator className="flex-1" />
-            hoặc
+            {t('login.form.or')}
             <Separator className="flex-1" />
           </div>
 
@@ -213,7 +221,7 @@ export default function LoginPage() {
                     fill="#EA4335"
                   />
                 </svg>
-                Tiếp tục với Google
+                {t('login.form.continueWithGoogle')}
               </>
             )}
           </Button>
@@ -221,15 +229,15 @@ export default function LoginPage() {
 
         <CardFooter className="flex flex-col gap-3 text-sm text-muted-foreground">
           <p className="text-center">
-            Chưa có tài khoản?{' '}
+            {t('login.form.noAccount')}{' '}
             <Link href="/signup" className="text-primary hover:underline">
-              Đăng ký ngay
+              {t('login.form.signUpNow')}
             </Link>
           </p>
           <Button variant="ghost" asChild>
             <Link href="/timer">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Quay lại ứng dụng
+              {t('login.form.backToApp')}
             </Link>
           </Button>
         </CardFooter>

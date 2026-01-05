@@ -9,7 +9,9 @@ import { TaskFilters } from './components/task-filters'
 import { TaskFormModal } from './components/task-form-modal'
 import { TaskList } from './components/task-list'
 import { useTaskFilters, useFilteredTasks } from '@/hooks/use-task-filters'
+import { useI18n } from '@/contexts/i18n-context'
 import { useTasks } from '@/hooks/use-tasks'
+import { Plus, Search, FilterX, AlertCircle } from 'lucide-react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,10 +30,14 @@ export function TaskManagement() {
     createTask,
     updateTask,
     hardDeleteTask,
+    isCreating,
+    isUpdating,
+    isHardDeleting,
   } = useTasks()
 
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
   const router = useRouter()
+  const { t } = useI18n()
 
   if (isAuthLoading) {
     return null // Or a loading spinner
@@ -40,8 +46,8 @@ export function TaskManagement() {
   if (!isAuthenticated) {
     return (
       <div className="flex flex-col items-center justify-center flex-1 min-h-[60vh] space-y-4">
-        <h2 className="text-xl font-semibold text-center">Vui lòng đăng nhập để xem danh sách công việc</h2>
-        <Button onClick={() => router.push('/login?redirect=/tasks')}>Đăng nhập</Button>
+        <h2 className="text-xl font-semibold text-center">{t('auth.signInToManageTasks')}</h2>
+        <Button onClick={() => router.push('/login?redirect=/tasks')}>{t('auth.signInButton')}</Button>
       </div>
     )
   }
@@ -53,6 +59,7 @@ export function TaskManagement() {
   const filteredTasks = useFilteredTasks(tasks, taskFilters)
 
   // Delete confirmation state
+
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
 
   const editingTask = useMemo(
@@ -131,24 +138,30 @@ export function TaskManagement() {
   }, [tasks])
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Tasks</h1>
+          <h1 className="text-2xl font-bold">{t('tasks.title')}</h1>
           <p className="text-sm text-muted-foreground">
-            Manage your tasks and track progress with Pomodoro technique
+            {t('tasks.subtitle')}
           </p>
         </div>
-        <TaskFormModal
-          editingTask={editingTask}
-          isOpen={!!editingId || isCreateModalOpen}
-          onOpenChange={handleOpenChange}
-          onSave={handleFormSubmit}
-          availableTags={uniqueTags}
-        />
+        <div className="flex items-center gap-3">
+          <Button onClick={() => setIsCreateModalOpen(true)} className="h-10 px-4 gap-2 shadow-lg shadow-primary/20">
+            <Plus className="h-4 w-4" />
+            <span className="hidden sm:inline">{t('tasks.addTask')}</span>
+          </Button>
+          <TaskFormModal
+            editingTask={editingTask}
+            isOpen={!!editingId || isCreateModalOpen}
+            onOpenChange={handleOpenChange}
+            onSave={handleFormSubmit}
+            availableTags={uniqueTags}
+          />
+        </div>
       </div>
 
-      <section className="rounded-xl border bg-card/70 backdrop-blur p-4 md:p-6 space-y-4">
+      <section className="space-y-4">
         <TaskFilters
           query={taskFilters.query}
           statusFilter={taskFilters.statusFilter}
@@ -176,18 +189,26 @@ export function TaskManagement() {
       <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>{t('tasks.confirmDelete.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the task and all associated data.
+              {t('tasks.confirmDelete.description')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={isHardDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 min-w-[100px]"
             >
-              Delete Permanently
+              {isHardDeleting ? (
+                <>
+                  <Plus className="mr-2 h-4 w-4 animate-spin rotate-45" />
+                  {t('tasks.actions.deleting')}
+                </>
+              ) : (
+                t('tasks.confirmDelete.action')
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
