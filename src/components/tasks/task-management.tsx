@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo, useCallback, memo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -59,6 +59,152 @@ const priorityColors = {
   medium: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
   high: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300'
 }
+
+// Memoized TaskItem component
+const TaskItem = memo(({
+  task,
+  projectId,
+  onToggleComplete,
+  onUpdatePomodoros,
+  onDelete
+}: {
+  task: Task,
+  projectId: string,
+  onToggleComplete: (projectId: string, taskId: string) => void,
+  onUpdatePomodoros: (projectId: string, taskId: string, increment: number) => void,
+  onDelete: (projectId: string, taskId: string) => void
+}) => {
+  return (
+    <div className="flex items-center justify-between p-4 border rounded-lg dark:border-border">
+      <div className="flex items-center space-x-3 flex-1">
+        <Checkbox
+          checked={task.completed}
+          onCheckedChange={() => onToggleComplete(projectId, task.id)}
+        />
+        <div className="flex-1">
+          <h4 className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''} dark:text-card-foreground`}>
+            {task.title}
+          </h4>
+          {task.description && (
+            <p className="text-sm text-muted-foreground mt-1 dark:text-muted-foreground">
+              {task.description}
+            </p>
+          )}
+          <div className="flex items-center gap-2 mt-2">
+            <Badge variant="outline" className="text-xs dark:border-border">
+              <Tag className="h-3 w-3 mr-1" />
+              {task.category}
+            </Badge>
+            <Badge className={`text-xs ${priorityColors[task.priority]}`}>
+              {task.priority}
+            </Badge>
+            <Badge variant="outline" className="text-xs dark:border-border">
+              <Clock className="h-3 w-3 mr-1" />
+              {task.actualPomodoros}/{task.estimatedPomodoros}
+            </Badge>
+            <Badge variant="outline" className="text-xs dark:border-border">
+              <Calendar className="h-3 w-3 mr-1" />
+              {new Date(task.createdAt).toLocaleDateString()}
+            </Badge>
+          </div>
+        </div>
+      </div>
+      <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => onUpdatePomodoros(projectId, task.id, -1)}
+          >
+            <Pause className="h-3 w-3" />
+          </Button>
+          <span className="text-sm font-medium w-8 text-center">
+            {task.actualPomodoros}
+          </span>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => onUpdatePomodoros(projectId, task.id, 1)}
+          >
+            <Play className="h-3 w-3" />
+          </Button>
+        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => onDelete(projectId, task.id)}
+        >
+          <Trash2 className="h-3 w-3" />
+        </Button>
+      </div>
+    </div>
+  )
+})
+TaskItem.displayName = 'TaskItem'
+
+// Memoized ProjectCard component
+const ProjectCard = memo(({
+  project,
+  onToggleComplete,
+  onUpdatePomodoros,
+  onDelete
+}: {
+  project: Project,
+  onToggleComplete: (projectId: string, taskId: string) => void,
+  onUpdatePomodoros: (projectId: string, taskId: string, increment: number) => void,
+  onDelete: (projectId: string, taskId: string) => void
+}) => {
+  const completedTasksCount = useMemo(() => project.tasks.filter(task => task.completed).length, [project.tasks])
+
+  return (
+    <Card className="bg-background/30 backdrop-blur-md border-white/10 dark:bg-card/90 dark:border-border">
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between dark:text-card-foreground">
+          <div className="flex items-center gap-2">
+            <div
+              className="w-3 h-3 rounded-full"
+              style={{ backgroundColor: project.color }}
+            />
+            {project.name}
+            <Badge variant="outline" className="dark:border-border">
+              {completedTasksCount}/{project.tasks.length}
+            </Badge>
+          </div>
+          <AnimatedCircularProgressBar
+            max={project.tasks.length || 1}
+            value={completedTasksCount}
+            gaugePrimaryColor={project.color}
+            gaugeSecondaryColor="#e5e7eb"
+            className="w-16 h-16"
+          >
+            <span className="text-xs font-medium">
+              {project.tasks.length > 0 ? Math.round((completedTasksCount / project.tasks.length) * 100) : 0}%
+            </span>
+          </AnimatedCircularProgressBar>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {project.tasks.length === 0 ? (
+          <p className="text-muted-foreground text-center py-4 dark:text-muted-foreground">
+            No tasks in this project yet.
+          </p>
+        ) : (
+          project.tasks.map((task) => (
+            <TaskItem
+              key={task.id}
+              task={task}
+              projectId={project.id}
+              onToggleComplete={onToggleComplete}
+              onUpdatePomodoros={onUpdatePomodoros}
+              onDelete={onDelete}
+            />
+          ))
+        )}
+      </CardContent>
+    </Card>
+  )
+})
+ProjectCard.displayName = 'ProjectCard'
 
 export function TaskManagement() {
   const [projects, setProjects] = useState<Project[]>([
@@ -120,7 +266,7 @@ export function TaskManagement() {
   const [selectedProject, setSelectedProject] = useState('1')
   const [showAddTask, setShowAddTask] = useState(false)
 
-  const addTask = () => {
+  const addTask = useCallback(() => {
     if (newTaskTitle.trim()) {
       const newTask: Task = {
         id: Date.now().toString(),
@@ -148,9 +294,9 @@ export function TaskManagement() {
       setNewTaskPomodoros(1)
       setShowAddTask(false)
     }
-  }
+  }, [newTaskTitle, newTaskDescription, newTaskPriority, newTaskCategory, newTaskPomodoros, selectedProject])
 
-  const toggleTaskComplete = (projectId: string, taskId: string) => {
+  const toggleTaskComplete = useCallback((projectId: string, taskId: string) => {
     setProjects(prev => prev.map(project => 
       project.id === projectId 
         ? {
@@ -167,17 +313,17 @@ export function TaskManagement() {
           }
         : project
     ))
-  }
+  }, [])
 
-  const deleteTask = (projectId: string, taskId: string) => {
+  const deleteTask = useCallback((projectId: string, taskId: string) => {
     setProjects(prev => prev.map(project => 
       project.id === projectId 
         ? { ...project, tasks: project.tasks.filter(task => task.id !== taskId) }
         : project
     ))
-  }
+  }, [])
 
-  const updateTaskPomodoros = (projectId: string, taskId: string, increment: number) => {
+  const updateTaskPomodoros = useCallback((projectId: string, taskId: string, increment: number) => {
     setProjects(prev => prev.map(project => 
       project.id === projectId 
         ? {
@@ -190,29 +336,29 @@ export function TaskManagement() {
           }
         : project
     ))
-  }
+  }, [])
 
-  const getTotalTasks = () => {
+  const totalTasks = useMemo(() => {
     return projects.reduce((acc, project) => acc + project.tasks.length, 0)
-  }
+  }, [projects])
 
-  const getCompletedTasks = () => {
+  const completedTasks = useMemo(() => {
     return projects.reduce((acc, project) => 
       acc + project.tasks.filter(task => task.completed).length, 0
     )
-  }
+  }, [projects])
 
-  const getTotalEstimatedPomodoros = () => {
+  const totalEstimatedPomodoros = useMemo(() => {
     return projects.reduce((acc, project) => 
       acc + project.tasks.reduce((taskAcc, task) => taskAcc + task.estimatedPomodoros, 0), 0
     )
-  }
+  }, [projects])
 
-  const getTotalActualPomodoros = () => {
+  const totalActualPomodoros = useMemo(() => {
     return projects.reduce((acc, project) => 
       acc + project.tasks.reduce((taskAcc, task) => taskAcc + task.actualPomodoros, 0), 0
     )
-  }
+  }, [projects])
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6">
@@ -231,19 +377,19 @@ export function TaskManagement() {
             <div>
               <h3 className="text-lg font-semibold dark:text-card-foreground">Overall Progress</h3>
               <p className="text-sm text-muted-foreground mt-1 dark:text-muted-foreground">
-                {getCompletedTasks()} of {getTotalTasks()} tasks completed
+                {completedTasks} of {totalTasks} tasks completed
               </p>
             </div>
             <div className="flex items-center gap-4">
               <AnimatedCircularProgressBar
-                max={getTotalTasks() || 1}
-                value={getCompletedTasks()}
+                max={totalTasks || 1}
+                value={completedTasks}
                 gaugePrimaryColor="#10b981"
                 gaugeSecondaryColor="#e5e7eb"
                 className="w-20 h-20"
               >
                 <span className="text-sm font-medium">
-                  {getTotalTasks() > 0 ? Math.round((getCompletedTasks() / getTotalTasks()) * 100) : 0}%
+                  {totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0}%
                 </span>
               </AnimatedCircularProgressBar>
             </div>
@@ -258,7 +404,7 @@ export function TaskManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Total Tasks</p>
-                <p className="text-2xl font-bold dark:text-card-foreground">{getTotalTasks()}</p>
+                <p className="text-2xl font-bold dark:text-card-foreground">{totalTasks}</p>
               </div>
               <CheckCircle className="h-8 w-8 text-blue-500" />
             </div>
@@ -270,7 +416,7 @@ export function TaskManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Completed</p>
-                <p className="text-2xl font-bold dark:text-card-foreground">{getCompletedTasks()}</p>
+                <p className="text-2xl font-bold dark:text-card-foreground">{completedTasks}</p>
               </div>
               <Circle className="h-8 w-8 text-green-500" />
             </div>
@@ -282,7 +428,7 @@ export function TaskManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Estimated</p>
-                <p className="text-2xl font-bold dark:text-card-foreground">{getTotalEstimatedPomodoros()}</p>
+                <p className="text-2xl font-bold dark:text-card-foreground">{totalEstimatedPomodoros}</p>
               </div>
               <Clock className="h-8 w-8 text-orange-500" />
             </div>
@@ -294,7 +440,7 @@ export function TaskManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Completed</p>
-                <p className="text-2xl font-bold dark:text-card-foreground">{getTotalActualPomodoros()}</p>
+                <p className="text-2xl font-bold dark:text-card-foreground">{totalActualPomodoros}</p>
               </div>
               <Play className="h-8 w-8 text-purple-500" />
             </div>
@@ -404,106 +550,13 @@ export function TaskManagement() {
       {/* Tasks by Project */}
       <div className="space-y-6">
         {projects.map((project) => (
-          <Card key={project.id} className="bg-background/30 backdrop-blur-md border-white/10 dark:bg-card/90 dark:border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between dark:text-card-foreground">
-                <div className="flex items-center gap-2">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: project.color }}
-                  />
-                  {project.name}
-                  <Badge variant="outline" className="dark:border-border">
-                    {project.tasks.filter(task => task.completed).length}/{project.tasks.length}
-                  </Badge>
-                </div>
-                <AnimatedCircularProgressBar
-                  max={project.tasks.length || 1}
-                  value={project.tasks.filter(task => task.completed).length}
-                  gaugePrimaryColor={project.color}
-                  gaugeSecondaryColor="#e5e7eb"
-                  className="w-16 h-16"
-                >
-                  <span className="text-xs font-medium">
-                    {project.tasks.length > 0 ? Math.round((project.tasks.filter(task => task.completed).length / project.tasks.length) * 100) : 0}%
-                  </span>
-                </AnimatedCircularProgressBar>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {project.tasks.length === 0 ? (
-                <p className="text-muted-foreground text-center py-4 dark:text-muted-foreground">
-                  No tasks in this project yet.
-                </p>
-              ) : (
-                project.tasks.map((task) => (
-                  <div key={task.id} className="flex items-center justify-between p-4 border rounded-lg dark:border-border">
-                    <div className="flex items-center space-x-3 flex-1">
-                      <Checkbox
-                        checked={task.completed}
-                        onCheckedChange={() => toggleTaskComplete(project.id, task.id)}
-                      />
-                      <div className="flex-1">
-                        <h4 className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''} dark:text-card-foreground`}>
-                          {task.title}
-                        </h4>
-                        {task.description && (
-                          <p className="text-sm text-muted-foreground mt-1 dark:text-muted-foreground">
-                            {task.description}
-                          </p>
-                        )}
-                        <div className="flex items-center gap-2 mt-2">
-                          <Badge variant="outline" className="text-xs dark:border-border">
-                            <Tag className="h-3 w-3 mr-1" />
-                            {task.category}
-                          </Badge>
-                          <Badge className={`text-xs ${priorityColors[task.priority]}`}>
-                            {task.priority}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs dark:border-border">
-                            <Clock className="h-3 w-3 mr-1" />
-                            {task.actualPomodoros}/{task.estimatedPomodoros}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs dark:border-border">
-                            <Calendar className="h-3 w-3 mr-1" />
-                            {new Date(task.createdAt).toLocaleDateString()}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="flex items-center space-x-1">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => updateTaskPomodoros(project.id, task.id, -1)}
-                        >
-                          <Pause className="h-3 w-3" />
-                        </Button>
-                        <span className="text-sm font-medium w-8 text-center">
-                          {task.actualPomodoros}
-                        </span>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => updateTaskPomodoros(project.id, task.id, 1)}
-                        >
-                          <Play className="h-3 w-3" />
-                        </Button>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => deleteTask(project.id, task.id)}
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
-                ))
-              )}
-            </CardContent>
-          </Card>
+          <ProjectCard
+            key={project.id}
+            project={project}
+            onToggleComplete={toggleTaskComplete}
+            onUpdatePomodoros={updateTaskPomodoros}
+            onDelete={deleteTask}
+          />
         ))}
       </div>
     </div>
