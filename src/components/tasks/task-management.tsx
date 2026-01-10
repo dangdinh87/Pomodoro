@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -192,27 +192,30 @@ export function TaskManagement() {
     ))
   }
 
-  const getTotalTasks = () => {
+  // Optimize performance by memoizing these calculations
+  // This prevents recalculating totals on every render (e.g. when typing in input fields)
+  // Only recalculate when projects array changes
+  const totalTasks = useMemo(() => {
     return projects.reduce((acc, project) => acc + project.tasks.length, 0)
-  }
+  }, [projects])
 
-  const getCompletedTasks = () => {
+  const completedTasks = useMemo(() => {
     return projects.reduce((acc, project) => 
       acc + project.tasks.filter(task => task.completed).length, 0
     )
-  }
+  }, [projects])
 
-  const getTotalEstimatedPomodoros = () => {
+  const totalEstimatedPomodoros = useMemo(() => {
     return projects.reduce((acc, project) => 
       acc + project.tasks.reduce((taskAcc, task) => taskAcc + task.estimatedPomodoros, 0), 0
     )
-  }
+  }, [projects])
 
-  const getTotalActualPomodoros = () => {
+  const totalActualPomodoros = useMemo(() => {
     return projects.reduce((acc, project) => 
       acc + project.tasks.reduce((taskAcc, task) => taskAcc + task.actualPomodoros, 0), 0
     )
-  }
+  }, [projects])
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6">
@@ -231,19 +234,19 @@ export function TaskManagement() {
             <div>
               <h3 className="text-lg font-semibold dark:text-card-foreground">Overall Progress</h3>
               <p className="text-sm text-muted-foreground mt-1 dark:text-muted-foreground">
-                {getCompletedTasks()} of {getTotalTasks()} tasks completed
+                {completedTasks} of {totalTasks} tasks completed
               </p>
             </div>
             <div className="flex items-center gap-4">
               <AnimatedCircularProgressBar
-                max={getTotalTasks() || 1}
-                value={getCompletedTasks()}
+                max={totalTasks || 1}
+                value={completedTasks}
                 gaugePrimaryColor="#10b981"
                 gaugeSecondaryColor="#e5e7eb"
                 className="w-20 h-20"
               >
                 <span className="text-sm font-medium">
-                  {getTotalTasks() > 0 ? Math.round((getCompletedTasks() / getTotalTasks()) * 100) : 0}%
+                  {totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0}%
                 </span>
               </AnimatedCircularProgressBar>
             </div>
@@ -258,7 +261,7 @@ export function TaskManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Total Tasks</p>
-                <p className="text-2xl font-bold dark:text-card-foreground">{getTotalTasks()}</p>
+                <p className="text-2xl font-bold dark:text-card-foreground">{totalTasks}</p>
               </div>
               <CheckCircle className="h-8 w-8 text-blue-500" />
             </div>
@@ -270,7 +273,7 @@ export function TaskManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Completed</p>
-                <p className="text-2xl font-bold dark:text-card-foreground">{getCompletedTasks()}</p>
+                <p className="text-2xl font-bold dark:text-card-foreground">{completedTasks}</p>
               </div>
               <Circle className="h-8 w-8 text-green-500" />
             </div>
@@ -282,7 +285,7 @@ export function TaskManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Estimated</p>
-                <p className="text-2xl font-bold dark:text-card-foreground">{getTotalEstimatedPomodoros()}</p>
+                <p className="text-2xl font-bold dark:text-card-foreground">{totalEstimatedPomodoros}</p>
               </div>
               <Clock className="h-8 w-8 text-orange-500" />
             </div>
@@ -294,7 +297,7 @@ export function TaskManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Completed</p>
-                <p className="text-2xl font-bold dark:text-card-foreground">{getTotalActualPomodoros()}</p>
+                <p className="text-2xl font-bold dark:text-card-foreground">{totalActualPomodoros}</p>
               </div>
               <Play className="h-8 w-8 text-purple-500" />
             </div>
