@@ -1,47 +1,21 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/checkbox'
 import AnimatedCircularProgressBar from '@/components/ui/animated-circular-progress-bar'
 import {
   Plus,
-  Trash2,
-  Edit,
   Clock,
   CheckCircle,
   Circle,
-  Calendar,
-  Tag,
-  Play,
-  Pause
+  Play
 } from 'lucide-react'
-
-interface Task {
-  id: string
-  title: string
-  description?: string
-  completed: boolean
-  priority: 'low' | 'medium' | 'high'
-  category: string
-  estimatedPomodoros: number
-  actualPomodoros: number
-  createdAt: string
-  completedAt?: string
-}
-
-interface Project {
-  id: string
-  name: string
-  color: string
-  tasks: Task[]
-}
+import { Task, Project } from '@/types/task'
+import { ProjectCard } from './project-card'
 
 const categories = [
   'Programming',
@@ -53,12 +27,6 @@ const categories = [
   'Health',
   'Other'
 ]
-
-const priorityColors = {
-  low: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
-  medium: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
-  high: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300'
-}
 
 export function TaskManagement() {
   const [projects, setProjects] = useState<Project[]>([
@@ -150,7 +118,7 @@ export function TaskManagement() {
     }
   }
 
-  const toggleTaskComplete = (projectId: string, taskId: string) => {
+  const toggleTaskComplete = useCallback((projectId: string, taskId: string) => {
     setProjects(prev => prev.map(project => 
       project.id === projectId 
         ? {
@@ -167,17 +135,17 @@ export function TaskManagement() {
           }
         : project
     ))
-  }
+  }, [])
 
-  const deleteTask = (projectId: string, taskId: string) => {
+  const deleteTask = useCallback((projectId: string, taskId: string) => {
     setProjects(prev => prev.map(project => 
       project.id === projectId 
         ? { ...project, tasks: project.tasks.filter(task => task.id !== taskId) }
         : project
     ))
-  }
+  }, [])
 
-  const updateTaskPomodoros = (projectId: string, taskId: string, increment: number) => {
+  const updateTaskPomodoros = useCallback((projectId: string, taskId: string, increment: number) => {
     setProjects(prev => prev.map(project => 
       project.id === projectId 
         ? {
@@ -190,7 +158,7 @@ export function TaskManagement() {
           }
         : project
     ))
-  }
+  }, [])
 
   const getTotalTasks = () => {
     return projects.reduce((acc, project) => acc + project.tasks.length, 0)
@@ -404,106 +372,13 @@ export function TaskManagement() {
       {/* Tasks by Project */}
       <div className="space-y-6">
         {projects.map((project) => (
-          <Card key={project.id} className="bg-background/30 backdrop-blur-md border-white/10 dark:bg-card/90 dark:border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between dark:text-card-foreground">
-                <div className="flex items-center gap-2">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: project.color }}
-                  />
-                  {project.name}
-                  <Badge variant="outline" className="dark:border-border">
-                    {project.tasks.filter(task => task.completed).length}/{project.tasks.length}
-                  </Badge>
-                </div>
-                <AnimatedCircularProgressBar
-                  max={project.tasks.length || 1}
-                  value={project.tasks.filter(task => task.completed).length}
-                  gaugePrimaryColor={project.color}
-                  gaugeSecondaryColor="#e5e7eb"
-                  className="w-16 h-16"
-                >
-                  <span className="text-xs font-medium">
-                    {project.tasks.length > 0 ? Math.round((project.tasks.filter(task => task.completed).length / project.tasks.length) * 100) : 0}%
-                  </span>
-                </AnimatedCircularProgressBar>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {project.tasks.length === 0 ? (
-                <p className="text-muted-foreground text-center py-4 dark:text-muted-foreground">
-                  No tasks in this project yet.
-                </p>
-              ) : (
-                project.tasks.map((task) => (
-                  <div key={task.id} className="flex items-center justify-between p-4 border rounded-lg dark:border-border">
-                    <div className="flex items-center space-x-3 flex-1">
-                      <Checkbox
-                        checked={task.completed}
-                        onCheckedChange={() => toggleTaskComplete(project.id, task.id)}
-                      />
-                      <div className="flex-1">
-                        <h4 className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''} dark:text-card-foreground`}>
-                          {task.title}
-                        </h4>
-                        {task.description && (
-                          <p className="text-sm text-muted-foreground mt-1 dark:text-muted-foreground">
-                            {task.description}
-                          </p>
-                        )}
-                        <div className="flex items-center gap-2 mt-2">
-                          <Badge variant="outline" className="text-xs dark:border-border">
-                            <Tag className="h-3 w-3 mr-1" />
-                            {task.category}
-                          </Badge>
-                          <Badge className={`text-xs ${priorityColors[task.priority]}`}>
-                            {task.priority}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs dark:border-border">
-                            <Clock className="h-3 w-3 mr-1" />
-                            {task.actualPomodoros}/{task.estimatedPomodoros}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs dark:border-border">
-                            <Calendar className="h-3 w-3 mr-1" />
-                            {new Date(task.createdAt).toLocaleDateString()}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="flex items-center space-x-1">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => updateTaskPomodoros(project.id, task.id, -1)}
-                        >
-                          <Pause className="h-3 w-3" />
-                        </Button>
-                        <span className="text-sm font-medium w-8 text-center">
-                          {task.actualPomodoros}
-                        </span>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => updateTaskPomodoros(project.id, task.id, 1)}
-                        >
-                          <Play className="h-3 w-3" />
-                        </Button>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => deleteTask(project.id, task.id)}
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
-                ))
-              )}
-            </CardContent>
-          </Card>
+          <ProjectCard
+            key={project.id}
+            project={project}
+            onToggleTask={toggleTaskComplete}
+            onDeleteTask={deleteTask}
+            onUpdateTaskPomodoros={updateTaskPomodoros}
+          />
         ))}
       </div>
     </div>
