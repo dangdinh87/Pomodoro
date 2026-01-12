@@ -17,6 +17,13 @@ export function DistributionChart({ data }: DistributionChartProps) {
     const totalDuration = data.reduce((acc, curr) => acc + curr.value, 0)
     const totalMinutes = Math.round(totalDuration / 60)
 
+    // Translate mode names
+    const modeTranslation: Record<string, string> = {
+        'work': t('timer.modes.work'),
+        'shortBreak': t('timer.modes.shortBreak'),
+        'longBreak': t('timer.modes.longBreak'),
+    }
+
     // Filter out zero values to avoid rendering empty segments or labels
     const activeData = data.filter(item => item.value > 0)
 
@@ -61,7 +68,7 @@ export function DistributionChart({ data }: DistributionChartProps) {
                                 style={{ backgroundColor: item.color }}
                             />
                             <span className="text-xs text-muted-foreground">
-                                {item.name} ({totalDuration > 0 ? Math.round((item.value / totalDuration) * 100) : 0}%)
+                                {modeTranslation[item.name] || item.name} ({totalDuration > 0 ? Math.round((item.value / totalDuration) * 100) : 0}%)
                             </span>
                         </div>
                     ))}

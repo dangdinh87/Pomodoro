@@ -122,9 +122,9 @@ export async function GET(request: Request) {
                 duration, // in seconds
             })),
             distribution: [
-                { name: 'Tập trung', value: distribution.work, color: '#3b82f6' }, // blue-500
-                { name: 'Nghỉ ngắn', value: distribution.shortBreak, color: '#f59e0b' }, // amber-500
-                { name: 'Nghỉ dài', value: distribution.longBreak, color: '#8b5cf6' }, // violet-500
+                { name: 'work', value: distribution.work, color: '#3b82f6' }, // blue-500
+                { name: 'shortBreak', value: distribution.shortBreak, color: '#f59e0b' }, // amber-500
+                { name: 'longBreak', value: distribution.longBreak, color: '#8b5cf6' }, // violet-500
             ],
         }
 
