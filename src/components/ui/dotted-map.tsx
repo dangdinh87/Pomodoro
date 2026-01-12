@@ -20,7 +20,8 @@ export interface DottedMapProps extends React.SVGProps<SVGSVGElement> {
   stagger?: boolean
 }
 
-export function DottedMap({
+// Separate component for memoization
+const DottedMapComponent = ({
   width = 150,
   height = 75,
   mapSamples = 5000,
@@ -30,16 +31,19 @@ export function DottedMap({
   stagger = true,
   className,
   style,
-}: DottedMapProps) {
-  const { points, addMarkers } = createMap({
+}: DottedMapProps) => {
+  // Memoize the expensive map creation (5000+ points generation)
+  const { points, addMarkers } = React.useMemo(() => createMap({
     width,
     height,
     mapSamples,
-  })
+  }), [width, height, mapSamples])
 
-  const processedMarkers = addMarkers(markers)
+  // Memoize marker processing
+  const processedMarkers = React.useMemo(() => addMarkers(markers), [addMarkers, markers])
 
   // Compute stagger helpers in a single, simple pass
+  // This depends on points, which is now stable thanks to useMemo above
   const { xStep, yToRowIndex } = React.useMemo(() => {
     const sorted = [...points].sort((a, b) => a.y - b.y || a.x - b.x)
     const rowMap = new Map<number, number>()
@@ -99,3 +103,5 @@ export function DottedMap({
     </svg>
   )
 }
+
+export const DottedMap = React.memo(DottedMapComponent)
