@@ -11,10 +11,14 @@ import {
   Music,
   Menu,
   X,
+  HelpCircle,
 } from 'lucide-react';
 import { ThemeToggle } from './theme-toggle';
 import { AnimatedThemeToggler } from '@/components/ui/animated-theme-toggler';
 import { useNavigationStore } from '@/stores/navigation-store';
+import { useTranslation } from '@/contexts/i18n-context';
+import { UserGuideModal } from '@/components/user-guide/user-guide-modal';
+import { cn } from '@/lib/utils';
 
 interface NavigationItem {
   id: string;
@@ -28,35 +32,36 @@ export function Navigation() {
   const pathname = usePathname();
   const router = useRouter();
   const { isNavCollapsed, toggleNav } = useNavigationStore();
+  const { t } = useTranslation();
 
   const navigationItems: NavigationItem[] = [
     {
       id: 'timer',
-      label: 'Timer',
+      label: t('nav.timer'),
       icon: <Timer className="h-4 w-4" />,
       href: '/timer',
     },
     {
       id: 'focus',
-      label: 'Focus Mode',
+      label: t('nav.focus'),
       icon: <Shield className="h-4 w-4" />,
       href: '/focus',
     },
     {
       id: 'tasks',
-      label: 'Tasks',
+      label: t('nav.tasks'),
       icon: <CheckSquare className="h-4 w-4" />,
       href: '/tasks',
     },
     {
       id: 'progress',
-      label: 'Progress',
+      label: t('nav.progress'),
       icon: <BarChart3 className="h-4 w-4" />,
       href: '/progress',
     },
     {
       id: 'audio',
-      label: 'Audio',
+      label: t('nav.audio'),
       icon: <Music className="h-4 w-4" />,
       href: '/audio',
     },
@@ -78,21 +83,18 @@ export function Navigation() {
     <div className="flex">
       {/* Desktop Sidebar Navigation */}
       <div
-        className={`hidden md:block fixed left-0 top-0 h-full bg-transparent z-40 transition-all duration-300 ${
-          isNavCollapsed ? 'w-16' : 'w-64'
-        }`}
+        className={`hidden md:block fixed left-0 top-0 h-full bg-transparent z-40 transition-all duration-300 ${isNavCollapsed ? 'w-16' : 'w-64'
+          }`}
       >
         <div
-          className={`p-4 h-full flex flex-col ${
-            isNavCollapsed ? 'items-center' : ''
-          }`}
+          className={`p-4 h-full flex flex-col ${isNavCollapsed ? 'items-center' : ''
+            }`}
         >
           <div
-            className={`flex items-center ${
-              isNavCollapsed ? 'justify-center' : 'justify-between'
-            } mb-6 w-full`}
+            className={`flex items-center ${isNavCollapsed ? 'justify-center' : 'justify-between'
+              } mb-6 w-full`}
           >
-            {!isNavCollapsed && <h1 className="text-xl font-bold">Focus</h1>}
+            {!isNavCollapsed && <h1 className="text-xl font-bold">{t('brand.title')}</h1>}
             <Button
               variant="ghost"
               size="icon"
@@ -100,9 +102,8 @@ export function Navigation() {
               className="transition-all duration-200"
             >
               <Menu
-                className={`h-4 w-4 transition-transform duration-300 ${
-                  isNavCollapsed ? 'rotate-180' : ''
-                }`}
+                className={`h-4 w-4 transition-transform duration-300 ${isNavCollapsed ? 'rotate-180' : ''
+                  }`}
               />
             </Button>
           </div>
@@ -112,9 +113,8 @@ export function Navigation() {
                 key={item.id}
                 variant={activeItem === item.id ? 'default' : 'ghost'}
                 onClick={() => handleNavigation(item.href)}
-                className={`w-full flex items-center transition-all duration-200 ${
-                  activeItem === item.id ? 'shadow-md' : 'hover:bg-accent/50'
-                } ${isNavCollapsed ? 'justify-center' : 'justify-start gap-3'}`}
+                className={`w-full flex items-center transition-all duration-200 ${activeItem === item.id ? 'shadow-md' : 'hover:bg-accent/50'
+                  } ${isNavCollapsed ? 'justify-center' : 'justify-start gap-3'}`}
                 title={isNavCollapsed ? item.label : ''}
               >
                 {item.icon}
@@ -122,21 +122,7 @@ export function Navigation() {
               </Button>
             ))}
           </div>
-          <div
-            className={`mt-auto pt-4 ${
-              isNavCollapsed ? 'flex justify-center' : ''
-            }`}
-          >
-            <Button
-              variant="ghost"
-              size="icon"
-              title="Toggle theme"
-              className="transition-all duration-200"
-              asChild
-            >
-              <AnimatedThemeToggler className="w-4 h-4" />
-            </Button>
-          </div>
+
         </div>
       </div>
 
@@ -144,12 +130,24 @@ export function Navigation() {
       <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-transparent border-b border-white/10">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold">Focus</h1>
+            <h1 className="text-xl font-bold">{t('brand.title')}</h1>
             <div className="flex items-center gap-2">
+              <UserGuideModal
+                trigger={
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    title="User Guide"
+                    className="transition-all duration-200"
+                  >
+                    <HelpCircle className="h-4 w-4" />
+                  </Button>
+                }
+              />
               <Button
                 variant="ghost"
                 size="icon"
-                title="Toggle theme"
+                title={t('tooltips.toggleTheme')}
                 className="transition-all duration-200"
                 asChild
               >
@@ -182,9 +180,8 @@ export function Navigation() {
                   key={item.id}
                   variant={activeItem === item.id ? 'default' : 'ghost'}
                   onClick={() => handleNavigation(item.href)}
-                  className={`w-full justify-start flex items-center gap-3 transition-all duration-200 ${
-                    activeItem === item.id ? 'shadow-md' : 'hover:bg-accent/50'
-                  }`}
+                  className={`w-full justify-start flex items-center gap-3 transition-all duration-200 ${activeItem === item.id ? 'shadow-md' : 'hover:bg-accent/50'
+                    }`}
                 >
                   {item.icon}
                   <span>{item.label}</span>

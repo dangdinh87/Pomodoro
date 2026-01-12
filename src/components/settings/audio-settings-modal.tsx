@@ -23,14 +23,22 @@ import {
   Pause,
   Square,
   Dice3,
-  YoutubeIcon,
+  Music,
+  Loader2,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAudioStore } from '@/stores/audio-store';
 import { useSystemStore } from '@/stores/system-store';
 import audioManager from '@/lib/audio/audio-manager';
 import { soundCatalog } from '@/lib/audio/sound-catalog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
+import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from '@/components/animate-ui/primitives/animate/tabs';
 import { Input } from '@/components/ui/input';
+import SpotifyPane from '@/components/audio/spotify/spotify-pane';
+import YouTubePane from '@/components/audio/youtube/youtube-pane';
+import { AudioLines } from '@/components/animate-ui/icons/audio-lines';
+import { getYouTubeThumbnailUrl } from '@/data/youtube-suggestions';
+import { useShallow } from 'zustand/react/shallow';
 
 export function AudioSettingsModal({
   isOpen,
@@ -39,353 +47,166 @@ export function AudioSettingsModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const { audioSettings, updateAudioSettings, updateSoundSettings } =
-    useSystemStore();
+  const { updateSoundSettings } = useSystemStore();
 
-  const [isMuted, setIsMuted] = useState(false);
-  const [ambientVolume, setAmbientVolume] = useState(audioSettings.volume);
-  const [fadeInOut, setFadeInOut] = useState(audioSettings.fadeInOut);
-  const [selectedAmbientSound, setSelectedAmbientSound] = useState<string>(
-    audioSettings.selectedAmbientSound,
+  // Use useShallow for object selectors to ensure proper re-renders
+  const {
+    audioSettings,
+    currentlyPlaying,
+    activeAmbientSounds,
+    updateVolume,
+    toggleMute,
+    toggleAmbient,
+    togglePlayPause,
+    stopAllAmbient,
+    updateAudioSettings,
+    updateCurrentlyPlayingForAmbients,
+  } = useAudioStore(
+    useShallow((state) => ({
+      audioSettings: state.audioSettings,
+      currentlyPlaying: state.currentlyPlaying,
+      activeAmbientSounds: state.activeAmbientSounds,
+      updateVolume: state.updateVolume,
+      toggleMute: state.toggleMute,
+      toggleAmbient: state.toggleAmbient,
+      togglePlayPause: state.togglePlayPause,
+      stopAllAmbient: state.stopAllAmbient,
+      updateAudioSettings: state.updateAudioSettings,
+      updateCurrentlyPlayingForAmbients: state.updateCurrentlyPlayingForAmbients,
+    }))
   );
-  const [youtubeUrl, setYoutubeUrl] = useState<string>(
-    audioSettings.youtubeUrl || '',
-  );
-
-  // Global YouTube player (persists after modal closes)
-  const getOrCreateGlobalYTContainer = () => {
-    let el = document.getElementById(
-      'youtube-global-container',
-    ) as HTMLDivElement | null;
-    if (!el) {
-      el = document.createElement('div');
-      el.id = 'youtube-global-container';
-      el.style.position = 'fixed';
-      el.style.width = '0px';
-      el.style.height = '0px';
-      el.style.left = '-9999px';
-      el.style.top = '0';
-      el.style.display = 'none';
-      document.body.appendChild(el);
-    }
-    return el;
-  };
-  const setGlobalYT = (p: any) => {
-    (window as any).__globalYTPlayer = p;
-  };
-  const getGlobalYT = () => (window as any).__globalYTPlayer || null;
-  const setGlobalYTSource = (src: { videoId?: string; listId?: string } | null) => {
-    (window as any).__globalYTSource = src;
-  };
-  const getGlobalYTSource = (): { videoId?: string; listId?: string } | null => {
-    return (window as any).__globalYTSource || null;
-  };
 
   const ambientSounds = soundCatalog.ambient;
 
-  // ambient mixing
-  const [activeAmbientIds, setActiveAmbientIds] = useState<string[]>([]);
-  const ambientAudiosRef = useRef<Record<string, HTMLAudioElement>>({});
+  // State for selected tab with persistence
+  const [selectedTab, setSelectedTab] = useState(audioSettings.selectedTab || 'sources');
 
+  // Loading state to prevent user interaction during audio initialization
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+
+  // Restore ambient sounds display on mount if needed (using store directly to avoid stale closures)
   useEffect(() => {
-    setAmbientVolume(audioSettings.volume);
-    setFadeInOut(audioSettings.fadeInOut);
-    setSelectedAmbientSound(audioSettings.selectedAmbientSound);
-    setYoutubeUrl(audioSettings.youtubeUrl || '');
-  }, [audioSettings]);
+    const state = useAudioStore.getState();
+    const { activeAmbientSounds, currentlyPlaying, updateCurrentlyPlayingForAmbients } = state;
 
-  useEffect(() => {
-    return () => {
-      audioManager.stop({ fadeOutMs: 150 });
-    };
-  }, []);
+    if (activeAmbientSounds.length > 0) {
+      const needsUpdate = !currentlyPlaying ||
+        (activeAmbientSounds.length === 1 && currentlyPlaying.id !== activeAmbientSounds[0]) ||
+        (activeAmbientSounds.length > 1 && currentlyPlaying.id !== 'mixed-ambient');
 
-  // Keep YouTube player volume/mute in sync with global settings
-  useEffect(() => {
-    try {
-      const yt = getGlobalYT();
-      if (!yt) return;
-      if (isMuted) yt.mute();
-      else yt.unMute();
-      yt.setVolume(ambientVolume);
-    } catch {}
-  }, [isMuted, ambientVolume]);
-
-  // Ensure only one ambient at a time; if YouTube is playing, pause it
-  const pauseYouTube = () => {
-    try {
-      getGlobalYT()?.pauseVideo();
-    } catch {}
-    try {
-      getGlobalYT()?.stopVideo();
-    } catch {}
-  };
-
-  const playSoundPreview = async (soundId: string) => {
-    const sound = ambientSounds.find((s) => s.id === soundId);
-    if (!sound) return;
-    const isActive = activeAmbientIds.includes(sound.id);
-    if (isActive) {
-      const el = ambientAudiosRef.current[sound.id];
-      if (el) {
-        try {
-          el.pause();
-        } catch {}
-        delete ambientAudiosRef.current[sound.id];
+      if (needsUpdate) {
+        updateCurrentlyPlayingForAmbients();
       }
-      setActiveAmbientIds((prev) => prev.filter((id) => id !== sound.id));
-    } else {
-      // Allow mixing: just pause YouTube and start this track in addition to others
-      pauseYouTube();
-      const el = new Audio(sound.url);
-      el.loop = true;
-      el.volume = isMuted ? 0 : ambientVolume / 100;
-      try {
-        await el.play();
-      } catch {}
-      ambientAudiosRef.current[sound.id] = el;
-      setActiveAmbientIds((prev) => [...prev, sound.id]);
+    }
+  }, []); // Empty deps - only run on mount
+
+  // Save selected tab when it changes
+  const handleTabChange = (value: string) => {
+    setSelectedTab(value);
+    updateAudioSettings({ selectedTab: value });
+  };
+
+  // Helper to check if a sound is currently active in the mix
+  const isSoundActive = (soundId: string) => {
+    return activeAmbientSounds.includes(soundId);
+  };
+
+  // Handle play/pause with loading state
+  const handlePlayPauseToggle = async () => {
+    setIsLoadingAudio(true);
+    try {
+      if (activeAmbientSounds.length > 0) {
+        await stopAllAmbient();
+      } else if (currentlyPlaying) {
+        togglePlayPause();
+      }
+    } catch (error) {
+      console.error('Error toggling audio:', error);
+      toast.error('Failed to toggle audio playback');
+    } finally {
+      // Add small delay to ensure audio state is updated
+      setTimeout(() => {
+        setIsLoadingAudio(false);
+      }, 300);
     }
   };
 
-  const stopAllAmbient = async () => {
-    // Stop any manager-driven playback (backward compatibility)
-    try {
-      await audioManager.stop({ fadeOutMs: 150 });
-    } catch {}
+  // This useEffect is no longer needed as audio state is managed by useAudioStore
+  // useEffect(() => {
+  //   setAmbientVolume(audioSettings.volume);
+  //   setFadeInOut(audioSettings.fadeInOut);
+  //   setSelectedAmbientSound(audioSettings.selectedAmbientSound);
+  // }, [audioSettings]);
 
-    // Pause and clear all ambient mix tracks
-    try {
-      Object.entries(ambientAudiosRef.current).forEach(([id, el]) => {
-        try {
-          el.pause();
-        } catch {}
-        delete ambientAudiosRef.current[id];
-      });
-    } catch {}
-    setActiveAmbientIds([]);
-  };
+  // This useEffect is no longer needed as audio state is managed by useAudioStore
+  // useEffect(() => {
+  //   return () => {
+  //     audioManager.stop();
+  //   };
+  // }, []);
 
-  const saveSettings = () => {
-    updateSoundSettings({
-      soundType: 'bell',
-      volume: ambientVolume,
-      isMuted,
-    });
-    updateAudioSettings({
-      selectedAmbientSound,
-      volume: ambientVolume,
-      fadeInOut,
-      youtubeUrl,
-    });
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(
-        'pomodoro-sound-settings',
-        JSON.stringify({ soundType: 'bell', volume: ambientVolume, isMuted }),
-      );
-      localStorage.setItem(
-        'pomodoro-audio-settings',
-        JSON.stringify({
-          selectedAmbientSound,
-          volume: ambientVolume,
-          fadeInOut,
-          youtubeUrl,
-        }),
-      );
-    }
+  // This useEffect is no longer needed as audio state is managed by useAudioStore
+  // useEffect(() => {
+  //   Object.values(ambientAudiosRef.current).forEach((el) => {
+  //     try {
+  //       el.volume = ambientVolume / 100;
+  //       if (isMuted) {
+  //         el.pause();
+  //       } else {
+  //         if (el.paused) el.play().catch(() => { });
+  //       }
+  //     } catch { }
+  //   });
+  // }, [isMuted, ambientVolume]);
+
+  // This function is no longer needed as playAmbient from useAudioStore handles it
+  // const playSoundPreview = async (soundId: string) => {
+  //   const sound = ambientSounds.find((s) => s.id === soundId);
+  //   if (!sound) return;
+
+  //   // If muted (paused), unmute (play) when interacting with a new sound
+  //   if (isMuted) {
+  //     setIsMuted(false);
+  //   }
+
+  //   const isActive = activeAmbientIds.includes(sound.id);
+  //   if (isActive) {
+  //     const el = ambientAudiosRef.current[sound.id];
+  //     if (el) {
+  //       try {
+  //         el.pause();
+  //       } catch { }
+  //       delete ambientAudiosRef.current[sound.id];
+  //     }
+  //     setActiveAmbientIds((prev) => prev.filter((id) => id !== sound.id));
+  //   } else {
+  //     const el = new Audio(sound.url);
+  //     el.loop = true;
+  //     el.volume = ambientVolume / 100;
+  //     try {
+  //       await el.play();
+  //     } catch { }
+  //     ambientAudiosRef.current[sound.id] = el;
+  //     setActiveAmbientIds((prev) => [...prev, sound.id]);
+  //   }
+  // };
+
+  // This function is no longer needed as settings are updated directly via store actions
+  const handleSave = () => {
     toast.success('Audio settings saved successfully!');
     onClose();
   };
 
-  const parseYouTubeUrl = (
-    url: string,
-  ): { videoId?: string; listId?: string; isChannel?: boolean } => {
-    if (!url) return {};
-    try {
-      const u = new URL(url);
-      if (u.hostname === 'youtu.be') {
-        const id = u.pathname.split('/').filter(Boolean)[0];
-        return id ? { videoId: id } : {};
-      }
-      if (u.hostname.includes('youtube.com')) {
-        if (u.pathname.startsWith('/watch')) {
-          const vid = u.searchParams.get('v') || undefined;
-          const list = u.searchParams.get('list') || undefined;
-          return { videoId: vid, listId: list };
-        }
-        if (u.pathname.startsWith('/shorts/')) {
-          const id = u.pathname.split('/').filter(Boolean)[1];
-          return id ? { videoId: id } : {};
-        }
-        if (u.pathname.startsWith('/live/')) {
-          const id = u.pathname.split('/').filter(Boolean)[1];
-          return id ? { videoId: id } : {};
-        }
-        if (u.pathname.startsWith('/playlist')) {
-          const list = u.searchParams.get('list') || undefined;
-          return { listId: list };
-        }
-        if (
-          u.pathname.startsWith('/c/') ||
-          u.pathname.startsWith('/channel/')
-        ) {
-          return { isChannel: true };
-        }
-      }
-      return {};
-    } catch {
-      return {};
-    }
-  };
-
-  const {
-    videoId: youtubeId,
-    listId: youtubeListId,
-    isChannel,
-  } = parseYouTubeUrl(youtubeUrl);
-  const youtubeEmbedUrl = youtubeId
-    ? `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&modestbranding=1&controls=1`
-    : null;
-  const youtubeThumbUrl = youtubeId
-    ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`
-    : null;
-
-  // Track YT playback state for unified toggle
-  const [ytStatus, setYtStatus] = useState<
-    'stopped' | 'playing' | 'paused' | 'buffering'
-  >('stopped');
-  const [currentYTSource, setCurrentYTSource] = useState<{ videoId?: string; listId?: string } | null>(null);
-  useEffect(() => {
-    const id = window.setInterval(() => {
-      try {
-        const yt = getGlobalYT();
-        const state = yt?.getPlayerState?.();
-        if (state === 1) setYtStatus('playing');
-        else if (state === 2) setYtStatus('paused');
-        else if (state === 3) setYtStatus('buffering');
-        else setYtStatus('stopped');
-        // Update current source info from global cache
-        const src = getGlobalYTSource();
-        setCurrentYTSource(src);
-      } catch {}
-    }, 800);
-    return () => window.clearInterval(id);
-  }, []);
-
-  const ensureYouTubeAPI = (): Promise<any> => {
-    return new Promise((resolve) => {
-      const w = window as any;
-      if (w.YT && w.YT.Player) {
-        resolve(w.YT);
-        return;
-      }
-      const prev = document.getElementById(
-        'youtube-iframe-api',
-      ) as HTMLScriptElement | null;
-      if (!prev) {
-        const tag = document.createElement('script');
-        tag.id = 'youtube-iframe-api';
-        tag.src = 'https://www.youtube.com/iframe_api';
-        document.body.appendChild(tag);
-      }
-      (window as any).onYouTubeIframeAPIReady = () => {
-        resolve((window as any).YT);
-      };
-    });
-  };
-
-  const createOrUpdateYTPlayer = async (
-    videoIdOrListId: string,
-    autoPlay: boolean,
-    opts?: { isPlaylist?: boolean },
-  ) => {
-    const YT = await ensureYouTubeAPI();
-    const existing = getGlobalYT();
-    if (existing) {
-      try {
-        if (autoPlay) {
-          // enforce exclusivity
-          await stopAllAmbient();
-          try {
-            existing.unMute?.();
-          } catch {}
-        }
-        if (opts?.isPlaylist) {
-          if (typeof existing.loadPlaylist === 'function') {
-            existing.loadPlaylist({ list: videoIdOrListId });
-          } else if (typeof existing.cuePlaylist === 'function') {
-            existing.cuePlaylist({ list: videoIdOrListId });
-          }
-          if (autoPlay) existing.playVideo?.();
-          setGlobalYTSource({ listId: videoIdOrListId });
-        } else {
-          existing.loadVideoById(videoIdOrListId);
-          if (autoPlay) existing.playVideo?.();
-          setGlobalYTSource({ videoId: videoIdOrListId });
-        }
-      } catch {}
-      return;
-    }
-    const mount = getOrCreateGlobalYTContainer();
-    const player = new YT.Player(mount, {
-      videoId: opts?.isPlaylist ? undefined : videoIdOrListId,
-      playerVars: opts?.isPlaylist
-        ? { rel: 0, list: videoIdOrListId, modestbranding: 1, controls: 1 }
-        : { rel: 0, modestbranding: 1, controls: 1 },
-      events: {
-        onReady: () => {
-          if (autoPlay) {
-            (async () => {
-              try {
-                await stopAllAmbient();
-              } catch {}
-              try {
-                player.unMute?.();
-              } catch {}
-              try {
-                player.playVideo?.();
-              } catch {}
-              toast.success(
-                'Đang phát nền • Nhạc sẽ tiếp tục khi đóng cửa sổ 🎧',
-              );
-            })();
-          }
-        },
-        onStateChange: (e: any) => {
-          const s = e?.data;
-          if (s === 1) setYtStatus('playing');
-          else if (s === 2) setYtStatus('paused');
-          else if (s === 3) setYtStatus('buffering');
-          else setYtStatus('stopped');
-        },
-      },
-    });
-    setGlobalYT(player);
-     // Record current source
-     if (opts?.isPlaylist) {
-       setGlobalYTSource({ listId: videoIdOrListId });
-     } else {
-       setGlobalYTSource({ videoId: videoIdOrListId });
-     }
-  };
-
-  // Do not auto-create/cue the YouTube player on URL change; only on explicit Play
-
-  // Keep global YT player alive after modal closes
-  useEffect(() => {
-    return () => {};
-  }, []);
-
   const iconForUrl = (url: string) => {
     if (url.includes('/nature/'))
-      return <Leaf className="h-4 w-4 text-muted-foreground" />;
+      return <Leaf className="h-3 w-3 text-muted-foreground" />;
     if (url.includes('/rain/'))
-      return <CloudRain className="h-4 w-4 text-muted-foreground" />;
+      return <CloudRain className="h-3 w-3 text-muted-foreground" />;
     if (url.includes('/transport/'))
-      return <Train className="h-4 w-4 text-muted-foreground" />;
+      return <Train className="h-3 w-3 text-muted-foreground" />;
     if (url.includes('/urban/'))
-      return <Building2 className="h-4 w-4 text-muted-foreground" />;
-    return <Package className="h-4 w-4 text-muted-foreground" />;
+      return <Building2 className="h-3 w-3 text-muted-foreground" />;
+    return <Package className="h-3 w-3 text-muted-foreground" />;
   };
 
   const AmbientGroup = ({
@@ -395,40 +216,54 @@ export function AudioSettingsModal({
     title: string;
     sounds: typeof soundCatalog.ambient;
   }) => (
-    <div className="space-y-3">
-      <Label className="text-sm font-medium">{title}</Label>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+    <div className="space-y-2">
+      <Label className="text-xs font-medium text-muted-foreground">{title}</Label>
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-2">
         {sounds.map((s) => {
-          const isActive = activeAmbientIds.includes(s.id);
+          const isActive = isSoundActive(s.id);
           return (
             <div
               key={s.id}
-              className={`p-3 border rounded-lg flex items-center justify-between transition-all ${
-                isActive
-                  ? 'border-primary bg-primary/10'
-                  : 'border-border hover:bg-muted'
-              }`}
+              className={`group relative overflow-hidden rounded-xl border transition-all duration-300 ${isActive
+                ? 'border-primary bg-gradient-to-br from-primary/10 to-primary/5 shadow-md'
+                : 'border-border/50 hover:border-border hover:bg-muted/50'
+                }`}
             >
-              <div className="flex-1 min-w-0 flex items-start gap-2">
-                <div className="shrink-0 mt-0.5">{iconForUrl(s.url)}</div>
-                <div className="min-w-0">
-                  <div className="font-medium text-sm truncate">{s.label}</div>
+              <div className="p-2 flex items-center gap-3">
+                {/* Icon */}
+                <div
+                  className={`p-2 rounded-lg transition-all duration-300 shrink-0 ${isActive
+                    ? 'bg-primary/20 text-primary scale-110'
+                    : 'bg-muted text-muted-foreground'
+                    }`}
+                >
+                  {iconForUrl(s.url)}
+                </div>
+
+                {/* Text */}
+                <div className="flex-1 min-w-0">
+                  <div className={`font-semibold text-sm truncate ${isActive ? 'text-foreground' : ''
+                    }`}>
+                    {s.label}
+                  </div>
                   <div className="text-xs text-muted-foreground truncate">
                     {s.vn || s.label}
                   </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-2 ml-2">
+
+                {/* Play/Pause Button */}
                 <Button
-                  size="sm"
-                  variant={isActive ? 'default' : 'outline'}
-                  onClick={() => {
-                    setSelectedAmbientSound(s.id);
-                    playSoundPreview(s.id);
-                  }}
-                  aria-label={isActive ? `Tắt ${s.label}` : `Phát ${s.label}`}
+                  size="icon"
+                  variant={isActive ? 'default' : 'ghost'}
+                  className={`h-8 w-8 rounded-full transition-all shrink-0 ${isActive
+                    ? 'bg-primary text-primary-foreground'
+                    : 'opacity-0 group-hover:opacity-100'
+                    }`}
+                  onClick={() => toggleAmbient(s.id)}
+                  title={isActive ? `Remove ${s.label} from mix` : `Add ${s.label} to mix`}
+                  disabled={isLoadingAudio}
                 >
-                  {isActive ? 'Tắt' : 'Phát'}
+                  {isActive ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
                 </Button>
               </div>
             </div>
@@ -438,423 +273,241 @@ export function AudioSettingsModal({
     </div>
   );
 
-  // Suggestions with thumbnails (videos + playlists)
-  const suggestions = [
-    {
-      label: 'Lofi Girl - beats to relax/study',
-      url: 'https://www.youtube.com/watch?v=jfKfPfyJRdk',
-    },
-    {
-      label: 'Focus Beats',
-      url: 'https://www.youtube.com/watch?v=P4r9LeM7DiQ',
-    },
-    {
-      label: 'Coding Lofi',
-      url: 'https://www.youtube.com/watch?v=FkfEMReEl5g',
-    },
-    { label: 'Deep Lofi', url: 'https://www.youtube.com/watch?v=2Cibm9iXjH4' },
-    {
-      label: 'Lofi Playlist 1',
-      url: 'https://www.youtube.com/playlist?list=PL3Rd_Q1n-uEmzrjVbyMQmgSoKk6qbWmCg',
-    },
-    { label: 'Relax Lofi', url: 'https://www.youtube.com/watch?v=ptHnmgaFvwE' },
-    {
-      label: 'Chill Study',
-      url: 'https://www.youtube.com/watch?v=q0ff3e-A7DY',
-    },
-    {
-      label: 'Lofi Playlist 2',
-      url: 'https://www.youtube.com/playlist?list=PLi8ZVZZLpNVZitABWmrUKWq0lYNC_O3hw',
-    },
-    {
-      label: 'Ambient Focus',
-      url: 'https://www.youtube.com/watch?v=sF80I-TQiW0',
-    },
-    {
-      label: 'Calm Coding',
-      url: 'https://www.youtube.com/watch?v=qGa-qZQGifI',
-    },
-    {
-      label: 'Night Vibes',
-      url: 'https://www.youtube.com/watch?v=pfs3AsE_sHI',
-    },
-    { label: 'Sleep Lofi', url: 'https://www.youtube.com/watch?v=7aPzNJ4lf5A' },
-    {
-      label: 'Morning Focus',
-      url: 'https://www.youtube.com/watch?v=lA9FONoiuFA',
-    },
-    {
-      label: 'Chill Piano',
-      url: 'https://www.youtube.com/watch?v=mJW57E7GpSo',
-    },
-    {
-      label: 'Soft Rain Lofi',
-      url: 'https://www.youtube.com/watch?v=CFGLoQIhmow',
-    },
-    {
-      label: 'Study Playlist',
-      url: 'https://www.youtube.com/playlist?list=PLv1quoEqqgjAihdJtJZVKWtZWo_vD2y6U',
-    },
-    {
-      label: 'Ambient Playlist',
-      url: 'https://www.youtube.com/playlist?list=PLNIOIzEHtNJZU_29QVd-LVCTvL83YmGRv',
-    },
-    {
-      label: 'Lo-Fi Chill',
-      url: 'https://www.youtube.com/watch?v=mmKguZohAck',
-    },
-    { label: 'Rainy Mood', url: 'https://www.youtube.com/watch?v=7NOSDKb0HlU' },
-    { label: 'Lofi Girl Channel', url: 'https://www.youtube.com/c/LofiGirl' },
-  ];
-
-  const pickRandomSuggestion = () => {
-    const r = suggestions[Math.floor(Math.random() * suggestions.length)];
-    setYoutubeUrl(r.url);
-  };
-
-  // Explicit preview toggle: only show preview when user requests
-  const [showPreview, setShowPreview] = useState(false);
-
-  // Unified toggle handler
-  const togglePlayback = async () => {
-    if (isChannel) return;
-    if (!youtubeId && !youtubeListId) return;
-    const yt = getGlobalYT();
-    try {
-      if (!yt) {
-        updateAudioSettings({ youtubeUrl });
-        if (youtubeListId && !youtubeId) {
-          await createOrUpdateYTPlayer(youtubeListId, true, {
-            isPlaylist: true,
-          });
-        } else if (youtubeId) {
-          await createOrUpdateYTPlayer(youtubeId, true);
-        }
-        return;
-      }
-      const state = yt.getPlayerState?.();
-      if (state === 1) {
-        yt.pauseVideo();
-      } else if (state === 2) {
-        yt.playVideo();
-      } else {
-        updateAudioSettings({ youtubeUrl });
-        if (youtubeListId && !youtubeId) {
-          await createOrUpdateYTPlayer(youtubeListId, true, {
-            isPlaylist: true,
-          });
-        } else if (youtubeId) {
-          await createOrUpdateYTPlayer(youtubeId, true);
-        }
-      }
-    } catch {}
-  };
-
-  const toggleLabel = isChannel
-    ? 'Link kênh'
-    : ytStatus === 'playing'
-    ? 'Tạm dừng'
-    : ytStatus === 'paused'
-    ? 'Phát lại'
-    : 'Phát nền';
-  const toggleIcon = isChannel ? (
-    <Play className="h-4 w-4" />
-  ) : ytStatus === 'playing' ? (
-    <Pause className="h-4 w-4" />
-  ) : ytStatus === 'paused' ? (
-    <Play className="h-4 w-4" />
-  ) : (
-    <Play className="h-4 w-4" />
+  const SpotifyIcon = ({ className }: { className?: string }) => (
+    <svg
+      role="img"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      fill="currentColor"
+    >
+      <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141 4.32-1.32 9.84-.6 13.5 1.56.42.18.6.78.241 1.26zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 14.82 1.14.54.3.72 1.02.42 1.56-.3.54-1.02.72-1.56.42z" />
+    </svg>
   );
 
-  const isValidYouTube =
-    !!youtubeUrl && (!!youtubeId || !!youtubeListId) && !isChannel;
+  const YouTubeIcon = ({ className }: { className?: string }) => (
+    <svg
+      role="img"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      fill="currentColor"
+    >
+      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+    </svg>
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[900px] max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-lg md:text-xl font-semibold">
-            Audio Settings
+      <DialogContent className="sm:max-w-[800px] h-[90vh] flex flex-col p-0 gap-0 overflow-hidden">
+        <DialogHeader className="px-6 py-4 border-b shrink-0">
+          <DialogTitle className="text-xl font-semibold">
+            Chọn nhạc để chill
           </DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="sources" className="w-full">
-          <TabsList className="w-full">
-            <TabsTrigger value="sources" className="w-1/2">
-              Hệ thống
-            </TabsTrigger>
-            <TabsTrigger value="player" className="w-1/2">
-              <YoutubeIcon className="me-2" /> YouTube
-            </TabsTrigger>
-          </TabsList>
+        <div className="flex-1 overflow-hidden flex flex-col">
+          {/* Mini Player / Volume Control - Compact Card */}
+          <div className="px-6 py-4 border-b flex justify-center shrink-0">
+            {/* Compact card - 50% width */}
+            <div className={cn(
+              "bg-card rounded-xl border p-4 max-w-md w-full shadow-sm transition-colors",
+              currentlyPlaying?.type === 'youtube' ? "border-[#ff0000]" : "border-border"
+            )}>
+              <div className="grid grid-cols-2 gap-4 items-center">
+                {/* Left: Now Playing with Dynamic Icon/Thumbnail (50%) */}
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center shrink-0 overflow-hidden relative">
+                    {currentlyPlaying ? (
+                      currentlyPlaying.type === 'youtube' ? (
+                        (() => {
+                          const videoId = currentlyPlaying.id.startsWith('video-')
+                            ? currentlyPlaying.id.replace('video-', '')
+                            : null;
+                          const thumb = videoId ? getYouTubeThumbnailUrl(videoId) : null;
 
-          <TabsContent value="sources" className="space-y-6 mt-4">
-            {/* Volume */}
-            <div className="space-y-2">
-              <Label htmlFor="ambient-volume">
-                Âm lượng nền: {ambientVolume}%
-              </Label>
-              <Slider
-                id="ambient-volume"
-                min={0}
-                max={100}
-                step={5}
-                value={[ambientVolume]}
-                onValueChange={(v) => {
-                  const vol = v[0];
-                  setAmbientVolume(vol);
-                  // update all ambient tracks volume
-                  Object.values(ambientAudiosRef.current).forEach((el) => {
-                    try {
-                      el.volume = isMuted ? 0 : vol / 100;
-                    } catch {}
-                  });
-                }}
-                className="w-full"
-                disabled={isMuted}
-              />
-            </div>
-
-            {/* Global mute */}
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="mute"
-                checked={isMuted}
-                onCheckedChange={setIsMuted}
-              />
-              <Label htmlFor="mute">Tắt tất cả âm thanh</Label>
-              {isMuted ? (
-                <VolumeX className="h-4 w-4" />
-              ) : (
-                <Volume2 className="h-4 w-4" />
-              )}
-            </div>
-
-            {/* Ambient groups */}
-            {(() => {
-              const groups = [
-                {
-                  key: 'nature',
-                  title: 'Thiên nhiên',
-                  sounds: ambientSounds.filter((s) =>
-                    s.url.includes('/nature/'),
-                  ),
-                },
-                {
-                  key: 'rain',
-                  title: 'Âm mưa',
-                  sounds: ambientSounds.filter((s) => s.url.includes('/rain/')),
-                },
-                {
-                  key: 'things',
-                  title: 'Vật dụng/Không gian',
-                  sounds: ambientSounds.filter((s) =>
-                    s.url.includes('/things/'),
-                  ),
-                },
-                {
-                  key: 'transport',
-                  title: 'Giao thông/Phương tiện',
-                  sounds: ambientSounds.filter((s) =>
-                    s.url.includes('/transport/'),
-                  ),
-                },
-                {
-                  key: 'urban',
-                  title: 'Đô thị',
-                  sounds: ambientSounds.filter((s) =>
-                    s.url.includes('/urban/'),
-                  ),
-                },
-              ];
-              return (
-                <div className="space-y-6 pt-2">
-                  {groups.map((g) =>
-                    g.sounds.length ? (
-                      <AmbientGroup
-                        key={g.key}
-                        title={g.title}
-                        sounds={g.sounds as any}
-                      />
-                    ) : null,
-                  )}
-                </div>
-              );
-            })()}
-          </TabsContent>
-
-          <TabsContent value="player" className="mt-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-              {/* Left: Input + suggestions */}
-              <div className="space-y-4">
-                {/* Currently playing badge (background) */}
-                {(ytStatus === 'playing' || ytStatus === 'paused') && currentYTSource && (
-                  <div className="text-xs text-muted-foreground">
-                    Đang phát nền:{' '}
-                    {currentYTSource.videoId ? (
-                      <span className="font-medium">Video {currentYTSource.videoId}</span>
-                    ) : currentYTSource.listId ? (
-                      <span className="font-medium">Playlist {currentYTSource.listId}</span>
-                    ) : null}
-                  </div>
-                )}
-                {/* YouTube Input */}
-                <div className="space-y-2">
-                  <Label htmlFor="youtube-url">Link YouTube</Label>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      id="youtube-url"
-                      placeholder="Nhập link YouTube của bạn…"
-                      value={youtubeUrl}
-                      onChange={(e) => {
-                        setYoutubeUrl(e.target.value);
-                        setShowPreview(true);
-                      }}
-                    />
-                    <Button
-                      onClick={togglePlayback}
-                      disabled={(!youtubeId && !youtubeListId) || isChannel}
-                    >
-                      {toggleIcon}
-                      <span className="ml-2">{toggleLabel}</span>
-                    </Button>
-                  </div>
-                  {!isValidYouTube && youtubeUrl && !isChannel && (
-                    <div className="text-xs text-destructive">
-                      Không tìm thấy video hợp lệ.
-                    </div>
-                  )}
-                </div>
-
-                {/* Suggestions */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label>Gợi ý phù hợp để học tập/làm việc</Label>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={pickRandomSuggestion}
-                    >
-                      <Dice3 className="h-4 w-4 mr-1" />
-                      Random
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {suggestions.map((item) => {
-                      return (
-                        <button
-                          key={item.url}
-                          type="button"
-                          onClick={() => {
-                            setYoutubeUrl(item.url);
-                            setShowPreview(true);
-                          }}
-                          className="group relative p-3 rounded-lg border text-left transition-colors hover:border-primary hover:bg-primary/5"
-                        >
-                          <div className="min-w-0">
-                            <div className="text-sm font-medium line-clamp-2">
-                              {item.label}
+                          return thumb ? (
+                            <div className="relative w-full h-full group">
+                              <img
+                                src={thumb}
+                                alt="Thumbnail"
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                                <YouTubeIcon className="h-5 w-5 text-[#ff0000] drop-shadow-md fill-current" />
+                              </div>
                             </div>
-                            <div className="text-xs text-muted-foreground">
-                              YouTube
-                            </div>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    Nhạc sẽ tiếp tục phát trong nền 🎧 khi bạn bấm Phát nền.
-                  </div>
-                </div>
-              </div>
-
-              {/* Right: Preview card (thumbnail + controls) */}
-              <div className="space-y-2">
-                <Label>Xem trước</Label>
-                {!showPreview ? (
-                  <div className="rounded-lg border bg-muted/10 p-4 text-sm text-muted-foreground flex items-center justify-between">
-                    <div>
-                      {youtubeUrl
-                        ? 'Nhấn “Xem trước” để hiển thị preview cho link hiện tại.'
-                        : 'Chưa có link YouTube.'}
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setShowPreview(true)}
-                      disabled={(!youtubeId && !youtubeListId) || isChannel}
-                    >
-                      Xem trước
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="rounded-lg border overflow-hidden bg-muted/20 w-full">
-                    <div className="aspect-video bg-muted">
-                      {youtubeThumbUrl ? (
-                        <img
-                          src={youtubeThumbUrl}
-                          alt="YouTube thumbnail"
-                          className="w-full h-full object-cover"
-                        />
+                          ) : (
+                            <YouTubeIcon className="h-6 w-6 text-[#ff0000]" />
+                          );
+                        })()
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
-                          {youtubeListId
-                            ? 'Playlist đã chọn'
-                            : isChannel
-                            ? 'Link kênh (không thể preview)'
-                            : 'Dán link YouTube để xem trước'}
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex flex-wrap items-center justify-between gap-2 p-3 text-sm">
-                      <div className="truncate text-muted-foreground">
-                        {youtubeId
-                          ? `Video: ${youtubeId}`
-                          : youtubeListId
-                          ? `Playlist: ${youtubeListId}`
-                          : isChannel
-                          ? 'Link kênh (không thể phát trực tiếp)'
-                          : 'Chưa có video'}
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={togglePlayback}
-                          disabled={(!youtubeId && !youtubeListId) || isChannel}
-                        >
-                          {toggleIcon}
-                          <span className="ml-1">{toggleLabel}</span>
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            try {
-                              getGlobalYT()?.stopVideo();
-                            } catch {}
-                          }}
-                          disabled={(!youtubeId && !youtubeListId) || isChannel}
-                        >
-                          <Square className="h-4 w-4 mr-1" />
-                          Dừng
-                        </Button>
-                      </div>
-                    </div>
+                        <AudioLines
+                          size={28}
+                          className="text-primary"
+                          animate={currentlyPlaying.isPlaying}
+                        />
+                      )
+                    ) : (
+                      <Music className="h-6 w-6 text-muted-foreground" />
+                    )}
                   </div>
-                )}
+                  <div className="flex flex-col overflow-hidden">
+                    <span className="text-sm font-medium truncate">
+                      {currentlyPlaying?.name || "No audio playing"}
+                    </span>
+                    <span className="text-xs truncate text-muted-foreground">
+                      {currentlyPlaying?.isPlaying ? "● Playing" : (currentlyPlaying ? "Paused" : "Select a sound")}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Right: Controls (50%) */}
+                <div className="flex items-center justify-end gap-3">
+                  {/* Play/Pause Button */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-10 w-10 rounded-full bg-primary/10 hover:bg-primary/20 text-primary disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+                    onClick={handlePlayPauseToggle}
+                    disabled={(!currentlyPlaying && activeAmbientSounds.length === 0) || isLoadingAudio}
+                    title={activeAmbientSounds.length > 0 ? "Stop all ambient sounds" : (currentlyPlaying?.isPlaying ? "Pause" : "Play")}
+                  >
+                    {isLoadingAudio ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : activeAmbientSounds.length > 0 ? (
+                      <Square className="h-4 w-4 fill-current" />
+                    ) : currentlyPlaying?.isPlaying ? (
+                      <Pause className="h-4 w-4 fill-current" />
+                    ) : (
+                      <Play className="h-4 w-4 fill-current ml-0.5" />
+                    )}
+                  </Button>
+
+                  {/* Volume Control */}
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted shrink-0"
+                      onClick={toggleMute}
+                      title={audioSettings.isMuted ? "Unmute" : "Mute"}
+                      disabled={isLoadingAudio}
+                    >
+                      {audioSettings.isMuted ? (
+                        <VolumeX className="h-4 w-4" />
+                      ) : (
+                        <Volume2 className="h-4 w-4" />
+                      )}
+                    </Button>
+                    <Slider
+                      value={[audioSettings.isMuted ? 0 : audioSettings.volume]}
+                      min={0}
+                      max={100}
+                      step={1}
+                      onValueChange={(v) => {
+                        if (audioSettings.isMuted && v[0] > 0) {
+                          toggleMute(); // Unmute if dragging slider
+                        }
+                        updateVolume(v[0]);
+                      }}
+                      disabled={isLoadingAudio}
+                      className="w-20"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-          </TabsContent>
-        </Tabs>
+          </div>
 
-        <div className="flex justify-between pt-4 border-t">
-          <Button variant="outline" onClick={onClose}>
-            Đóng
-          </Button>
-          <Button onClick={saveSettings}>Lưu cài đặt</Button>
+          <Tabs value={selectedTab} onValueChange={handleTabChange} className="flex-1 flex flex-col overflow-hidden">
+            <div className="px-6 py-2 shrink-0">
+              <TabsList className="grid w-full grid-cols-3 gap-1 bg-muted/40 p-1 rounded-xl border border-border/50">
+                <TabsTrigger
+                  value="sources"
+                  className="flex items-center justify-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-all hover:bg-muted/50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-md data-[state=active]:font-semibold data-[state=active]:border data-[state=active]:border-border"
+                >
+                  Hệ thống
+                </TabsTrigger>
+                <TabsTrigger
+                  value="player"
+                  className="flex items-center justify-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-all hover:bg-muted/50 data-[state=active]:bg-background data-[state=active]:text-[#ff0000] data-[state=active]:shadow-md data-[state=active]:font-semibold data-[state=active]:border data-[state=active]:border-border"
+                >
+                  <YouTubeIcon className="h-4 w-4" />
+                  YouTube
+                </TabsTrigger>
+                <TabsTrigger
+                  value="spotify"
+                  className="flex items-center justify-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-all hover:bg-muted/50 data-[state=active]:bg-background data-[state=active]:text-[#1DB954] data-[state=active]:shadow-md data-[state=active]:font-semibold data-[state=active]:border data-[state=active]:border-border"
+                >
+                  <SpotifyIcon className="h-4 w-4" />
+                  Spotify
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            {/* Scrollable content area with custom scrollbar and fade indicator */}
+            <div className="flex-1 overflow-hidden relative">
+              {/* Scroll fade indicator at bottom */}
+              <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none z-10" />
+
+              <div className="h-full overflow-y-auto px-6 py-2 custom-scrollbar">
+                <TabsContents>
+                  <TabsContent value="sources" className="space-y-4 pb-4">
+                    {/* Ambient Sounds Grid - All Categories */}
+                    <div className="space-y-6">
+                      {(() => {
+                        const groups = [
+                          {
+                            key: 'nature',
+                            title: 'Thiên nhiên (Nature)',
+                            sounds: ambientSounds.filter((s) => s.url.includes('/nature/')),
+                          },
+                          {
+                            key: 'rain',
+                            title: 'Mưa (Rain)',
+                            sounds: ambientSounds.filter((s) => s.url.includes('/rain/')),
+                          },
+                          {
+                            key: 'things',
+                            title: 'Đồ vật (Things)',
+                            sounds: ambientSounds.filter((s) => s.url.includes('/things/')),
+                          },
+                          {
+                            key: 'transport',
+                            title: 'Phương tiện (Transport)',
+                            sounds: ambientSounds.filter((s) => s.url.includes('/transport/')),
+                          },
+                          {
+                            key: 'urban',
+                            title: 'Đô thị (Urban)',
+                            sounds: ambientSounds.filter((s) => s.url.includes('/urban/')),
+                          },
+                        ];
+                        return groups.map((g) =>
+                          g.sounds.length ? (
+                            <AmbientGroup
+                              key={g.key}
+                              title={g.title}
+                              sounds={g.sounds}
+                            />
+                          ) : null
+                        );
+                      })()}
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="player" className="h-full">
+                    <YouTubePane />
+                  </TabsContent>
+
+                  <TabsContent value="spotify" className="h-full">
+                    <SpotifyPane />
+                  </TabsContent>
+                </TabsContents>
+              </div>
+            </div>
+          </Tabs>
         </div>
       </DialogContent>
     </Dialog>

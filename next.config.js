@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
-  },
   // Ignore TypeScript and ESLint errors during production builds
   typescript: {
     ignoreBuildErrors: true,

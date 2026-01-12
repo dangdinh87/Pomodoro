@@ -1,0 +1,808 @@
+{
+  "brand": {
+    "title": "StudyBro",
+    "subtitle": "Pomodoro Timer Focus"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "noResults": "No results found",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "confirm": "Confirm",
+    "retry": "Retry",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "actions": "Actions",
+    "settings": "Settings",
+    "language": "Language"
+  },
+  "nav": {
+    "navigation": "Navigation",
+    "system": "System",
+    "timer": "Timer",
+    "tasks": "Tasks",
+    "history": "History",
+    "leaderboard": "Leaderboard",
+    "chatAI": "Chat AI",
+    "settings": "Settings",
+    "guide": "Guide",
+    "feedback": "Feedback",
+    "login": "Sign In",
+    "logout": "Sign Out",
+    "loginNow": "Sign in now"
+  },
+  "auth": {
+    "pleaseLogin": "Please sign in to continue",
+    "signInToManageTasks": "Please sign in to manage tasks",
+    "signInToViewStats": "Please sign in to view statistics",
+    "signInButton": "Sign In",
+    "signOutSuccess": "Successfully signed out",
+    "signOutError": "Unable to sign out",
+    "signOutConfirm": "Are you sure you want to sign out?",
+    "supabaseNotConfigured": "Supabase is not configured yet",
+    "signOutUnexpectedError": "An error occurred while signing out"
+  },
+  "timer": {
+    "modes": {
+      "work": "Work",
+      "shortBreak": "Short Break",
+      "longBreak": "Long Break"
+    },
+    "controls": {
+      "start": "Start",
+      "pause": "Pause",
+      "reset": "Reset",
+      "skip": "Skip",
+      "start_hint": "Start (Space)",
+      "pause_hint": "Pause (Space)",
+      "reset_hint": "Reset (R)",
+      "skip_hint": "Skip session",
+      "aria": {
+        "start": "Start timer",
+        "pause": "Pause timer",
+        "reset": "Reset timer"
+      }
+    },
+    "toasts": {
+      "work_done": "Work session completed! Time for a break.",
+      "break_done": "Break completed! Time to focus."
+    },
+    "title_prefix": {
+      "work": "Work",
+      "shortBreak": "Break",
+      "longBreak": "Long Break"
+    },
+    "aria": {
+      "timeRemaining": "Time remaining: {time}"
+    },
+    "progress": {
+      "complete": "{percent}% Complete"
+    },
+    "stats": {
+      "today": "Today",
+      "poms": "poms",
+      "time": "Time",
+      "minutes": "min"
+    },
+    "focusMode": "Focus Mode"
+  },
+  "timerSettings": {
+    "title": "Timer Settings",
+    "labels": {
+      "workDuration": "Work Duration (min)",
+      "shortBreakDuration": "Short Break (min)",
+      "longBreakDuration": "Long Break (min)",
+      "longBreakInterval": "Long Break Interval",
+      "autoStartBreaks": "Auto-start breaks",
+      "autoStartWork": "Auto-start work sessions",
+      "showClock": "Show Clock",
+      "clockType": "Clock Type",
+      "selectClockType": "Select clock type",
+      "digital": "Digital",
+      "analog": "Analog",
+      "progress": "Progress",
+      "flip": "Flip",
+      "clockPreview": "Clock Preview",
+      "endsAround": "Ends around {time}",
+      "clockSize": "Clock Size",
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large",
+      "timerDurations": "Timer Durations",
+      "behavior": "Behavior",
+      "clockDisplay": "Clock Display",
+      "clockStyle": "Clock Style",
+      "preview": "Preview",
+      "selectSize": "Select size",
+      "lowTimeWarning": "Low-time warning (under 10s)"
+    },
+    "actions": {
+      "resetDefaults": "Reset to Defaults",
+      "cancel": "Cancel",
+      "save": "Save Settings",
+      "saveChanges": "Save Changes"
+    },
+    "toasts": {
+      "saved": "Timer settings saved successfully!",
+      "reset": "Timer settings reset to defaults!"
+    }
+  },
+  "tasks": {
+    "title": "Tasks",
+    "subtitle": "Manage your tasks and track progress with Pomodoro technique",
+    "addTask": "Add New Task",
+    "editTask": "Edit Task",
+    "deleteTask": "Delete Task",
+    "noTasks": "No tasks found",
+    "noTasksDescription": "You don't have any tasks yet. Create one to get started with your focus session.",
+    "createFirst": "Create your first task to get started",
+    "taskName": "Task Name",
+    "taskNamePlaceholder": "What are you working on?",
+    "taskDescription": "Description",
+    "taskDescriptionPlaceholder": "Add some notes...",
+    "priority": "Priority",
+    "dueDate": "Due Date",
+    "status": "Status",
+    "estimated": "Estimate Pomodoros",
+    "actual": "Actual",
+    "completed": "Completed",
+    "pending": "Pending",
+    "inProgress": "In Progress",
+    "cancelled": "Cancelled",
+    "progress": "Progress",
+    "time": "Time",
+    "priorityLevels": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "statuses": {
+      "pending": "Pending",
+      "in_progress": "In Progress",
+      "done": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "filters": {
+      "searchPlaceholder": "Search tasks...",
+      "status": "Status",
+      "priority": "Priority",
+      "dateRange": "Date Range",
+      "today": "Today",
+      "all": "All",
+      "reset": "Reset Filters"
+    },
+    "actions": {
+      "markComplete": "Mark as Complete",
+      "markIncomplete": "Mark as Incomplete",
+      "startFocus": "Focus on this task",
+      "stopFocus": "Stop focusing",
+      "edit": "Edit task",
+      "delete": "Delete task",
+      "save": "Save Task",
+      "create": "Create Task",
+      "deleting": "Deleting..."
+    },
+    "count": "tasks",
+    "confirmDelete": {
+      "title": "Are you sure?",
+      "description": "This action cannot be undone. This will permanently delete the task and all associated session data.",
+      "action": "Delete Permanently"
+    }
+  },
+  "history": {
+    "title": "History & Statistics",
+    "subtitle": "Review your focus performance over time",
+    "startNewSession": "Start New Session",
+    "errorLoading": "An error occurred while loading data",
+    "noData": "No data available",
+    "noDataDescription": "Start your first Pomodoro session to see your statistics here",
+    "stats": {
+      "totalFocusTime": "Total Focus Time",
+      "completedSessions": "Completed Sessions",
+      "currentStreak": "Current Streak",
+      "days": "days",
+      "hours": "hours",
+      "minutes": "minutes",
+      "sessions": "sessions"
+    },
+    "charts": {
+      "focusOverview": "Focus Time Overview",
+      "distribution": "Session Distribution",
+      "sessionHistory": "Session History",
+      "noTask": "No task"
+    },
+    "dateRange": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "last7Days": "Last 7 Days",
+      "last30Days": "Last 30 Days",
+      "custom": "Custom Range",
+      "selectDate": "Select date range"
+    }
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "comingSoon": "Coming Soon",
+    "description": "Leaderboard will help you compare your achievements with other users and motivate your learning."
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your preferences, timer settings, and appearance.",
+    "tabs": {
+      "general": "General",
+      "timer": "Timer",
+      "background": "Background",
+      "audio": "Audio"
+    },
+    "general": {
+      "title": "General Settings",
+      "appearance": "Appearance",
+      "language": {
+        "title": "Language",
+        "description": "Choose the interface display language",
+        "sectionTitle": "Language",
+        "selectPlaceholder": "Select language",
+        "updated": "Language updated",
+        "english": "English",
+        "vietnamese": "Vietnamese"
+      },
+      "theme": {
+        "title": "Theme",
+        "description": "Choose your app theme",
+        "mode": "Theme Mode",
+        "modeDescription": "Select your preferred theme mode.",
+        "colorTheme": "Color Theme",
+        "colorThemeDescription": "Choose your preferred color palette for the UI.",
+        "fontFamily": "Font Family",
+        "fontDescription": "Choose a suitable font to enhance your reading experience.",
+        "selectModePlaceholder": "Select theme mode",
+        "selectColorPlaceholder": "Select color theme",
+        "selectFontPlaceholder": "Select a font",
+        "fontChanged": "Font changed to {font}",
+        "themeApplied": "Theme \"{name}\" applied",
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      },
+      "notifications": {
+        "title": "Notifications",
+        "description": "Manage notification preferences",
+        "enable": "Enable notifications",
+        "sound": "Play sound on completion"
+      }
+    },
+    "background": {
+      "title": "Background Settings",
+      "chooseBackground": "Choose Background",
+      "uploadCustom": "Upload Custom",
+      "backgroundType": "Background Type",
+      "image": "Image",
+      "video": "Video",
+      "solid": "Solid Color",
+      "gradient": "Gradient",
+      "blur": "Blur Amount",
+      "opacity": "Opacity",
+      "brightness": "Brightness",
+      "selectImage": "Select Image",
+      "description": "Choose a suitable background for the system color",
+      "reset": "Reset",
+      "saveChanges": "Save Changes",
+      "systemAuto": "System & Auto",
+      "videoBackgrounds": "Video Backgrounds",
+      "images": "Images",
+      "opacityDescription": "Adjust the transparency of the background or video.",
+      "brightnessDescription": "Adjust the brightness to suit your environment.",
+      "presets": {
+        "systemAutoColor": "System Color (Auto)",
+        "lofiChillAuto": "Lofi Chill (Auto)",
+        "dayChill": "Day Chill",
+        "nightChill": "Night Chill",
+        "travelling1": "Travelling 1",
+        "travelling2": "Travelling 2",
+        "travelling3": "Travelling 3",
+        "travelling4": "Travelling 4",
+        "travelling5": "Travelling 5",
+        "travelling6": "Travelling 6",
+        "travelling7": "Travelling 7",
+        "travelling8": "Travelling 8",
+        "travelling9": "Travelling 9",
+        "background1": "Background 1",
+        "chillShiba": "Chill Shiba"
+      },
+      "toasts": {
+        "saved": "Background saved",
+        "resetInfo": "Defaults loaded, click Save to apply"
+      }
+    },
+    "audio": {
+      "title": "Audio Settings",
+      "volume": "Volume",
+      "backgroundMusic": "Background Music",
+      "natureSounds": "Nature Sounds",
+      "connectSpotify": "Connect Spotify",
+      "connectYouTube": "Connect YouTube"
+    }
+  },
+  "guide": {
+    "title": "User Guide",
+    "subtitle": "Learn about the Pomodoro method and how to use Study Bro to optimize your learning and work productivity",
+    "pomodoro": {
+      "badge": "Pomodoro Method",
+      "title": "What is Pomodoro?",
+      "description": "<strong>Pomodoro</strong> is a simple time management method that helps you work and study efficiently by breaking work into <strong>25-minute</strong> sessions called a Pomodoro. In each session, you focus completely on a single task. Then, take a <strong>5-minute</strong> break to relax and recharge.",
+      "imageAlt": "Pomodoro method illustration"
+    },
+    "howToApply": {
+      "badge": "How To Apply",
+      "title": "How to apply Pomodoro",
+      "steps": {
+        "step1": {
+          "title": "Choose task & set timer",
+          "description": "Choose a task to do and set a 25-minute timer to start the Pomodoro session."
+        },
+        "step2": {
+          "title": "Focus on work",
+          "description": "Focus on work until the timer rings, without interruption."
+        },
+        "step3": {
+          "title": "Short break",
+          "description": "Take a 5-minute break, you can stand up and move lightly or relax your mind."
+        },
+        "step4": {
+          "title": "Repeat & long break",
+          "description": "Repeat the cycle. After 4 Pomodoro sessions, take a longer break of about 15-30 minutes."
+        }
+      }
+    },
+    "benefits": {
+      "badge": "Benefits",
+      "title": "Why use Pomodoro?",
+      "list": [
+        "Increase focus and work efficiency",
+        "Avoid being overwhelmed when working long hours",
+        "Easy to measure and manage work progress",
+        "Suitable for those who are easily distracted",
+        "Helps maintain energy and work efficiency in the long run"
+      ],
+      "tip": "💡 <strong>Tip:</strong> You can completely adjust work and rest time to suit yourself, as long as you keep the principle of \"breaking time into small chunks to focus and rest regularly.\""
+    },
+    "howToUse": {
+      "badge": "Website Guide",
+      "title": "How to use Study Bro",
+      "description": "Study Bro provides tools to help you apply the Pomodoro method effectively.",
+      "features": {
+        "timer": {
+          "title": "Timer",
+          "subtitle": "Pomodoro countdown clock",
+          "description": "The Timer page is the center of the app, where you:",
+          "points": [
+            "Start/pause Pomodoro sessions",
+            "Choose task to focus on",
+            "Track work time",
+            "Automatically switch to break when time is up"
+          ],
+          "cta": "Go to Timer"
+        },
+        "tasks": {
+          "title": "Tasks",
+          "subtitle": "Manage your tasks",
+          "description": "Tasks page helps you organize work:",
+          "points": [
+            "Create, edit and delete tasks",
+            "Set priority and deadline",
+            "Filter tasks by status, date",
+            "Estimate required Pomodoros"
+          ],
+          "cta": "Go to Tasks"
+        },
+        "history": {
+          "title": "History",
+          "subtitle": "Track your progress",
+          "description": "History page helps you review:",
+          "points": [
+            "Pomodoro session history",
+            "Statistics by day, week, month",
+            "Total working time",
+            "Productivity charts"
+          ],
+          "cta": "Go to History"
+        },
+        "settings": {
+          "title": "Settings",
+          "subtitle": "Customize experience",
+          "description": "Settings page allows you to:",
+          "points": [
+            "Adjust Pomodoro & break time",
+            "Choose background & theme",
+            "Set notification sounds",
+            "Customize personal preferences"
+          ],
+          "cta": "Go to Settings"
+        }
+      }
+    },
+    "getStarted": {
+      "badge": "Get Started",
+      "title": "Ready to start?",
+      "description": "Start your productive work journey with Study Bro!",
+      "steps": [
+        "Create your first task in the <link>Tasks</link> page",
+        "Adjust Settings to your liking (optional)",
+        "Turn on <link>Timer</link> and start your first Pomodoro!"
+      ],
+      "cta": "Start Now"
+    }
+  },
+  "feedback": {
+    "title": "Send Feedback",
+    "subtitle": "Help us improve the app by submitting bug reports or suggesting new features.",
+    "form": {
+      "name": "Your Name (Optional)",
+      "namePlaceholder": "Enter your name...",
+      "email": "Email (Optional)",
+      "emailPlaceholder": "example@email.com",
+      "type": "Feedback Type",
+      "typeOptions": {
+        "feature": "✨ Feature Suggestion",
+        "bug": "🐛 Bug Report",
+        "other": "📝 Other"
+      },
+      "message": "Content",
+      "messagePlaceholder": "Describe your feedback in detail...",
+      "required": "*",
+      "submit": "Send Feedback"
+    },
+    "success": {
+      "title": "Thank you!",
+      "message": "Your feedback has been recorded. We will review and improve the app better.",
+      "cta": "Send Another Feedback"
+    },
+    "errors": {
+      "submitFailed": "An error occurred. Please try again later.",
+      "fieldRequired": "This field is required"
+    },
+    "toast": {
+      "success": "Thank you for your feedback!",
+      "error": "An error occurred. Please try again later."
+    }
+  },
+  "chat": {
+    "title": "Chat AI",
+    "subtitle": "Chat with AI assistant",
+    "placeholder": "Type your message...",
+    "send": "Send",
+    "clear": "Clear Chat",
+    "newChat": "New Chat",
+    "historyTitle": "Chat History",
+    "noConversations": "No conversations yet. Start a new chat!",
+    "deleteConfirmTitle": "Delete Conversation?",
+    "deleteConfirmDescription": "This action cannot be undone. This will permanently delete this conversation and all its messages.",
+    "thread": {
+      "welcome": "Hey there! 👋",
+      "welcomeSubtitle": "I'm Bro Chat - your study buddy!",
+      "scrollToBottom": "Scroll to bottom",
+      "inputPlaceholder": "Ask me anything...",
+      "sendMessage": "Send message",
+      "stopGenerating": "Stop generating",
+      "error": "⚠️ Error",
+      "copy": "Copy",
+      "exportMarkdown": "Export as Markdown",
+      "refresh": "Refresh",
+      "edit": "Edit",
+      "previous": "Previous",
+      "next": "Next",
+      "cancel": "Cancel",
+      "update": "Update",
+      "instruction": "I can help you with: Pomodoro method 🍅, study tips 📚, time management ⏰, and using this app. Feel free to ask!",
+      "conversationGroups": {
+        "older": "Older"
+      },
+      "suggestions": {
+        "pomodoro": {
+          "title": "Explain the Pomodoro Technique",
+          "label": "and how it boosts productivity",
+          "prompt": "Explain the Pomodoro Technique and how it helps boost productivity and focus"
+        },
+        "studyTips": {
+          "title": "Give me study tips",
+          "label": "for staying focused longer",
+          "prompt": "Give me some study tips for staying focused for longer periods and avoiding distractions"
+        },
+        "studyPlan": {
+          "title": "Create a study plan",
+          "label": "for my goals",
+          "prompt": "Help me create an effective study plan with Pomodoro sessions for my learning goals"
+        },
+        "breakActivities": {
+          "title": "Suggest break activities",
+          "label": "for Pomodoro breaks",
+          "prompt": "Suggest some relaxing activities I can do during my 5-minute Pomodoro breaks"
+        }
+      }
+    }
+  },
+  "tooltips": {
+    "toggleTheme": "Toggle theme",
+    "timerSettings": "Timer Settings",
+    "themeSettings": "Theme settings",
+    "backgroundSetup": "Background setup",
+    "backgroundSettings": "Background Settings",
+    "soundSettings": "Sound Settings",
+    "focusAudio": "Focus music / Nature sounds",
+    "enterFocus": "Enter Focus",
+    "exitFocus": "Exit Focus"
+  },
+  "errors": {
+    "generic": "An error occurred",
+    "network": "Network error. Please check your connection.",
+    "notFound": "Not found",
+    "unauthorized": "Unauthorized. Please sign in.",
+    "forbidden": "You don't have permission to access this resource"
+  },
+  "metadata": {
+    "timer": {
+      "title": "Timer • Study Bro App",
+      "description": "Manage work and break sessions with a refined Pomodoro timer and unified settings."
+    },
+    "tasks": {
+      "title": "Tasks • Study Bro App",
+      "description": "Organize and manage your tasks efficiently with our task management system."
+    },
+    "history": {
+      "title": "History • Study Bro App",
+      "description": "Review your focus performance and productivity statistics over time."
+    },
+    "guide": {
+      "title": "User Guide • Study Bro App",
+      "description": "Learn about the Pomodoro method and how to use Study Bro features."
+    }
+  },
+  "login": {
+    "title": "Sign in to Study Bro",
+    "description": "Sign in to keep your study rhythm and sync all Pomodoro sessions.",
+    "form": {
+      "email": "Email",
+      "emailPlaceholder": "your@email.com",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "forgotPassword": "Forgot password?",
+      "signingIn": "Signing in...",
+      "signIn": "Sign In",
+      "or": "or",
+      "continueWithGoogle": "Continue with Google",
+      "noAccount": "Don't have an account?",
+      "signUpNow": "Sign up now",
+      "backToApp": "Back to app"
+    },
+    "errors": {
+      "supabaseNotConfigured": "Supabase is not configured. Please add environment variables.",
+      "emailPasswordRequired": "Please enter email and password.",
+      "loginFailed": "Unable to sign in.",
+      "loginError": "An error occurred while signing in.",
+      "googleConnectionFailed": "Unable to connect to Google. Try again later.",
+      "googleAuthError": "An error occurred while initiating sign in."
+    },
+    "success": {
+      "loginSuccess": "Successfully signed in!",
+      "redirectingToGoogle": "Redirecting to Google..."
+    }
+  },
+  "signup": {
+    "title": "Sign up for Study Bro",
+    "description": "Sign up for free to save presets, focus history and sync tasks across devices.",
+    "form": {
+      "email": "Email",
+      "emailPlaceholder": "your@email.com",
+      "password": "Password",
+      "passwordPlaceholder": "Create a password",
+      "signingUp": "Signing up...",
+      "signUp": "Sign Up",
+      "or": "or",
+      "signUpWithGoogle": "Sign up with Google",
+      "haveAccount": "Already have an account?",
+      "signInNow": "Sign in now",
+      "backToApp": "Back to app"
+    },
+    "errors": {
+      "supabaseNotConfigured": "Supabase is not configured. Please add environment variables.",
+      "emailPasswordRequired": "Please enter email and password to sign up.",
+      "signupFailed": "Unable to sign up.",
+      "signupError": "An error occurred while signing up.",
+      "googleConnectionFailed": "Unable to connect to Google. Try again later.",
+      "googleAuthError": "An error occurred while initiating sign in."
+    },
+    "success": {
+      "checkEmail": "Please check your email to confirm your account.",
+      "redirectingToGoogle": "Redirecting to Google..."
+    }
+  },
+  "notFound": {
+    "title": "This page could not be found",
+    "description": "The page you're looking for doesn't exist or has been moved.",
+    "backToTimer": "Back to Timer",
+    "home": "Home",
+    "goBack": "Go back"
+  },
+  "progress": {
+    "comingSoon": "Coming Soon",
+    "description": "The statistics page is being finalized. You will soon be able to track your focus progress, streaks, and work time.",
+    "features": {
+      "focusTime": {
+        "title": "Focus Time",
+        "description": "By day/week/month"
+      },
+      "pomodoroSessions": {
+        "title": "Pomodoro & Sessions",
+        "description": "Number of sessions, completion rate"
+      },
+      "streaks": {
+        "title": "Streaks",
+        "description": "Keep streak, earn badges"
+      }
+    },
+    "backToTimer": "Back to Timer"
+  },
+  "clockDemo": {
+    "title": "Clock Components Demo",
+    "subtitle": "Test and compare all timer clock types with live animations",
+    "controls": {
+      "title": "Timer Controls",
+      "description": "Control the demo timer for all clocks",
+      "pause": "Pause",
+      "start": "Start",
+      "reset": "Reset",
+      "timeProgress": "Time: {time} | Progress: {progress}%"
+    },
+    "modes": {
+      "work": "Work",
+      "shortBreak": "Short Break",
+      "longBreak": "Long Break"
+    },
+    "tabs": {
+      "animated": "Animated",
+      "digital": "Digital",
+      "analog": "Analog",
+      "progress": "Progress",
+      "flip": "Flip"
+    },
+    "clockTypes": {
+      "digital": {
+        "title": "Digital Clock",
+        "description": "Classic digital display with progress ring and low-time warning"
+      },
+      "analog": {
+        "title": "Analog Clock",
+        "description": "Traditional clock face with sweeping hand"
+      },
+      "progress": {
+        "title": "Progress Bar Clock",
+        "description": "Linear progress bar with time display"
+      },
+      "flip": {
+        "title": "Flip Clock",
+        "description": "Retro flip-style digital clock animation"
+      },
+      "animated": {
+        "title": "Animated Countdown",
+        "description": "Modern animated countdown with smooth transitions"
+      }
+    },
+    "animationFeatures": {
+      "title": "Animation Features",
+      "breathing": {
+        "title": "Breathing Effect",
+        "description": "Gentle pulsing animation that creates a calming rhythm"
+      },
+      "colorTransition": {
+        "title": "Color Transitions",
+        "description": "Smooth color changes based on time remaining and mode"
+      },
+      "progressRing": {
+        "title": "Progress Ring",
+        "description": "Circular progress indicator around the timer"
+      },
+      "glowEffect": {
+        "title": "Glow Effect",
+        "description": "Soft glow that intensifies as time runs low"
+      },
+      "modeIndicator": {
+        "title": "Mode Indicator",
+        "description": "Visual badge showing current session type (Focus/Break)"
+      }
+    }
+  },
+  "timerComponents": {
+    "taskSelector": {
+      "loginToSelect": "Sign in to select a task",
+      "selectToFocus": "Select a task to focus",
+      "dialogTitle": "Select Task for Focus",
+      "dialogDescription": "Choose a task to work on during your Pomodoro session",
+      "noPendingTasks": "No pending tasks available",
+      "noPendingTasksToday": "No tasks for today. Focus on your goals!",
+      "createTaskPrompt": "Create a new task to get started",
+      "goToTaskList": "Go to task list"
+    },
+    "enhancedTimer": {
+      "today": "Today",
+      "poms": "poms",
+      "time": "Time",
+      "minutes": "min",
+      "focusMode": "Focus Mode",
+      "soundSettings": "Sound Settings",
+      "backgroundSettings": "Background Settings",
+      "timerSettings": "Timer Settings",
+      "exitFocus": "Exit Focus",
+      "enterFocus": "Enter Focus"
+    },
+    "animatedCountdown": {
+      "modes": {
+        "focus": "Focus",
+        "shortBreak": "Short Break",
+        "longBreak": "Long Break"
+      }
+    }
+  },
+  "historyComponents": {
+    "dateRangePicker": {
+      "selectRange": "Select date range",
+      "presets": {
+        "today": "Today",
+        "last3Days": "Last 3 Days",
+        "last7Days": "Last 7 Days",
+        "last30Days": "Last 30 Days",
+        "thisMonth": "This Month"
+      }
+    },
+    "distributionChart": {
+      "title": "Time Distribution",
+      "time": "Time",
+      "total": "Total",
+      "minutes": "{minutes} minutes"
+    },
+    "focusChart": {
+      "title": "Daily Focus Time",
+      "minutes": "{minutes} minutes"
+    },
+    "sessionHistory": {
+      "title": "Completed Session Details",
+      "modes": {
+        "focus": "Focus",
+        "shortBreak": "Short Break",
+        "longBreak": "Long Break"
+      },
+      "tableHeaders": {
+        "task": "Task",
+        "sessionType": "Session Type",
+        "dateTime": "Date & Time",
+        "duration": "Duration"
+      },
+      "noTask": "No task",
+      "minutes": "{minutes} minutes",
+      "noData": "No session data available yet."
+    },
+    "statsCards": {
+      "totalFocusTime": "Total Focus Time",
+      "timeFormat": "{hours} hours {minutes} minutes",
+      "completedSessions": "Completed Sessions",
+      "longestStreak": "Longest Streak",
+      "days": "{days} days",
+      "currentStreak": "Current: {current} days"
+    },
+    "statsEmpty": {
+      "title": "No data available",
+      "description": "No focus sessions recorded during this time period. Start a new session!",
+      "startFocus": "Start Focus"
+    }
+  }
+}
