@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
@@ -9,8 +9,6 @@ import { Flame, CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
   format,
-  parseISO,
-  differenceInCalendarDays,
   startOfMonth,
   startOfWeek,
   endOfMonth,
@@ -20,177 +18,92 @@ import {
   addMonths,
   isSameMonth,
   isToday,
-  isValid,
 } from 'date-fns'
 import { vi } from 'date-fns/locale'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
-type StreakStore = {
-  streak: number
-  lastDateISO: string | null
-  history: string[] // ISO dates for days marked focused
-}
-
-const STORAGE_KEY = 'pomodoro-streak'
 const MILESTONES = [7, 30, 100] as const
 
 // Utility functions
 const todayISO = () => format(new Date(), 'yyyy-MM-dd')
 
-const isoToDate = (iso: string) => {
-  try {
-    const date = parseISO(iso)
-    return isValid(date) ? date : null
-  } catch {
-    return null
-  }
-}
-
-const diffDays = (aISO: string, bISO: string) => {
-  const dateA = isoToDate(aISO)
-  const dateB = isoToDate(bISO)
-  if (!dateA || !dateB) return 0
-  return differenceInCalendarDays(dateA, dateB)
-}
-
-const isMilestone = (n: number) => MILESTONES.includes(n as typeof MILESTONES[number])
-
 const nextMilestone = (n: number) => MILESTONES.find(m => m > n) ?? null
 
-const uniqueSortedPush = (arr: string[], v: string) => {
-  if (arr.includes(v)) return [...arr]
-  const sorted = [...arr, v].sort((a, b) => a.localeCompare(b))
-  return sorted
-}
-
-// Calculate current streak by finding consecutive days ending with today
-const calculateCurrentStreak = (history: string[], today: string): number => {
-  if (!history.includes(today)) return 0
-
-  const sortedHistory = [...history].sort((a, b) => a.localeCompare(b))
-  let streak = 0
-  let currentDate = today
-
-  while (sortedHistory.includes(currentDate)) {
-    streak++
-    const date = isoToDate(currentDate)
-    if (!date) break
-    currentDate = format(addDays(date, -1), 'yyyy-MM-dd')
-  }
-
-  return streak
-}
-
-// Validate and sanitize stored data
-const validateStreakStore = (data: any): StreakStore => {
-  const defaultData: StreakStore = { streak: 0, lastDateISO: null, history: [] }
-
-  if (!data || typeof data !== 'object') return defaultData
-
-  const { streak, lastDateISO, history } = data
-
-  // Validate streak
-  const validStreak = (typeof streak === 'number' && streak >= 0) ? streak : 0
-
-  // Validate lastDateISO
-  const validLastDate = (typeof lastDateISO === 'string' && isoToDate(lastDateISO)) ? lastDateISO : null
-
-  // Validate and sort history
-  const validHistory = Array.isArray(history)
-    ? history.filter(date => typeof date === 'string' && isoToDate(date)).sort((a, b) => a.localeCompare(b))
-    : []
-
-  return {
-    streak: validStreak,
-    lastDateISO: validLastDate,
-    history: validHistory,
-  }
-}
-
 export default function StreakTracker() {
-  const [data, setData] = useState<StreakStore>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY)
-        if (raw) {
-          const parsed = JSON.parse(raw)
-          return validateStreakStore(parsed)
-        }
-      } catch (error) {
-        console.warn('Failed to load streak data:', error)
-      }
-    }
-    return { streak: 0, lastDateISO: null, history: [] }
-  })
-
-  const [loaded, setLoaded] = useState(false)
   const [month, setMonth] = useState<Date>(() => startOfMonth(new Date()))
+  const queryClient = useQueryClient()
 
   // Computed values
   const today = useMemo(() => todayISO(), [])
-  const hasMarkedToday = useMemo(() => data.history.includes(today), [data.history, today])
-  const currentStreak = useMemo(() => calculateCurrentStreak(data.history, today), [data.history, today])
 
-  // Hydrate from localStorage on mount
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY)
-      if (raw) {
-        const parsed = JSON.parse(raw)
-        const validated = validateStreakStore(parsed)
-        setData(validated)
+  // Calculate range for query
+  const start = startOfWeek(startOfMonth(month), { weekStartsOn: 1 })
+  const end = endOfWeek(endOfMonth(month), { weekStartsOn: 1 })
+  const startDateStr = format(start, 'yyyy-MM-dd')
+  const endDateStr = format(end, 'yyyy-MM-dd')
+  const timezoneOffset = new Date().getTimezoneOffset()
+
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ['stats', startDateStr, endDateStr, timezoneOffset],
+    queryFn: async () => {
+      const res = await fetch(`/api/stats?startDate=${startDateStr}&endDate=${endDateStr}&timezoneOffset=${timezoneOffset}`)
+      if (!res.ok) throw new Error('Failed to fetch stats')
+      return res.json()
+    },
+    // Keep data fresh but cache for a bit
+    staleTime: 60 * 1000,
+  })
+
+  // Derived state
+  const history = useMemo(() => {
+    if (!stats?.dailyFocus) return []
+    // dailyFocus is array of { date: string, duration: number }
+    return stats.dailyFocus
+      .filter((d: any) => d.duration > 0)
+      .map((d: any) => d.date)
+  }, [stats])
+
+  const currentStreak = stats?.summary?.streak?.current || 0
+  const hasMarkedToday = useMemo(() => history.includes(today), [history, today])
+
+  // Mutation for "Mark Today"
+  const markTodayMutation = useMutation({
+      mutationFn: async () => {
+          const res = await fetch('/api/tasks/session-complete', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                  durationSec: 1, // Dummy duration
+                  mode: 'work',
+                  clientDate: today,
+                  timezoneOffset: timezoneOffset
+              })
+          })
+          if (!res.ok) throw new Error('Failed to mark today')
+          return res.json()
+      },
+      onSuccess: () => {
+          toast.success('Đã đánh dấu hôm nay!')
+          queryClient.invalidateQueries({ queryKey: ['stats'] })
+      },
+      onError: () => {
+          toast.error('Có lỗi xảy ra khi đánh dấu.')
       }
-    } catch (error) {
-      console.warn('Failed to load streak data:', error)
-    }
-    setLoaded(true)
-  }, [])
-
-  // Persist data changes (only after hydration)
-  useEffect(() => {
-    if (!loaded) return
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
-    } catch (error) {
-      console.warn('Failed to save streak data:', error)
-    }
-  }, [data, loaded])
+  })
 
   // Simplified month navigation
   const handlePrevMonth = () => setMonth((m) => startOfMonth(subMonths(m, 1)))
   const handleNextMonth = () => setMonth((m) => startOfMonth(addMonths(m, 1)))
 
   const handleMarkToday = () => {
-    const todayDate = todayISO()
-
     if (hasMarkedToday) {
       toast.info('Bạn đã đánh dấu hôm nay rồi')
       return
     }
-
-    const newHistory = uniqueSortedPush(data.history, todayDate)
-    const newStreak = calculateCurrentStreak(newHistory, todayDate)
-
-    const updated: StreakStore = {
-      streak: newStreak,
-      lastDateISO: todayDate,
-      history: newHistory,
-    }
-
-    setData(updated)
-
-    if (isMilestone(newStreak)) {
-      toast.success(`Cột mốc ${newStreak}! 🎉`)
-    } else {
-      toast.success(`+1 streak! Tổng: ${newStreak}`)
-    }
-
-    // Ensure calendar shows current month
-    setMonth(startOfMonth(new Date()))
+    markTodayMutation.mutate()
   }
 
   const gridDays = useMemo(() => {
-    const start = startOfWeek(startOfMonth(month), { weekStartsOn: 1 })
-    const end = endOfWeek(endOfMonth(month), { weekStartsOn: 1 })
     const days: { date: Date; iso: string; focused: boolean; inMonth: boolean; today: boolean }[] = []
     for (let d = start; d <= end; d = addDays(d, 1)) {
       const date = new Date(d)
@@ -198,13 +111,13 @@ export default function StreakTracker() {
       days.push({
         date,
         iso,
-        focused: data.history.includes(iso),
+        focused: history.includes(iso),
         inMonth: isSameMonth(date, month),
         today: isToday(date),
       })
     }
     return days
-  }, [data.history, month])
+  }, [history, month, start, end])
 
   const weekdays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']
   const monthLabel = format(month, 'LLLL yyyy', { locale: vi })
@@ -215,7 +128,7 @@ export default function StreakTracker() {
     [gridDays]
   )
 
-  if (!loaded) {
+  if (isLoading) {
     return (
       <div className="w-full max-w-3xl mx-auto px-4">
         <Card className="bg-background/50 backdrop-blur-sm border-border/20">
@@ -262,13 +175,13 @@ export default function StreakTracker() {
           <div className="flex items-center gap-3 justify-center">
             <Button
               onClick={handleMarkToday}
-              disabled={hasMarkedToday}
+              disabled={hasMarkedToday || markTodayMutation.isPending}
               className={cn(
                 'px-5',
                 hasMarkedToday ? 'opacity-60 cursor-not-allowed' : ''
               )}
             >
-              + Đánh dấu hôm nay
+              {markTodayMutation.isPending ? 'Đang xử lý...' : '+ Đánh dấu hôm nay'}
             </Button>
             <div className="text-xs text-muted-foreground">
               {hasMarkedToday ? 'Đã đánh dấu hôm nay' : 'Đánh dấu một ngày tập trung'}

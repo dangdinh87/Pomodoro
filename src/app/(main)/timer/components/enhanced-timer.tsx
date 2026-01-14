@@ -45,6 +45,7 @@ import {
     TooltipTrigger,
 } from '@/components/animate-ui/components/animate/tooltip';
 import { useSidebar } from '@/components/ui/sidebar';
+import { format } from 'date-fns';
 
 export function EnhancedTimer() {
     const { t } = useTranslation();
@@ -211,6 +212,10 @@ export function EnhancedTimer() {
         const currentRemaining = timeLeftRef.current;
         const completedDuration = sessionDurationRef.current - currentRemaining;
 
+        const now = new Date();
+        const clientDate = format(now, 'yyyy-MM-dd');
+        const timezoneOffset = now.getTimezoneOffset();
+
         if (mode === 'work') {
             incrementCompletedSessions();
             try {
@@ -225,6 +230,8 @@ export function EnhancedTimer() {
                         taskId: activeTaskId || null,
                         durationSec: completedDuration,
                         mode: 'work',
+                        clientDate,
+                        timezoneOffset,
                     }),
                 });
 
@@ -243,6 +250,8 @@ export function EnhancedTimer() {
                         taskId: null,
                         durationSec: completedDuration,
                         mode,
+                        clientDate,
+                        timezoneOffset,
                     }),
                 });
             } catch (error) {

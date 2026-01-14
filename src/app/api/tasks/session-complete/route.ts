@@ -21,10 +21,14 @@ export async function POST(request: Request) {
       taskId,
       durationSec,
       mode,
+      clientDate,
+      timezoneOffset,
     }: {
       taskId?: string | null
       durationSec: number
       mode: 'work' | 'shortBreak' | 'longBreak'
+      clientDate?: string
+      timezoneOffset?: number
     } = body
 
     const duration = Math.max(0, Math.round(durationSec))
@@ -71,7 +75,8 @@ export async function POST(request: Request) {
         .eq('user_id', userId)
         .single()
 
-      const today = new Date().toISOString().split('T')[0]
+      const useClientTime = clientDate && typeof timezoneOffset === 'number'
+      const today = useClientTime ? clientDate! : new Date().toISOString().split('T')[0]
 
       if (streakFetchError && streakFetchError.code !== 'PGRST116') { // PGRST116 is "Row not found"
         console.error('Error fetching streak', streakFetchError)
@@ -82,7 +87,17 @@ export async function POST(request: Request) {
       let shouldUpdate = false
 
       if (streakData) {
-        const lastSessionDate = streakData.last_session ? new Date(streakData.last_session).toISOString().split('T')[0] : null
+        let lastSessionDate: string | null = null
+        if (streakData.last_session) {
+          if (useClientTime) {
+            const d = new Date(streakData.last_session)
+            // timezoneOffset is in minutes, positive if behind UTC
+            const localD = new Date(d.getTime() - timezoneOffset! * 60000)
+            lastSessionDate = localD.toISOString().split('T')[0]
+          } else {
+            lastSessionDate = new Date(streakData.last_session).toISOString().split('T')[0]
+          }
+        }
 
         if (lastSessionDate === today) {
           // Already recorded for today, don't increment streak, but update last_session timestamp
@@ -91,7 +106,7 @@ export async function POST(request: Request) {
           newLongest = streakData.longest
         } else {
           // Check if yesterday
-          const yesterday = new Date()
+          const yesterday = new Date(today)
           yesterday.setDate(yesterday.getDate() - 1)
           const yesterdayStr = yesterday.toISOString().split('T')[0]
 
