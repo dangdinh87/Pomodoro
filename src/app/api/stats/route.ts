@@ -21,6 +21,7 @@ export async function GET(request: Request) {
         const { searchParams } = new URL(request.url)
         const startDate = searchParams.get('startDate')
         const endDate = searchParams.get('endDate')
+        const timezoneOffset = parseInt(searchParams.get('timezoneOffset') || '0')
 
         // 2. Fetch Summary Stats (Total Time, Completed Sessions)
         let query = supabase
@@ -64,9 +65,11 @@ export async function GET(request: Request) {
             }
         } else {
             // Default to last 7 days if no range specified
-            const today = new Date()
+            const now = new Date()
+            const localNow = new Date(now.getTime() - timezoneOffset * 60000)
+
             for (let i = 6; i >= 0; i--) {
-                const d = new Date(today)
+                const d = new Date(localNow)
                 d.setDate(d.getDate() - i)
                 const dateStr = d.toISOString().split('T')[0]
                 dailyFocus[dateStr] = 0
@@ -88,7 +91,10 @@ export async function GET(request: Request) {
 
             // Daily Focus (only work)
             if (session.mode === 'work') {
-                const dateStr = new Date(session.created_at).toISOString().split('T')[0]
+                const date = new Date(session.created_at)
+                const localDate = new Date(date.getTime() - timezoneOffset * 60000)
+                const dateStr = localDate.toISOString().split('T')[0]
+
                 if (dailyFocus[dateStr] !== undefined) {
                     dailyFocus[dateStr] += session.duration
                 }
