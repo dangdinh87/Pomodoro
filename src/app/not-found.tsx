@@ -4,8 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Home, Timer, ArrowLeft, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect } from 'react';
+import { useI18n } from '@/contexts/i18n-context';
 
 export default function NotFound() {
+  const { t } = useI18n();
+
   return (
     <main className="min-h-screen flex items-center justify-center px-4">
       <div className="max-w-md w-full text-center space-y-8">
@@ -31,9 +34,9 @@ export default function NotFound() {
                 <Search className="w-8 h-8 text-primary" />
               </div>
             </div>
-            <h1 className="text-3xl font-bold tracking-tight">This page could not be found</h1>
+            <h1 className="text-3xl font-bold tracking-tight">{t('notFound.title')}</h1>
             <p className="text-muted-foreground text-lg">
-              The page you're looking for doesn't exist or has been moved.
+              {t('notFound.description')}
             </p>
           </div>
         </div>
@@ -43,13 +46,13 @@ export default function NotFound() {
           <Button asChild size="lg" className="gap-2 bg-primary/80 backdrop-blur-sm hover:bg-primary/90">
             <Link href="/timer">
               <Timer className="w-5 h-5" />
-              Back to Timer
+              {t('notFound.backToTimer')}
             </Link>
           </Button>
           <Button variant="outline" size="lg" className="gap-2 bg-background/40 backdrop-blur-sm border-border/30 hover:bg-background/60" asChild>
             <Link href="/">
               <Home className="w-5 h-5" />
-              Home
+              {t('notFound.home')}
             </Link>
           </Button>
         </div>
@@ -63,7 +66,7 @@ export default function NotFound() {
             onClick={() => window.history.back()}
           >
             <ArrowLeft className="w-4 h-4" />
-            Go back
+            {t('notFound.goBack')}
           </Button>
         </div>
       </div>
