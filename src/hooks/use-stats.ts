@@ -14,6 +14,7 @@ export interface StatsData {
     dailyFocus: {
         date: string
         duration: number
+        count: number
     }[]
     distribution: {
         name: string
