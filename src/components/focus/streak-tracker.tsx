@@ -63,14 +63,15 @@ const uniqueSortedPush = (arr: string[], v: string) => {
 }
 
 // Calculate current streak by finding consecutive days ending with today
-const calculateCurrentStreak = (history: string[], today: string): number => {
-  if (!history.includes(today)) return 0
+export const calculateCurrentStreak = (history: string[], today: string): number => {
+  // Optimization: Use Set for O(1) lookups instead of Array.includes which is O(N)
+  const historySet = new Set(history)
+  if (!historySet.has(today)) return 0
 
-  const sortedHistory = [...history].sort((a, b) => a.localeCompare(b))
   let streak = 0
   let currentDate = today
 
-  while (sortedHistory.includes(currentDate)) {
+  while (historySet.has(currentDate)) {
     streak++
     const date = isoToDate(currentDate)
     if (!date) break
@@ -191,6 +192,8 @@ export default function StreakTracker() {
   const gridDays = useMemo(() => {
     const start = startOfWeek(startOfMonth(month), { weekStartsOn: 1 })
     const end = endOfWeek(endOfMonth(month), { weekStartsOn: 1 })
+    // Optimization: Create Set for O(1) lookup during grid generation
+    const historySet = new Set(data.history)
     const days: { date: Date; iso: string; focused: boolean; inMonth: boolean; today: boolean }[] = []
     for (let d = start; d <= end; d = addDays(d, 1)) {
       const date = new Date(d)
@@ -198,7 +201,7 @@ export default function StreakTracker() {
       days.push({
         date,
         iso,
-        focused: data.history.includes(iso),
+        focused: historySet.has(iso),
         inMonth: isSameMonth(date, month),
         today: isToday(date),
       })
