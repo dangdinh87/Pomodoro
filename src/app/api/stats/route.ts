@@ -47,7 +47,7 @@ export async function GET(request: Request) {
         let completedSessions = 0
 
         // For charts
-        const dailyFocus: Record<string, number> = {}
+        const dailyFocus: Record<string, { duration: number; count: number }> = {}
         const distribution = {
             work: 0,
             shortBreak: 0,
@@ -60,7 +60,7 @@ export async function GET(request: Request) {
             const end = new Date(endDate)
             for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
                 const dateStr = d.toISOString().split('T')[0]
-                dailyFocus[dateStr] = 0
+                dailyFocus[dateStr] = { duration: 0, count: 0 }
             }
         } else {
             // Default to last 7 days if no range specified
@@ -69,7 +69,7 @@ export async function GET(request: Request) {
                 const d = new Date(today)
                 d.setDate(d.getDate() - i)
                 const dateStr = d.toISOString().split('T')[0]
-                dailyFocus[dateStr] = 0
+                dailyFocus[dateStr] = { duration: 0, count: 0 }
             }
         }
 
@@ -90,7 +90,8 @@ export async function GET(request: Request) {
             if (session.mode === 'work') {
                 const dateStr = new Date(session.created_at).toISOString().split('T')[0]
                 if (dailyFocus[dateStr] !== undefined) {
-                    dailyFocus[dateStr] += session.duration
+                    dailyFocus[dateStr].duration += session.duration
+                    dailyFocus[dateStr].count += 1
                 }
             }
         })
@@ -117,9 +118,10 @@ export async function GET(request: Request) {
                     longest: streakData?.longest || 0,
                 }
             },
-            dailyFocus: Object.entries(dailyFocus).map(([date, duration]) => ({
+            dailyFocus: Object.entries(dailyFocus).map(([date, data]) => ({
                 date,
-                duration, // in seconds
+                duration: data.duration, // in seconds
+                count: data.count,
             })),
             distribution: [
                 { name: 'work', value: distribution.work, color: '#3b82f6' }, // blue-500
