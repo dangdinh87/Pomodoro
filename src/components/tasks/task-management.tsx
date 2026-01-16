@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/use-auth'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useCallback } from 'react'
 import { Task, useTasksStore } from '@/stores/task-store'
 import { TaskFilters } from './components/task-filters'
 import { TaskFormModal } from './components/task-form-modal'
@@ -39,19 +39,6 @@ export function TaskManagement() {
   const router = useRouter()
   const { t } = useI18n()
 
-  if (isAuthLoading) {
-    return null // Or a loading spinner
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="flex flex-col items-center justify-center flex-1 min-h-[60vh] space-y-4">
-        <h2 className="text-xl font-semibold text-center">{t('auth.signInToManageTasks')}</h2>
-        <Button onClick={() => router.push('/login?redirect=/tasks')}>{t('auth.signInButton')}</Button>
-      </div>
-    )
-  }
-
   const { activeTaskId, setActiveTask } = useTasksStore()
   const { editingId, setEditingId, resetEditingState } = useEditingState()
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
@@ -81,12 +68,13 @@ export function TaskManagement() {
     }
   }
 
-  const handleToggleStatus = (task: Task) => {
+  const handleToggleStatus = useCallback((task: Task) => {
     const newStatus = task.status === 'done' ? 'pending' : 'done'
     updateTask({ id: task.id, input: { status: newStatus } })
-  }
+  }, [updateTask])
 
-  const handleToggleActive = (task: Task) => {
+  const handleToggleActive = useCallback((task: Task) => {
+    const { activeTaskId, setActiveTask } = useTasksStore.getState()
     if (activeTaskId === task.id) {
       setActiveTask(null)
     } else {
@@ -96,11 +84,11 @@ export function TaskManagement() {
         updateTask({ id: task.id, input: { status: 'in_progress' } })
       }
     }
-  }
+  }, [updateTask])
 
-  const handleDeleteRequest = (id: string) => {
+  const handleDeleteRequest = useCallback((id: string) => {
     setDeleteConfirmId(id)
-  }
+  }, [])
 
   const confirmDelete = async () => {
     if (!deleteConfirmId) return
@@ -118,9 +106,9 @@ export function TaskManagement() {
     }
   }
 
-  const handleEdit = (task: Task) => {
+  const handleEdit = useCallback((task: Task) => {
     setEditingId(task.id)
-  }
+  }, [setEditingId])
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -136,6 +124,19 @@ export function TaskManagement() {
     tasks.forEach(task => task.tags.forEach(tag => tags.add(tag)))
     return Array.from(tags).sort()
   }, [tasks])
+
+  if (isAuthLoading) {
+    return null // Or a loading spinner
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center flex-1 min-h-[60vh] space-y-4">
+        <h2 className="text-xl font-semibold text-center">{t('auth.signInToManageTasks')}</h2>
+        <Button onClick={() => router.push('/login?redirect=/tasks')}>{t('auth.signInButton')}</Button>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
