@@ -1,3 +1,7 @@
 ## 2024-05-24 - [Unused Dependencies]
-**Learning:** `svg-dotted-map` appears in `package.json` but `grep` found no usage in `src`. It might be a candidate for removal to reduce install time/size, but requires careful checking of non-standard usage (e.g. dynamic imports or usage in scripts).
-**Action:** When looking for heavy dependencies to prune, verify usage of `svg-dotted-map`.
+**Learning:** `svg-dotted-map` was found to be unused in `src`.
+**Action:** Removed `svg-dotted-map` on 2025-02-18 (simulated).
+
+## 2025-02-18 - [Streak Tracking]
+**Learning:** Streak tracking backend uses UTC dates, which may mismatch with frontend local dates. Future improvement should pass client timezone to backend.
+**Action:** Refactored `StreakTracker` to use server-side data despite this limitation.
