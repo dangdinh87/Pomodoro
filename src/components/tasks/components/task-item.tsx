@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Task } from '@/stores/task-store'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -46,7 +47,7 @@ function TaskProgress({ actual, estimated, t }: { actual: number; estimated: num
   )
 }
 
-export function TaskItem({
+export const TaskItem = memo(function TaskItem({
   task,
   isActive,
   onToggleStatus,
@@ -202,4 +203,4 @@ export function TaskItem({
       </article>
     </TooltipProvider>
   )
-}
+})
