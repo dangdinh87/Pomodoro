@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { AnimatedTestimonials } from '@/components/ui/animated-testimonials';
+import { useTranslation } from '@/contexts/i18n-context';
 
 const testimonials = [
     {
@@ -37,6 +38,8 @@ const testimonials = [
 ];
 
 export function Testimonials() {
+    const { t } = useTranslation();
+
     return (
         <section id="testimonials" className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
             {/* Background decoration */}
@@ -61,17 +64,17 @@ export function Testimonials() {
                         className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-500 text-xs font-medium mb-6"
                     >
                         <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
-                        Testimonials
+                        {t('landing.testimonials.badge')}
                     </motion.div>
 
-                    <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-tight">
-                        Loved by
+                    <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight">
+                        {t('landing.testimonials.title')}
                         <span className="block mt-2 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 bg-clip-text text-transparent">
-                            Thousands
+                            {t('landing.testimonials.titleHighlight')}
                         </span>
                     </h2>
                     <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto">
-                        Join the community of focused professionals who have transformed their productivity.
+                        {t('landing.testimonials.subtitle')}
                     </p>
                 </motion.div>
 

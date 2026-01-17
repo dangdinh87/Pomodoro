@@ -43,6 +43,7 @@
     "loginNow": "Sign in now"
   },
   "auth": {
+    "login": "Log In",
     "pleaseLogin": "Please sign in to continue",
     "signInToManageTasks": "Please sign in to manage tasks",
     "signInToViewStats": "Please sign in to view statistics",
@@ -95,7 +96,13 @@
       "time": "Time",
       "minutes": "min"
     },
-    "focusMode": "Focus Mode"
+    "focusMode": "Focus Mode",
+    "skipped_not_recorded": "Session skipped - not recorded",
+    "skip_confirm": {
+      "title": "Skip without recording?",
+      "description": "You've completed less than 50% of this session. This will not count as a completed pomodoro.",
+      "confirm": "Skip anyway"
+    }
   },
   "timerSettings": {
     "title": "Timer Settings",
@@ -142,10 +149,18 @@
     "title": "Tasks",
     "subtitle": "Manage your tasks and track progress with Pomodoro technique",
     "addTask": "Add New Task",
+    "manageTags": "Manage Tags",
+    "manageTagsDescription": "Tags are for organizing only. Removing a tag here won't affect your tasks.",
+    "newTagPlaceholder": "New tag...",
+    "noTags": "No tags yet",
+    "tagsLimit": "tags",
+    "tag": "Tag",
     "editTask": "Edit Task",
     "deleteTask": "Delete Task",
     "noTasks": "No tasks found",
     "noTasksDescription": "You don't have any tasks yet. Create one to get started with your focus session.",
+    "noResults": "No results found",
+    "noResultsDescription": "Try adjusting your search or filters to find what you're looking for.",
     "createFirst": "Create your first task to get started",
     "taskName": "Task Name",
     "taskNamePlaceholder": "What are you working on?",
@@ -155,6 +170,7 @@
     "dueDate": "Due Date",
     "status": "Status",
     "estimated": "Estimate Pomodoros",
+    "estimatedHint": "Number of Pomodoro sessions (~25 min each) you estimate to complete this task.",
     "actual": "Actual",
     "completed": "Completed",
     "pending": "Pending",
@@ -420,6 +436,7 @@
         },
         "settings": {
           "title": "Settings",
+
           "subtitle": "Customize experience",
           "description": "Settings page allows you to:",
           "points": [
@@ -731,7 +748,13 @@
       "noPendingTasks": "No pending tasks available",
       "noPendingTasksToday": "No tasks for today. Focus on your goals!",
       "createTaskPrompt": "Create a new task to get started",
-      "goToTaskList": "Go to task list"
+      "goToTaskList": "Go to task list",
+      "startFocus": "Start focusing",
+      "stopFocus": "Stop focusing",
+      "switchConfirm": {
+        "title": "Switch Task?",
+        "description": "You are focusing on another task. Are you sure you want to switch?"
+      }
     },
     "enhancedTimer": {
       "today": "Today",
@@ -803,6 +826,248 @@
       "title": "No data available",
       "description": "No focus sessions recorded during this time period. Start a new session!",
       "startFocus": "Start Focus"
+    }
+  },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "testimonials": "Success Stories",
+      "contact": "Contact",
+      "pricing": "Pricing",
+      "login": "Log in",
+      "getStarted": "Get Started"
+    },
+    "hero": {
+      "badge": "AI-Powered Productivity 🤖",
+      "focusMode": "Deep Work Mode",
+      "title": "Master Your",
+      "titleHighlight": "Focus",
+      "subtitle": "The advanced Pomodoro timer engineered for peak performance. Eliminate distractions, achieve flow state, and track your progress with precision analytics.",
+      "getStarted": "Start for Free",
+      "tryDemo": "Watch Demo",
+      "aiChat": "New: AI Productivity Coach",
+      "timer": "Focus Session",
+      "stats": {
+        "focusSessions": "Focus Sessions",
+        "moreProductive": "Efficiency Boost",
+        "focused": "Focused Time"
+      },
+      "features": {
+        "ai": {
+          "title": "Smart Insights",
+          "desc": "AI-driven session summaries & coaching."
+        },
+        "music": {
+          "title": "Focus Environment",
+          "desc": "Curated ambient soundscapes for deep work."
+        },
+        "tasks": {
+          "title": "Task Synchronization",
+          "desc": "Seamlessly integrate tasks with focus sessions."
+        },
+        "skins": {
+          "title": "Visual Customization",
+          "desc": "Professional Digital, Flip, and Analog interfaces."
+        }
+      }
+    },
+    "footer": {
+      "madeWith": "Designed with",
+      "for": "for",
+      "focusedMinds": "high achievers",
+      "rightsReserved": "All rights reserved.",
+      "links": {
+        "features": "Features",
+        "pricing": "Pricing",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service"
+      }
+    },
+    "aiChatHighlight": {
+      "title": "Unlock Your Potential with AI",
+      "subtitle": "Get instant, personalized guidance on productivity strategies, study techniques, and workflow optimization.",
+      "cta": "Consult AI Coach"
+    },
+
+    "howItWorks": {
+      "badge": "Workflow",
+      "title": "Achieve Mastery in",
+      "titleHighlight": "3 Steps",
+      "subtitle": "A proven framework for consistent high performance",
+      "steps": {
+        "step1": {
+          "title": "Define Objectives",
+          "description": "Input your tasks and estimate the Pomodoros required for completion."
+        },
+        "step2": {
+          "title": "Execute Sessions",
+          "description": "Immerse yourself in 25-minute focused work intervals."
+        },
+        "step3": {
+          "title": "Analyze & Optimize",
+          "description": "Review detailed analytics to refine your work habits."
+        }
+      }
+    },
+    "socialProof": {
+      "stats": {
+        "activeUsers": "Active Professionals",
+        "focusHours": "Focus Hours Logged",
+        "tasksCompleted": "Tasks Completed",
+        "userRating": "Average Rating"
+      },
+      "trustedBy": "Trusted by top performers from",
+      "highlight": {
+        "title": "Users report 40% productivity increase",
+        "description": "Based on performance metrics of 1,000+ active users after 30 days",
+        "verified": "Verified Data"
+      }
+    },
+    "faq": {
+      "badge": "FAQ",
+      "title": "Common",
+      "titleHighlight": "Questions",
+      "subtitle": "Everything you need to know about the Study Bro ecosystem",
+      "stillHaveQuestions": "Need further assistance?",
+      "sendMessage": "Contact Support",
+      "items": {
+        "q1": {
+          "question": "What is the science behind this technique?",
+          "answer": "The Pomodoro Technique leverages fixed time intervals (typically 25 minutes) to instill a sense of urgency and maintain high cognitive performance, utilizing scheduled breaks to prevent mental fatigue."
+        },
+        "q2": {
+          "question": "Is the platform free to use?",
+          "answer": "Yes. The core productivity suite—including the timer, task management, and basic analytics—is free forever. We offer a Professional tier for advanced power users."
+        },
+        "q3": {
+          "question": "Can I tailor the workflow to my needs?",
+          "answer": "Absolutely. You have full control over session durations, break intervals, and long break frequencies to perfectly match your personal circadian rhythm and work style."
+        },
+        "q4": {
+          "question": "Is offline usage supported?",
+          "answer": "Yes. The essential timer and task functions operate locally. Data synchronization occurs automatically once a secure connection is re-established."
+        },
+        "q5": {
+          "question": "How is my data secured?",
+          "answer": "We adhere to strict privacy standards. Your productivity data is encrypted and stored securely. You retain full ownership and can export or delete your data at any time."
+        },
+        "q6": {
+          "question": "Platform compatibility?",
+          "answer": "Study Bro is a progressive web application optimized for all modern browsers across desktop, tablet, and mobile devices. Native applications are in development."
+        }
+      }
+    },
+    "cta": {
+      "badge": "Start Your Journey 🚀",
+      "title": "Ready to Achieve",
+      "titleHighlight": "Peak Performance?",
+      "subtitle": "Join thousands of professionals mastering their workflow today.",
+      "getStarted": "Start for Free",
+      "tryDemo": "View Demo",
+      "trustedByMany": "Trusted by industry leaders",
+      "rating": "4.9/5 Average Rating"
+    },
+    "features": {
+      "badge": "Key Capabilities",
+      "title": "The Ecosystem for",
+      "titleHighlight": "Deep Work",
+      "subtitle": "A comprehensive suite of tools designed to facilitate flow state and maximize creative output.",
+      "items": {
+        "timer": {
+          "title": "Precision Timer",
+          "description": "Customizable intervals with automated transitions"
+        },
+        "tasks": {
+          "title": "Task Orchestration",
+          "description": "Seamlessly link objectives to focus sessions"
+        },
+        "analytics": {
+          "title": "Performance Analytics",
+          "description": "Deep dive into your productivity metrics"
+        },
+        "sounds": {
+          "title": "Acoustic Focus",
+          "description": "Premium Lo-fi and white noise soundscapes"
+        },
+        "streaks": {
+          "title": "Consistency Tracking",
+          "description": "Visualize your commitment with daily streaks"
+        },
+        "themes": {
+          "title": "Adaptive Interface",
+          "description": "Light and Dark modes tailored for eye comfort"
+        }
+      }
+    },
+    "chatAI": {
+      "indicator": "AI Productivity Assistant",
+      "prompt": "How can I optimize my schedule..."
+    },
+
+    "pricing": {
+      "badge": "Value Proposition 💎",
+      "title": "Transparent",
+      "titleHighlight": "Pricing",
+      "subtitle": "Flexible plans designed to scale with your productivity needs.",
+      "forever": "forever",
+      "noCreditCard": "No credit card required",
+      "freeForever": "Basic Plan",
+      "cancelAnytime": "Cancel anytime",
+      "free": {
+        "name": "Starter",
+        "description": "Essential tools for focus",
+        "cta": "Get Started",
+        "features": {
+          "timer": "Standard Pomodoro Timer",
+          "tasks": "Up to 5 Active Tasks",
+          "history": "7-Day History Retention",
+          "themes": "System Light/Dark Mode",
+          "sounds": "Standard Soundscapes",
+          "stats": "Core Analytics"
+        }
+      },
+      "pro": {
+        "name": "Professional",
+        "description": "For peak performers",
+        "cta": "Join Waitlist",
+        "comingSoon": "Coming Soon",
+        "comingSoonText": "In Development",
+        "brewingTitle": "Advanced Features",
+        "brewingSubtitle": "are being engineered. Stay tuned.",
+        "includesEverything": "Everything in Starter, plus:",
+        "features": {
+          "unlimited": "Unlimited Task Management",
+          "fullHistory": "Unlimited History Retention",
+          "cloudSync": "Cross-Device Cloud Sync",
+          "advanced": "Advanced Performance Insights",
+          "priority": "Priority Support Channel",
+          "sounds": "Premium Soundscape Library",
+          "themes": "Custom Interface Themes"
+        }
+      }
+    },
+    "testimonials": {
+      "badge": "Success Stories",
+      "title": "Trusted by",
+      "titleHighlight": "Achievers",
+      "subtitle": "Trusted by thousands to improve focus and work efficiency.",
+      "items": {
+        "item1": {
+          "name": "Sarah Chen",
+          "role": "Senior Software Engineer",
+          "content": "The productivity analytics helped me pinpoint my peak performance hours. I'm shipping code significantly faster now."
+        },
+        "item2": {
+          "name": "Alex Rivera",
+          "role": "Product Designer",
+          "content": "The curated soundscapes are essential for my open-office environment. My focus depth has notably improved."
+        },
+        "item3": {
+          "name": "David Kim",
+          "role": "Indie Founder",
+          "content": "Elegant and effective. The synthesis of the Pomodoro technique with task management provides exactly the structure I was missing."
+        }
+      }
     }
   }
 }

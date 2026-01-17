@@ -4,49 +4,52 @@ import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { Check, Sparkles, Zap, Bell, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
-
-const plans = [
-    {
-        name: 'Free',
-        description: 'Perfect for getting started',
-        icon: Zap,
-        price: { monthly: 0, annually: 0 },
-        features: [
-            'Basic Pomodoro timer',
-            'Up to 5 tasks',
-            '7-day focus history',
-            'Light & dark mode',
-            'Basic statistics',
-        ],
-        cta: 'Get Started Free',
-        popular: false,
-        comingSoon: false,
-        gradient: 'from-slate-500 to-slate-600',
-    },
-    {
-        name: 'Pro',
-        description: 'For serious productivity',
-        icon: Sparkles,
-        price: { monthly: 9, annually: 7 },
-        features: [
-            'Everything in Free',
-            'Unlimited tasks',
-            'Full focus history',
-            'Ambient sounds library',
-            'Advanced analytics',
-            'Cloud sync across devices',
-            'Custom themes',
-            'Priority support',
-        ],
-        cta: 'Notify Me',
-        popular: true,
-        comingSoon: true,
-        gradient: 'from-blue-500 via-violet-500 to-purple-500',
-    },
-];
+import { useTranslation } from '@/contexts/i18n-context';
 
 export function Pricing() {
+    const { t } = useTranslation();
+
+    const plans = [
+        {
+            name: t('landing.pricing.free.name'),
+            description: t('landing.pricing.free.description'),
+            icon: Zap,
+            price: { monthly: 0, annually: 0 },
+            features: [
+                t('landing.pricing.free.features.timer'),
+                t('landing.pricing.free.features.tasks'),
+                t('landing.pricing.free.features.history'),
+                t('landing.pricing.free.features.themes'),
+                t('landing.pricing.free.features.sounds'),
+                t('landing.pricing.free.features.stats'),
+            ],
+            cta: t('landing.pricing.free.cta'),
+            popular: false,
+            comingSoon: false,
+            gradient: 'from-slate-500 to-slate-600',
+        },
+        {
+            name: t('landing.pricing.pro.name'),
+            description: t('landing.pricing.pro.description'),
+            icon: Sparkles,
+            price: { monthly: 9, annually: 7 },
+            features: [
+                t('landing.pricing.pro.includesEverything'),
+                t('landing.pricing.pro.features.unlimited'),
+                t('landing.pricing.pro.features.fullHistory'),
+                t('landing.pricing.pro.features.sounds'),
+                t('landing.pricing.pro.features.advanced'),
+                t('landing.pricing.pro.features.cloudSync'),
+                t('landing.pricing.pro.features.themes'),
+                t('landing.pricing.pro.features.priority'),
+            ],
+            cta: t('landing.pricing.pro.cta'),
+            popular: true,
+            comingSoon: true,
+            gradient: 'from-blue-500 via-violet-500 to-purple-500',
+        },
+    ];
+
     return (
         <section id="pricing" className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
             {/* Background */}
@@ -70,17 +73,17 @@ export function Pricing() {
                         className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-500 text-xs font-medium mb-6"
                     >
                         <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
-                        Pricing
+                        {t('landing.pricing.badge')}
                     </motion.div>
 
-                    <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight">
-                        Simple, Transparent
-                        <span className="block mt-2 bg-gradient-to-r from-blue-500 via-violet-500 to-purple-500 bg-clip-text text-transparent">
-                            Pricing
+                    <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-slate-900 dark:text-white">
+                        {t('landing.pricing.title')}
+                        <span className="block mt-2 bg-gradient-to-r from-blue-600 via-violet-600 to-purple-600 bg-clip-text text-transparent">
+                            {t('landing.pricing.titleHighlight')}
                         </span>
                     </h2>
-                    <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto">
-                        Start free, upgrade when you're ready. No hidden fees.
+                    <p className="mt-6 text-lg text-slate-600 dark:text-muted-foreground max-w-2xl mx-auto">
+                        {t('landing.pricing.subtitle')}
                     </p>
                 </motion.div>
 
@@ -96,7 +99,7 @@ export function Pricing() {
                             whileHover={{ y: -8, transition: { duration: 0.2 } }}
                             className={`relative p-8 rounded-3xl border transition-all duration-300 cursor-pointer ${plan.popular
                                 ? 'border-violet-500/30 bg-gradient-to-b from-violet-500/10 via-transparent to-transparent shadow-2xl shadow-violet-500/10'
-                                : 'border-white/10 bg-white/5 dark:bg-white/[0.02] hover:border-white/20 hover:bg-white/10'
+                                : 'border-slate-200 dark:border-white/10 bg-white/80 dark:bg-white/[0.02] hover:border-slate-300 dark:hover:border-white/10 hover:bg-white/90 dark:hover:bg-white/5'
                                 }`}
                         >
                             {/* Animated gradient border for coming soon */}
@@ -132,7 +135,7 @@ export function Pricing() {
                                             />
                                             <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-pink-500 text-white text-xs font-semibold shadow-lg shadow-orange-500/25">
                                                 <Sparkles className="h-3.5 w-3.5" />
-                                                Coming Soon
+                                                {t('landing.pricing.pro.comingSoon')}
                                             </div>
                                         </div>
                                     </motion.div>
@@ -144,8 +147,8 @@ export function Pricing() {
                                         <plan.icon className="h-5 w-5 text-white" />
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-bold">{plan.name}</h3>
-                                        <p className="text-xs text-muted-foreground">{plan.description}</p>
+                                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">{plan.name}</h3>
+                                        <p className="text-xs text-slate-500 dark:text-muted-foreground">{plan.description}</p>
                                     </div>
                                 </div>
 
@@ -158,16 +161,16 @@ export function Pricing() {
                                                 transition={{ duration: 3, repeat: Infinity }}
                                                 className="text-xl font-bold bg-gradient-to-r from-blue-500 via-violet-500 to-purple-500 bg-clip-text text-transparent"
                                             >
-                                                Something amazing
+                                                {t('landing.pricing.pro.brewingTitle')}
                                             </motion.div>
                                             <p className="text-sm text-muted-foreground">
-                                                is brewing... Stay tuned!
+                                                {t('landing.pricing.pro.brewingSubtitle')}
                                             </p>
                                         </div>
                                     ) : (
                                         <div className="flex items-baseline gap-1">
                                             <span className="text-5xl font-bold">$0</span>
-                                            <span className="text-muted-foreground text-sm">/forever</span>
+                                            <span className="text-muted-foreground text-sm">/{t('landing.pricing.forever')}</span>
                                         </div>
                                     )}
                                 </div>
@@ -234,15 +237,15 @@ export function Pricing() {
                 >
                     <div className="flex items-center gap-2">
                         <Check className="h-4 w-4 text-green-500" />
-                        <span>No credit card required</span>
+                        <span>{t('landing.pricing.noCreditCard')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <Check className="h-4 w-4 text-green-500" />
-                        <span>Free forever plan</span>
+                        <span>{t('landing.pricing.freeForever')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <Check className="h-4 w-4 text-green-500" />
-                        <span>Cancel anytime</span>
+                        <span>{t('landing.pricing.cancelAnytime')}</span>
                     </div>
                 </motion.div>
             </div>

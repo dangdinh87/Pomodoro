@@ -23,6 +23,7 @@ import { Badge } from '@/components/ui/badge'
 import { X, Plus, AlertCircle, Tag as TagIcon } from 'lucide-react'
 import { Task } from '@/stores/task-store'
 import { useI18n } from '@/contexts/i18n-context'
+import { cn } from '@/lib/utils'
 
 interface TaskFormModalProps {
   editingTask: Task | null
@@ -30,6 +31,7 @@ interface TaskFormModalProps {
   onOpenChange: (open: boolean) => void
   onSave: (task: any) => void
   availableTags?: string[]
+  userTags?: string[]
   isSaving?: boolean
 }
 
@@ -48,6 +50,7 @@ export function TaskFormModal({
   onOpenChange,
   onSave,
   availableTags = [],
+  userTags = [],
   isSaving = false,
 }: TaskFormModalProps) {
   const { t } = useI18n()
@@ -146,8 +149,13 @@ export function TaskFormModal({
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder={t('tasks.taskDescriptionPlaceholder')}
-              className="resize-none h-20"
+              className={cn("resize-none h-20", errors.description ? 'border-destructive' : '')}
             />
+            {errors.description && (
+              <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                <AlertCircle className="h-3 w-3" /> {errors.description}
+              </p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -159,13 +167,22 @@ export function TaskFormModal({
                 id="estimatePomodoros"
                 type="number"
                 min="1"
-                max="100"
+                max="64"
                 value={formData.estimatePomodoros === 0 ? '' : formData.estimatePomodoros}
                 onChange={(e) => {
                   const val = e.target.value === '' ? 0 : parseInt(e.target.value)
-                  setFormData({ ...formData, estimatePomodoros: val })
+                  setFormData({ ...formData, estimatePomodoros: isNaN(val) ? 0 : val })
                 }}
+                className={errors.estimatePomodoros ? 'border-destructive' : ''}
               />
+              <p className="text-[11px] text-muted-foreground">
+                {t('tasks.estimatedHint')}
+              </p>
+              {errors.estimatePomodoros && (
+                <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                  <AlertCircle className="h-3 w-3" /> {errors.estimatePomodoros}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -190,27 +207,30 @@ export function TaskFormModal({
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="status" className="text-sm font-semibold">
-              {t('tasks.status')}
-            </Label>
-            <Select
-              value={formData.status}
-              onValueChange={(val: Task['status']) =>
-                setFormData({ ...formData, status: val })
-              }
-            >
-              <SelectTrigger id="status">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pending">{t('tasks.statuses.pending')}</SelectItem>
-                <SelectItem value="in_progress">{t('tasks.statuses.in_progress')}</SelectItem>
-                <SelectItem value="done">{t('tasks.statuses.done')}</SelectItem>
-                <SelectItem value="cancelled">{t('tasks.statuses.cancelled')}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Only show status field when editing existing task */}
+          {editingTask && (
+            <div className="space-y-2">
+              <Label htmlFor="status" className="text-sm font-semibold">
+                {t('tasks.status')}
+              </Label>
+              <Select
+                value={formData.status}
+                onValueChange={(val: Task['status']) =>
+                  setFormData({ ...formData, status: val })
+                }
+              >
+                <SelectTrigger id="status">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pending">{t('tasks.statuses.pending')}</SelectItem>
+                  <SelectItem value="in_progress">{t('tasks.statuses.in_progress')}</SelectItem>
+                  <SelectItem value="done">{t('tasks.statuses.done')}</SelectItem>
+                  <SelectItem value="cancelled">{t('tasks.statuses.cancelled')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label className="text-sm font-semibold flex items-center gap-2">

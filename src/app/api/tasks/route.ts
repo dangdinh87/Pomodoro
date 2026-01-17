@@ -37,8 +37,9 @@ function buildInsertPayload(
   userId: string,
   payload: CreateTaskPayload,
 ) {
+  // Ensure user_id is a string (UUID from auth is already a string, but ensure consistency)
   return {
-    user_id: userId,
+    user_id: String(userId),
     title: payload.title,
     description: payload.description,
     priority: payload.priority,
@@ -60,12 +61,19 @@ export async function GET() {
   const { data, error } = await supabase
     .from('tasks')
     .select('*')
-    .eq('user_id', userId)
+    .eq('user_id', String(userId))
     .eq('is_deleted', false)
     .order('created_at', { ascending: false })
 
   if (error) {
-    console.error('Error fetching tasks', error)
+    console.error('Error fetching tasks:', {
+      error,
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code,
+      userId,
+    })
     return NextResponse.json(
       { error: 'Failed to fetch tasks' },
       { status: 500 },
@@ -76,14 +84,18 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  if (!isAuthorized(request)) {
-    return unauthorizedResponse()
-  }
-
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
+    if (!isAuthorized(request)) {
+      return unauthorizedResponse()
+    }
+    // If authorized by token, we still need a user_id to create the task for.
+    // The current implementation relies on user.id.
+    // If we want to support token-based creation, we'd need to pass user_id in body.
+    // For now, I will keep the restriction that user MUST be present.
+    // The issue was that isAuthorized was running BEFORE checking for user session, potentially blocking valid users if they didn't have the token.
     return unauthorizedResponse()
   }
 
@@ -106,9 +118,20 @@ export async function POST(request: Request) {
       .single()
 
     if (error) {
-      console.error('Error creating task', error)
+      console.error('Error creating task:', {
+        error,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code,
+        userId,
+        payload,
+      })
       return NextResponse.json(
-        { error: 'Failed to create task' },
+        { 
+          error: 'Failed to create task',
+          details: error.message,
+        },
         { status: 500 },
       )
     }

@@ -29,9 +29,12 @@ const GLOBAL_YT_CONTAINER_ID = 'youtube-global-container';
 
 // YouTube player state mapping
 const YT_STATE_MAP: Record<number, YouTubePlayerState['status']> = {
+  '-1': 'buffering', // Unstarted
+  0: 'stopped',      // Ended
   1: 'playing',
   2: 'paused',
   3: 'buffering',
+  5: 'buffering',    // Video cued
 };
 
 declare global {
@@ -135,30 +138,40 @@ const updateAudioStoreForYouTube = (
   isPlaying: boolean,
   setCurrentlyPlaying: (audio: any) => void
 ) => {
+  const current = useAudioStore.getState().currentlyPlaying;
   const id = source.videoId ? `video-${source.videoId}` : source.listId ? `playlist-${source.listId}` : '';
+
+  // Skip if same video and same play state
+  if (current?.id === id && current.isPlaying === isPlaying && current.type === 'youtube') return;
+
   const name = source.videoId ? 'YouTube Video' : 'YouTube Playlist';
   const url = source.videoId
     ? `https://www.youtube.com/watch?v=${source.videoId}`
     : `https://www.youtube.com/playlist?list=${source.listId}`;
 
+  // If it's already playing this video but the state changed (e.g. isPlaying), preserve the existing name
+  const finalName = (current?.id === id && current.type === 'youtube') ? current.name : name;
+
   setCurrentlyPlaying({
     type: 'youtube',
     id,
-    name,
+    name: finalName,
     volume: 50,
     isPlaying,
-    source: { type: 'youtube', id, name, url, volume: 50, loop: false }
+    source: { type: 'youtube', id, name: finalName, url, volume: 50, loop: false }
   });
 
-  // Fetch real title
-  fetchYouTubeOEmbed(url).then(data => {
-    if (data?.title) {
-      const current = useAudioStore.getState().currentlyPlaying;
-      if (current?.id === id) {
-        setCurrentlyPlaying({ ...current, name: data.title });
+  // Fetch real title only if it's generic
+  if (finalName.startsWith('YouTube')) {
+    fetchYouTubeOEmbed(url).then(data => {
+      if (data?.title) {
+        const latest = useAudioStore.getState().currentlyPlaying;
+        if (latest?.id === id && latest.name !== data.title) {
+          setCurrentlyPlaying({ ...latest, name: data.title });
+        }
       }
-    }
-  });
+    });
+  }
 };
 
 // Main YouTube player hook
@@ -180,9 +193,16 @@ export const useYouTubePlayer = () => {
       const mappedStatus = state !== undefined ? YT_STATE_MAP[state] || 'stopped' : 'stopped';
       const source = getGlobalYTSource();
 
-      setPlayerState({
-        status: mappedStatus,
-        currentSource: source,
+      setPlayerState(prev => {
+        const isSameSource = prev.currentSource?.videoId === source?.videoId &&
+          prev.currentSource?.listId === source?.listId;
+        if (prev.status === mappedStatus && isSameSource) {
+          return prev;
+        }
+        return {
+          status: mappedStatus,
+          currentSource: source,
+        };
       });
 
       const currentPlaying = useAudioStore.getState().currentlyPlaying;
