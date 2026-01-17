@@ -204,7 +204,7 @@ export function FocusMode() {
                 onChange={(e) => setNewSiteUrl(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && addBlockedSite()}
               />
-              <Button onClick={addBlockedSite} size="icon" variant="transparent">
+              <Button onClick={addBlockedSite} size="icon" variant="ghost">
                 <Plus className="h-4 w-4" />
               </Button>
             </div>

@@ -108,7 +108,7 @@ export function ModelSelector<T extends string>({
     const modelsArray = useMemo(() => {
         return Object.entries(models).map(([id, info]) => ({
             id: id as T,
-            ...info,
+            ...(info as ModelInfo),
         }));
     }, [models]);
 
@@ -274,7 +274,7 @@ export function ModelSelector<T extends string>({
                                                         key={model.id}
                                                         model={model}
                                                         isSelected={model.id === selectedModel}
-                                                        onSelect={() => handleSelect(model.id)}
+                                                        onSelect={() => handleSelect(model.id as T)}
                                                     />
                                                 ))}
                                             </div>
@@ -290,7 +290,7 @@ export function ModelSelector<T extends string>({
                                         key={model.id}
                                         model={model}
                                         isSelected={model.id === selectedModel}
-                                        onSelect={() => handleSelect(model.id)}
+                                        onSelect={() => handleSelect(model.id as T)}
                                     />
                                 ))}
                             </div>

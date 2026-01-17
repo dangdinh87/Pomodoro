@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   AnalogClock,
   AnimatedCountdown,
@@ -21,6 +21,7 @@ export default function ClockDemoPage() {
   const [isRunning, setIsRunning] = useState(false);
   const [mode, setMode] = useState<TimerMode>('work');
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
+  const timeRef = useRef<HTMLDivElement>(null);
 
   const totalTime = 25 * 60; // 25 minutes
   const formattedTime = `${Math.floor(timeLeft / 60)
@@ -154,9 +155,10 @@ export default function ClockDemoPage() {
             </CardHeader>
             <CardContent className="min-h-[500px] flex items-center justify-center">
               <AnimatedCountdown
-                formattedTime={formattedTime}
+                timeLeft={timeLeft}
+                totalTime={totalTime}
+                isRunning={isRunning}
                 mode={mode}
-                clockSize={clockSize}
               />
             </CardContent>
           </Card>
@@ -173,7 +175,7 @@ export default function ClockDemoPage() {
             </CardHeader>
             <CardContent className="min-h-[500px] flex items-center justify-center">
               <DigitalClock
-                timeRef={null}
+                timeRef={timeRef}
                 formattedTime={formattedTime}
                 isRunning={isRunning}
                 progressPercent={progressPercent}

@@ -47,7 +47,7 @@ export function FocusChart({ data }: FocusChartProps) {
                                                         {payload[0].payload.fullDate}
                                                     </span>
                                                     <span className="font-bold text-muted-foreground">
-                                                        {t('historyComponents.focusChart.minutes', { minutes: payload[0].value })}
+                                                        {t('historyComponents.focusChart.minutes', { minutes: payload[0].value as number })}
                                                     </span>
                                                 </div>
                                             </div>
