@@ -1,75 +1,64 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Home, Timer, ArrowLeft, Search } from 'lucide-react';
-import Link from 'next/link';
-import { useEffect } from 'react';
+import { LampContainer } from '@/components/ui/lamp';
 import { useI18n } from '@/contexts/i18n-context';
+import { Home, Timer, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import { motion } from 'motion/react';
 
 export default function NotFound() {
   const { t } = useI18n();
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4">
-      <div className="max-w-md w-full text-center space-y-8">
-        {/* 404 Number with Animation and Glassmorphism */}
-        <div className="relative">
-          <div className="absolute inset-0 bg-primary/10 blur-3xl rounded-full scale-150 animate-pulse"></div>
-          <div className="relative">
-            <div className="text-9xl font-bold text-primary/20 animate-pulse">404</div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-9xl font-bold text-primary bg-clip-text bg-gradient-to-b from-primary to-primary/60">
-                404
-              </div>
-            </div>
-          </div>
+    <LampContainer className="!bg-background">
+      <motion.div
+        initial={{ opacity: 0, y: 100 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{
+          delay: 0.3,
+          duration: 0.8,
+          ease: 'easeInOut',
+        }}
+        className="flex flex-col items-center text-center space-y-8"
+      >
+        {/* 404 Number */}
+        <h1 className="text-8xl sm:text-9xl font-black tracking-tighter bg-gradient-to-br from-foreground via-foreground/80 to-foreground/40 bg-clip-text text-transparent">
+          404
+        </h1>
+
+        {/* Message */}
+        <div className="space-y-3 max-w-md">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+            {t('notFound.title')}
+          </h2>
+          <p className="text-muted-foreground text-lg">
+            {t('notFound.description')}
+          </p>
         </div>
 
-        {/* Error Message with Enhanced Styling */}
-        <div className="space-y-4 relative">
-          <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-lg blur"></div>
-          <div className="relative bg-background/60 backdrop-blur-sm border border-border/20 rounded-lg p-6 space-y-4">
-            <div className="flex justify-center">
-              <div className="p-3 bg-primary/10 rounded-full">
-                <Search className="w-8 h-8 text-primary" />
-              </div>
-            </div>
-            <h1 className="text-3xl font-bold tracking-tight">{t('notFound.title')}</h1>
-            <p className="text-muted-foreground text-lg">
-              {t('notFound.description')}
-            </p>
-          </div>
-        </div>
-
-        {/* Action Buttons with Glassmorphism */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button asChild size="lg" className="gap-2 bg-primary/80 backdrop-blur-sm hover:bg-primary/90">
-            <Link href="/timer">
-              <Timer className="w-5 h-5" />
-              {t('notFound.backToTimer')}
-            </Link>
-          </Button>
-          <Button variant="outline" size="lg" className="gap-2 bg-background/40 backdrop-blur-sm border-border/30 hover:bg-background/60" asChild>
-            <Link href="/">
-              <Home className="w-5 h-5" />
-              {t('notFound.home')}
-            </Link>
-          </Button>
-        </div>
-
-        {/* Go Back Button */}
-        <div className="pt-2">
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          {/* Go Back */}
           <Button
-            variant="ghost"
-            size="sm"
-            className="gap-2 text-muted-foreground hover:text-foreground hover:bg-background/40"
             onClick={() => window.history.back()}
+            className="gap-2 rounded-xl"
+            variant="ghost"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-5 h-5" />
             {t('notFound.goBack')}
           </Button>
+          <Button
+            className="gap-2 rounded-xl"
+            onClick={() => window.location.href = '/'}
+          >
+            <Home className="w-5 h-5" />
+            {t('notFound.home')}
+          </Button>
         </div>
-      </div>
-    </main>
+
+
+      </motion.div>
+    </LampContainer>
   );
 }
