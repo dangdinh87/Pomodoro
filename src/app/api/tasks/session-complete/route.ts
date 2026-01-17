@@ -21,10 +21,12 @@ export async function POST(request: Request) {
       taskId,
       durationSec,
       mode,
+      timezoneOffset = 0, // Default to 0 if not provided
     }: {
       taskId?: string | null
       durationSec: number
       mode: 'work' | 'shortBreak' | 'longBreak'
+      timezoneOffset?: number
     } = body
 
     const duration = Math.max(0, Math.round(durationSec))
@@ -71,7 +73,10 @@ export async function POST(request: Request) {
         .eq('user_id', userId)
         .single()
 
-      const today = new Date().toISOString().split('T')[0]
+      // Calculate "today" in client's local time
+      const now = new Date()
+      const localNow = new Date(now.getTime() - timezoneOffset * 60 * 1000)
+      const today = localNow.toISOString().split('T')[0]
 
       if (streakFetchError && streakFetchError.code !== 'PGRST116') { // PGRST116 is "Row not found"
         console.error('Error fetching streak', streakFetchError)
@@ -82,7 +87,10 @@ export async function POST(request: Request) {
       let shouldUpdate = false
 
       if (streakData) {
-        const lastSessionDate = streakData.last_session ? new Date(streakData.last_session).toISOString().split('T')[0] : null
+        // Convert last session time to client's local time
+        const lastSessionDate = streakData.last_session
+          ? new Date(new Date(streakData.last_session).getTime() - timezoneOffset * 60 * 1000).toISOString().split('T')[0]
+          : null
 
         if (lastSessionDate === today) {
           // Already recorded for today, don't increment streak, but update last_session timestamp
@@ -91,7 +99,7 @@ export async function POST(request: Request) {
           newLongest = streakData.longest
         } else {
           // Check if yesterday
-          const yesterday = new Date()
+          const yesterday = new Date(localNow)
           yesterday.setDate(yesterday.getDate() - 1)
           const yesterdayStr = yesterday.toISOString().split('T')[0]
 
@@ -120,7 +128,7 @@ export async function POST(request: Request) {
             user_id: userId,
             current: newCurrent,
             longest: newLongest,
-            last_session: new Date().toISOString(),
+            last_session: new Date().toISOString(), // Store UTC timestamp as usual
             updated_at: new Date().toISOString(),
           }, { onConflict: 'user_id' })
 
@@ -139,4 +147,3 @@ export async function POST(request: Request) {
     )
   }
 }
-

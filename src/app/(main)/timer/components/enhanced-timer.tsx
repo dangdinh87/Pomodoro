@@ -225,6 +225,7 @@ export function EnhancedTimer() {
                         taskId: activeTaskId || null,
                         durationSec: completedDuration,
                         mode: 'work',
+                        timezoneOffset: new Date().getTimezoneOffset(),
                     }),
                 });
 
@@ -243,6 +244,7 @@ export function EnhancedTimer() {
                         taskId: null,
                         durationSec: completedDuration,
                         mode,
+                        timezoneOffset: new Date().getTimezoneOffset(),
                     }),
                 });
             } catch (error) {
