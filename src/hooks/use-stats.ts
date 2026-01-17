@@ -24,12 +24,18 @@ export interface StatsData {
 
 async function fetchStats(dateRange: DateRange | undefined): Promise<StatsData> {
     let url = '/api/stats'
+    const params = new URLSearchParams()
+
+    // Always send timezone offset
+    params.append('timezoneOffset', new Date().getTimezoneOffset().toString())
 
     if (dateRange?.from && dateRange?.to) {
-        const params = new URLSearchParams({
-            startDate: format(dateRange.from, 'yyyy-MM-dd'),
-            endDate: format(dateRange.to, 'yyyy-MM-dd')
-        })
+        params.append('startDate', format(dateRange.from, 'yyyy-MM-dd'))
+        params.append('endDate', format(dateRange.to, 'yyyy-MM-dd'))
+    }
+
+    // If params exist, append them to URL
+    if (Array.from(params.keys()).length > 0) {
         url += `?${params.toString()}`
     }
 
