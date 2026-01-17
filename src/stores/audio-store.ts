@@ -97,10 +97,13 @@ export const useAudioStore = create<AudioState>()(
       setCurrentlyPlaying: (audio) => {
         const current = get().currentlyPlaying
 
-        // Skip update if already playing the same audio with same state
+        // Guard against redundant updates
+        if (!audio && !current) return
         if (audio && current &&
           current.id === audio.id &&
-          current.isPlaying === audio.isPlaying) {
+          current.isPlaying === audio.isPlaying &&
+          current.type === audio.type &&
+          current.name === audio.name) {
           return
         }
 
@@ -109,7 +112,8 @@ export const useAudioStore = create<AudioState>()(
 
         set({ currentlyPlaying: audioWithTimestamp })
 
-        if (audioWithTimestamp) {
+        // Only add to history if it's a new item or if history is empty
+        if (audioWithTimestamp && (!current || current.id !== audioWithTimestamp.id)) {
           get().addToHistory(audioWithTimestamp)
           get().addToRecentlyPlayed(audioWithTimestamp.id)
         }
@@ -126,6 +130,9 @@ export const useAudioStore = create<AudioState>()(
       },
 
       updatePlayingStatus: (isPlaying) => {
+        const current = get().currentlyPlaying
+        if (!current || current.isPlaying === isPlaying) return
+
         set((state) => ({
           currentlyPlaying: state.currentlyPlaying
             ? { ...state.currentlyPlaying, isPlaying }
@@ -155,8 +162,13 @@ export const useAudioStore = create<AudioState>()(
           const soundCount = newActiveAmbientSounds.length
 
           // Calculate new currentlyPlaying based on new ambient sounds
-          let newCurrentlyPlaying: CurrentlyPlayingAudio
-          if (soundCount === 1) {
+          let newCurrentlyPlaying: CurrentlyPlayingAudio | null = null
+          const current = get().currentlyPlaying
+          const isMainSourcePlaying = current && current.type !== 'ambient'
+
+          if (isMainSourcePlaying) {
+            newCurrentlyPlaying = current
+          } else if (soundCount === 1) {
             newCurrentlyPlaying = {
               type: 'ambient',
               id: sound.id,
@@ -182,8 +194,8 @@ export const useAudioStore = create<AudioState>()(
             activeAmbientSounds: newActiveAmbientSounds,
             audioSettings: { ...state.audioSettings, selectedAmbientSound: soundId },
             currentlyPlaying: newCurrentlyPlaying,
-            audioHistory: [newCurrentlyPlaying, ...state.audioHistory.filter(item => item.id !== newCurrentlyPlaying.id)].slice(0, 20),
-            recentlyPlayed: [newCurrentlyPlaying.id, ...state.recentlyPlayed.filter(id => id !== newCurrentlyPlaying.id)].slice(0, 10)
+            audioHistory: newCurrentlyPlaying ? [newCurrentlyPlaying, ...state.audioHistory.filter(item => item.id !== newCurrentlyPlaying!.id)].slice(0, 20) : state.audioHistory,
+            recentlyPlayed: newCurrentlyPlaying ? [newCurrentlyPlaying.id, ...state.recentlyPlayed.filter(id => id !== newCurrentlyPlaying!.id)].slice(0, 10) : state.recentlyPlayed
           }))
         }
       },
@@ -208,7 +220,12 @@ export const useAudioStore = create<AudioState>()(
 
         // Calculate new currentlyPlaying
         let newCurrentlyPlaying: CurrentlyPlayingAudio | null = null
-        if (soundCount === 0) {
+        const current = get().currentlyPlaying
+        const isMainSourcePlaying = current && current.type !== 'ambient'
+
+        if (isMainSourcePlaying) {
+          newCurrentlyPlaying = current
+        } else if (soundCount === 0) {
           newCurrentlyPlaying = null
         } else if (soundCount === 1) {
           const sound = soundCatalog.ambient.find(s => s.id === newActiveAmbientSounds[0])
@@ -243,11 +260,21 @@ export const useAudioStore = create<AudioState>()(
 
       stopAllAmbient: async () => {
         await audioManager.stopAllAmbient()
-        set({ activeAmbientSounds: [], currentlyPlaying: null })
+        const current = get().currentlyPlaying
+        const isMainSource = current && current.type !== 'ambient'
+        set({
+          activeAmbientSounds: [],
+          currentlyPlaying: isMainSource ? current : null
+        })
       },
 
       updateCurrentlyPlayingForAmbients: () => {
-        const { activeAmbientSounds } = get()
+        const { activeAmbientSounds, currentlyPlaying } = get()
+
+        // If playing main source, do NOT override it with ambient info
+        if (currentlyPlaying && currentlyPlaying.type !== 'ambient') {
+          return
+        }
 
         if (activeAmbientSounds.length === 0) {
           get().clearCurrentlyPlaying()
@@ -284,10 +311,10 @@ export const useAudioStore = create<AudioState>()(
         const success = await audioManager.play(source)
 
         if (success) {
-          // For non-ambient sources, stop all ambients first
-          if (source.type === 'youtube' || source.type === 'spotify') {
-            await get().stopAllAmbient()
-          }
+          // For non-ambient sources, we do NOT stop ambients anymore (mixed playback)
+          // if (source.type === 'youtube' || source.type === 'spotify') {
+          //   await get().stopAllAmbient()
+          // }
 
           get().setCurrentlyPlaying({
             type: source.type as any,
@@ -317,10 +344,14 @@ export const useAudioStore = create<AudioState>()(
             if (yt) {
               const state = yt.getPlayerState?.()
               if (state === 1) {
+                // Video is playing -> Pause it AND all ambients
                 yt.pauseVideo()
+                await audioManager.pause()
                 get().updatePlayingStatus(false)
               } else {
+                // Video is NOT playing -> Play it AND resume all ambients
                 yt.playVideo()
+                await audioManager.resume()
                 get().updatePlayingStatus(true)
               }
             }
@@ -330,13 +361,21 @@ export const useAudioStore = create<AudioState>()(
           return
         }
 
-        // Handle other audio types
+        // Handle other audio types & Ambient mixing
+        // audioManager.pause/resume now handles both main player and ambient players
         if (currentlyPlaying?.isPlaying) {
           await audioManager.pause()
           get().updatePlayingStatus(false)
         } else {
+          // If we have nothing playing but have active ambients, resume them
+          // Or if we have paused content
           await audioManager.resume()
-          get().updatePlayingStatus(true)
+
+          const { activeAmbientSounds } = get()
+          // Update status to true if we have ANY active content
+          if (currentlyPlaying || activeAmbientSounds.length > 0) {
+            get().updatePlayingStatus(true)
+          }
         }
       },
 

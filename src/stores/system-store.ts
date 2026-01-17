@@ -36,6 +36,10 @@ interface SystemState {
 
   // Focus mode actions
   setFocusMode: (isFocusMode: boolean) => void
+
+  // Chat panel state
+  isChatPanelOpen: boolean
+  setChatPanelOpen: (isOpen: boolean) => void
 }
 
 const defaultSoundSettings: SoundSettings = {
@@ -59,6 +63,7 @@ export const useSystemStore = create<SystemState>()(
       backgroundSettings: defaultBackgroundSettings,
       isLoading: false,
       isFocusMode: false,
+      isChatPanelOpen: false,
 
       updateSoundSettings: (newSettings) =>
         set((state) => ({
@@ -87,6 +92,9 @@ export const useSystemStore = create<SystemState>()(
 
       setFocusMode: (isFocusMode) =>
         set({ isFocusMode }),
+
+      setChatPanelOpen: (isOpen) =>
+        set({ isChatPanelOpen: isOpen }),
     }),
     {
       name: 'system-storage',
@@ -94,6 +102,7 @@ export const useSystemStore = create<SystemState>()(
       partialize: (state) => ({
         soundSettings: state.soundSettings,
         backgroundSettings: state.backgroundSettings,
+        isChatPanelOpen: state.isChatPanelOpen,
       }),
     }
   )
