@@ -70,6 +70,7 @@ module.exports = {
   			shadow: 'hsl(var(--shadow))',
   			'focus-active': 'hsl(var(--focus-active))',
   			'focus-inactive': 'hsl(var(--focus-inactive))',
+        'timer-foreground': 'hsl(var(--timer-foreground))',
   			chart: {
   				'1': 'hsl(var(--chart-1))',
   				'2': 'hsl(var(--chart-2))',

@@ -4,7 +4,7 @@ import { persist } from 'zustand/middleware'
 export type TimerMode = 'work' | 'shortBreak' | 'longBreak'
 export type ClockType = 'digital' | 'analog' | 'progress' | 'flip' | 'animated'
 
-interface TimerSettings {
+export interface TimerSettings {
   workDuration: number // in minutes
   shortBreakDuration: number // in minutes
   longBreakDuration: number // in minutes
