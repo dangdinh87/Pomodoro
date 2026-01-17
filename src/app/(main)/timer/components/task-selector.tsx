@@ -3,7 +3,7 @@ import { Task, useTasksStore } from '@/stores/task-store';
 import { useTasks } from '@/hooks/use-tasks';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Target, Play, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Target, Play, Square, CheckCircle2, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Dialog,
@@ -14,6 +14,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
 import { useI18n } from '@/contexts/i18n-context';
@@ -28,12 +38,17 @@ export function TaskSelector({ className }: TaskSelectorProps) {
   const { tasks, updateTask } = useTasks();
   const { activeTaskId, setActiveTask } = useTasksStore();
   const [isOpen, setIsOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingTaskId, setPendingTaskId] = useState<string | null>(null);
 
 
   const activeTask = tasks.find((task) => task.id === activeTaskId);
 
   const todayTasks = tasks.filter((task) => {
     if (task.status === 'done' || task.status === 'cancelled') return false;
+    // Hide if completed pomodoros
+    if (task.actualPomodoros >= task.estimatePomodoros) return false;
+
     const taskDate = new Date(task.createdAt);
     const today = new Date();
     return (
@@ -44,12 +59,28 @@ export function TaskSelector({ className }: TaskSelectorProps) {
   });
 
   const handleSelectTask = (taskId: string) => {
+    // If clicking the current active task -> deselect (un-focus)
+    if (activeTaskId === taskId) {
+      setActiveTask(null);
+      return;
+    }
+
+    if (activeTaskId && activeTaskId !== taskId) {
+      setPendingTaskId(taskId);
+      setConfirmOpen(true);
+      return;
+    }
+    selectTask(taskId);
+  };
+
+  const selectTask = (taskId: string) => {
     setActiveTask(taskId);
     const task = tasks.find((t) => t.id === taskId);
     if (task && task.status === 'pending') {
       updateTask({ id: taskId, input: { status: 'in_progress' } });
     }
-    // Removed setIsOpen(false) to keep modal open as per user request
+    setConfirmOpen(false);
+    setPendingTaskId(null);
   };
 
   const TaskItemInternal = ({ task }: { task: Task }) => {
@@ -64,7 +95,7 @@ export function TaskSelector({ className }: TaskSelectorProps) {
         className={cn(
           'group relative flex items-start gap-4 p-4 rounded-xl border transition-all cursor-pointer overflow-hidden',
           'bg-card/40 backdrop-blur-sm border-muted/40 hover:border-primary/40 hover:shadow-lg hover:bg-primary/5',
-          isActive && 'border-primary ring-1 ring-primary/30 bg-primary/10 shadow-md',
+          isActive && 'border-primary bg-primary/5 shadow-md animate-pulse duration-[3000ms]',
         )}
         onClick={() => handleSelectTask(task.id)}
       >
@@ -116,10 +147,10 @@ export function TaskSelector({ className }: TaskSelectorProps) {
           </div>
         </div>
 
-        <div className="shrink-0 pt-1">
+        <div className="shrink-0 pt-1" title={isActive ? t('timerComponents.taskSelector.stopFocus') : t('timerComponents.taskSelector.startFocus')}>
           {isActive ? (
             <div className="p-1.5 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-110 transition-transform">
-              <Play className="h-3 w-3 fill-current" />
+              <Square className="h-3 w-3 fill-current" />
             </div>
           ) : (
             <div className="p-1.5 rounded-full bg-muted/50 text-muted-foreground group-hover:bg-primary/20 group-hover:text-primary transition-colors">
@@ -143,80 +174,101 @@ export function TaskSelector({ className }: TaskSelectorProps) {
           </div>
         </Link>
       ) : (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
-            <Button
-              variant="ghost"
-              className={cn(
-                'h-auto p-0 hover:bg-transparent',
-                className,
-              )}
-              aria-label="Select task for focus"
-            >
-              {activeTask ? (
-                <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-background/80 backdrop-blur-md border border-border/50 shadow-sm hover:bg-background/90 transition-colors dark:bg-background/60 dark:hover:bg-background/80">
-                  <div className="flex items-center gap-2">
-                    <div className="p-1.5 rounded-full bg-primary/10 text-primary">
-                      <Target className="w-4 h-4" />
+        <>
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+              <Button
+                variant="ghost"
+                className={cn(
+                  'h-auto p-0 hover:bg-transparent',
+                  className,
+                )}
+                aria-label="Select task for focus"
+              >
+                {activeTask ? (
+                  <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-background/80 backdrop-blur-md border border-border/50 shadow-sm hover:bg-background/90 transition-colors dark:bg-background/60 dark:hover:bg-background/80">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-full bg-primary/10 text-primary">
+                        <Target className="w-4 h-4" />
+                      </div>
+                      <span className="text-xs font-medium text-foreground truncate max-w-[200px]">{activeTask.title}</span>
                     </div>
-                    <span className="text-xs font-medium text-foreground truncate max-w-[200px]">{activeTask.title}</span>
-                  </div>
-                  <span className="bg-primary/10 px-1.5 py-0.5 rounded-full text-[10px] border border-primary/20 text-primary font-semibold">
-                    {activeTask.actualPomodoros}/{activeTask.estimatePomodoros}
-                  </span>
-                </div>
-              ) : (
-                <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-background/80 backdrop-blur-md border border-border/50 shadow-sm hover:bg-background/90 transition-colors dark:bg-background/60 dark:hover:bg-background/80">
-                  <div className="p-1.5 rounded-full bg-muted text-muted-foreground">
-                    <Target className="w-4 h-4" />
-                  </div>
-                  <span className="text-xs font-medium text-muted-foreground">{t('timerComponents.taskSelector.selectToFocus')}</span>
-                </div>
-              )}
-            </Button>
-          </DialogTrigger>
-
-          <DialogContent className="max-w-2xl max-h-[80vh]">
-            <DialogHeader>
-              <DialogTitle>{t('timerComponents.taskSelector.dialogTitle')}</DialogTitle>
-              <DialogDescription>
-                {t('timerComponents.taskSelector.dialogDescription')}
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between mb-1">
-                  <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-widest text-primary border-primary/30 bg-primary/5">
-                    {t('tasks.filters.today') || "Today's Tasks"}
-                  </Badge>
-                  <span className="text-[10px] text-muted-foreground italic">{todayTasks.length} {t('tasks.count') || "tasks"}</span>
-                </div>
-
-                {todayTasks.length === 0 ? (
-                  <div className="text-center py-12 bg-muted/10 rounded-2xl border border-dashed border-muted/50">
-                    <Target className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-                    <p className="text-sm font-semibold text-muted-foreground">
-                      {t('timerComponents.taskSelector.noPendingTasksToday') || t('timerComponents.taskSelector.noPendingTasks')}
-                    </p>
-                    <p className="text-xs text-muted-foreground/70 mt-2 px-8">
-                      {t('timerComponents.taskSelector.createTaskPrompt')}
-                    </p>
+                    <span className="bg-primary/10 px-1.5 py-0.5 rounded-full text-[10px] border border-primary/20 text-primary font-semibold">
+                      {activeTask.actualPomodoros}/{activeTask.estimatePomodoros}
+                    </span>
                   </div>
                 ) : (
-                  todayTasks.map((task) => <TaskItemInternal key={task.id} task={task} />)
+                  <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-background/80 backdrop-blur-md border border-border/50 shadow-sm hover:bg-background/90 transition-colors dark:bg-background/60 dark:hover:bg-background/80">
+                    <div className="p-1.5 rounded-full bg-muted text-muted-foreground">
+                      <Target className="w-4 h-4" />
+                    </div>
+                    <span className="text-xs font-medium text-muted-foreground">{t('timerComponents.taskSelector.selectToFocus')}</span>
+                  </div>
                 )}
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="link" asChild>
-                <Link href="/tasks">
-                  {t('timerComponents.taskSelector.goToTaskList')} <ArrowRight className="ms-1 h-4 w-4" />
-                </Link>
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+
+            <DialogContent className="max-w-2xl max-h-[80vh]">
+              <DialogHeader>
+                <DialogTitle>{t('timerComponents.taskSelector.dialogTitle')}</DialogTitle>
+                <DialogDescription>
+                  {t('timerComponents.taskSelector.dialogDescription')}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between mb-1">
+                    <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-widest text-primary border-primary/30 bg-primary/5">
+                      {t('tasks.filters.today') || "Today's Tasks"}
+                    </Badge>
+                    <span className="text-[10px] text-muted-foreground italic">{todayTasks.length} {t('tasks.count') || "tasks"}</span>
+                  </div>
+
+                  {todayTasks.length === 0 ? (
+                    <div className="text-center py-12 bg-muted/10 rounded-2xl border border-dashed border-muted/50">
+                      <Target className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+                      <p className="text-sm font-semibold text-muted-foreground">
+                        {t('timerComponents.taskSelector.noPendingTasksToday') || t('timerComponents.taskSelector.noPendingTasks')}
+                      </p>
+                      <p className="text-xs text-muted-foreground/70 mt-2 px-8">
+                        {t('timerComponents.taskSelector.createTaskPrompt')}
+                      </p>
+                    </div>
+                  ) : (
+                    todayTasks.map((task) => <TaskItemInternal key={task.id} task={task} />)
+                  )}
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="link" asChild>
+                  <Link href="/tasks">
+                    {t('timerComponents.taskSelector.goToTaskList')} <ArrowRight className="ms-1 h-4 w-4" />
+                  </Link>
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t('timerComponents.taskSelector.switchConfirm.title')}</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {t('timerComponents.taskSelector.switchConfirm.description')}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setPendingTaskId(null)}>
+                  {t('common.cancel')}
+                </AlertDialogCancel>
+                <AlertDialogAction onClick={() => pendingTaskId && selectTask(pendingTaskId)}>
+                  {t('common.confirm')}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </>
       )}
     </>
   );

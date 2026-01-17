@@ -7,16 +7,19 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const navLinks = [
-    { href: '#features', label: 'Features' },
-    { href: '#testimonials', label: 'Testimonials' },
-    { href: '#pricing', label: 'Pricing' },
-];
+import { LanguageSwitcher } from '@/components/layout/language-switcher';
+import { useTranslation } from '@/contexts/i18n-context';
 
 export function Navbar() {
+    const { t } = useTranslation();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    const navLinks = [
+        { href: '#features', label: t('landing.nav.features') },
+        { href: '#pricing', label: t('landing.nav.pricing') },
+        { href: '/feedback', label: t('landing.nav.contact') },
+    ];
 
     useEffect(() => {
         const handleScroll = () => {
@@ -32,7 +35,7 @@ export function Navbar() {
                 initial={{ y: -100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6, ease: 'easeOut' }}
-                className={`fixed top-4 left-4 right-4 z-50 mx-auto max-w-5xl rounded-2xl border transition-all duration-500 ${isScrolled
+                className={`fixed top-4 left-4 right-4 z-50 mx-auto max-w-7xl rounded-2xl border transition-all duration-500 ${isScrolled
                     ? 'bg-white/80 dark:bg-black/80 backdrop-blur-2xl border-white/20 dark:border-white/10 shadow-xl shadow-black/5'
                     : 'bg-white/5 dark:bg-white/[0.02] backdrop-blur-lg border-white/10'
                     }`}
@@ -73,7 +76,7 @@ export function Navbar() {
                         <AnimatedThemeToggler />
                         <Link href="/login">
                             <Button variant="ghost" size="sm" className="cursor-pointer text-sm font-medium">
-                                Log in
+                                {t('auth.login')}
                             </Button>
                         </Link>
                         <Link href="/signup">
@@ -82,7 +85,7 @@ export function Navbar() {
                                     size="sm"
                                     className="relative bg-gradient-to-r from-blue-500 to-violet-600 hover:from-blue-600 hover:to-violet-700 text-white shadow-lg shadow-violet-500/20 cursor-pointer text-sm font-medium rounded-lg px-4 group overflow-hidden"
                                 >
-                                    Get Started
+                                    {t('landing.hero.getStarted')}
                                     <ArrowRight className="ml-1.5 h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                                     <span className="absolute inset-x-0 w-1/2 mx-auto -bottom-px bg-gradient-to-r from-transparent via-white to-transparent h-px" />
                                 </Button>
@@ -150,14 +153,18 @@ export function Navbar() {
                                     </motion.div>
                                 ))}
                                 <div className="border-t border-white/10 dark:border-white/5 pt-4 mt-2 flex flex-col gap-2">
+                                    <div className="px-4 py-2 flex items-center justify-between">
+                                        <span className="text-sm font-medium text-muted-foreground">{t('common.language')}</span>
+                                        <LanguageSwitcher className="w-[140px]" />
+                                    </div>
                                     <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
                                         <Button variant="ghost" className="w-full justify-center cursor-pointer">
-                                            Log in
+                                            {t('auth.login')}
                                         </Button>
                                     </Link>
                                     <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)}>
                                         <Button className="w-full bg-gradient-to-r from-blue-500 to-violet-600 hover:from-blue-600 hover:to-violet-700 text-white cursor-pointer">
-                                            Get Started
+                                            {t('landing.hero.getStarted')}
                                             <ArrowRight className="ml-2 h-4 w-4" />
                                         </Button>
                                     </Link>

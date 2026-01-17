@@ -143,7 +143,10 @@ export function TaskItem({
 
         {/* Actions - Redesigned to be more compact */}
         <div className={cn(
-          "absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity",
+          "absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-0.5 transition-opacity",
+          // Mobile: Always visible
+          // Desktop: Visible on hover or when active
+          "opacity-100 sm:opacity-0 sm:group-hover:opacity-100",
           isActive && "opacity-100"
         )}>
           <Tooltip>

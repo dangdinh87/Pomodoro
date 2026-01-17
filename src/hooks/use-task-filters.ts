@@ -7,6 +7,7 @@ export interface TaskFilters {
   query: string
   statusFilter: 'all' | TaskStatus
   priorityFilter: 'all' | TaskPriority
+  tagFilter: 'all' | string
   dateRange: DateRange | undefined
 }
 
@@ -14,6 +15,7 @@ export function useTaskFilters() {
   const [query, setQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | TaskStatus>('all')
   const [priorityFilter, setPriorityFilter] = useState<'all' | TaskPriority>('all')
+  const [tagFilter, setTagFilter] = useState<'all' | string>('all')
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: subDays(new Date(), 2),
     to: new Date()
@@ -24,14 +26,16 @@ export function useTaskFilters() {
       query.trim().length > 0 ||
       statusFilter !== 'all' ||
       priorityFilter !== 'all' ||
+      tagFilter !== 'all' ||
       dateRange !== undefined,
-    [query, statusFilter, priorityFilter, dateRange]
+    [query, statusFilter, priorityFilter, tagFilter, dateRange]
   )
 
   const resetFilters = () => {
     setQuery('')
     setStatusFilter('all')
     setPriorityFilter('all')
+    setTagFilter('all')
     setDateRange({
       from: subDays(new Date(), 2),
       to: new Date()
@@ -42,11 +46,13 @@ export function useTaskFilters() {
     query,
     statusFilter,
     priorityFilter,
+    tagFilter,
     dateRange,
     hasActiveFilter,
     setQuery,
     setStatusFilter,
     setPriorityFilter,
+    setTagFilter,
     setDateRange,
     resetFilters,
   }
@@ -56,34 +62,61 @@ export function useFilteredTasks(tasks: Task[], filters: TaskFilters) {
   return useMemo(() => {
     const q = filters.query.trim().toLowerCase()
 
+    // Optimize: Pre-parse dates if date range is active or for sorting
+    // We can do this lazily or just handle it efficiently
+    const fromDate = filters.dateRange?.from ? startOfDay(filters.dateRange.from) : null
+    const toDate = filters.dateRange?.to ? endOfDay(filters.dateRange.to) : null
+
     return tasks
       .filter((task) => {
-        const matchesQuery =
-          !q ||
-          task.title.toLowerCase().includes(q) ||
-          (task.description ?? '').toLowerCase().includes(q) ||
-          task.tags.some((tag) => tag.toLowerCase().includes(q))
+        // 1. Status Filter (Fastest check)
+        if (filters.statusFilter !== 'all' && task.status !== filters.statusFilter) {
+          return false
+        }
 
-        const matchesStatus =
-          filters.statusFilter === 'all' ? true : task.status === filters.statusFilter
-        const matchesPriority =
-          filters.priorityFilter === 'all' ? true : task.priority === filters.priorityFilter
+        // 2. Priority Filter
+        if (filters.priorityFilter !== 'all' && task.priority !== filters.priorityFilter) {
+          return false
+        }
 
-        const matchesDate = filters.dateRange?.from && filters.dateRange?.to
-          ? task.createdAt
-            ? isWithinInterval(new Date(task.createdAt), {
-              start: startOfDay(filters.dateRange.from),
-              end: endOfDay(filters.dateRange.to)
-            })
-            : false
-          : true
+        // 3. Tag Filter
+        if (filters.tagFilter !== 'all' && !task.tags.includes(filters.tagFilter)) {
+          return false
+        }
 
-        return matchesQuery && matchesStatus && matchesPriority && matchesDate
+        // 4. Date Range Filter
+        if (fromDate && toDate) {
+          if (!task.createdAt) return false
+          const taskDate = new Date(task.createdAt)
+          if (!isWithinInterval(taskDate, { start: fromDate, end: toDate })) {
+            return false
+          }
+        }
+
+        // 4. Query Filter (Slowest check, do last)
+        if (q) {
+          const titleMatch = task.title.toLowerCase().includes(q)
+          if (titleMatch) return true
+
+          const descMatch = (task.description ?? '').toLowerCase().includes(q)
+          if (descMatch) return true
+
+          const tagMatch = task.tags.some((tag) => tag.toLowerCase().includes(q))
+          if (tagMatch) return true
+
+          return false
+        }
+
+        return true
       })
       .sort((a, b) => {
-        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0
-        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0
-        return bTime - aTime
+        // Sort by createdAt DESC
+        // Optimization: Lexicographical comparison of ISO strings works for dates!
+        // No need to new Date() if the format is ISO 8601
+        if (a.createdAt && b.createdAt) {
+          return b.createdAt.localeCompare(a.createdAt)
+        }
+        return 0
       })
   }, [tasks, filters])
 }

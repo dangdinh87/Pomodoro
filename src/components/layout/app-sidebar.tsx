@@ -36,6 +36,8 @@ import Image from 'next/image';
 import { AnimateIcon } from '../animate-ui/icons/icon';
 import { Clock } from '../animate-ui/icons/clock';
 import { useI18n } from '@/contexts/i18n-context';
+import { LanguageSwitcher } from './language-switcher';
+import { AnimatedThemeToggler } from '../ui/animated-theme-toggler';
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -170,7 +172,14 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
 
+
+
         <SidebarSeparator className="mx-0" />
+
+        <div className="flex items-center justify-between px-2 py-2 gap-2 group-data-[collapsible=icon]:flex-col">
+          <LanguageSwitcher className="w-full border-none shadow-none bg-transparent focus:ring-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" />
+          <AnimatedThemeToggler className="p-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md transition-colors" />
+        </div>
 
         <SidebarMenu>
           <SidebarMenuItem>

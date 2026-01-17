@@ -485,9 +485,8 @@ export class AudioManager {
 
   async play(source: AudioSource): Promise<boolean> {
     try {
-      // If playing YouTube or Spotify, stop all ambients and current player
+      // If playing YouTube or Spotify, stop current main player but KEEP ambients
       if (source.type === 'youtube' || source.type === 'spotify') {
-        await this.stopAllAmbient()
         await this.stop()
       } else if (source.type === 'ambient') {
         // For ambient sounds, use the mix system
@@ -551,50 +550,72 @@ export class AudioManager {
   }
 
   async pause(): Promise<void> {
-    if (!this.currentPlayer) return
-    try {
-      await this.currentPlayer.pause()
-    } catch (error) {
-      console.error('Error pausing audio:', error)
+    const promises: Promise<void>[] = []
+
+    // Pause main player
+    if (this.currentPlayer) {
+      promises.push(this.currentPlayer.pause().catch(err => {
+        console.error('Error pausing main audio:', err)
+      }))
     }
+
+    // Pause all ambient players
+    this.ambientPlayers.forEach(player => {
+      promises.push(player.pause().catch(err => {
+        console.error('Error pausing ambient sound:', err)
+      }))
+    })
+
+    await Promise.all(promises)
   }
 
   async resume(): Promise<void> {
-    if (!this.currentPlayer) return
-    try {
-      await this.currentPlayer.play()
-    } catch (error) {
-      console.error('Error resuming audio:', error)
-      // Fallback: try to play the current source again
-      if (this.currentSource) {
-        try {
-          await this.play(this.currentSource)
-        } catch (retryError) {
-          console.error('Error retrying playback:', retryError)
+    const promises: Promise<void>[] = []
+
+    // Resume main player
+    if (this.currentPlayer) {
+      promises.push(this.currentPlayer.play().catch(error => {
+        console.error('Error resuming main audio:', error)
+        // Fallback: try to play the current source again
+        if (this.currentSource) {
+          this.play(this.currentSource).catch(e => console.error('Error retrying playback:', e))
         }
-      }
+      }))
     }
+
+    // Resume all ambient players
+    this.ambientPlayers.forEach(player => {
+      promises.push(player.play().catch(err => {
+        console.error('Error resuming ambient sound:', err)
+      }))
+    })
+
+    await Promise.all(promises)
   }
 
   setVolume(volume: number): void {
     this.volume = Math.max(0, Math.min(100, volume))
+    const vol = this.isMuted ? 0 : this.volume
+
     if (this.currentPlayer) {
-      this.currentPlayer.setVolume(this.isMuted ? 0 : this.volume)
+      this.currentPlayer.setVolume(vol)
     }
     // Apply to all ambient players
     this.ambientPlayers.forEach(player => {
-      player.setVolume(this.isMuted ? 0 : this.volume)
+      player.setVolume(vol)
     })
   }
 
   setMute(muted: boolean): void {
     this.isMuted = muted
+    const vol = muted ? 0 : this.volume
+
     if (this.currentPlayer) {
-      this.currentPlayer.setVolume(muted ? 0 : this.volume)
+      this.currentPlayer.setVolume(vol)
     }
     // Apply to all ambient players
     this.ambientPlayers.forEach(player => {
-      player.setVolume(muted ? 0 : this.volume)
+      player.setVolume(vol)
     })
   }
 

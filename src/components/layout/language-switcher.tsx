@@ -10,12 +10,14 @@ import {
 } from '@/components/ui/select';
 import { Globe } from 'lucide-react';
 
-export function LanguageSwitcher() {
+import { cn } from '@/lib/utils';
+
+export function LanguageSwitcher({ className }: { className?: string }) {
   const { lang, setLang } = useI18n();
 
   return (
     <Select value={lang} onValueChange={(value) => setLang(value as Lang)}>
-      <SelectTrigger className="w-[140px]">
+      <SelectTrigger className={cn("w-[140px]", className)}>
         <Globe className="mr-2 h-4 w-4" />
         <SelectValue />
       </SelectTrigger>

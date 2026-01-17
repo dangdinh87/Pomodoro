@@ -44,7 +44,23 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/animate-ui/components/animate/tooltip';
+import {
+    Tabs,
+    TabsList,
+    TabsTrigger,
+} from '@/components/animate-ui/components/animate/tabs';
 import { useSidebar } from '@/components/ui/sidebar';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { toast } from 'sonner';
 
 export function EnhancedTimer() {
     const { t } = useTranslation();
@@ -101,6 +117,10 @@ export function EnhancedTimer() {
     const [timerSettingsOpen, setTimerSettingsOpen] = useState(false);
     const [audioSettingsOpen, setAudioSettingsOpen] = useState(false);
     const [backgroundSettingsOpen, setBackgroundSettingsOpen] = useState(false);
+    const [skipConfirmOpen, setSkipConfirmOpen] = useState(false);
+
+    // Minimum completion percentage to count as a valid pomodoro
+    const MINIMUM_COMPLETION_PERCENT = 50;
 
     const queryClient = useQueryClient();
 
@@ -203,38 +223,79 @@ export function EnhancedTimer() {
 
     const [isProcessing, setIsProcessing] = useState(false);
 
-    const handleSessionComplete = async () => {
+    // Calculate completion percentage
+    const getCompletionPercent = () => {
+        const currentRemaining = timeLeftRef.current;
+        const completedDuration = sessionDurationRef.current - currentRemaining;
+        return (completedDuration / sessionDurationRef.current) * 100;
+    };
+
+    // Handle skip button click - check if confirmation is needed
+    const handleSkipClick = () => {
+        if (isProcessing) return;
+
+        const completionPercent = getCompletionPercent();
+
+        // If less than minimum completion, show confirmation dialog
+        if (mode === 'work' && completionPercent < MINIMUM_COMPLETION_PERCENT) {
+            setSkipConfirmOpen(true);
+            return;
+        }
+
+        // Otherwise, complete normally
+        handleSessionComplete(false);
+    };
+
+    // Handle confirmed skip (user chose to skip without recording)
+    const handleConfirmedSkip = () => {
+        setSkipConfirmOpen(false);
+        handleSessionComplete(true); // true = skip without recording
+    };
+
+    const handleSessionComplete = async (skipWithoutRecording: boolean = false) => {
         if (isProcessing) return;
         setIsProcessing(true);
         setIsRunning(false);
 
         const currentRemaining = timeLeftRef.current;
         const completedDuration = sessionDurationRef.current - currentRemaining;
+        const completionPercent = (completedDuration / sessionDurationRef.current) * 100;
+
+        // Determine if this is a valid session (>= 50% completion OR not a manual skip)
+        const isValidSession = !skipWithoutRecording && completionPercent >= MINIMUM_COMPLETION_PERCENT;
 
         if (mode === 'work') {
-            incrementCompletedSessions();
-            try {
-                const { activeTaskId } = await import('@/stores/task-store').then((m) =>
-                    m.useTasksStore.getState(),
-                );
+            if (isValidSession) {
+                // Record the session
+                incrementCompletedSessions();
+                try {
+                    const { activeTaskId } = await import('@/stores/task-store').then((m) =>
+                        m.useTasksStore.getState(),
+                    );
 
-                await fetch('/api/tasks/session-complete', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        taskId: activeTaskId || null,
-                        durationSec: completedDuration,
-                        mode: 'work',
-                    }),
-                });
+                    await fetch('/api/tasks/session-complete', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            taskId: activeTaskId || null,
+                            durationSec: completedDuration,
+                            mode: 'work',
+                        }),
+                    });
 
-                queryClient.invalidateQueries({ queryKey: ['stats'] });
-                queryClient.invalidateQueries({ queryKey: ['tasks'] });
-                queryClient.invalidateQueries({ queryKey: ['history'] });
-            } catch (error) {
-                console.error('Failed to record session completion:', error);
+                    queryClient.invalidateQueries({ queryKey: ['stats'] });
+                    queryClient.invalidateQueries({ queryKey: ['tasks'] });
+                    queryClient.invalidateQueries({ queryKey: ['history'] });
+                } catch (error) {
+                    console.error('Failed to record session completion:', error);
+                }
+                playNotificationSound();
+            } else {
+                // Skipped without recording
+                toast.info(t('timer.skipped_not_recorded') || 'Session skipped - not recorded');
             }
         } else {
+            // Break sessions are always recorded (but don't affect task progress)
             try {
                 await fetch('/api/tasks/session-complete', {
                     method: 'POST',
@@ -248,27 +309,31 @@ export function EnhancedTimer() {
             } catch (error) {
                 console.error('Failed to record break session:', error);
             }
+            if (!skipWithoutRecording) {
+                playNotificationSound();
+            }
         }
 
-        playNotificationSound();
-
+        // Always transition to next mode
         if (mode === 'work') {
             const newSessionCount = sessionCount + 1;
-            incrementSessionCount();
+            if (isValidSession) {
+                incrementSessionCount();
+            }
 
             if (newSessionCount % settings.longBreakInterval === 0) {
                 setMode('longBreak');
                 setTimeLeft(settings.longBreakDuration * 60);
-                if (settings.autoStartBreak) setIsRunning(true);
+                if (settings.autoStartBreak && !skipWithoutRecording) setIsRunning(true);
             } else {
                 setMode('shortBreak');
                 setTimeLeft(settings.shortBreakDuration * 60);
-                if (settings.autoStartBreak) setIsRunning(true);
+                if (settings.autoStartBreak && !skipWithoutRecording) setIsRunning(true);
             }
         } else {
             setMode('work');
             setTimeLeft(settings.workDuration * 60);
-            if (settings.autoStartWork) setIsRunning(true);
+            if (settings.autoStartWork && !skipWithoutRecording) setIsRunning(true);
         }
         setIsProcessing(false);
     };
@@ -455,11 +520,22 @@ export function EnhancedTimer() {
             toggleTimer: () => void;
             resetTimer: () => void;
             handleSessionComplete: () => void;
-            hasImageOrVideoBackground: boolean;
             isProcessing: boolean;
         }) => {
             return (
-                <div className="flex justify-center gap-3">
+                <div className="flex items-center justify-center gap-6">
+                    <Button
+                        onClick={resetTimer}
+                        disabled={isProcessing}
+                        aria-label={t('timer.controls.aria.reset')}
+                        title={t('timer.controls.reset_hint')}
+                        variant="secondary"
+                        size="icon"
+                        className="h-12 w-12 rounded-2xl bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground shadow-sm transition-all"
+                    >
+                        <RotateCcw size={20} />
+                    </Button>
+
                     <Button
                         onClick={toggleTimer}
                         disabled={isProcessing}
@@ -474,39 +550,31 @@ export function EnhancedTimer() {
                                 ? t('timer.controls.pause_hint')
                                 : t('timer.controls.start_hint')
                         }
-                        className="min-w-[100px]"
+                        className={cn(
+                            "h-16 px-8 rounded-2xl text-lg font-bold shadow-lg shadow-primary/25 transition-all hover:scale-105 active:scale-95",
+                            "bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+                        )}
                     >
                         {isRunning ? (
                             <span className="inline-flex items-center gap-2">
-                                <Pause size={18} /> {t('timer.controls.pause')}
+                                <Pause size={24} fill="currentColor" /> {t('timer.controls.pause')}
                             </span>
                         ) : (
                             <span className="inline-flex items-center gap-2">
-                                <Play size={18} /> {t('timer.controls.start')}
+                                <Play size={24} fill="currentColor" /> {t('timer.controls.start').toUpperCase()}
                             </span>
                         )}
                     </Button>
-                    <Button
-                        onClick={resetTimer}
-                        disabled={isProcessing}
-                        aria-label={t('timer.controls.aria.reset')}
-                        title={t('timer.controls.reset_hint')}
-                        variant="outline"
-                    >
-                        <span className="inline-flex items-center gap-2">
-                            <RotateCcw size={18} />
-                        </span>
-                    </Button>
 
                     <Button
-                        onClick={handleSessionComplete}
+                        onClick={handleSkipClick}
                         disabled={isProcessing}
-                        variant="outline"
+                        variant="secondary"
+                        size="icon"
                         title={t('timer.controls.skip_hint')}
+                        className="h-12 w-12 rounded-2xl bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground shadow-sm transition-all"
                     >
-                        <span className="inline-flex items-center gap-2">
-                            <SkipForwardIcon size={18} />
-                        </span>
+                        <SkipForwardIcon size={20} />
                     </Button>
                 </div>
             );
@@ -520,34 +588,33 @@ export function EnhancedTimer() {
             <div className="w-full max-w-xl mx-auto z-10">
                 <div className={cn('bg-transparent border-0')}>
                     <div className="text-center relative">
-                        <div className="mb-6 flex justify-center gap-3">
-                            <Button
-                                variant={mode === 'work' ? 'default' : 'outline'}
-                                size="sm"
-                                onClick={() => switchMode('work')}
-                                className="rounded-full"
+                        <div className="mb-8 flex justify-center">
+                            <Tabs
+                                value={mode}
+                                onValueChange={(val) => switchMode(val as TimerMode)}
+                                className="w-fit"
                             >
-                                <Briefcase size={14} className="mr-1" />
-                                {t('timer.modes.work')}
-                            </Button>
-                            <Button
-                                variant={mode === 'shortBreak' ? 'default' : 'outline'}
-                                size="sm"
-                                onClick={() => switchMode('shortBreak')}
-                                className="rounded-full"
-                            >
-                                <Coffee size={14} className="mr-1" />
-                                {t('timer.modes.shortBreak')}
-                            </Button>
-                            <Button
-                                variant={mode === 'longBreak' ? 'default' : 'outline'}
-                                size="sm"
-                                onClick={() => switchMode('longBreak')}
-                                className="rounded-full"
-                            >
-                                <Coffee size={14} className="mr-1" />
-                                {t('timer.modes.longBreak')}
-                            </Button>
+                                <TabsList className="bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-black/5 dark:border-white/5 p-1 rounded-full shadow-sm">
+                                    <TabsTrigger
+                                        value="work"
+                                        className="rounded-full px-6 py-2 text-sm font-medium transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground dark:data-[state=active]:bg-white dark:data-[state=active]:text-black data-[state=active]:shadow-md"
+                                    >
+                                        {t('timer.modes.work')}
+                                    </TabsTrigger>
+                                    <TabsTrigger
+                                        value="shortBreak"
+                                        className="rounded-full px-6 py-2 text-sm font-medium transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground dark:data-[state=active]:bg-white dark:data-[state=active]:text-black data-[state=active]:shadow-md"
+                                    >
+                                        {t('timer.modes.shortBreak')}
+                                    </TabsTrigger>
+                                    <TabsTrigger
+                                        value="longBreak"
+                                        className="rounded-full px-6 py-2 text-sm font-medium transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground dark:data-[state=active]:bg-white dark:data-[state=active]:text-black data-[state=active]:shadow-md"
+                                    >
+                                        {t('timer.modes.longBreak')}
+                                    </TabsTrigger>
+                                </TabsList>
+                            </Tabs>
                         </div>
 
                         <div className="pb-8 pt-4">
@@ -559,45 +626,47 @@ export function EnhancedTimer() {
                             isRunning={isRunning}
                             toggleTimer={toggleTimer}
                             resetTimer={resetTimer}
-                            handleSessionComplete={handleSessionComplete}
-                            hasImageOrVideoBackground={hasImageOrVideoBackground}
+                            handleSessionComplete={() => handleSessionComplete(false)}
                             isProcessing={isProcessing}
                         />
 
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
-                            {!isFocusMode && mode === 'work' && (
-                                <>
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6 min-h-[44px]">
+                            {!isFocusMode && (
+                                <div className={cn(
+                                    "transition-opacity duration-300",
+                                    mode === 'work' ? "opacity-100" : "opacity-0 pointer-events-none"
+                                )}>
                                     <TaskSelector />
+                                </div>
+                            )}
 
-                                    {dailyPomodoros > 0 && (
-                                        <div className="animate-in slide-in-from-top-2 fade-in duration-500">
-                                            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-background/80 backdrop-blur-md border border-border/50 shadow-sm hover:bg-background/90 transition-colors dark:bg-background/60 dark:hover:bg-background/80 whitespace-nowrap">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="p-1.5 rounded-full bg-primary/10 text-primary">
-                                                        <CheckCircle2 className="w-4 h-4" />
-                                                    </div>
-                                                    <div className="flex flex-row items-center gap-2">
-                                                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{t('timerComponents.enhancedTimer.today')}</span>
-                                                        <span className="text-sm font-bold text-foreground leading-none">
-                                                            {dailyPomodoros} <span className="text-xs font-normal text-muted-foreground">{t('timerComponents.enhancedTimer.poms')}</span>
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                {dailyFocusTime > 0 && (
-                                                    <>
-                                                        <div className="w-px h-4 bg-border/50" />
-                                                        <div className="flex flex-row items-center gap-2">
-                                                            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{t('timerComponents.enhancedTimer.time')}</span>
-                                                            <span className="text-sm font-bold text-foreground leading-none">
-                                                                {Math.floor(dailyFocusTime / 60)} <span className="text-xs font-normal text-muted-foreground">{t('timerComponents.enhancedTimer.minutes')}</span>
-                                                            </span>
-                                                        </div>
-                                                    </>
-                                                )}
+                            {!isFocusMode && mode === 'work' && dailyPomodoros > 0 && (
+                                <div className="animate-in slide-in-from-top-2 fade-in duration-500">
+                                    <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-background/80 backdrop-blur-md border border-border/50 shadow-sm hover:bg-background/90 transition-colors dark:bg-background/60 dark:hover:bg-background/80 whitespace-nowrap">
+                                        <div className="flex items-center gap-2">
+                                            <div className="p-1.5 rounded-full bg-primary/10 text-primary">
+                                                <CheckCircle2 className="w-4 h-4" />
+                                            </div>
+                                            <div className="flex flex-row items-center gap-2">
+                                                <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{t('timerComponents.enhancedTimer.today')}</span>
+                                                <span className="text-sm font-bold text-foreground leading-none">
+                                                    {dailyPomodoros} <span className="text-xs font-normal text-muted-foreground">{t('timerComponents.enhancedTimer.poms')}</span>
+                                                </span>
                                             </div>
                                         </div>
-                                    )}
-                                </>
+                                        {dailyFocusTime > 0 && (
+                                            <>
+                                                <div className="w-px h-4 bg-border/50" />
+                                                <div className="flex flex-row items-center gap-2">
+                                                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{t('timerComponents.enhancedTimer.time')}</span>
+                                                    <span className="text-sm font-bold text-foreground leading-none">
+                                                        {Math.floor(dailyFocusTime / 60)} <span className="text-xs font-normal text-muted-foreground">{t('timerComponents.enhancedTimer.minutes')}</span>
+                                                    </span>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
                             )}
 
                             {isFocusMode && (
@@ -638,15 +707,25 @@ export function EnhancedTimer() {
                                         variant="ghost"
                                         size="icon"
                                         className={cn(
-                                            "h-10 w-10 rounded-full backdrop-blur-sm border transition-all",
+                                            "h-10 w-10 rounded-full backdrop-blur-sm border transition-all relative overflow-visible",
                                             hasActiveAudio
-                                                ? "bg-gradient-to-br from-primary/80 to-primary border-primary/50 text-primary-foreground hover:from-primary hover:to-primary/90 shadow-lg shadow-primary/25"
+                                                ? currentlyPlaying?.type === 'youtube'
+                                                    ? "bg-red-500/90 border-red-500/50 text-white hover:bg-red-500 shadow-lg shadow-red-500/25 pulse-red"
+                                                    : "bg-gradient-to-br from-primary/80 to-primary border-primary/50 text-primary-foreground hover:from-primary hover:to-primary/90 shadow-lg shadow-primary/25"
                                                 : "bg-background/20 hover:bg-background/40 border-white/10 text-foreground"
                                         )}
                                         onClick={() => setAudioSettingsOpen(true)}
                                     >
                                         {hasActiveAudio ? (
-                                            <AudioLines size={20} animate={isAudioPlaying} className="text-background" />
+                                            <div className="flex items-center justify-center">
+                                                {currentlyPlaying?.type === 'youtube' ? (
+                                                    <svg className="h-5 w-5 text-white fill-current" viewBox="0 0 24 24">
+                                                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                                                    </svg>
+                                                ) : (
+                                                    <AudioLines size={20} animate={isAudioPlaying} className="text-background" />
+                                                )}
+                                            </div>
                                         ) : (
                                             <Music className="h-5 w-5" />
                                         )}
@@ -667,7 +746,23 @@ export function EnhancedTimer() {
                                             ) : (
                                                 <AudioLines size={16} className="shrink-0" animate={isAudioPlaying} />
                                             )}
-                                            <span className="max-w-[180px] truncate">{currentlyPlaying.name}</span>
+                                            <div className="flex flex-col min-w-0">
+                                                <span className="max-w-[180px] truncate">{currentlyPlaying.name}</span>
+                                                {activeAmbientSounds.length > 0 && currentlyPlaying.type !== 'ambient' && (
+                                                    <span className="text-[10px] text-muted-foreground font-medium">
+                                                        + {activeAmbientSounds.length} ambient sound{activeAmbientSounds.length > 1 ? 's' : ''}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ) : activeAmbientSounds.length > 0 ? (
+                                        <div className="flex items-center gap-2">
+                                            <AudioLines size={16} className="shrink-0" animate={true} />
+                                            <span className="max-w-[180px] truncate">
+                                                {activeAmbientSounds.length === 1
+                                                    ? "Ambient Sound Playing"
+                                                    : `Mixed Ambient (${activeAmbientSounds.length} sounds)`}
+                                            </span>
                                         </div>
                                     ) : (
                                         <p>{t('timerComponents.enhancedTimer.soundSettings')}</p>
@@ -730,6 +825,29 @@ export function EnhancedTimer() {
                     </Tooltip>
                 </TooltipProvider>
             </div>
+
+            {/* Skip Confirmation Dialog */}
+            <AlertDialog open={skipConfirmOpen} onOpenChange={setSkipConfirmOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>
+                            {t('timer.skip_confirm.title') || 'Skip without recording?'}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {t('timer.skip_confirm.description') ||
+                                `You've completed less than ${MINIMUM_COMPLETION_PERCENT}% of this session. This will not count as a completed pomodoro.`}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>
+                            {t('common.cancel') || 'Cancel'}
+                        </AlertDialogCancel>
+                        <AlertDialogAction onClick={handleConfirmedSkip}>
+                            {t('timer.skip_confirm.confirm') || 'Skip anyway'}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

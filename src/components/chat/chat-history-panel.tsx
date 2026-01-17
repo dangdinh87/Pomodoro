@@ -215,18 +215,6 @@ export function ChatHistoryPanel({
                             <SheetTitle className="text-base">
                                 {t('chat.historyTitle')}
                             </SheetTitle>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-primary hover:text-primary"
-                                onClick={() => {
-                                    onNewChat();
-                                    onOpenChange(false);
-                                }}
-                                title={t('chat.newChat')}
-                            >
-                                <Plus className="h-5 w-5" />
-                            </Button>
                         </div>
                     </SheetHeader>
 

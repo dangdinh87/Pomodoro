@@ -8,9 +8,11 @@ import { Task, useTasksStore } from '@/stores/task-store'
 import { TaskFilters } from './components/task-filters'
 import { TaskFormModal } from './components/task-form-modal'
 import { TaskList } from './components/task-list'
+import { TagManager } from './components/tag-manager'
 import { useTaskFilters, useFilteredTasks } from '@/hooks/use-task-filters'
 import { useI18n } from '@/contexts/i18n-context'
 import { useTasks } from '@/hooks/use-tasks'
+import { useTags } from '@/hooks/use-tags'
 import { Plus, Search, FilterX, AlertCircle } from 'lucide-react'
 import {
   AlertDialog,
@@ -56,6 +58,7 @@ export function TaskManagement() {
   const { editingId, setEditingId, resetEditingState } = useEditingState()
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const taskFilters = useTaskFilters()
+  const userTags = useTags()
   const filteredTasks = useFilteredTasks(tasks, taskFilters)
 
   // Delete confirmation state
@@ -106,6 +109,11 @@ export function TaskManagement() {
     if (!deleteConfirmId) return
 
     try {
+      // If deleting the active task, reset active state
+      if (deleteConfirmId === activeTaskId) {
+        setActiveTask(null)
+      }
+
       await hardDeleteTask(deleteConfirmId)
 
       if (editingId === deleteConfirmId) {
@@ -146,7 +154,13 @@ export function TaskManagement() {
             {t('tasks.subtitle')}
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <TagManager
+            tags={userTags.tags}
+            isLoading={userTags.isLoading}
+            onAddTag={userTags.addTag}
+            onRemoveTag={userTags.removeTag}
+          />
           <Button onClick={() => setIsCreateModalOpen(true)} className="h-10 px-4 gap-2 shadow-lg shadow-primary/20">
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">{t('tasks.addTask')}</span>
@@ -157,6 +171,7 @@ export function TaskManagement() {
             onOpenChange={handleOpenChange}
             onSave={handleFormSubmit}
             availableTags={uniqueTags}
+            userTags={userTags.tags}
           />
         </div>
       </div>
@@ -166,10 +181,13 @@ export function TaskManagement() {
           query={taskFilters.query}
           statusFilter={taskFilters.statusFilter}
           priorityFilter={taskFilters.priorityFilter}
+          tagFilter={taskFilters.tagFilter}
           dateRange={taskFilters.dateRange}
+          availableTags={uniqueTags}
           onQueryChange={taskFilters.setQuery}
           onStatusChange={taskFilters.setStatusFilter}
           onPriorityChange={taskFilters.setPriorityFilter}
+          onTagChange={taskFilters.setTagFilter}
           onDateRangeChange={taskFilters.setDateRange}
           onReload={() => { /* React Query handles caching, but we could invalidate here if needed */ }}
           onResetFilters={taskFilters.resetFilters}
@@ -179,6 +197,7 @@ export function TaskManagement() {
           tasks={filteredTasks}
           isLoading={isLoading}
           activeTaskId={activeTaskId}
+          hasTasks={tasks.length > 0}
           onToggleStatus={handleToggleStatus}
           onToggleActive={handleToggleActive}
           onEdit={handleEdit}

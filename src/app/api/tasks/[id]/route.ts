@@ -74,14 +74,25 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       .from('tasks')
       .update(updates)
       .eq('id', id)
-      .eq('user_id', userId)
+      .eq('user_id', String(userId))
       .select('*')
       .single()
 
     if (error) {
-      console.error('Error updating task', error)
+      console.error('Error updating task:', {
+        error,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code,
+        userId,
+        taskId: id,
+      })
       return NextResponse.json(
-        { error: 'Failed to update task' },
+        { 
+          error: 'Failed to update task',
+          details: error.message,
+        },
         { status: 500 },
       )
     }
@@ -97,14 +108,13 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 }
 
 export async function DELETE(request: Request, { params }: RouteParams) {
-  if (!isAuthorized(request)) {
-    return unauthorizedResponse()
-  }
-
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
+    if (!isAuthorized(request)) {
+      return unauthorizedResponse()
+    }
     return unauthorizedResponse()
   }
 
@@ -119,12 +129,23 @@ export async function DELETE(request: Request, { params }: RouteParams) {
         .from('tasks')
         .delete()
         .eq('id', id)
-        .eq('user_id', userId)
+        .eq('user_id', String(userId))
 
       if (error) {
-        console.error('Error hard-deleting task', error)
+        console.error('Error hard-deleting task:', {
+          error,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code,
+          userId,
+          taskId: id,
+        })
         return NextResponse.json(
-          { error: 'Failed to delete task' },
+          { 
+            error: 'Failed to delete task',
+            details: error.message,
+          },
           { status: 500 },
         )
       }
@@ -136,14 +157,25 @@ export async function DELETE(request: Request, { params }: RouteParams) {
       .from('tasks')
       .update({ is_deleted: true })
       .eq('id', id)
-      .eq('user_id', userId)
+      .eq('user_id', String(userId))
       .select('*')
       .single()
 
     if (error) {
-      console.error('Error soft-deleting task', error)
+      console.error('Error soft-deleting task:', {
+        error,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code,
+        userId,
+        taskId: id,
+      })
       return NextResponse.json(
-        { error: 'Failed to delete task' },
+        { 
+          error: 'Failed to delete task',
+          details: error.message,
+        },
         { status: 500 },
       )
     }

@@ -109,7 +109,9 @@
   }
   body {
     @apply bg-background text-foreground;
-    transition: background-color 0.3s ease, color 0.3s ease,
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease,
       border-color 0.3s ease;
   }
 
@@ -179,7 +181,8 @@ html.dark ::-webkit-scrollbar-thumb:hover {
 
 /* Subtle low-time glow: uses CSS var for unified color; enable via conditional class */
 .timer-glow {
-  text-shadow: 0 0 0.35rem hsl(var(--timer-foreground)),
+  text-shadow:
+    0 0 0.35rem hsl(var(--timer-foreground)),
     0 0 0.6rem hsl(var(--timer-foreground));
 }
 
@@ -208,11 +211,15 @@ html.dark ::-webkit-scrollbar-thumb:hover {
 }
 
 .timer-state-transition {
-  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+  transition:
+    opacity 0.2s ease-in-out,
+    transform 0.2s ease-in-out;
 }
 
 .timer-button-transition {
-  transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+  transition:
+    opacity 0.15s ease-out,
+    transform 0.15s ease-out;
 }
 
 /* Mini Player Card Animations */
@@ -309,4 +316,37 @@ html.dark .custom-scrollbar {
   animation: border-beam var(--duration) linear infinite;
   animation-delay: var(--delay);
   animation-direction: var(--direction);
+}
+
+/* Audio Pulse Animations */
+@keyframes pulse-red {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+.pulse-red {
+  animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-primary {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+.pulse-primary {
+  animation: pulse-primary 2s infinite;
 }

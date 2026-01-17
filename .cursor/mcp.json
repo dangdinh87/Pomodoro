@@ -1,20 +1,17 @@
 {
-  "mcpServers": {
-    "shadcn": {
-      "command": "npx",
-      "args": [
-        "shadcn@latest",
-        "mcp"
-      ]
-    },
-    "supabase": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@supabase/mcp-server-supabase@0.5.5",
-        "--access-token",
-        "sbp_a9d225013b2905357f64a5c28e4492db2384e031"
-      ]
+  "mcp": {
+    "servers": {
+      "shadcn": {
+        "command": "npx",
+        "args": ["shadcn@latest", "mcp"]
+      },
+      "supabase": {
+        "command": "npx",
+        "args": ["-y", "@supabase/mcp-server-supabase"],
+        "env": {
+          "SUPABASE_ACCESS_TOKEN": "sbp_c780abde691fd12fb61152764cc04db661834b97"
+        }
+      }
     }
   }
 }

@@ -4,7 +4,7 @@ import { Task } from '@/stores/task-store'
 import { TaskItem } from './task-item'
 import { AnimatedListItem } from '@/components/ui/animated-list'
 import { Skeleton } from '@/components/ui/skeleton'
-import { LayoutList } from 'lucide-react'
+import { LayoutList, FilterX } from 'lucide-react'
 import { useI18n } from '@/contexts/i18n-context'
 import { AnimatePresence } from 'motion/react'
 
@@ -12,6 +12,7 @@ interface TaskListProps {
   tasks: Task[]
   isLoading: boolean
   activeTaskId: string | null
+  hasTasks: boolean
   onToggleStatus: (task: Task) => void
   onToggleActive: (task: Task) => void
   onEdit: (task: Task) => void
@@ -22,6 +23,7 @@ export function TaskList({
   tasks,
   isLoading,
   activeTaskId,
+  hasTasks,
   onToggleStatus,
   onToggleActive,
   onEdit,
@@ -40,16 +42,21 @@ export function TaskList({
   }
 
   if (tasks.length === 0) {
+    const isFiltered = true // We can pass this from parent or check filters here
+    
     return (
-      <div className="flex flex-col items-center justify-center py-16 px-4 bg-muted/20 border border-dashed rounded-xl space-y-3">
-        <div className="h-12 w-12 rounded-full bg-muted/50 flex items-center justify-center">
-          <LayoutList className="h-6 w-6 text-muted-foreground" />
+      <div className="flex flex-col items-center justify-center py-20 px-4 bg-muted/10 border border-dashed border-muted/50 rounded-2xl space-y-4">
+        <div className="h-16 w-16 rounded-full bg-muted/30 flex items-center justify-center animate-pulse">
+          <LayoutList className="h-8 w-8 text-muted-foreground/60" />
         </div>
-        <div className="text-center">
-          <h3 className="text-base font-semibold">{t('tasks.noTasks')}</h3>
-          <p className="text-sm text-muted-foreground max-w-[250px] mx-auto">
+        <div className="text-center space-y-1">
+          <h3 className="text-lg font-semibold tracking-tight">{t('tasks.noTasks')}</h3>
+          <p className="text-sm text-muted-foreground max-w-[280px] mx-auto leading-relaxed">
             {t('tasks.noTasksDescription')}
           </p>
+        </div>
+        <div className="pt-2">
+           {/* We could add a clear filters button here if we know it's filtered */}
         </div>
       </div>
     )

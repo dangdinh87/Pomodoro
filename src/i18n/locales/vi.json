@@ -43,6 +43,7 @@
     "loginNow": "Đăng nhập ngay"
   },
   "auth": {
+    "login": "Đăng nhập",
     "pleaseLogin": "Vui lòng đăng nhập để tiếp tục",
     "signInToManageTasks": "Vui lòng đăng nhập để quản lý công việc",
     "signInToViewStats": "Vui lòng đăng nhập để xem thống kê",
@@ -95,7 +96,13 @@
       "time": "Thời gian",
       "minutes": "phút"
     },
-    "focusMode": "Chế độ tập trung"
+    "focusMode": "Chế độ tập trung",
+    "skipped_not_recorded": "Đã bỏ qua phiên - không được ghi nhận",
+    "skip_confirm": {
+      "title": "Bỏ qua mà không ghi nhận?",
+      "description": "Bạn mới hoàn thành chưa đến 50% phiên này. Phiên này sẽ không được tính là một pomodoro hoàn thành.",
+      "confirm": "Vẫn bỏ qua"
+    }
   },
   "timerSettings": {
     "title": "Cài đặt Hẹn giờ",
@@ -142,10 +149,19 @@
     "title": "Quản lý công việc",
     "subtitle": "Quản lý công việc và theo dõi tiến độ với phương pháp Pomodoro",
     "addTask": "Thêm công việc mới",
+    "manageTags": "Quản lý tag",
+    "manageTagsDescription": "Tags chỉ dùng để sắp xếp. Xóa tag ở đây không ảnh hưởng đến công việc của bạn.",
+    "newTagPlaceholder": "Tag mới...",
+    "noTags": "Chưa có tag nào",
+    "tagsLimit": "tags",
+    "tag": "Tag",
     "editTask": "Chỉnh sửa công việc",
     "deleteTask": "Xóa công việc",
     "noTasks": "Không tìm thấy công việc nào",
     "noTasksDescription": "Bạn chưa có công việc nào. Hãy tạo một công việc để bắt đầu phiên tập trung.",
+    "noResults": "Không tìm thấy kết quả",
+    "noResultsDescription": "Thử điều chỉnh tìm kiếm hoặc bộ lọc để tìm thấy công việc bạn cần.",
+    "focusing": "Đang tập trung",
     "createFirst": "Tạo công việc đầu tiên để bắt đầu",
     "taskName": "Tên công việc",
     "taskNamePlaceholder": "Bạn đang định làm gì?",
@@ -155,6 +171,7 @@
     "dueDate": "Hạn chót",
     "status": "Trạng thái",
     "estimated": "Pomodoro dự kiến",
+    "estimatedHint": "Số phiên Pomodoro (~25 phút/phiên) bạn dự tính để hoàn thành công việc này.",
     "actual": "Thực tế",
     "completed": "Hoàn thành",
     "pending": "Chờ xử lý",
@@ -731,7 +748,13 @@
       "noPendingTasks": "Không có công việc chờ xử lý",
       "noPendingTasksToday": "Không có công việc nào trong hôm nay. Hãy tập trung vào mục tiêu của bạn!",
       "createTaskPrompt": "Tạo công việc mới để bắt đầu",
-      "goToTaskList": "Đi đến danh sách công việc"
+      "goToTaskList": "Đi đến danh sách công việc",
+      "startFocus": "Bắt đầu tập trung",
+      "stopFocus": "Ngừng tập trung",
+      "switchConfirm": {
+        "title": "Đổi công việc?",
+        "description": "Bạn đang tập trung vào một công việc khác. Bạn có chắc muốn đổi không?"
+      }
     },
     "enhancedTimer": {
       "today": "Hôm nay",
@@ -803,6 +826,248 @@
       "title": "Chưa có dữ liệu",
       "description": "Không có phiên tập trung nào được ghi nhận trong khoảng thời gian này. Hãy bắt đầu một phiên mới!",
       "startFocus": "Bắt đầu tập trung"
+    }
+  },
+  "landing": {
+    "nav": {
+      "features": "Tính Năng",
+      "testimonials": "Câu Chuyện Thành Công",
+      "contact": "Liên Hệ",
+      "pricing": "Bảng Giá",
+      "login": "Đăng Nhập",
+      "getStarted": "Bắt Đầu Ngay"
+    },
+    "hero": {
+      "badge": "Năng Suất Được Hỗ Trợ Bởi AI 🤖",
+      "focusMode": "Chế Độ Làm Việc Sâu",
+      "title": "Làm Chủ",
+      "titleHighlight": "Sự Tập Trung",
+      "subtitle": "Đồng hồ Pomodoro tiên tiến được thiết kế cho hiệu suất tối đa. Loại bỏ xao nhãng, đạt trạng thái 'Flow' và theo dõi tiến độ với phân tích chính xác.",
+      "getStarted": "Bắt Đầu Miễn Phí",
+      "tryDemo": "Xem Demo",
+      "aiChat": "Mới: Trợ Lý Năng Suất AI",
+      "timer": "Phiên Tập Trung",
+      "stats": {
+        "focusSessions": "Phiên Tập Trung",
+        "moreProductive": "Tăng Hiệu Suất",
+        "focused": "Thời Gian Tập Trung"
+      },
+      "features": {
+        "ai": {
+          "title": "Thông Tin Thông Minh",
+          "desc": "Tóm tắt phiên & huấn luyện bởi AI."
+        },
+        "music": {
+          "title": "Môi Trường Tập Trung",
+          "desc": "Âm thanh môi trường được chọn lọc."
+        },
+        "tasks": {
+          "title": "Đồng Bộ Công Việc",
+          "desc": "Tích hợp mượt mà nhiệm vụ với phiên tập trung."
+        },
+        "skins": {
+          "title": "Tùy Biến Giao Diện",
+          "desc": "Giao diện Kỹ thuật số, Lật và Kim chuyên nghiệp."
+        }
+      }
+    },
+    "footer": {
+      "madeWith": "Thiết kế bởi",
+      "for": "dành cho",
+      "focusedMinds": "những người chuyên nghiệp",
+      "rightsReserved": "Mọi quyền được bảo lưu.",
+      "links": {
+        "features": "Tính Năng",
+        "pricing": "Bảng Giá",
+        "privacy": "Chính Sách Quyền Riêng Tư",
+        "terms": "Điều Khoản Dịch Vụ"
+      }
+    },
+    "aiChatHighlight": {
+      "title": "Khai Phá Tiềm Năng Cùng AI",
+      "subtitle": "Nhận ngay hướng dẫn cá nhân hóa về chiến lược năng suất, phương pháp học tập và tối ưu hóa quy trình làm việc.",
+      "cta": "Tư Vấn Cùng AI"
+    },
+
+    "howItWorks": {
+      "badge": "Quy Trình",
+      "title": "Thành Thạo Trong",
+      "titleHighlight": "3 Bước",
+      "subtitle": "Khung làm việc đã kiểm chứng cho hiệu suất cao ổn định",
+      "steps": {
+        "step1": {
+          "title": "Xác Định Mục Tiêu",
+          "description": "Nhập nhiệm vụ và ước tính số lượng Pomodoro cần thiết để hoàn thành."
+        },
+        "step2": {
+          "title": "Thực Hiện Phiên",
+          "description": "Đắm mình vào các khoảng thời gian làm việc tập trung 25 phút."
+        },
+        "step3": {
+          "title": "Phân Tích & Tối Ưu",
+          "description": "Xem lại phân tích chi tiết để tinh chỉnh thói quen làm việc của bạn."
+        }
+      }
+    },
+    "socialProof": {
+      "stats": {
+        "activeUsers": "Chuyên Gia Đang Hoạt Động",
+        "focusHours": "Giờ Tập Trung Đã Ghi",
+        "tasksCompleted": "Nhiệm Vụ Hoàn Thành",
+        "userRating": "Đánh Giá Trung Bình"
+      },
+      "trustedBy": "Được tin dùng bởi những người dẫn đầu từ",
+      "highlight": {
+        "title": "Người dùng báo cáo tăng 40% năng suất",
+        "description": "Dựa trên chỉ số hiệu suất của 1,000+ người dùng tích cực sau 30 ngày",
+        "verified": "Dữ Liệu Đã Xác Minh"
+      }
+    },
+    "faq": {
+      "badge": "Câu Hỏi Thường Gặp",
+      "title": "Các Câu Hỏi",
+      "titleHighlight": "Phổ Biến",
+      "subtitle": "Mọi thứ bạn cần biết về hệ sinh thái Study Bro",
+      "stillHaveQuestions": "Cần hỗ trợ thêm?",
+      "sendMessage": "Liên Hệ Hỗ Trợ",
+      "items": {
+        "q1": {
+          "question": "Cơ sở khoa học của phương pháp này là gì?",
+          "answer": "Kỹ thuật Pomodoro tận dụng các khoảng thời gian cố định (thường là 25 phút) để tạo cảm giác cấp bách và duy trì hiệu suất nhận thức cao, sử dụng các khoảng nghỉ theo lịch trình để ngăn chặn sự mệt mỏi về tinh thần."
+        },
+        "q2": {
+          "question": "Nền tảng có miễn phí không?",
+          "answer": "Có. Bộ công cụ năng suất cốt lõi—bao gồm đồng hồ hẹn giờ, quản lý công việc và phân tích cơ bản—hoàn toàn miễn phí mãi mãi. Chúng tôi cung cấp gói Chuyên Nghiệp cho người dùng có nhu cầu nâng cao."
+        },
+        "q3": {
+          "question": "Tôi có thể điều chỉnh quy trình làm việc không?",
+          "answer": "Chắc chắn rồi. Bạn có toàn quyền kiểm soát thời lượng phiên, khoảng nghỉ ngắt quãng và tần suất nghỉ dài để phù hợp hoàn hảo với nhịp sinh học và phong cách làm việc của bạn."
+        },
+        "q4": {
+          "question": "Có hỗ trợ sử dụng ngoại tuyến không?",
+          "answer": "Có. Các chức năng hẹn giờ và công việc thiết yếu hoạt động cục bộ. Đồng bộ hóa dữ liệu diễn ra tự động ngay khi kết nối an toàn được thiết lập."
+        },
+        "q5": {
+          "question": "Dữ liệu của tôi được bảo mật như thế nào?",
+          "answer": "Chúng tôi tuân thủ các tiêu chuẩn quyền riêng tư nghiêm ngặt. Dữ liệu năng suất của bạn được mã hóa và lưu trữ an toàn. Bạn giữ toàn quyền sở hữu và có thể xuất hoặc xóa dữ liệu của mình bất cứ lúc nào."
+        },
+        "q6": {
+          "question": "Khả năng tương thích nền tảng?",
+          "answer": "Study Bro là một ứng dụng web tiến bộ (PWA) được tối ưu hóa cho tất cả các trình duyệt hiện đại trên máy tính để bàn, máy tính bảng và thiết bị di động. Các ứng dụng gốc đang được phát triển."
+        }
+      }
+    },
+    "cta": {
+      "badge": "Bắt Đầu Hành Trình Của Bạn 🚀",
+      "title": "Sẵn Sàng Đạt",
+      "titleHighlight": "Hiệu Suất Đỉnh Cao?",
+      "subtitle": "Tham gia cùng hàng nghìn chuyên gia đang làm chủ quy trình làm việc của họ ngay hôm nay.",
+      "getStarted": "Bắt Đầu Miễn Phí",
+      "tryDemo": "Xem Demo",
+      "trustedByMany": "Được tin dùng bởi các nhà lãnh đạo",
+      "rating": "Đánh giá trung bình 4.9/5"
+    },
+    "features": {
+      "badge": "Khả Năng Chính",
+      "title": "Hệ Sinh Thái Cho",
+      "titleHighlight": "Làm Việc Sâu",
+      "subtitle": "Một bộ công cụ toàn diện được thiết kế để tạo điều kiện cho trạng thái 'Flow' và tối đa hóa đầu ra sáng tạo.",
+      "items": {
+        "timer": {
+          "title": "Đồng Hồ Chính Xác",
+          "description": "Các khoảng thời gian có thể tùy chỉnh với chuyển đổi tự động"
+        },
+        "tasks": {
+          "title": "Điều Phối Nhiệm Vụ",
+          "description": "Liên kết mượt mà các mục tiêu với phiên tập trung"
+        },
+        "analytics": {
+          "title": "Phân Tích Hiệu Suất",
+          "description": "Đi sâu vào các chỉ số năng suất của bạn"
+        },
+        "sounds": {
+          "title": "Âm Thanh Tập Trung",
+          "description": "Cảnh quan âm thanh Lo-fi và tiếng ồn trắng cao cấp"
+        },
+        "streaks": {
+          "title": "Theo Dõi Nhất Quán",
+          "description": "Trực quan hóa cam kết của bạn với chuỗi ngày"
+        },
+        "themes": {
+          "title": "Giao Diện Thích Ứng",
+          "description": "Chế độ Sáng và Tối được thiết kế để thoải mái cho mắt"
+        }
+      }
+    },
+    "chatAI": {
+      "indicator": "Trợ Lý Năng Suất AI",
+      "prompt": "Làm thế nào tôi có thể tối ưu hóa lịch trình..."
+    },
+
+    "pricing": {
+      "badge": "Giá Trị Mang Lại 💎",
+      "title": "Bảng Giá",
+      "titleHighlight": "Minh Bạch",
+      "subtitle": "Các gói linh hoạt được thiết kế để mở rộng theo nhu cầu năng suất của bạn.",
+      "forever": "mãi mãi",
+      "noCreditCard": "Không cần thẻ tín dụng",
+      "freeForever": "Gói Cơ Bản",
+      "cancelAnytime": "Hủy bất cứ lúc nào",
+      "free": {
+        "name": "Khởi Đầu",
+        "description": "Công cụ thiết yếu cho sự tập trung",
+        "cta": "Bắt Đầu Ngay",
+        "features": {
+          "timer": "Đồng hồ Pomodoro Tiêu Chuẩn",
+          "tasks": "Tối đa 5 Nhiệm vụ Hoạt động",
+          "history": "Lưu trữ Lịch sử 7 Ngày",
+          "themes": "Chế độ Sáng/Tối Hệ thống",
+          "sounds": "Cảnh Quan Âm Thanh Tiêu Chuẩn",
+          "stats": "Phân Tích Cốt Lỗi"
+        }
+      },
+      "pro": {
+        "name": "Chuyên Nghiệp",
+        "description": "Dành cho người hiệu suất cao",
+        "cta": "Tham Gia Danh Sách Chờ",
+        "comingSoon": "Sắp Ra Mắt",
+        "comingSoonText": "Đang Phát Triển",
+        "brewingTitle": "Tính Năng Nâng Cao",
+        "brewingSubtitle": "đang được xây dựng. Hãy đón chờ.",
+        "includesEverything": "Tất cả trong Khởi Đầu, cộng thêm:",
+        "features": {
+          "unlimited": "Quản Lý Nhiệm Vụ Không Giới Hạn",
+          "fullHistory": "Lưu Trữ Lịch Sử Không Giới Hạn",
+          "cloudSync": "Đồng Bộ Đám Mây Đa Thiết Bị",
+          "advanced": "Thông Tin Hiệu Suất Nâng Cao",
+          "priority": "Kênh Hỗ Trợ Ưu Tiên",
+          "sounds": "Thư Viện Âm Thanh Cao Cấp",
+          "themes": "Giao Diện Tùy Chỉnh"
+        }
+      }
+    },
+    "testimonials": {
+      "badge": "Câu Chuyện Thành Công",
+      "title": "Được Tin Dùng Bởi",
+      "titleHighlight": "Người Thành Đạt",
+      "subtitle": "Được hàng nghìn người tin dùng để nâng cao sự tập trung và hiệu quả công việc.",
+      "items": {
+        "item1": {
+          "name": "Sarah Chen",
+          "role": "Kỹ Sư Phần Mềm Senior",
+          "content": "Phân tích năng suất giúp tôi xác định giờ hiệu suất cao điểm. Bây giờ tôi triển khai mã nhanh hơn đáng kể."
+        },
+        "item2": {
+          "name": "Alex Rivera",
+          "role": "Nhà Thiết Kế Sản Phẩm",
+          "content": "Các cảnh quan âm thanh được chọn lọc rất cần thiết cho môi trường văn phòng mở của tôi. Độ sâu tập trung của tôi đã cải thiện đáng kể."
+        },
+        "item3": {
+          "name": "David Kim",
+          "role": "Nhà Sáng Lập Độc Lập",
+          "content": "Thanh lịch và hiệu quả. Sự tổng hợp giữa kỹ thuật Pomodoro với quản lý công việc cung cấp chính xác cấu trúc mà tôi còn thiếu."
+        }
+      }
     }
   }
 }

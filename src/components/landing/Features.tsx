@@ -2,87 +2,85 @@
 
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/contexts/i18n-context';
 import {
     Timer,
     BarChart3,
     ListTodo,
     Music,
     Palette,
-    Cloud,
+    Flame,
 } from 'lucide-react';
 
-const features = [
-    {
-        icon: Timer,
-        title: 'Smart Timer',
-        description: 'Customizable Pomodoro sessions with automatic break reminders and smart notifications.',
-        gradient: 'from-blue-500 to-cyan-500',
-        className: 'md:col-span-2',
-    },
-    {
-        icon: BarChart3,
-        title: 'Focus Analytics',
-        description: 'Track productivity with detailed statistics and insights.',
-        gradient: 'from-purple-500 to-pink-500',
-        className: 'md:col-span-1',
-    },
-    {
-        icon: ListTodo,
-        title: 'Task Management',
-        description: 'Organize and link tasks to focus sessions.',
-        gradient: 'from-orange-500 to-red-500',
-        className: 'md:col-span-1',
-    },
-    {
-        icon: Music,
-        title: 'Ambient Sounds',
-        description: 'Curated soundscapes and lo-fi beats to enhance your concentration and boost creativity.',
-        gradient: 'from-green-500 to-emerald-500',
-        className: 'md:col-span-2',
-    },
-    {
-        icon: Palette,
-        title: 'Beautiful Themes',
-        description: 'Light and dark modes with custom colors.',
-        gradient: 'from-violet-500 to-purple-500',
-        className: 'md:col-span-1',
-    },
-    {
-        icon: Cloud,
-        title: 'Cloud Sync',
-        description: 'Access your data anywhere, anytime across all devices.',
-        gradient: 'from-sky-500 to-blue-500',
-        className: 'md:col-span-1',
-    },
-];
-
-const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-        opacity: 1,
-        transition: {
-            staggerChildren: 0.08,
-        },
-    },
-};
-
-const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-        opacity: 1,
-        y: 0,
-        transition: { duration: 0.5, ease: 'easeOut' },
-    },
-};
-
 export function Features() {
-    return (
-        <section id="features" className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-            {/* Background decoration */}
-            <div className="absolute inset-0 -z-10">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-gradient-to-r from-blue-500/5 to-purple-500/5 blur-3xl" />
-            </div>
+    const { t } = useTranslation();
 
+    const features = [
+        {
+            icon: Timer,
+            title: t('landing.features.items.timer.title'),
+            description: t('landing.features.items.timer.description'),
+            color: 'bg-blue-600',
+            bgGlow: 'from-blue-600/20 to-transparent',
+        },
+        {
+            icon: ListTodo,
+            title: t('landing.features.items.tasks.title'),
+            description: t('landing.features.items.tasks.description'),
+            color: 'bg-orange-600',
+            bgGlow: 'from-orange-600/20 to-transparent',
+        },
+        {
+            icon: BarChart3,
+            title: t('landing.features.items.analytics.title'),
+            description: t('landing.features.items.analytics.description'),
+            color: 'bg-purple-600',
+            bgGlow: 'from-purple-600/20 to-transparent',
+        },
+        {
+            icon: Music,
+            title: t('landing.features.items.sounds.title'),
+            description: t('landing.features.items.sounds.description'),
+            color: 'bg-green-600',
+            bgGlow: 'from-green-600/20 to-transparent',
+        },
+        {
+            icon: Flame,
+            title: t('landing.features.items.streaks.title'),
+            description: t('landing.features.items.streaks.description'),
+            color: 'bg-red-600',
+            bgGlow: 'from-red-600/20 to-transparent',
+        },
+        {
+            icon: Palette,
+            title: t('landing.features.items.themes.title'),
+            description: t('landing.features.items.themes.description'),
+            color: 'bg-pink-600',
+            bgGlow: 'from-pink-600/20 to-transparent',
+        },
+    ];
+
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1,
+            },
+        },
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.5, ease: 'easeOut' },
+        },
+    };
+
+    return (
+        <section id="features" className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-background">
             <div className="mx-auto max-w-6xl">
                 {/* Section Header */}
                 <motion.div
@@ -90,87 +88,52 @@ export function Features() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5 }}
-                    className="text-center mb-20"
+                    className="mb-16"
                 >
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: true }}
-                        className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-500 text-xs font-medium mb-6"
-                    >
-                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                        Features
-                    </motion.div>
-
-                    <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-tight">
-                        Everything You Need to
-                        <span className="block mt-2 bg-gradient-to-r from-blue-600 via-violet-600 to-purple-600 bg-clip-text text-transparent">
-                            Stay Focused
-                        </span>
+                    <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-4">
+                        {t('landing.features.title')} {t('landing.features.titleHighlight')}
                     </h2>
-                    <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto">
-                        Powerful features designed to help you achieve deep work and maximize your productivity.
+                    <p className="text-slate-600 dark:text-neutral-400 max-w-2xl text-lg">
+                        {t('landing.features.subtitle')}
                     </p>
                 </motion.div>
 
-                {/* Aceternity-style Bento Grid */}
+                {/* Grid Layout matching image */}
                 <motion.div
                     variants={containerVariants}
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true, margin: '-100px' }}
-                    className="grid grid-cols-1 md:grid-cols-3 gap-4 md:auto-rows-[18rem]"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
                     {features.map((feature, index) => (
                         <motion.div
                             key={index}
                             variants={itemVariants}
-                            className={cn(
-                                'group/bento relative row-span-1 flex flex-col justify-between rounded-xl border border-neutral-200 dark:border-white/[0.1] bg-white dark:bg-neutral-950 p-6 transition duration-200 hover:shadow-xl dark:shadow-none cursor-pointer overflow-hidden',
-                                feature.className
-                            )}
+                            className="group relative flex flex-col p-8 rounded-[2.5rem] bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-white/[0.05] transition-all duration-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:border-neutral-300 dark:hover:border-white/[0.1] cursor-default"
                         >
-                            {/* Gradient overlay on hover */}
+                            {/* Icon with colored container */}
                             <div className={cn(
-                                'absolute inset-0 opacity-0 group-hover/bento:opacity-100 transition-opacity duration-500 bg-gradient-to-br',
-                                feature.gradient,
-                                'opacity-[0.03] dark:opacity-[0.05]'
-                            )} />
-
-                            {/* Glow effect on hover */}
-                            <div className={cn(
-                                'absolute -inset-px opacity-0 group-hover/bento:opacity-100 transition-opacity duration-500 rounded-xl blur-2xl -z-10 bg-gradient-to-br',
-                                feature.gradient,
-                                'opacity-20'
-                            )} />
-
-                            {/* Header with animated icon */}
-                            <div className="relative z-10">
-                                <motion.div
-                                    whileHover={{ scale: 1.1, rotate: 5 }}
-                                    className={cn(
-                                        'inline-flex p-3 rounded-xl bg-gradient-to-br shadow-lg w-fit',
-                                        feature.gradient
-                                    )}
-                                >
-                                    <feature.icon className="h-6 w-6 text-white" />
-                                </motion.div>
+                                'h-12 w-12 rounded-xl flex items-center justify-center mb-8 shadow-lg ring-1 ring-white/10 transition-transform group-hover:scale-110 duration-300',
+                                feature.color
+                            )}>
+                                <feature.icon className="h-6 w-6 text-white" />
                             </div>
 
                             {/* Content */}
-                            <div className="relative z-10 transition duration-200 group-hover/bento:translate-x-2">
-                                <div className="mt-2 mb-2 font-bold text-lg text-neutral-800 dark:text-neutral-200 flex items-center gap-2">
+                            <div className="space-y-4">
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
                                     {feature.title}
-                                </div>
-                                <div className="text-sm font-normal text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                                </h3>
+                                <p className="text-slate-600 dark:text-neutral-500 leading-relaxed font-medium">
                                     {feature.description}
-                                </div>
+                                </p>
                             </div>
 
-                            {/* Corner decoration */}
+                            {/* Subtle background glow on hover */}
                             <div className={cn(
-                                'absolute -bottom-2 -right-2 w-32 h-32 rounded-full blur-3xl transition-opacity duration-500 opacity-0 group-hover/bento:opacity-30 bg-gradient-to-br',
-                                feature.gradient
+                                'absolute inset-0 rounded-[2.5rem] bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none',
+                                feature.bgGlow
                             )} />
                         </motion.div>
                     ))}

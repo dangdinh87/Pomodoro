@@ -64,7 +64,16 @@ async function createTask(input: CreateTaskInput): Promise<Task> {
         body: JSON.stringify(body),
     })
 
-    if (!res.ok) throw new Error('Failed to create task')
+    if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}))
+        const errorMessage = errorData.details || errorData.error || 'Failed to create task'
+        console.error('Failed to create task:', {
+            status: res.status,
+            statusText: res.statusText,
+            error: errorData,
+        })
+        throw new Error(errorMessage)
+    }
     const data = await res.json()
     return mapTaskFromApi(data.task)
 }
@@ -140,6 +149,7 @@ export function useTasks() {
                             // Handle partial updates for nested/complex types if needed
                             priority: input.priority ?? task.priority,
                             status: input.status ?? task.status,
+                            updatedAt: new Date().toISOString(), // Optimistic update timestamp
                         } as Task
                     }
                     return task
@@ -149,7 +159,9 @@ export function useTasks() {
             return { previousTasks }
         },
         onError: (err, newTodo, context) => {
-            queryClient.setQueryData(['tasks'], context?.previousTasks)
+            if (context?.previousTasks) {
+                queryClient.setQueryData(['tasks'], context.previousTasks)
+            }
             toast.error('Failed to update task')
         },
         onSettled: () => {

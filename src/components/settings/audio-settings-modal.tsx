@@ -115,11 +115,7 @@ export function AudioSettingsModal({
   const handlePlayPauseToggle = async () => {
     setIsLoadingAudio(true);
     try {
-      if (activeAmbientSounds.length > 0) {
-        await stopAllAmbient();
-      } else if (currentlyPlaying) {
-        togglePlayPause();
-      }
+      await togglePlayPause();
     } catch (error) {
       console.error('Error toggling audio:', error);
       toast.error('Failed to toggle audio playback');
@@ -354,10 +350,23 @@ export function AudioSettingsModal({
                   </div>
                   <div className="flex flex-col overflow-hidden">
                     <span className="text-sm font-medium truncate">
-                      {currentlyPlaying?.name || "No audio playing"}
+                      {currentlyPlaying?.name || (activeAmbientSounds.length > 0
+                        ? (activeAmbientSounds.length === 1
+                          ? soundCatalog.ambient.find(s => s.id === activeAmbientSounds[0])?.label || "Ambient Sound"
+                          : `Mixed Ambient (${activeAmbientSounds.length} sounds)`)
+                        : "No audio playing")}
                     </span>
                     <span className="text-xs truncate text-muted-foreground">
-                      {currentlyPlaying?.isPlaying ? "● Playing" : (currentlyPlaying ? "Paused" : "Select a sound")}
+                      {currentlyPlaying?.isPlaying || activeAmbientSounds.length > 0
+                        ? (
+                          <span className="flex items-center gap-1">
+                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                            {activeAmbientSounds.length > 0 && currentlyPlaying && currentlyPlaying.type !== 'ambient'
+                              ? `Playing (+ ${activeAmbientSounds.length} ambient)`
+                              : "Playing"}
+                          </span>
+                        )
+                        : (currentlyPlaying ? "Paused" : "Select a sound")}
                     </span>
                   </div>
                 </div>
@@ -371,13 +380,11 @@ export function AudioSettingsModal({
                     className="h-10 w-10 rounded-full bg-primary/10 hover:bg-primary/20 text-primary disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
                     onClick={handlePlayPauseToggle}
                     disabled={(!currentlyPlaying && activeAmbientSounds.length === 0) || isLoadingAudio}
-                    title={activeAmbientSounds.length > 0 ? "Stop all ambient sounds" : (currentlyPlaying?.isPlaying ? "Pause" : "Play")}
+                    title={currentlyPlaying?.isPlaying ? "Pause" : "Play"}
                   >
                     {isLoadingAudio ? (
                       <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : activeAmbientSounds.length > 0 ? (
-                      <Square className="h-4 w-4 fill-current" />
-                    ) : currentlyPlaying?.isPlaying ? (
+                    ) : (currentlyPlaying?.isPlaying || activeAmbientSounds.length > 0) ? (
                       <Pause className="h-4 w-4 fill-current" />
                     ) : (
                       <Play className="h-4 w-4 fill-current ml-0.5" />

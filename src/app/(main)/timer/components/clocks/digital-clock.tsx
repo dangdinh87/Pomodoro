@@ -18,7 +18,6 @@ export const DigitalClock = memo(
   ({ timeRef, formattedTime, lowWarnEnabled, timeLeft, clockSize = 'medium', ariaLabel }: DigitalClockProps) => {
     const { t } = useTranslation();
     const isLow = timeLeft <= 10 && lowWarnEnabled;
-    console.log(formattedTime);
 
     // Size mappings
     const sizeClasses = {
