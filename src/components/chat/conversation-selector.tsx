@@ -201,7 +201,7 @@ export function ConversationSelector({
                     <Plus className="h-4 w-4" />
                     <span className="font-medium text-sm">{t('chat.newChat')}</span>
                 </div>
-                <ScrollArea className="max-h-[200px]">
+                <ScrollArea className="h-[300px]">
                     {!hasConversations ? (
                         <div className="p-4 text-center text-sm text-muted-foreground">
                             {t('errors.notFound')}
