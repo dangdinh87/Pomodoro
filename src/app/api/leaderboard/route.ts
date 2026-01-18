@@ -2,11 +2,13 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase-server';
 
+import { startOfWeek, startOfMonth, startOfYear } from 'date-fns';
+
 export async function GET(request: Request) {
   const supabase = await createClient();
   const { searchParams } = new URL(request.url);
   const sortBy = searchParams.get('sortBy') || 'time'; // 'time' | 'tasks'
-  const limit = parseInt(searchParams.get('limit') || '50');
+  const limit = parseInt(searchParams.get('limit') || '100');
 
   try {
     let query = supabase
@@ -35,7 +37,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const supabase = await createClient();
-  
+
   try {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 

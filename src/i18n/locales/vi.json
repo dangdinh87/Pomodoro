@@ -251,7 +251,13 @@
   "leaderboard": {
     "title": "Bảng xếp hạng",
     "comingSoon": "Tính năng sắp ra mắt",
-    "description": "Bảng xếp hạng sẽ giúp bạn so sánh thành tích với các người dùng khác và tạo động lực học tập."
+    "description": "Cùng thi đua với cộng đồng StudyBro. Xem ai là người tập trung chăm chỉ nhất!",
+    "tabs": {
+      "focusTime": "Thời gian tập trung",
+      "completedTasks": "Task hoàn thành"
+    },
+    "empty": "Chưa có dữ liệu. Hãy là người đầu tiên!",
+    "you": "Bạn"
   },
   "settings": {
     "title": "Cài đặt",
@@ -320,6 +326,8 @@
       "images": "Hình ảnh",
       "opacityDescription": "Điều chỉnh độ trong suốt của hình nền hoặc video.",
       "brightnessDescription": "Điều chỉnh độ sáng để phù hợp với môi trường của bạn.",
+      "blur": "Độ mờ",
+      "blurDescription": "Điều chỉnh độ mờ của hình nền",
       "presets": {
         "systemAutoColor": "System Color (Auto)",
         "lofiChillAuto": "Lofi Chill (Auto)",
@@ -335,11 +343,37 @@
         "travelling8": "Travelling 8",
         "travelling9": "Travelling 9",
         "background1": "Background 1",
-        "chillShiba": "Chill Shiba"
+        "chillShiba": "Chill Shiba",
+        "studyDesk1": "Bàn học"
       },
       "toasts": {
         "saved": "Đã lưu hình nền",
         "resetInfo": "Đã tải mặc định, nhấn Lưu để áp dụng"
+      },
+      "tabs": {
+        "system": "Ảnh hệ thống",
+        "personal": "Ảnh của tôi"
+      },
+      "customImages": {
+        "title": "Ảnh của tôi",
+        "upload": "Tải lên",
+        "uploadFile": "Tải từ thiết bị",
+        "addUrl": "Thêm từ URL",
+        "or": "hoặc",
+        "delete": "Xóa",
+        "fileTooLarge": "File quá lớn. Kích thước tối đa là 2MB",
+        "invalidType": "Chỉ chấp nhận file ảnh",
+        "invalidUrl": "URL ảnh không hợp lệ",
+        "limitReached": "Chỉ được phép tối đa 5 ảnh tùy chỉnh",
+        "processingError": "Không thể xử lý ảnh",
+        "uploadSuccess": "Đã thêm ảnh thành công",
+        "deleteSuccess": "Đã xóa ảnh",
+        "urlPlaceholder": "Dán link ảnh...",
+        "limitInfo": "{current}/5 ảnh",
+        "empty": "Chưa có ảnh. Thêm ảnh của bạn!",
+        "current": "Hiện tại",
+        "replaceNotice": "Tải ảnh mới sẽ thay thế ảnh hiện tại.",
+        "limit2MB": "Tối đa 2MB (JPEG, PNG, WebP)"
       }
     },
     "audio": {
