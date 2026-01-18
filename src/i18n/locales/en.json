@@ -313,7 +313,6 @@
       "video": "Video",
       "solid": "Solid Color",
       "gradient": "Gradient",
-      "blur": "Blur Amount",
       "opacity": "Opacity",
       "brightness": "Brightness",
       "selectImage": "Select Image",
@@ -342,7 +341,7 @@
         "travelling8": "Travelling 8",
         "travelling9": "Travelling 9",
         "background1": "Background 1",
-        "chillShiba": "Chill Shiba",
+        "chillShiba": "Chill Shiba Christmas",
         "studyDesk1": "Study Desk"
       },
       "toasts": {

@@ -314,7 +314,6 @@
       "video": "Video",
       "solid": "Màu đơn sắc",
       "gradient": "Gradient",
-      "blur": "Độ mờ",
       "opacity": "Độ trong suốt",
       "brightness": "Độ sáng",
       "selectImage": "Lựa ảnh",
@@ -343,7 +342,7 @@
         "travelling8": "Travelling 8",
         "travelling9": "Travelling 9",
         "background1": "Background 1",
-        "chillShiba": "Chill Shiba",
+        "chillShiba": "Chill Shiba Giáng Sinh",
         "studyDesk1": "Bàn học"
       },
       "toasts": {

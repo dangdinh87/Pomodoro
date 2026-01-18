@@ -31,9 +31,43 @@ export const metadata: Metadata = {
   description:
     'A comprehensive Pomodoro Timer web application for focus enhancement and productivity tracking',
   manifest: '/manifest.json',
+  metadataBase: new URL('https://www.pomodoro-focus.site'),
+  keywords: [
+    'Pomodoro Timer',
+    'Study Timer',
+    'Focus Timer',
+    'Productivity Tool',
+    'Study Bro',
+    'Focus Enhancement',
+    'Time Management',
+  ],
   icons: {
     icon: '/favicon.ico',
     apple: '/apple-touch-icon.png',
+  },
+  openGraph: {
+    title: 'Study Bro App',
+    description:
+      'A comprehensive Pomodoro Timer web application for focus enhancement and productivity tracking',
+    url: 'https://www.pomodoro-focus.site',
+    siteName: 'Study Bro App',
+    images: [
+      {
+        url: '/card.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Study Bro App',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Study Bro App',
+    description:
+      'A comprehensive Pomodoro Timer web application for focus enhancement and productivity tracking',
+    images: ['/card.jpg'],
   },
 };
 
