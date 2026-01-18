@@ -192,13 +192,17 @@ export default function StreakTracker() {
     const start = startOfWeek(startOfMonth(month), { weekStartsOn: 1 })
     const end = endOfWeek(endOfMonth(month), { weekStartsOn: 1 })
     const days: { date: Date; iso: string; focused: boolean; inMonth: boolean; today: boolean }[] = []
+
+    // ⚡ Bolt Optimization: Use Set for O(1) lookup instead of O(N) includes() in loop
+    const historySet = new Set(data.history)
+
     for (let d = start; d <= end; d = addDays(d, 1)) {
       const date = new Date(d)
       const iso = format(date, 'yyyy-MM-dd')
       days.push({
         date,
         iso,
-        focused: data.history.includes(iso),
+        focused: historySet.has(iso),
         inMonth: isSameMonth(date, month),
         today: isToday(date),
       })
