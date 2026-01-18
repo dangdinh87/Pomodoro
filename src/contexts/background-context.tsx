@@ -143,7 +143,11 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
 
   const persist = (next: BackgroundSettings) => {
     setBackgroundState(next);
-    localStorage.setItem('background-settings', JSON.stringify(next));
+    try {
+      localStorage.setItem('background-settings', JSON.stringify(next));
+    } catch (e) {
+      console.warn('Failed to save background settings to localStorage:', e);
+    }
   };
 
   const update = (
@@ -151,7 +155,11 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
   ) => {
     setBackgroundState((prev) => {
       const next = updater(prev);
-      localStorage.setItem('background-settings', JSON.stringify(next));
+      try {
+        localStorage.setItem('background-settings', JSON.stringify(next));
+      } catch (e) {
+        console.warn('Failed to save background settings to localStorage:', e);
+      }
       return next;
     });
   };

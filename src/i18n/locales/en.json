@@ -250,7 +250,13 @@
   "leaderboard": {
     "title": "Leaderboard",
     "comingSoon": "Coming Soon",
-    "description": "Leaderboard will help you compare your achievements with other users and motivate your learning."
+    "description": "Compete with the StudyBro community. See who is the most focused!",
+    "tabs": {
+      "focusTime": "Focus Time",
+      "completedTasks": "Completed Tasks"
+    },
+    "empty": "No data yet. Be the first!",
+    "you": "You"
   },
   "settings": {
     "title": "Settings",
@@ -307,7 +313,6 @@
       "video": "Video",
       "solid": "Solid Color",
       "gradient": "Gradient",
-      "blur": "Blur Amount",
       "opacity": "Opacity",
       "brightness": "Brightness",
       "selectImage": "Select Image",
@@ -319,6 +324,8 @@
       "images": "Images",
       "opacityDescription": "Adjust the transparency of the background or video.",
       "brightnessDescription": "Adjust the brightness to suit your environment.",
+      "blur": "Blur",
+      "blurDescription": "Adjust background blur intensity",
       "presets": {
         "systemAutoColor": "System Color (Auto)",
         "lofiChillAuto": "Lofi Chill (Auto)",
@@ -334,11 +341,37 @@
         "travelling8": "Travelling 8",
         "travelling9": "Travelling 9",
         "background1": "Background 1",
-        "chillShiba": "Chill Shiba"
+        "chillShiba": "Chill Shiba Christmas",
+        "studyDesk1": "Study Desk"
       },
       "toasts": {
         "saved": "Background saved",
         "resetInfo": "Defaults loaded, click Save to apply"
+      },
+      "tabs": {
+        "system": "System Images",
+        "personal": "My Images"
+      },
+      "customImages": {
+        "title": "My Images",
+        "upload": "Upload",
+        "uploadFile": "Upload from device",
+        "addUrl": "Add from URL",
+        "or": "or",
+        "delete": "Delete",
+        "fileTooLarge": "File is too large. Maximum size is 2MB",
+        "invalidType": "Only image files are accepted",
+        "invalidUrl": "Invalid image URL",
+        "limitReached": "Maximum 5 custom images allowed",
+        "processingError": "Failed to process image",
+        "uploadSuccess": "Image added successfully",
+        "deleteSuccess": "Image deleted",
+        "urlPlaceholder": "Paste image URL...",
+        "limitInfo": "{current}/5 images",
+        "empty": "No images yet. Add your own!",
+        "current": "Current",
+        "replaceNotice": "Uploading a new image will replace this one.",
+        "limit2MB": "Max 2MB (JPEG, PNG, WebP)"
       }
     },
     "audio": {

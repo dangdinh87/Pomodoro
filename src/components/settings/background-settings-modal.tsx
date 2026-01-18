@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import {
   Dialog,
   DialogContent,
@@ -15,10 +17,15 @@ export default function BackgroundSettingsModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
+  const [isDragging, setIsDragging] = useState(false);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[1000px] h-[85vh] p-0 gap-0 overflow-hidden flex flex-col [&>button]:hidden">
-        <BackgroundSettings onClose={onClose} />
+      <DialogContent
+        className={`sm:max-w-[1000px] h-[85vh] p-0 gap-0 overflow-hidden flex flex-col [&>button]:hidden transition-all duration-200 ${isDragging ? '!bg-transparent !border-transparent !shadow-none' : ''}`}
+        overlayClassName={`transition-all duration-200 ${isDragging ? 'opacity-0 invisible' : 'opacity-100 visible'}`}
+      >
+        <BackgroundSettings onClose={onClose} onDragChange={setIsDragging} />
       </DialogContent>
     </Dialog>
   );
