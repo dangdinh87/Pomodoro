@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/use-auth'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useCallback } from 'react'
 import { Task, useTasksStore } from '@/stores/task-store'
 import { TaskFilters } from './components/task-filters'
 import { TaskFormModal } from './components/task-form-modal'
@@ -41,19 +41,6 @@ export function TaskManagement() {
   const router = useRouter()
   const { t } = useI18n()
 
-  if (isAuthLoading) {
-    return null // Or a loading spinner
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="flex flex-col items-center justify-center flex-1 min-h-[60vh] space-y-4">
-        <h2 className="text-xl font-semibold text-center">{t('auth.signInToManageTasks')}</h2>
-        <Button onClick={() => router.push('/login?redirect=/tasks')}>{t('auth.signInButton')}</Button>
-      </div>
-    )
-  }
-
   const { activeTaskId, setActiveTask } = useTasksStore()
   const { editingId, setEditingId, resetEditingState } = useEditingState()
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
@@ -70,6 +57,53 @@ export function TaskManagement() {
     [editingId, tasks],
   )
 
+  const uniqueTags = useMemo(() => {
+    const tags = new Set<string>()
+    tasks.forEach(task => task.tags.forEach(tag => tags.add(tag)))
+    return Array.from(tags).sort()
+  }, [tasks])
+
+  const handleToggleStatus = useCallback((task: Task) => {
+    const newStatus = task.status === 'done' ? 'pending' : 'done'
+    updateTask({ id: task.id, input: { status: newStatus } })
+  }, [updateTask])
+
+  const handleToggleActive = useCallback((task: Task) => {
+    // Optimization: Access state directly to prevent re-creating this handler when activeTaskId changes
+    const currentActiveId = useTasksStore.getState().activeTaskId
+
+    if (currentActiveId === task.id) {
+      setActiveTask(null)
+    } else {
+      setActiveTask(task.id)
+      // If task is pending, move it to in_progress
+      if (task.status === 'pending') {
+        updateTask({ id: task.id, input: { status: 'in_progress' } })
+      }
+    }
+  }, [setActiveTask, updateTask])
+
+  const handleDeleteRequest = useCallback((id: string) => {
+    setDeleteConfirmId(id)
+  }, [])
+
+  const handleEdit = useCallback((task: Task) => {
+    setEditingId(task.id)
+  }, [setEditingId])
+
+  if (isAuthLoading) {
+    return null // Or a loading spinner
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center flex-1 min-h-[60vh] space-y-4">
+        <h2 className="text-xl font-semibold text-center">{t('auth.signInToManageTasks')}</h2>
+        <Button onClick={() => router.push('/login?redirect=/tasks')}>{t('auth.signInButton')}</Button>
+      </div>
+    )
+  }
+
   const handleFormSubmit = async (payload: any) => {
     try {
       if (editingId) {
@@ -82,27 +116,6 @@ export function TaskManagement() {
     } catch (error) {
       // Error handled by hook
     }
-  }
-
-  const handleToggleStatus = (task: Task) => {
-    const newStatus = task.status === 'done' ? 'pending' : 'done'
-    updateTask({ id: task.id, input: { status: newStatus } })
-  }
-
-  const handleToggleActive = (task: Task) => {
-    if (activeTaskId === task.id) {
-      setActiveTask(null)
-    } else {
-      setActiveTask(task.id)
-      // If task is pending, move it to in_progress
-      if (task.status === 'pending') {
-        updateTask({ id: task.id, input: { status: 'in_progress' } })
-      }
-    }
-  }
-
-  const handleDeleteRequest = (id: string) => {
-    setDeleteConfirmId(id)
   }
 
   const confirmDelete = async () => {
@@ -126,10 +139,6 @@ export function TaskManagement() {
     }
   }
 
-  const handleEdit = (task: Task) => {
-    setEditingId(task.id)
-  }
-
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       resetEditingState()
@@ -138,12 +147,6 @@ export function TaskManagement() {
       setIsCreateModalOpen(true)
     }
   }
-
-  const uniqueTags = useMemo(() => {
-    const tags = new Set<string>()
-    tasks.forEach(task => task.tags.forEach(tag => tags.add(tag)))
-    return Array.from(tags).sort()
-  }, [tasks])
 
   return (
     <div className="space-y-6">
