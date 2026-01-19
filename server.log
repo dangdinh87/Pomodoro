@@ -1,0 +1,29 @@
+
+> pomodoro-focus-app@0.1.0 dev /app
+> next dev
+
+   ▲ Next.js 14.0.4
+   - Local:        http://localhost:3000
+   - Environments: .env.local
+
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm.
+npm warn Unknown env config "_jsr-registry". This will stop working in the next major version of npm.
+ ✓ Ready in 2.9s
+ ○ Compiling /src/middleware ...
+ ✓ Compiled /src/middleware in 1114ms (148 modules)
+ ○ Compiling /tasks ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Warning: You're using `next/head` inside the `app` directory, please migrate to the Metadata API. See https://nextjs.org/docs/app/building-your-application/upgrading/app-router-migration#step-3-migrating-nexthead for more details.
+ ✓ Compiled /tasks in 19s (4800 modules)
+
+ ⚠ metadata.metadataBase is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ✓ Compiled in 2.1s (2542 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (135kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+ ✓ Compiled in 1943ms (4782 modules)
+
+ ⚠ metadata.metadataBase is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ○ Compiling /api/tasks ...
+ ✓ Compiled /api/tasks in 1546ms (2353 modules)
+ ✓ Compiled in 1712ms (4895 modules)
+[?25h
+ ELIFECYCLE  Command failed.
