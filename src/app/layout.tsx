@@ -41,10 +41,6 @@ export const metadata: Metadata = {
     'Focus Enhancement',
     'Time Management',
   ],
-  icons: {
-    icon: '/favicon.svg',
-    apple: '/apple-touch-icon.png',
-  },
   openGraph: {
     title: 'Study Bro App',
     description:
