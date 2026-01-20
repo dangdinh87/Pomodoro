@@ -127,7 +127,9 @@ export default function StreakTracker() {
 
   // Computed values
   const today = useMemo(() => todayISO(), [])
-  const hasMarkedToday = useMemo(() => data.history.includes(today), [data.history, today])
+  // Optimize lookups with a Set (O(1) vs O(N))
+  const historySet = useMemo(() => new Set(data.history), [data.history])
+  const hasMarkedToday = useMemo(() => historySet.has(today), [historySet, today])
   const currentStreak = useMemo(() => calculateCurrentStreak(data.history, today), [data.history, today])
 
   // Hydrate from localStorage on mount
@@ -198,13 +200,13 @@ export default function StreakTracker() {
       days.push({
         date,
         iso,
-        focused: data.history.includes(iso),
+        focused: historySet.has(iso),
         inMonth: isSameMonth(date, month),
         today: isToday(date),
       })
     }
     return days
-  }, [data.history, month])
+  }, [historySet, month])
 
   const weekdays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']
   const monthLabel = format(month, 'LLLL yyyy', { locale: vi })
