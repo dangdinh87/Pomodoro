@@ -11,19 +11,19 @@ import { Metadata } from 'next';
 
 // SEO Metadata - này sẽ được render server-side
 export const metadata: Metadata = {
-    title: 'Study Bro - AI-Powered Pomodoro Timer for Maximum Focus',
-    description: 'Boost your productivity with Study Bro. Smart Pomodoro timer with AI insights, task management, ambient sounds, and detailed analytics. Free to use.',
+    title: 'Improcode - AI-Powered Pomodoro Timer for Maximum Focus',
+    description: 'Boost your productivity with Improcode. Smart Pomodoro timer with AI insights, task management, ambient sounds, and detailed analytics. Free to use.',
     keywords: ['pomodoro', 'timer', 'productivity', 'focus', 'study', 'AI', 'task management'],
     openGraph: {
-        title: 'Study Bro - AI-Powered Pomodoro Timer',
-        description: 'Boost your productivity with Study Bro. Smart Pomodoro timer with AI insights.',
+        title: 'Improcode - AI-Powered Pomodoro Timer',
+        description: 'Boost your productivity with Improcode. Smart Pomodoro timer with AI insights.',
         type: 'website',
-        url: 'https://studybro.app',
+        url: 'https://improcode.com',
     },
     twitter: {
         card: 'summary_large_image',
-        title: 'Study Bro - AI-Powered Pomodoro Timer',
-        description: 'Boost your productivity with Study Bro. Smart Pomodoro timer with AI insights.',
+        title: 'Improcode - AI-Powered Pomodoro Timer',
+        description: 'Boost your productivity with Improcode. Smart Pomodoro timer with AI insights.',
     },
 };
 
@@ -33,9 +33,9 @@ export default function LandingPage() {
         <>
             {/* SEO-friendly static content - rendered on server */}
             <div className="sr-only" aria-hidden="false">
-                <h1>Study Bro - AI-Powered Pomodoro Timer for Maximum Focus</h1>
+                <h1>Improcode - AI-Powered Pomodoro Timer for Maximum Focus</h1>
                 <p>
-                    Study Bro is a comprehensive productivity app featuring a smart Pomodoro timer,
+                    Improcode is a comprehensive productivity app featuring a smart Pomodoro timer,
                     AI-powered insights, task management, ambient sounds, and detailed analytics
                     to help you stay focused and achieve your goals.
                 </p>
