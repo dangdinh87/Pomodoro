@@ -1,7 +1,7 @@
 {
   "brand": {
-    "title": "StudyBro",
-    "subtitle": "Hẹn giờ Pomodoro Tập trung"
+    "title": "Improcode",
+    "subtitle": "Improcode Every Day"
   },
   "common": {
     "loading": "Đang tải...",
@@ -251,7 +251,7 @@
   "leaderboard": {
     "title": "Bảng xếp hạng",
     "comingSoon": "Tính năng sắp ra mắt",
-    "description": "Cùng thi đua với cộng đồng StudyBro. Xem ai là người tập trung chăm chỉ nhất!",
+    "description": "Cùng thi đua với cộng đồng Improcode. Xem ai là người tập trung chăm chỉ nhất!",
     "tabs": {
       "focusTime": "Thời gian tập trung",
       "completedTasks": "Task hoàn thành"
@@ -386,7 +386,7 @@
   },
   "guide": {
     "title": "Hướng dẫn Sử dụng",
-    "subtitle": "Tìm hiểu về phương pháp Pomodoro và cách sử dụng Study Bro để tối ưu hóa năng suất học tập và làm việc của bạn",
+    "subtitle": "Tìm hiểu về phương pháp Pomodoro và cách sử dụng Improcode để tối ưu hóa năng suất học tập và làm việc của bạn",
     "pomodoro": {
       "badge": "Phương Pháp Pomodoro",
       "title": "Pomodoro là gì?",
@@ -429,8 +429,8 @@
     },
     "howToUse": {
       "badge": "Hướng Dẫn Website",
-      "title": "Cách sử dụng Study Bro",
-      "description": "Study Bro cung cấp các công cụ giúp bạn áp dụng phương pháp Pomodoro một cách hiệu quả.",
+      "title": "Cách sử dụng Improcode",
+      "description": "Improcode cung cấp các công cụ giúp bạn áp dụng phương pháp Pomodoro một cách hiệu quả.",
       "features": {
         "timer": {
           "title": "Timer",
@@ -485,7 +485,7 @@
     "getStarted": {
       "badge": "Bắt Đầu Ngay",
       "title": "Sẵn sàng bắt đầu chưa?",
-      "description": "Hãy bắt đầu hành trình làm việc hiệu quả với Study Bro!",
+      "description": "Hãy bắt đầu hành trình làm việc hiệu quả với Improcode!",
       "steps": [
         "Tạo task đầu tiên của bạn trong trang <link>Tasks</link>",
         "Điều chỉnh Settings theo sở thích (tùy chọn)",
@@ -540,7 +540,7 @@
     "deleteConfirmDescription": "Hành động này không thể hoàn tác. Cuộc trò chuyện và tất cả tin nhắn sẽ bị xóa vĩnh viễn.",
     "thread": {
       "welcome": "Yo! Chào bạn 👋",
-      "welcomeSubtitle": "Mình là Bro Chat - người bạn đồng hành của bạn!",
+      "welcomeSubtitle": "Mình là Improcode AI - người bạn đồng hành của bạn!",
       "scrollToBottom": "Cuộn xuống cuối",
       "inputPlaceholder": "Hỏi mình bất cứ điều gì...",
       "sendMessage": "Gửi tin nhắn",
@@ -602,24 +602,24 @@
   },
   "metadata": {
     "timer": {
-      "title": "Hẹn giờ • Study Bro App",
+      "title": "Hẹn giờ • Improcode App",
       "description": "Quản lý các phiên làm việc và nghỉ ngơi với hẹn giờ Pomodoro tinh tế và cài đặt thống nhất."
     },
     "tasks": {
-      "title": "Công việc • Study Bro App",
+      "title": "Công việc • Improcode App",
       "description": "Tổ chức và quản lý công việc của bạn một cách hiệu quả với hệ thống quản lý công việc của chúng tôi."
     },
     "history": {
-      "title": "Lịch sử • Study Bro App",
+      "title": "Lịch sử • Improcode App",
       "description": "Xem lại hiệu suất tập trung và thống kê năng suất của bạn theo thời gian."
     },
     "guide": {
-      "title": "Hướng dẫn Sử dụng • Study Bro App",
-      "description": "Tìm hiểu về phương pháp Pomodoro và cách sử dụng các tính năng của Study Bro."
+      "title": "Hướng dẫn Sử dụng • Improcode App",
+      "description": "Tìm hiểu về phương pháp Pomodoro và cách sử dụng các tính năng của Improcode."
     }
   },
   "login": {
-    "title": "Đăng nhập với Study Bro",
+    "title": "Đăng nhập với Improcode",
     "description": "Đăng nhập để giữ nhịp học và đồng bộ mọi phiên Pomodoro.",
     "form": {
       "email": "Email",
@@ -649,7 +649,7 @@
     }
   },
   "signup": {
-    "title": "Đăng ký với Study Bro",
+    "title": "Đăng ký với Improcode",
     "description": "Đăng ký miễn phí để lưu preset, lịch sử tập trung và đồng bộ nhiệm vụ giữa các thiết bị.",
     "form": {
       "email": "Email",
@@ -960,7 +960,7 @@
       "badge": "Câu Hỏi Thường Gặp",
       "title": "Các Câu Hỏi",
       "titleHighlight": "Phổ Biến",
-      "subtitle": "Mọi thứ bạn cần biết về hệ sinh thái Study Bro",
+      "subtitle": "Mọi thứ bạn cần biết về hệ sinh thái Improcode",
       "stillHaveQuestions": "Cần hỗ trợ thêm?",
       "sendMessage": "Liên Hệ Hỗ Trợ",
       "items": {
@@ -986,7 +986,7 @@
         },
         "q6": {
           "question": "Khả năng tương thích nền tảng?",
-          "answer": "Study Bro là một ứng dụng web tiến bộ (PWA) được tối ưu hóa cho tất cả các trình duyệt hiện đại trên máy tính để bàn, máy tính bảng và thiết bị di động. Các ứng dụng gốc đang được phát triển."
+          "answer": "Improcode là một ứng dụng web tiến bộ (PWA) được tối ưu hóa cho tất cả các trình duyệt hiện đại trên máy tính để bàn, máy tính bảng và thiết bị di động. Các ứng dụng gốc đang được phát triển."
         }
       }
     },
