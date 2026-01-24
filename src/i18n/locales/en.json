@@ -1,7 +1,7 @@
 {
   "brand": {
-    "title": "StudyBro",
-    "subtitle": "Pomodoro Timer Focus"
+    "title": "Improcode",
+    "subtitle": "Improcode Every Day"
   },
   "common": {
     "loading": "Loading...",
@@ -250,7 +250,7 @@
   "leaderboard": {
     "title": "Leaderboard",
     "comingSoon": "Coming Soon",
-    "description": "Compete with the StudyBro community. See who is the most focused!",
+    "description": "Compete with the Improcode community. See who is the most focused!",
     "tabs": {
       "focusTime": "Focus Time",
       "completedTasks": "Completed Tasks"
@@ -385,7 +385,7 @@
   },
   "guide": {
     "title": "User Guide",
-    "subtitle": "Learn about the Pomodoro method and how to use Study Bro to optimize your learning and work productivity",
+    "subtitle": "Learn about the Pomodoro method and how to use Improcode to optimize your learning and work productivity",
     "pomodoro": {
       "badge": "Pomodoro Method",
       "title": "What is Pomodoro?",
@@ -428,8 +428,8 @@
     },
     "howToUse": {
       "badge": "Website Guide",
-      "title": "How to use Study Bro",
-      "description": "Study Bro provides tools to help you apply the Pomodoro method effectively.",
+      "title": "How to use Improcode",
+      "description": "Improcode provides tools to help you apply the Pomodoro method effectively.",
       "features": {
         "timer": {
           "title": "Timer",
@@ -485,7 +485,7 @@
     "getStarted": {
       "badge": "Get Started",
       "title": "Ready to start?",
-      "description": "Start your productive work journey with Study Bro!",
+      "description": "Start your productive work journey with Improcode!",
       "steps": [
         "Create your first task in the <link>Tasks</link> page",
         "Adjust Settings to your liking (optional)",
@@ -540,7 +540,7 @@
     "deleteConfirmDescription": "This action cannot be undone. This will permanently delete this conversation and all its messages.",
     "thread": {
       "welcome": "Hey there! 👋",
-      "welcomeSubtitle": "I'm Bro Chat - your study buddy!",
+      "welcomeSubtitle": "I'm Improcode AI - your study buddy!",
       "scrollToBottom": "Scroll to bottom",
       "inputPlaceholder": "Ask me anything...",
       "sendMessage": "Send message",
@@ -602,24 +602,24 @@
   },
   "metadata": {
     "timer": {
-      "title": "Timer • Study Bro App",
+      "title": "Timer • Improcode",
       "description": "Manage work and break sessions with a refined Pomodoro timer and unified settings."
     },
     "tasks": {
-      "title": "Tasks • Study Bro App",
+      "title": "Tasks • Improcode",
       "description": "Organize and manage your tasks efficiently with our task management system."
     },
     "history": {
-      "title": "History • Study Bro App",
+      "title": "History • Improcode",
       "description": "Review your focus performance and productivity statistics over time."
     },
     "guide": {
-      "title": "User Guide • Study Bro App",
-      "description": "Learn about the Pomodoro method and how to use Study Bro features."
+      "title": "User Guide • Improcode",
+      "description": "Learn about the Pomodoro method and how to use Improcode features."
     }
   },
   "login": {
-    "title": "Sign in to Study Bro",
+    "title": "Sign in to Improcode",
     "description": "Sign in to keep your study rhythm and sync all Pomodoro sessions.",
     "form": {
       "email": "Email",
@@ -649,7 +649,7 @@
     }
   },
   "signup": {
-    "title": "Sign up for Study Bro",
+    "title": "Sign up for Improcode",
     "description": "Sign up for free to save presets, focus history and sync tasks across devices.",
     "form": {
       "email": "Email",
@@ -871,10 +871,10 @@
       "getStarted": "Get Started"
     },
     "hero": {
-      "badge": "AI-Powered Productivity 🤖",
+      "badge": "Improcode AI 🤖",
       "focusMode": "Deep Work Mode",
-      "title": "Master Your",
-      "titleHighlight": "Focus",
+      "title": "Improcode",
+      "titleHighlight": "Every Day",
       "subtitle": "The advanced Pomodoro timer engineered for peak performance. Eliminate distractions, achieve flow state, and track your progress with precision analytics.",
       "getStarted": "Start for Free",
       "tryDemo": "Watch Demo",
@@ -960,7 +960,7 @@
       "badge": "FAQ",
       "title": "Common",
       "titleHighlight": "Questions",
-      "subtitle": "Everything you need to know about the Study Bro ecosystem",
+      "subtitle": "Everything you need to know about the Improcode ecosystem",
       "stillHaveQuestions": "Need further assistance?",
       "sendMessage": "Contact Support",
       "items": {
@@ -986,7 +986,7 @@
         },
         "q6": {
           "question": "Platform compatibility?",
-          "answer": "Study Bro is a progressive web application optimized for all modern browsers across desktop, tablet, and mobile devices. Native applications are in development."
+          "answer": "Improcode is a progressive web application optimized for all modern browsers across desktop, tablet, and mobile devices. Native applications are in development."
         }
       }
     },
