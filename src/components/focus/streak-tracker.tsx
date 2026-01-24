@@ -63,14 +63,18 @@ const uniqueSortedPush = (arr: string[], v: string) => {
 }
 
 // Calculate current streak by finding consecutive days ending with today
-const calculateCurrentStreak = (history: string[], today: string): number => {
-  if (!history.includes(today)) return 0
+// Optimization: Uses Set for O(1) lookups instead of O(N) array scans
+// Complexity: O(N) to build Set (if array passed) + O(StreakLength) for loop.
+// Previous: O(N log N) sort + O(StreakLength * N) loop.
+export const calculateCurrentStreak = (history: string[] | Set<string>, today: string): number => {
+  const historySet = Array.isArray(history) ? new Set(history) : history
 
-  const sortedHistory = [...history].sort((a, b) => a.localeCompare(b))
+  if (!historySet.has(today)) return 0
+
   let streak = 0
   let currentDate = today
 
-  while (sortedHistory.includes(currentDate)) {
+  while (historySet.has(currentDate)) {
     streak++
     const date = isoToDate(currentDate)
     if (!date) break
@@ -127,8 +131,12 @@ export default function StreakTracker() {
 
   // Computed values
   const today = useMemo(() => todayISO(), [])
-  const hasMarkedToday = useMemo(() => data.history.includes(today), [data.history, today])
-  const currentStreak = useMemo(() => calculateCurrentStreak(data.history, today), [data.history, today])
+
+  // Optimization: Create a Set for O(1) lookups during rendering
+  const historySet = useMemo(() => new Set(data.history), [data.history])
+
+  const hasMarkedToday = useMemo(() => historySet.has(today), [historySet, today])
+  const currentStreak = useMemo(() => calculateCurrentStreak(historySet, today), [historySet, today])
 
   // Hydrate from localStorage on mount
   useEffect(() => {
@@ -168,6 +176,8 @@ export default function StreakTracker() {
     }
 
     const newHistory = uniqueSortedPush(data.history, todayDate)
+
+    // Pass new history array - helper will convert to Set efficiently for calculation
     const newStreak = calculateCurrentStreak(newHistory, todayDate)
 
     const updated: StreakStore = {
@@ -192,19 +202,20 @@ export default function StreakTracker() {
     const start = startOfWeek(startOfMonth(month), { weekStartsOn: 1 })
     const end = endOfWeek(endOfMonth(month), { weekStartsOn: 1 })
     const days: { date: Date; iso: string; focused: boolean; inMonth: boolean; today: boolean }[] = []
+
     for (let d = start; d <= end; d = addDays(d, 1)) {
       const date = new Date(d)
       const iso = format(date, 'yyyy-MM-dd')
       days.push({
         date,
         iso,
-        focused: data.history.includes(iso),
+        focused: historySet.has(iso), // Optimization: O(1) lookup
         inMonth: isSameMonth(date, month),
         today: isToday(date),
       })
     }
     return days
-  }, [data.history, month])
+  }, [historySet, month])
 
   const weekdays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']
   const monthLabel = format(month, 'LLLL yyyy', { locale: vi })
