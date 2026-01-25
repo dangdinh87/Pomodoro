@@ -63,14 +63,14 @@ const uniqueSortedPush = (arr: string[], v: string) => {
 }
 
 // Calculate current streak by finding consecutive days ending with today
-const calculateCurrentStreak = (history: string[], today: string): number => {
-  if (!history.includes(today)) return 0
+// Optimization: Uses Set for O(1) lookups instead of O(N) array scans
+const calculateCurrentStreak = (historySet: Set<string>, today: string): number => {
+  if (!historySet.has(today)) return 0
 
-  const sortedHistory = [...history].sort((a, b) => a.localeCompare(b))
   let streak = 0
   let currentDate = today
 
-  while (sortedHistory.includes(currentDate)) {
+  while (historySet.has(currentDate)) {
     streak++
     const date = isoToDate(currentDate)
     if (!date) break
@@ -125,10 +125,13 @@ export default function StreakTracker() {
   const [loaded, setLoaded] = useState(false)
   const [month, setMonth] = useState<Date>(() => startOfMonth(new Date()))
 
+  // Optimization: Memoize history as Set for O(1) lookups
+  const historySet = useMemo(() => new Set(data.history), [data.history])
+
   // Computed values
   const today = useMemo(() => todayISO(), [])
-  const hasMarkedToday = useMemo(() => data.history.includes(today), [data.history, today])
-  const currentStreak = useMemo(() => calculateCurrentStreak(data.history, today), [data.history, today])
+  const hasMarkedToday = useMemo(() => historySet.has(today), [historySet, today])
+  const currentStreak = useMemo(() => calculateCurrentStreak(historySet, today), [historySet, today])
 
   // Hydrate from localStorage on mount
   useEffect(() => {
@@ -168,7 +171,9 @@ export default function StreakTracker() {
     }
 
     const newHistory = uniqueSortedPush(data.history, todayDate)
-    const newStreak = calculateCurrentStreak(newHistory, todayDate)
+    // Create temporary Set for calculation
+    const newHistorySet = new Set(newHistory)
+    const newStreak = calculateCurrentStreak(newHistorySet, todayDate)
 
     const updated: StreakStore = {
       streak: newStreak,
@@ -198,13 +203,13 @@ export default function StreakTracker() {
       days.push({
         date,
         iso,
-        focused: data.history.includes(iso),
+        focused: historySet.has(iso),
         inMonth: isSameMonth(date, month),
         today: isToday(date),
       })
     }
     return days
-  }, [data.history, month])
+  }, [historySet, month])
 
   const weekdays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']
   const monthLabel = format(month, 'LLLL yyyy', { locale: vi })
