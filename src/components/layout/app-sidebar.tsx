@@ -71,7 +71,7 @@ export function AppSidebar() {
             <SidebarMenuButton size="lg" asChild>
               <Link href="/timer">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg text-sidebar-primary-foreground">
-                  <Image alt="StudyBro" width={40} height={40} src="/images/logo.png" />
+                  <Image alt="Improcode" width={40} height={40} src="/images/logo.png" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold" suppressHydrationWarning>{t('brand.title')}</span>
@@ -128,7 +128,7 @@ export function AppSidebar() {
                     <AnimateIcon animateOnHover className="group-hover/chat:text-primary">
                       <BotMessageSquare animate={pathname === '/chat'} loop={pathname === '/chat'} className="size-5" />
                     </AnimateIcon>
-                    <span suppressHydrationWarning>Bro Chat</span>
+                    <span suppressHydrationWarning>Improcode AI</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
