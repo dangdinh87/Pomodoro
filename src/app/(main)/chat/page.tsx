@@ -150,7 +150,7 @@ export default function ChatPage() {
                     <AnimateIcon animateOnHover>
                         <BotMessageSquare className="h-16 w-16 text-primary" />
                     </AnimateIcon>
-                    <h1 className="text-2xl font-bold">Bro Chat</h1>
+                    <h1 className="text-2xl font-bold">Improcode AI</h1>
                     <p className="text-center text-muted-foreground max-w-md" suppressHydrationWarning>
                         {t('chat.subtitle')}
                     </p>
@@ -171,7 +171,7 @@ export default function ChatPage() {
                 <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                     <div className="flex items-center justify-between px-4 py-2 max-w-3xl mx-auto">
                         <div className="flex items-center gap-2">
-                            <span className="font-semibold">Bro Chat</span>
+                            <span className="font-semibold">Improcode AI</span>
                         </div>
                         <div className="flex items-center gap-1">
                             <Button

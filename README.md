@@ -1,6 +1,6 @@
-# Pomodoro Focus & Productivity Application
+# Improcode - Improcode Every Day
 
-A comprehensive Pomodoro Timer web application that combines time management, focus enhancement, and productivity analytics to help users achieve their 10,000-hour mastery goals.
+Improcode is a comprehensive Pomodoro Timer web application that combines time management, focus enhancement, and productivity analytics to help users achieve their 10,000-hour mastery goals.
 
 ## Features
 
