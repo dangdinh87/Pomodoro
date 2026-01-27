@@ -25,7 +25,10 @@
     "sort": "Sort",
     "actions": "Actions",
     "settings": "Settings",
-    "language": "Language"
+    "language": "Language",
+    "total": "Total",
+    "item": "item",
+    "items": "items"
   },
   "nav": {
     "navigation": "Navigation",
@@ -35,6 +38,7 @@
     "history": "History",
     "leaderboard": "Leaderboard",
     "chatAI": "Chat AI",
+    "entertainment": "Relax",
     "settings": "Settings",
     "guide": "Guide",
     "feedback": "Feedback",
@@ -148,7 +152,7 @@
   "tasks": {
     "title": "Tasks",
     "subtitle": "Manage your tasks and track progress with Pomodoro technique",
-    "addTask": "Add New Task",
+    "addTask": "Add Task",
     "manageTags": "Manage Tags",
     "manageTagsDescription": "Tags are for organizing only. Removing a tag here won't affect your tasks.",
     "newTagPlaceholder": "New tag...",
@@ -161,7 +165,19 @@
     "noTasksDescription": "You don't have any tasks yet. Create one to get started with your focus session.",
     "noResults": "No results found",
     "noResultsDescription": "Try adjusting your search or filters to find what you're looking for.",
+    "focusing": "Focusing",
+    "overdue": "Overdue",
+    "tomorrow": "Tomorrow",
+    "clone": "Clone",
+    "templateBadge": "Template",
     "createFirst": "Create your first task to get started",
+    "fields": {
+      "title": "Title",
+      "priority": "Priority",
+      "dueDate": "Due Date",
+      "tags": "Tags",
+      "progress": "Progress"
+    },
     "taskName": "Task Name",
     "taskNamePlaceholder": "What are you working on?",
     "taskDescription": "Description",
@@ -173,9 +189,6 @@
     "estimatedHint": "Number of Pomodoro sessions (~25 min each) you estimate to complete this task.",
     "actual": "Actual",
     "completed": "Completed",
-    "pending": "Pending",
-    "inProgress": "In Progress",
-    "cancelled": "Cancelled",
     "progress": "Progress",
     "time": "Time",
     "priorityLevels": {
@@ -184,10 +197,9 @@
       "high": "High"
     },
     "statuses": {
-      "pending": "Pending",
-      "in_progress": "In Progress",
-      "done": "Completed",
-      "cancelled": "Cancelled"
+      "todo": "Todo",
+      "doing": "Doing",
+      "done": "Done"
     },
     "filters": {
       "searchPlaceholder": "Search tasks...",
@@ -207,13 +219,27 @@
       "delete": "Delete task",
       "save": "Save Task",
       "create": "Create Task",
-      "deleting": "Deleting..."
+      "deleting": "Deleting...",
+      "clone": "Clone task",
+      "saveAsTemplate": "Save as template",
+      "deletePermanent": "Delete permanently"
     },
     "count": "tasks",
     "confirmDelete": {
       "title": "Are you sure?",
       "description": "This action cannot be undone. This will permanently delete the task and all associated session data.",
       "action": "Delete Permanently"
+    },
+    "templates": {
+      "title": "Task Templates",
+      "description": "Quick-start from a saved template",
+      "useTemplate": "Use Template",
+      "saveAsTemplate": "Save as Template",
+      "removeTemplate": "Remove Template",
+      "noTemplates": "No templates yet",
+      "createTemplateHint": "Save any task as a template to reuse it later",
+      "empty": "No templates yet",
+      "emptyHint": "Click the bookmark icon on any task to save it as a template"
     }
   },
   "history": {
@@ -581,6 +607,52 @@
         }
       }
     }
+  },
+  "entertainment": {
+    "title": "Entertainment",
+    "subtitle": "Take a break and relax",
+    "games": {
+      "spaceShooter": {
+        "title": "Space Shooter",
+        "description": "Defend Earth from alien invaders in this classic arcade shooter"
+      },
+      "memoryMatch": {
+        "title": "Memory Match",
+        "description": "Find matching pairs to train your memory",
+        "instructions": "Flip 2 cards each turn to find matching pairs",
+        "clicks": "Moves",
+        "time": "Time",
+        "moves": "moves",
+        "win": "Excellent!",
+        "reset": "Play Again"
+      },
+      "ticTacToe": {
+        "title": "Tic Tac Toe",
+        "description": "Classic strategy game against smart AI",
+        "instructions": "Choose your mode and challenge the AI",
+        "mode3x3": "3x3 GRID",
+        "mode3x3Desc": "Classic mode - Easy to play",
+        "mode4x4": "4x4 GRID",
+        "mode4x4Desc": "Hardcore - AI uses advanced strategy",
+        "yourTurn": "Your turn",
+        "aiThinking": "AI thinking...",
+        "gameOver": "Game over",
+        "you": "You",
+        "ai": "AI",
+        "youWin": "You win! Well played!",
+        "aiWins": "AI wins! Try again!",
+        "draw": "It's a draw!",
+        "newGame": "New Game"
+      }
+    },
+    "playNow": "Play Now",
+    "backToList": "Back to Games",
+    "closeGame": "Close Game",
+    "controls": "Controls",
+    "instructions": "Move mouse or touch to control the spaceship. Shoot down enemies and avoid collisions!",
+    "loading": "Loading game...",
+    "highScore": "High Score",
+    "lastScore": "Last Score"
   },
   "tooltips": {
     "toggleTheme": "Toggle theme",

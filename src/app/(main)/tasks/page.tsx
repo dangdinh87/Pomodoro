@@ -37,10 +37,10 @@ export default function TasksPage() {
 
   return (
     <main
-      className="w-full h-full p-4 md:p-8"
+      className="w-full h-full p-4 md:py-2 md:px-8"
       aria-label="Tasks management page"
     >
-      <div className="max-w-5xl mx-auto space-y-6">
+      <div className="max-w-5xl mx-auto space-y-6 pb-8">
         <TaskManagement />
       </div>
     </main>

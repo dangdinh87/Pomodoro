@@ -24,7 +24,7 @@ const defaultState: FormState = {
   description: '',
   estimatePomodoros: 1,
   priority: 'medium',
-  status: 'pending',
+  status: 'todo',
   tags: '',
 }
 

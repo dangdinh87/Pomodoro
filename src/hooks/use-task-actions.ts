@@ -46,7 +46,7 @@ export function useTaskActions() {
   }
 
   const handleToggleStatus = async (task: Task) => {
-    const nextStatus: TaskStatus = task.status === 'done' ? 'pending' : 'done'
+    const nextStatus: TaskStatus = task.status === 'done' ? 'todo' : 'done'
     try {
       await updateTask({ id: task.id, input: { status: nextStatus } })
     } catch (error) {
