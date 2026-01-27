@@ -30,6 +30,7 @@ import {
   AnimatedSettings,
   AnimatedGuide,
   AnimatedFeedback,
+  AnimatedEntertainment,
 } from '@/components/ui/animated-sidebar-icons';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Image from 'next/image';
@@ -129,6 +130,14 @@ export function AppSidebar() {
                       <BotMessageSquare animate={pathname === '/chat'} loop={pathname === '/chat'} className="size-5" />
                     </AnimateIcon>
                     <span suppressHydrationWarning>Bro Chat</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === '/entertainment'}>
+                  <Link href="/entertainment">
+                    <AnimatedEntertainment isActive={pathname === '/entertainment'} />
+                    <span suppressHydrationWarning>{t('nav.entertainment')}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

@@ -48,6 +48,7 @@ export const TimerControls = memo(function TimerControls() {
     const incrementSessionCount = useTimerStore((state) => state.incrementSessionCount);
     const setMode = useTimerStore((state) => state.setMode);
     const setTimeLeft = useTimerStore((state) => state.setTimeLeft);
+    const setDeadlineAt = useTimerStore((state) => state.setDeadlineAt);
     const sessionCount = useTimerStore((state) => state.sessionCount);
 
     // Local state
@@ -85,6 +86,8 @@ export const TimerControls = memo(function TimerControls() {
         if (isProcessing) return;
         setIsProcessing(true);
         setIsRunning(false);
+        // Clear deadline before mode transition to prevent stale deadline reuse
+        setDeadlineAt(null);
 
         const totalTime = getTotalTimeForMode();
         const completedDuration = totalTime - timeLeft;
@@ -127,16 +130,22 @@ export const TimerControls = memo(function TimerControls() {
 
             if (newSessionCount % settings.longBreakInterval === 0) {
                 setMode('longBreak');
-                setTimeLeft(settings.longBreakDuration * 60);
+                const newDuration = settings.longBreakDuration * 60;
+                setTimeLeft(newDuration);
+                useTimerStore.getState().setLastSessionTimeLeft(newDuration);
                 if (settings.autoStartBreak && !skipWithoutRecording) setIsRunning(true);
             } else {
                 setMode('shortBreak');
-                setTimeLeft(settings.shortBreakDuration * 60);
+                const newDuration = settings.shortBreakDuration * 60;
+                setTimeLeft(newDuration);
+                useTimerStore.getState().setLastSessionTimeLeft(newDuration);
                 if (settings.autoStartBreak && !skipWithoutRecording) setIsRunning(true);
             }
         } else {
             setMode('work');
-            setTimeLeft(settings.workDuration * 60);
+            const newDuration = settings.workDuration * 60;
+            setTimeLeft(newDuration);
+            useTimerStore.getState().setLastSessionTimeLeft(newDuration);
             if (settings.autoStartWork && !skipWithoutRecording) setIsRunning(true);
         }
         setIsProcessing(false);

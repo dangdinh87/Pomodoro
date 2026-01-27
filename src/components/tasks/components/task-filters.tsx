@@ -15,18 +15,18 @@ import { DateRange } from 'react-day-picker'
 import { useI18n } from '@/contexts/i18n-context'
 import { TaskStatus, TaskPriority } from '@/stores/task-store'
 import { DateRangePicker } from '@/app/(main)/history/components/date-range-picker'
+import { isToday } from 'date-fns'
+import { cn } from '@/lib/utils'
 
 interface TaskFiltersProps {
   query: string
   statusFilter: 'all' | TaskStatus
   priorityFilter: 'all' | TaskPriority
-  tagFilter: 'all' | string
   dateRange: DateRange | undefined
   availableTags: string[]
   onQueryChange: (query: string) => void
   onStatusChange: (status: 'all' | TaskStatus) => void
   onPriorityChange: (priority: 'all' | TaskPriority) => void
-  onTagChange: (tag: 'all' | string) => void
   onDateRangeChange: (range: DateRange | undefined) => void
   onReload: () => void
   onResetFilters: () => void
@@ -36,13 +36,11 @@ export function TaskFilters({
   query,
   statusFilter,
   priorityFilter,
-  tagFilter,
   dateRange,
   availableTags,
   onQueryChange,
   onStatusChange,
   onPriorityChange,
-  onTagChange,
   onDateRangeChange,
   onResetFilters,
 }: TaskFiltersProps) {
@@ -52,7 +50,6 @@ export function TaskFilters({
   const hasActiveFilters = query.trim() !== '' ||
     statusFilter !== 'all' ||
     priorityFilter !== 'all' ||
-    tagFilter !== 'all' ||
     dateRange !== undefined
 
   return (
@@ -63,69 +60,59 @@ export function TaskFilters({
           placeholder={t('tasks.filters.searchPlaceholder')}
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
-          className="pl-9 h-9 bg-card/50"
+          className="pl-9 h-9 text-sm"
         />
       </div>
 
-      <Select
-        value={statusFilter === 'all' ? undefined : statusFilter}
-        onValueChange={(val: any) => onStatusChange(val || 'all')}
-      >
-        <SelectTrigger
-          className="w-[130px] h-9 bg-card/50"
-          onClear={() => onStatusChange('all')}
-          showClear={statusFilter !== 'all'}
-        >
-          <SelectValue placeholder={t('tasks.status')} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">{t('tasks.filters.all')}</SelectItem>
-          <SelectItem value="pending">{t('tasks.statuses.pending')}</SelectItem>
-          <SelectItem value="in_progress">{t('tasks.statuses.in_progress')}</SelectItem>
-          <SelectItem value="done">{t('tasks.statuses.done')}</SelectItem>
-          <SelectItem value="cancelled">{t('tasks.statuses.cancelled')}</SelectItem>
-        </SelectContent>
-      </Select>
-
-      <Select
-        value={priorityFilter === 'all' ? undefined : priorityFilter}
-        onValueChange={(val: any) => onPriorityChange(val || 'all')}
-      >
-        <SelectTrigger
-          className="w-[130px] h-9 bg-card/50"
-          onClear={() => onPriorityChange('all')}
-          showClear={priorityFilter !== 'all'}
-        >
-          <SelectValue placeholder={t('tasks.priority')} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">{t('tasks.filters.all')}</SelectItem>
-          <SelectItem value="low">{t('tasks.priorityLevels.low')}</SelectItem>
-          <SelectItem value="medium">{t('tasks.priorityLevels.medium')}</SelectItem>
-          <SelectItem value="high">{t('tasks.priorityLevels.high')}</SelectItem>
-        </SelectContent>
-      </Select>
-
-      {availableTags.length > 0 && (
+      <div className="flex items-center gap-1.5">
+        <span className="text-xs text-muted-foreground font-medium shrink-0">{t('tasks.filters.status')}:</span>
         <Select
-          value={tagFilter === 'all' ? undefined : tagFilter}
-          onValueChange={(val: any) => onTagChange(val || 'all')}
+          value={statusFilter === 'all' ? undefined : statusFilter}
+          onValueChange={(val: any) => onStatusChange(val || 'all')}
         >
           <SelectTrigger
-            className="w-[130px] h-9 bg-card/50"
-            onClear={() => onTagChange('all')}
-            showClear={tagFilter !== 'all'}
+            className={cn(
+              "w-[110px] h-9 text-sm",
+              statusFilter === 'all' && "text-muted-foreground"
+            )}
+            onClear={() => onStatusChange('all')}
+            showClear={statusFilter !== 'all'}
           >
             <SelectValue placeholder={t('tasks.filters.all')} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t('tasks.filters.all')}</SelectItem>
-            {availableTags.map((tag) => (
-              <SelectItem key={tag} value={tag}>{tag}</SelectItem>
-            ))}
+            <SelectItem value="todo">{t('tasks.statuses.todo')}</SelectItem>
+            <SelectItem value="doing">{t('tasks.statuses.doing')}</SelectItem>
+            <SelectItem value="done">{t('tasks.statuses.done')}</SelectItem>
           </SelectContent>
         </Select>
-      )}
+      </div>
+
+      <div className="flex items-center gap-1.5">
+        <span className="text-xs text-muted-foreground font-medium shrink-0">{t('tasks.filters.priority')}:</span>
+        <Select
+          value={priorityFilter === 'all' ? undefined : priorityFilter}
+          onValueChange={(val: any) => onPriorityChange(val || 'all')}
+        >
+          <SelectTrigger
+            className={cn(
+              "w-[110px] h-9 text-sm",
+              priorityFilter === 'all' && "text-muted-foreground"
+            )}
+            onClear={() => onPriorityChange('all')}
+            showClear={priorityFilter !== 'all'}
+          >
+            <SelectValue placeholder={t('tasks.filters.all')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t('tasks.filters.all')}</SelectItem>
+            <SelectItem value="low">{t('tasks.priorityLevels.low')}</SelectItem>
+            <SelectItem value="medium">{t('tasks.priorityLevels.medium')}</SelectItem>
+            <SelectItem value="high">{t('tasks.priorityLevels.high')}</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
       <DateRangePicker
         value={dateRange}
@@ -134,7 +121,7 @@ export function TaskFilters({
       />
 
       <Button
-        variant="ghost"
+        variant="outline"
         size="icon"
         onClick={onResetFilters}
         disabled={!hasActiveFilters}

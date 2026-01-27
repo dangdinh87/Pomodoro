@@ -6,20 +6,31 @@ import { cn } from '@/lib/utils'
 import { AnimatedTrash, AnimatedEdit, AnimatedTarget, AnimatedSquare } from '@/components/ui/animated-icons'
 import { BorderBeam } from '@/components/ui/border-beam'
 import { useI18n } from '@/contexts/i18n-context'
+import { Copy, Calendar, Bookmark, Loader2 } from 'lucide-react'
+import { format, isPast, isToday, isTomorrow } from 'date-fns'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { MoreHorizontal } from 'lucide-react'
 
 interface TaskItemProps {
   task: Task
   isActive: boolean
   onToggleStatus: (task: Task) => void
-  onToggleActive: (task: Task) => void
   onEdit: (task: Task) => void
   onDelete: (id: string) => void
+  onClone?: (id: string) => void
+  onSaveAsTemplate?: (id: string) => void
+  togglingTaskIds?: Set<string>
 }
 
 function formatMinutes(ms?: number): string {
@@ -33,31 +44,41 @@ function TaskProgress({ actual, estimated, t }: { actual: number; estimated: num
 
   return (
     <div className="flex items-center gap-2 text-xs">
-      <div className="w-12 h-1.5 bg-secondary rounded-full overflow-hidden shrink-0">
+      <div className="w-20 h-1.5 bg-muted/50 rounded-full overflow-hidden shrink-0">
         <div
-          className="h-full bg-primary transition-all duration-300"
+          className="h-full bg-primary/80 transition-all duration-500 rounded-full"
           style={{ width: `${percentage}%` }}
         />
       </div>
-      <span className="text-muted-foreground whitespace-nowrap">
+      <span className="text-muted-foreground/60 tabular-nums text-[11px] font-medium">
         {actual}/{estimated}
       </span>
     </div>
   )
 }
 
+function getDueDateInfo(dueDate: string | null | undefined) {
+  if (!dueDate) return null
+  const date = new Date(dueDate)
+  const overdue = isPast(date) && !isToday(date)
+  const today = isToday(date)
+  const tomorrow = isTomorrow(date)
+  return { date, overdue, today, tomorrow }
+}
+
 export function TaskItem({
   task,
   isActive,
   onToggleStatus,
-  onToggleActive,
   onEdit,
   onDelete,
+  onClone,
+  onSaveAsTemplate,
+  togglingTaskIds,
 }: TaskItemProps) {
   const { t } = useI18n()
   const isDone = task.status === 'done'
-  const isCancelled = task.status === 'cancelled'
-  const isCompleted = isDone || isCancelled
+  const dueDateInfo = getDueDateInfo(task.dueDate)
 
   const priorityVariants: Record<Task['priority'], "destructive" | "default" | "secondary"> = {
     high: "destructive",
@@ -69,60 +90,99 @@ export function TaskItem({
     <TooltipProvider>
       <article
         className={cn(
-          "group relative rounded-xl border transition-all duration-300 ease-in-out p-4",
-          "hover:shadow-xl hover:border-primary/40 hover:-translate-y-0.5",
-          "bg-card/40 backdrop-blur-md border-muted/40",
+          "group relative rounded-xl border transition-all duration-300 ease-in-out p-3.5",
+          "hover:shadow-lg hover:border-primary/40",
+          "bg-card/40 backdrop-blur-md border-muted/30",
           isActive
-            ? "border-transparent ring-2 ring-primary/40 bg-primary/5 shadow-2xl brightness-110"
-            : "shadow-md hover:shadow-primary/5",
+            ? "border-transparent ring-1 ring-primary/40 bg-primary/5 shadow-xl brightness-110"
+            : "shadow-sm hover:shadow-primary/5",
           isDone && "opacity-60 grayscale-[0.2]"
         )}
       >
         {isActive && <BorderBeam size={160} duration={6} borderWidth={2.5} radius={12} className="z-10 opacity-80" />}
 
         <div className="flex items-start gap-5">
-          <div className="pt-1.5">
-            <Checkbox
-              checked={isDone}
-              onCheckedChange={() => onToggleStatus(task)}
-              disabled={isCancelled}
-              className="h-5 w-5 rounded-full transition-all hover:scale-110 active:scale-90 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-            />
+          <div className="pt-1.5 min-w-[32px] flex justify-center relative">
+            <div className="relative flex items-center justify-center h-5 w-5">
+              <Checkbox
+                checked={isDone}
+                onCheckedChange={() => onToggleStatus(task)}
+                className={cn(
+                  "h-5 w-5 rounded-full transition-all hover:scale-110 active:scale-90 data-[state=checked]:bg-primary data-[state=checked]:border-primary",
+                  togglingTaskIds?.has(task.id) && "opacity-50"
+                )}
+                disabled={togglingTaskIds?.has(task.id)}
+              />
+              {togglingTaskIds?.has(task.id) && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <Loader2 className={cn(
+                    "h-3 w-3 animate-spin",
+                    isDone ? "text-primary-foreground" : "text-primary"
+                  )} strokeWidth={3} />
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="flex-1 min-w-0 pr-24">
-            <div className="flex items-center flex-wrap gap-2.5 mb-2 min-h-[1.75rem]">
-              <h3 className={cn(
-                "font-bold text-base uppercase tracking-tight leading-snug text-foreground/90",
-                isDone && "line-through text-muted-foreground font-medium",
-                isCancelled && "text-muted-foreground line-through"
-              )}>
-                {task.title}
-              </h3>
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-col gap-2 mb-3">
+              <div className="flex items-start justify-between gap-4">
+                <h3 className={cn(
+                  "font-bold text-[16px] tracking-tight leading-snug text-foreground line-clamp-2",
+                  isDone && "line-through text-muted-foreground font-normal"
+                )}>
+                  {task.title}
+                </h3>
+              </div>
+
+              {task.isTemplate && (
+                <div className="mt-1">
+                  <Badge variant="outline" className="text-[10px] h-5 px-2.5 rounded-md font-bold border-amber-500/30 text-amber-600 bg-amber-500/10 dark:text-amber-400 dark:border-amber-400/20">
+                    <Bookmark className="h-3 w-3 mr-1.5 fill-current" />
+                    {t('tasks.templateBadge')}
+                  </Badge>
+                </div>
+              )}
 
               <div className="flex gap-2 shrink-0 items-center">
                 <Badge
                   variant={priorityVariants[task.priority]}
-                  className="text-[10px] h-5 px-2 rounded-full font-extrabold uppercase tracking-widest shadow-sm"
+                  className="text-[10px] h-5.5 px-3 rounded-full font-semibold capitalize"
                 >
                   {t(`tasks.priorityLevels.${task.priority}`)}
                 </Badge>
                 {isActive && (
-                  <Badge variant="outline" className="text-[10px] h-5 px-2 rounded-full font-extrabold uppercase tracking-widest border-primary text-primary animate-pulse bg-primary/20 shadow-primary/20 shadow-sm">
-                    Focusing
+                  <Badge
+                    variant="outline"
+                    className="text-[10px] h-5.5 px-3 rounded-full font-bold border-primary/40 text-primary animate-pulse bg-primary/10 flex items-center gap-1.5 shadow-sm shadow-primary/10"
+                  >
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary animate-ping" />
+                    {t('tasks.focusing') || 'Focusing'}
                   </Badge>
                 )}
               </div>
             </div>
 
-            <div className="flex items-center flex-wrap gap-x-6 gap-y-3 text-[12px] text-muted-foreground/80 font-medium">
-              <div className="flex items-center gap-2 overflow-hidden">
-                <span className="shrink-0 opacity-70 uppercase tracking-tighter decoration-primary/30 underline-offset-4 decoration-2">{t('tasks.progress')}:</span>
-                <TaskProgress actual={task.actualPomodoros} estimated={task.estimatePomodoros} t={t} />
-              </div>
-              <div className="flex items-center gap-1.5 shrink-0">
-                <span className="opacity-70 uppercase tracking-tighter decoration-primary/30 underline-offset-4 decoration-2">{t('tasks.time')}:</span>
-                <span className="tabular-nums font-bold text-foreground/70">{formatMinutes(task.timeSpentMs)}</span>
+            <div className="flex items-center flex-wrap gap-x-4 gap-y-2 text-xs text-muted-foreground">
+              {dueDateInfo && (
+                <div className={cn(
+                  "flex items-center gap-1.5 shrink-0",
+                  dueDateInfo.overdue && !isDone && "text-destructive",
+                  dueDateInfo.today && !isDone && "text-amber-600",
+                  dueDateInfo.tomorrow && !isDone && "text-blue-500"
+                )}>
+                  <Calendar className="h-3.5 w-3.5" />
+                  <span className="font-medium">
+                    {dueDateInfo.overdue && !isDone ? t('tasks.overdue') :
+                      dueDateInfo.today ? t('tasks.filters.today') :
+                        dueDateInfo.tomorrow ? t('tasks.tomorrow') :
+                          format(dueDateInfo.date, 'MMM d')}
+                  </span>
+                </div>
+              )}
+              <TaskProgress actual={task.actualPomodoros} estimated={task.estimatePomodoros} t={t} />
+              <div className="flex items-center gap-1.5 shrink-0 text-muted-foreground/60">
+                <span className="tabular-nums font-medium text-[11px]">{formatMinutes(task.timeSpentMs)}</span>
               </div>
               {task.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 items-center">
@@ -141,66 +201,47 @@ export function TaskItem({
           </div>
         </div>
 
-        {/* Actions - Redesigned to be more compact */}
+        {/* Actions - Bottom Aligned */}
         <div className={cn(
-          "absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-0.5 transition-opacity",
-          // Mobile: Always visible
-          // Desktop: Visible on hover or when active
+          "mt-4 pt-3 flex items-center justify-end gap-1 border-t border-muted/20 transition-all duration-300",
           "opacity-100 sm:opacity-0 sm:group-hover:opacity-100",
-          isActive && "opacity-100"
+          isActive && "opacity-100 border-primary/20"
         )}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onToggleActive(task)}
-                disabled={isDone}
-                className={cn(
-                  "h-7 w-7 rounded-sm",
-                  isActive ? "text-primary bg-primary/10" : "hover:text-primary hover:bg-primary/5"
-                )}
-              >
-                {isActive ? <AnimatedSquare className="h-3.5 w-3.5 fill-current" /> : <AnimatedTarget className="h-3.5 w-3.5 text-current" />}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" className="text-[10px] py-1 px-2">
-              {isActive ? t('tasks.actions.stopFocus') : t('tasks.actions.startFocus')}
-            </TooltipContent>
-          </Tooltip>
 
-          <Tooltip>
-            <TooltipTrigger asChild>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => onEdit(task)}
-                disabled={isDone}
-                className="h-7 w-7 rounded-sm hover:text-primary hover:bg-primary/5"
+                className="h-7 w-7 rounded-sm hover:bg-muted"
               >
-                <AnimatedEdit className="h-3.5 w-3.5" />
+                <MoreHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
               </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" className="text-[10px] py-1 px-2">
-              {t('tasks.actions.edit')}
-            </TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuItem onClick={() => onEdit(task)} className="text-xs gap-2 cursor-pointer">
+                <AnimatedEdit className="h-3.5 w-3.5 text-muted-foreground" />
+                {t('common.edit')}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onClone?.(task.id)} className="text-xs gap-2 cursor-pointer">
+                <Copy className="h-3.5 w-3.5 text-muted-foreground" />
+                {t('tasks.clone')}
+              </DropdownMenuItem>
+              {!task.isTemplate && onSaveAsTemplate && (
+                <DropdownMenuItem onClick={() => onSaveAsTemplate(task.id)} className="text-xs gap-2 cursor-pointer">
+                  <Bookmark className="h-3.5 w-3.5 text-muted-foreground" />
+                  {t('tasks.templates.saveAsTemplate')}
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem
                 onClick={() => onDelete(task.id)}
-                className="h-7 w-7 rounded-sm hover:text-destructive hover:bg-destructive/5"
+                className="text-xs gap-2 text-destructive focus:text-destructive cursor-pointer"
               >
                 <AnimatedTrash className="h-3.5 w-3.5" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" className="text-[10px] py-1 px-2 text-destructive">
-              {t('tasks.actions.delete')}
-            </TooltipContent>
-          </Tooltip>
+                {t('common.delete')}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </article>
     </TooltipProvider>

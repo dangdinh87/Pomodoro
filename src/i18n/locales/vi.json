@@ -25,7 +25,10 @@
     "sort": "Sắp xếp",
     "actions": "Hành động",
     "settings": "Cài đặt",
-    "language": "Ngôn ngữ"
+    "language": "Ngôn ngữ",
+    "total": "Tổng cộng",
+    "item": "mục",
+    "items": "mục"
   },
   "nav": {
     "navigation": "Điều hướng",
@@ -35,6 +38,7 @@
     "history": "Lịch sử",
     "leaderboard": "Bảng xếp hạng",
     "chatAI": "Chat AI",
+    "entertainment": "Thư giãn",
     "settings": "Cài đặt",
     "guide": "Hướng dẫn",
     "feedback": "Phản hồi",
@@ -162,7 +166,18 @@
     "noResults": "Không tìm thấy kết quả",
     "noResultsDescription": "Thử điều chỉnh tìm kiếm hoặc bộ lọc để tìm thấy công việc bạn cần.",
     "focusing": "Đang tập trung",
+    "overdue": "Quá hạn",
+    "tomorrow": "Ngày mai",
+    "clone": "Nhân bản",
+    "templateBadge": "Mẫu",
     "createFirst": "Tạo công việc đầu tiên để bắt đầu",
+    "fields": {
+      "title": "Tiêu đề",
+      "priority": "Độ ưu tiên",
+      "dueDate": "Hạn chót",
+      "tags": "Tags",
+      "progress": "Tiến độ"
+    },
     "taskName": "Tên công việc",
     "taskNamePlaceholder": "Bạn đang định làm gì?",
     "taskDescription": "Mô tả",
@@ -174,9 +189,6 @@
     "estimatedHint": "Số phiên Pomodoro (~25 phút/phiên) bạn dự tính để hoàn thành công việc này.",
     "actual": "Thực tế",
     "completed": "Hoàn thành",
-    "pending": "Chờ xử lý",
-    "inProgress": "Đang làm",
-    "cancelled": "Đã hủy",
     "progress": "Tiến độ",
     "time": "Thời gian",
     "priorityLevels": {
@@ -185,10 +197,9 @@
       "high": "Cao"
     },
     "statuses": {
-      "pending": "Chờ xử lý",
-      "in_progress": "Đang làm",
-      "done": "Hoàn thành",
-      "cancelled": "Đã hủy"
+      "todo": "Cần làm",
+      "doing": "Đang làm",
+      "done": "Hoàn thành"
     },
     "filters": {
       "searchPlaceholder": "Tìm kiếm công việc...",
@@ -208,13 +219,27 @@
       "delete": "Xóa công việc",
       "save": "Lưu công việc",
       "create": "Tạo công việc",
-      "deleting": "Đang xóa..."
+      "deleting": "Đang xóa...",
+      "clone": "Nhân bản",
+      "saveAsTemplate": "Lưu thành mẫu",
+      "deletePermanent": "Xóa vĩnh viễn"
     },
     "count": "công việc",
     "confirmDelete": {
       "title": "Bạn có chắc chắn?",
       "description": "Hành động này không thể hoàn tác. Việc này sẽ xóa vĩnh viễn công việc và dữ liệu phiên liên quan.",
       "action": "Xóa vĩnh viễn"
+    },
+    "templates": {
+      "title": "Mẫu công việc",
+      "description": "Bắt đầu nhanh từ mẫu đã lưu",
+      "useTemplate": "Dùng mẫu",
+      "saveAsTemplate": "Lưu làm mẫu",
+      "removeTemplate": "Xóa mẫu",
+      "noTemplates": "Chưa có mẫu nào",
+      "createTemplateHint": "Lưu bất kỳ công việc nào làm mẫu để dùng lại sau",
+      "empty": "Chưa có mẫu nào",
+      "emptyHint": "Nhấn vào biểu tượng bookmark trên bất kỳ công việc nào để lưu làm mẫu"
     }
   },
   "history": {
@@ -581,6 +606,52 @@
         }
       }
     }
+  },
+  "entertainment": {
+    "title": "Giải trí",
+    "subtitle": "Nghỉ ngơi và thư giãn",
+    "games": {
+      "spaceShooter": {
+        "title": "Bảo Vệ Không Gian",
+        "description": "Bảo vệ Trái Đất khỏi quân xâm lược ngoài hành tinh trong game bắn súng cổ điển này"
+      },
+      "memoryMatch": {
+        "title": "Lật Thẻ",
+        "description": "Tìm các cặp thẻ giống nhau để rèn luyện trí nhớ",
+        "instructions": "Lật 2 thẻ mỗi lượt để tìm các cặp trùng nhau",
+        "clicks": "Lượt",
+        "time": "Thời gian",
+        "moves": "lượt",
+        "win": "Xuất sắc!",
+        "reset": "Chơi lại"
+      },
+      "ticTacToe": {
+        "title": "Cờ Caro",
+        "description": "Game chiến thuật cổ điển đấu với AI thông minh",
+        "instructions": "Chọn chế độ và thách đấu AI",
+        "mode3x3": "LƯỚI 3x3",
+        "mode3x3Desc": "Chế độ cổ điển - Dễ chơi",
+        "mode4x4": "LƯỚI 4x4",
+        "mode4x4Desc": "Hardcore - AI siêu tính toán",
+        "yourTurn": "Lượt của bạn",
+        "aiThinking": "Máy đang nghĩ...",
+        "gameOver": "Kết thúc",
+        "you": "Bạn",
+        "ai": "Máy",
+        "youWin": "Bạn thắng! Ghê đấy!",
+        "aiWins": "Máy thắng! Thử lại nào!",
+        "draw": "Hòa rồi!",
+        "newGame": "Ván mới"
+      }
+    },
+    "playNow": "Chơi ngay",
+    "backToList": "Quay lại danh sách",
+    "closeGame": "Đóng game",
+    "controls": "Điều khiển",
+    "instructions": "Di chuyển chuột hoặc chạm tay để điều khiển phi thuyền. Bắn hạ kẻ thù và tránh va chạm!",
+    "loading": "Đang tải game...",
+    "highScore": "Điểm cao nhất",
+    "lastScore": "Điểm gần nhất"
   },
   "tooltips": {
     "toggleTheme": "Chuyển đổi giao diện",

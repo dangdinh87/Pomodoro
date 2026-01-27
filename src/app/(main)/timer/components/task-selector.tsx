@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Task, useTasksStore } from '@/stores/task-store';
 import { useTasks } from '@/hooks/use-tasks';
 import { Button } from '@/components/ui/button';
@@ -35,27 +35,32 @@ interface TaskSelectorProps {
 export function TaskSelector({ className }: TaskSelectorProps) {
   const { t } = useI18n();
   const { isAuthenticated } = useAuth();
-  const { tasks, updateTask } = useTasks();
+  const todayRange = useMemo(() => {
+    const from = new Date();
+    from.setHours(0, 0, 0, 0);
+    const to = new Date();
+    to.setHours(23, 59, 59, 999);
+    return { from, to };
+  }, []);
+
+  const { tasks, updateTask } = useTasks({
+    dateRange: todayRange,
+    dateField: 'created_at',
+    limit: 50 // Get more for the selector
+  });
+
   const { activeTaskId, setActiveTask } = useTasksStore();
   const [isOpen, setIsOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingTaskId, setPendingTaskId] = useState<string | null>(null);
 
-
   const activeTask = tasks.find((task) => task.id === activeTaskId);
 
   const todayTasks = tasks.filter((task) => {
-    if (task.status === 'done' || task.status === 'cancelled') return false;
+    if (task.status === 'done') return false;
     // Hide if completed pomodoros
     if (task.actualPomodoros >= task.estimatePomodoros) return false;
-
-    const taskDate = new Date(task.createdAt);
-    const today = new Date();
-    return (
-      taskDate.getDate() === today.getDate() &&
-      taskDate.getMonth() === today.getMonth() &&
-      taskDate.getFullYear() === today.getFullYear()
-    );
+    return true; // Already filtered by date Range in useTasks
   });
 
   const handleSelectTask = (taskId: string) => {
@@ -76,8 +81,8 @@ export function TaskSelector({ className }: TaskSelectorProps) {
   const selectTask = (taskId: string) => {
     setActiveTask(taskId);
     const task = tasks.find((t) => t.id === taskId);
-    if (task && task.status === 'pending') {
-      updateTask({ id: taskId, input: { status: 'in_progress' } });
+    if (task && task.status === 'todo') {
+      updateTask({ id: taskId, input: { status: 'doing' } });
     }
     setConfirmOpen(false);
     setPendingTaskId(null);
