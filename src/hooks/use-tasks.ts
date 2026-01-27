@@ -8,6 +8,7 @@ import {
   TaskStatus,
 } from '@/stores/task-store';
 import { toast } from 'sonner';
+import { startOfDay, endOfDay } from 'date-fns';
 
 // Helper functions to map API data
 function mapPriorityToApi(priority: TaskPriority | undefined) {
@@ -220,8 +221,8 @@ export function useTasks(filters: any = {}) {
           status: filters.statusFilter,
           priority: filters.priorityFilter,
           tag: filters.tagFilter,
-          from: filters.dateRange?.from?.toISOString(),
-          to: filters.dateRange?.to?.toISOString(),
+          from: filters.dateRange?.from ? startOfDay(filters.dateRange.from).toISOString() : undefined,
+          to: filters.dateRange?.to ? endOfDay(filters.dateRange.to).toISOString() : undefined,
           dateField: filters.dateField || 'created_at',
         },
       }),
