@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Timer • Study Bro App',
+  title: 'Timer • Improcode App',
   description:
     'Manage work and break sessions with a refined Pomodoro timer and unified settings.',
 };

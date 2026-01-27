@@ -15,20 +15,20 @@ import { Metadata } from 'next';
 
 // SEO Metadata - rendered server-side
 export const metadata: Metadata = {
-  title: 'Study Bro - AI-Powered Pomodoro Timer for Maximum Focus',
+  title: 'Improcode - Improcode Every Day',
   description:
-    'Boost your productivity with Study Bro. Smart Pomodoro timer with AI insights, task management, ambient sounds, and detailed analytics. Free to use.',
+    'Improcode Every Day - The advanced Pomodoro timer engineered for peak performance. Smart Pomodoro timer with AI insights, task management, and detailed analytics.',
   keywords: ['pomodoro', 'timer', 'productivity', 'focus', 'study', 'AI', 'task management'],
   openGraph: {
-    title: 'Study Bro - AI-Powered Pomodoro Timer',
-    description: 'Boost your productivity with Study Bro. Smart Pomodoro timer with AI insights.',
+    title: 'Improcode - Improcode Every Day',
+    description: 'Improcode Every Day - The advanced Pomodoro timer engineered for peak performance.',
     type: 'website',
-    url: 'https://www.pomodoro-focus.site',
+    url: 'https://improcode.com',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Study Bro - AI-Powered Pomodoro Timer',
-    description: 'Boost your productivity with Study Bro. Smart Pomodoro timer with AI insights.',
+    title: 'Improcode - Improcode Every Day',
+    description: 'Improcode Every Day - The advanced Pomodoro timer engineered for peak performance.',
   },
 };
 
