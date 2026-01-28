@@ -39,9 +39,26 @@ export async function GET(request: Request) {
             query = query.lt('created_at', endDateTime.toISOString())
         }
 
-        const { data: sessions, error: sessionsError } = await query
+        // 3. Fetch Streak (Concurrent with sessions)
+        const streakQuery = supabase
+            .from('streaks')
+            .select('current, longest')
+            .eq('user_id', userId)
+            .single()
+
+        // Execute both queries in parallel
+        const [sessionsResult, streakResult] = await Promise.all([
+            query,
+            streakQuery
+        ])
+
+        const { data: sessions, error: sessionsError } = sessionsResult
+        const { data: streakData, error: streakError } = streakResult
 
         if (sessionsError) throw sessionsError
+        if (streakError && streakError.code !== 'PGRST116') {
+            console.error('Error fetching streak', streakError)
+        }
 
         let totalFocusTime = 0
         let completedSessions = 0
@@ -74,7 +91,7 @@ export async function GET(request: Request) {
         }
 
 
-        sessions.forEach(session => {
+        sessions?.forEach(session => {
             // Summary
             if (session.mode === 'work') {
                 totalFocusTime += session.duration
@@ -94,17 +111,6 @@ export async function GET(request: Request) {
                 }
             }
         })
-
-        // 3. Fetch Streak
-        const { data: streakData, error: streakError } = await supabase
-            .from('streaks')
-            .select('current, longest')
-            .eq('user_id', userId)
-            .single()
-
-        if (streakError && streakError.code !== 'PGRST116') {
-            console.error('Error fetching streak', streakError)
-        }
 
         // Format response
         // Format response
