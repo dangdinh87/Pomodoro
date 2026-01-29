@@ -63,14 +63,14 @@ const uniqueSortedPush = (arr: string[], v: string) => {
 }
 
 // Calculate current streak by finding consecutive days ending with today
-const calculateCurrentStreak = (history: string[], today: string): number => {
-  if (!history.includes(today)) return 0
+export const calculateCurrentStreak = (history: string[], today: string): number => {
+  const historySet = new Set(history)
+  if (!historySet.has(today)) return 0
 
-  const sortedHistory = [...history].sort((a, b) => a.localeCompare(b))
   let streak = 0
   let currentDate = today
 
-  while (sortedHistory.includes(currentDate)) {
+  while (historySet.has(currentDate)) {
     streak++
     const date = isoToDate(currentDate)
     if (!date) break
@@ -192,13 +192,17 @@ export default function StreakTracker() {
     const start = startOfWeek(startOfMonth(month), { weekStartsOn: 1 })
     const end = endOfWeek(endOfMonth(month), { weekStartsOn: 1 })
     const days: { date: Date; iso: string; focused: boolean; inMonth: boolean; today: boolean }[] = []
+
+    // Create Set for O(1) lookups inside the loop
+    const historySet = new Set(data.history)
+
     for (let d = start; d <= end; d = addDays(d, 1)) {
       const date = new Date(d)
       const iso = format(date, 'yyyy-MM-dd')
       days.push({
         date,
         iso,
-        focused: data.history.includes(iso),
+        focused: historySet.has(iso),
         inMonth: isSameMonth(date, month),
         today: isToday(date),
       })
