@@ -23,32 +23,30 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: 'Study Bro App',
-  description:
-    'A comprehensive Pomodoro Timer web application for focus enhancement and productivity tracking',
+  title: 'Improcode',
+  description: 'Improcode Every Day',
   manifest: '/manifest.json',
-  metadataBase: new URL('https://www.pomodoro-focus.site'),
+  metadataBase: new URL('https://improcode.com'),
   keywords: [
     'Pomodoro Timer',
     'Study Timer',
     'Focus Timer',
     'Productivity Tool',
-    'Study Bro',
+    'Improcode',
     'Focus Enhancement',
     'Time Management',
   ],
   openGraph: {
-    title: 'Study Bro App',
-    description:
-      'A comprehensive Pomodoro Timer web application for focus enhancement and productivity tracking',
-    url: 'https://www.pomodoro-focus.site',
-    siteName: 'Study Bro App',
+    title: 'Improcode',
+    description: 'Improcode Every Day',
+    url: 'https://improcode.com',
+    siteName: 'Improcode',
     images: [
       {
         url: '/card.jpg',
         width: 1200,
         height: 630,
-        alt: 'Study Bro App',
+        alt: 'Improcode',
       },
     ],
     locale: 'en_US',
@@ -56,9 +54,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Study Bro App',
-    description:
-      'A comprehensive Pomodoro Timer web application for focus enhancement and productivity tracking',
+    title: 'Improcode',
+    description: 'Improcode Every Day',
     images: ['/card.jpg'],
   },
 };
@@ -78,9 +75,9 @@ export default function RootLayout({
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'WebApplication',
-              name: 'Study Bro',
+              name: 'Improcode',
               description: 'AI-Powered Pomodoro Timer for Maximum Focus and Productivity',
-              url: 'https://www.pomodoro-focus.site',
+              url: 'https://improcode.com',
               applicationCategory: 'ProductivityApplication',
               operatingSystem: 'Web Browser',
               offers: {
