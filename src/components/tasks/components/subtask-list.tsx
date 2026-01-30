@@ -17,6 +17,7 @@ interface SubtaskListProps {
   onEdit: (task: Task) => void
   onDelete: (id: string) => void
   onClone?: (id: string) => void
+  togglingTaskIds?: Set<string>
 }
 
 // Calculate subtask progress for a parent task
@@ -31,10 +32,10 @@ export function SubtaskList({
   subtasks,
   activeTaskId,
   onToggleStatus,
-  onToggleActive,
   onEdit,
   onDelete,
   onClone,
+  togglingTaskIds,
 }: SubtaskListProps) {
   const [isExpanded, setIsExpanded] = useState(true)
   const progress = getSubtaskProgress(subtasks)
@@ -67,10 +68,10 @@ export function SubtaskList({
                     task={subtask}
                     isActive={activeTaskId === subtask.id}
                     onToggleStatus={onToggleStatus}
-                    onToggleActive={onToggleActive}
                     onEdit={onEdit}
                     onDelete={onDelete}
                     onClone={onClone}
+                    isToggling={togglingTaskIds?.has(subtask.id)}
                   />
                 </div>
               </AnimatedListItem>

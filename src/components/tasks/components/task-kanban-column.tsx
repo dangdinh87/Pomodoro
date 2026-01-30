@@ -1,5 +1,6 @@
 "use client"
 
+import { memo } from 'react'
 import { useDroppable } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { Task, TaskStatus } from '@/stores/task-store'
@@ -44,7 +45,7 @@ const statusConfig = {
   },
 }
 
-export function TaskKanbanColumn({
+export const TaskKanbanColumn = memo(function TaskKanbanColumn({
   status,
   tasks,
   activeTaskId,
@@ -96,6 +97,7 @@ export function TaskKanbanColumn({
                   onDelete={onDelete}
                   onClone={onClone}
                   onSaveAsTemplate={onSaveAsTemplate}
+                  isToggling={togglingTaskIds?.has(task.id)}
                 />
               </AnimatedListItem>
             ))}
@@ -110,4 +112,4 @@ export function TaskKanbanColumn({
       </div>
     </div>
   )
-}
+})
