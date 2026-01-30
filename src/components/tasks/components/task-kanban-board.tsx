@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useCallback } from 'react'
+import { useMemo, useCallback, memo } from 'react'
 import {
   DndContext,
   DragOverlay,
@@ -60,7 +60,7 @@ const kanbanCollisionDetection: CollisionDetection = (args) => {
   return rectIntersection(args)
 }
 
-export function TaskKanbanBoard({
+export const TaskKanbanBoard = memo(function TaskKanbanBoard({
   tasks,
   isLoading,
   activeTaskId,
@@ -170,11 +170,11 @@ export function TaskKanbanBoard({
               onDelete={onDelete}
               onClone={onClone}
               onSaveAsTemplate={onSaveAsTemplate}
-              togglingTaskIds={togglingTaskIds}
+              isToggling={togglingTaskIds?.has(activeTask.id)}
             />
           </div>
         ) : null}
       </DragOverlay>
     </DndContext>
   )
-}
+})
