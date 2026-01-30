@@ -8,7 +8,7 @@ const testimonials = [
     {
         name: 'Sarah Chen',
         designation: 'Software Engineer at Google',
-        quote: "Study Bro transformed how I work. The focus analytics helped me identify my most productive hours. I'm now shipping features 3x faster.",
+        quote: "Improcode transformed how I work. The focus analytics helped me identify my most productive hours. I'm now shipping features 3x faster.",
         src: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=400&h=400&fit=crop',
     },
     {
@@ -26,13 +26,13 @@ const testimonials = [
     {
         name: 'Lisa Thompson',
         designation: 'Medical Student at Johns Hopkins',
-        quote: "Studying for boards requires intense focus. Study Bro's analytics showed me my peak hours and helped me study smarter, not harder.",
+        quote: "Studying for boards requires intense focus. Improcode's analytics showed me my peak hours and helped me study smarter, not harder.",
         src: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=400&h=400&fit=crop',
     },
     {
         name: 'Marcus Johnson',
         designation: 'Freelance Writer',
-        quote: "As a writer, distractions are my enemy. Study Bro has been instrumental in helping me meet deadlines. The Pomodoro technique works wonders!",
+        quote: "As a writer, distractions are my enemy. Improcode has been instrumental in helping me meet deadlines. The Pomodoro technique works wonders!",
         src: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=400&h=400&fit=crop',
     },
 ];

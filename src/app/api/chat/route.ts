@@ -3,7 +3,7 @@ import {
     createUIMessageStreamResponse,
 } from "ai";
 import { createClient } from "@/lib/supabase-server";
-import { BRO_AI_SYSTEM_PROMPT } from "@/lib/prompts/bro-ai-system";
+import { IMPROCODE_AI_SYSTEM_PROMPT } from "@/lib/prompts/improcode-ai-system";
 
 export const maxDuration = 60;
 
@@ -86,7 +86,7 @@ export async function POST(req: Request) {
     // Add system prompt to restrict AI to app-related topics only
     const systemPrompt = {
         role: "system",
-        content: BRO_AI_SYSTEM_PROMPT,
+        content: IMPROCODE_AI_SYSTEM_PROMPT,
     };
 
     // Prepend system prompt to messages

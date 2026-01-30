@@ -1,12 +1,12 @@
-# 🏗️ Tài liệu Phân tích Kiến trúc: Study Bro App
+# 🏗️ Tài liệu Phân tích Kiến trúc: Improcode
 
-Chào mừng bạn đến với bản phân tích kỹ thuật chi tiết nhất về **Study Bro App**. Tài liệu này được thiết kế để cung cấp cái nhìn toàn diện về mọi khía cạnh: từ mã nguồn, quy trình xử lý dữ liệu, hệ thống AI cho đến các quy chuẩn thiết kế và cấu hình môi trường.
+Chào mừng bạn đến với bản phân tích kỹ thuật chi tiết nhất về **Improcode**. Tài liệu này được thiết kế để cung cấp cái nhìn toàn diện về mọi khía cạnh: từ mã nguồn, quy trình xử lý dữ liệu, hệ thống AI cho đến các quy chuẩn thiết kế và cấu hình môi trường.
 
 ---
 
-## � 1. Tổng quan Kỹ thuật (Technical Overview)
+##  1. Tổng quan Kỹ thuật (Technical Overview)
 
-Study Bro App là một nền tảng năng suất hiện đại, kết hợp Pomodoro, quản lý tác vụ và trợ lý AI. Ứng dụng được xây dựng trên nền tảng **Next.js 14 (App Router)** để tận dụng tối đa Server Components và tối ưu hóa tốc độ tải trang (Initial Page Load).
+Improcode là một nền tảng năng suất hiện đại, kết hợp Pomodoro, quản lý tác vụ và trợ lý AI. Ứng dụng được xây dựng trên nền tảng **Next.js 14 (App Router)** để tận dụng tối đa Server Components và tối ưu hóa tốc độ tải trang (Initial Page Load).
 
 ### Các trụ cột công nghệ chính:
 
@@ -107,7 +107,7 @@ Hệ thống AI được thiết kế linh hoạt qua gói **MegaLLM**:
 
 ---
 
-## � 8. Bảo mật & Hiệu năng (Security & Performance)
+##  8. Bảo mật & Hiệu năng (Security & Performance)
 
 - **Middleware Security**: Sử dụng Supabase SSR để kiểm soát phiên làm việc (Session) ở tầng Edge, đảm bảo người dùng chưa đăng nhập không bao giờ thấy được dữ liệu nhạy cảm.
 - **Database RLS**: Filter dữ liệu trực tiếp trong Postgres. Mỗi user chỉ thấy data của chính mình (`user_id = auth.uid()`).
