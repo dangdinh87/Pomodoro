@@ -1,4 +1,4 @@
-# Pomodoro Focus & Productivity Application
+# Improcode
 
 A comprehensive Pomodoro Timer web application that combines time management, focus enhancement, and productivity analytics to help users achieve their 10,000-hour mastery goals.
 
@@ -32,7 +32,7 @@ A comprehensive Pomodoro Timer web application that combines time management, fo
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd pomodoro-focus-app
+cd improcode
 ```
 
 2. Install dependencies:
@@ -55,7 +55,7 @@ npm run dev
 ## Project Structure
 
 ```
-pomodoro-focus-app/
+improcode/
 ├── src/
 │   ├── app/                 # Next.js app directory
 │   │   ├── globals.css      # Global styles
