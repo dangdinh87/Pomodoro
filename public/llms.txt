@@ -1,12 +1,12 @@
-# Study Bro - Pomodoro Focus App
+# Improcode - Improcode
 
 > AI-powered Pomodoro timer for maximum focus and productivity.
 
 ## Description
-Study Bro is a comprehensive Pomodoro Timer web application featuring AI-powered insights, task management, ambient sounds, and detailed analytics for focus enhancement and productivity tracking.
+Improcode is a comprehensive Pomodoro Timer web application featuring AI-powered insights, task management, ambient sounds, and detailed analytics for focus enhancement and productivity tracking.
 
 ## Website
-https://www.pomodoro-focus.site
+https://improcode.com
 
 ## Features
 - Precision Pomodoro Timer with customizable intervals (25/5/15 min default)
@@ -46,7 +46,7 @@ https://www.pomodoro-focus.site
 - Real-time updates for timer sync
 
 ## Contact
-- Feedback: https://www.pomodoro-focus.site/feedback
+- Feedback: https://improcode.com/feedback
 - GitHub: https://github.com/dangdinh87
 
 ## License

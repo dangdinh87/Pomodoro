@@ -1,0 +1,28 @@
+
+> pomodoro-focus-app@0.1.0 dev
+> next dev
+
+   ▲ Next.js 14.0.4
+   - Local:        http://localhost:3000
+   - Environments: .env.local
+
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+ ✓ Ready in 2.8s
+ ○ Compiling /src/middleware ...
+ ✓ Compiled /src/middleware in 1370ms (148 modules)
+ ○ Compiling / ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+
+warn - The class `duration-[3000ms]` is ambiguous and matches multiple utilities.
+warn - If this is content and not a class, replace it with `duration-&lsqb;3000ms&rsqb;` to silence this warning.
+ ✓ Compiled / in 11.7s (1408 modules)
+ ✓ Compiled in 2s (679 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (135kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+ ✓ Compiled in 1388ms (1390 modules)
+ ✓ Compiled in 723ms (679 modules)
+ ✓ Compiled in 956ms (679 modules)
+ ✓ Compiled in 672ms (679 modules)
