@@ -1,6 +1,6 @@
 {
-  "name": "Pomodoro Focus App",
-  "short_name": "Pomodoro Focus",
+  "name": "Improcode",
+  "short_name": "Improcode",
   "description": "A comprehensive Pomodoro Timer web application for focus enhancement and productivity tracking",
   "start_url": "/",
   "display": "standalone",

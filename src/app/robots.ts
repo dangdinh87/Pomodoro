@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = 'https://www.pomodoro-focus.site';
+  const baseUrl = 'https://improcode.com';
 
   return {
     rules: [
