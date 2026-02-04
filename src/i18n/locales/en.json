@@ -33,12 +33,12 @@
   "nav": {
     "navigation": "Navigation",
     "system": "System",
-    "timer": "Timer",
+    "timer": "Focus",
     "tasks": "Tasks",
     "history": "History",
     "leaderboard": "Leaderboard",
     "chatAI": "Chat AI",
-    "entertainment": "Relax",
+    "entertainment": "Entertainment",
     "settings": "Settings",
     "guide": "Guide",
     "feedback": "Feedback",
@@ -106,7 +106,54 @@
       "title": "Skip without recording?",
       "description": "You've completed less than 50% of this session. This will not count as a completed pomodoro.",
       "confirm": "Skip anyway"
-    }
+    },
+    "mode_switch_confirm": {
+      "title": "Switch mode?",
+      "description": "Timer is running. Switching mode will discard your current progress.",
+      "confirm": "Switch anyway"
+    },
+    "doneAt": "Done at",
+    "breakTask": "Next up"
+  },
+  "timerGuide": {
+    "title": "How Pomodoro works",
+    "subtitle": "Focus smarter, not longer",
+    "modes": {
+      "title": "Work Cycle",
+      "work": "Work",
+      "workDesc": "25 min deep focus",
+      "shortBreak": "Short Break",
+      "shortBreakDesc": "5 min chill",
+      "longBreak": "Long Break",
+      "longBreakDesc": "15 min (after 4)"
+    },
+    "validSession": {
+      "title": "Valid Session",
+      "subtitle": "No cheating!",
+      "rule": "≥ 50% time",
+      "ruleDesc": "to count as valid",
+      "skip": "Skip early",
+      "skipDesc": "won't add to streak",
+      "badge": "Anti fake-focus system"
+    },
+    "keyboard": {
+      "title": "Quick Tips",
+      "space": "Start / Pause",
+      "reset": "Reset"
+    },
+    "task": {
+      "title": "Task Linking",
+      "select": "Pick a task",
+      "auto": "Pomodoros auto sync progress"
+    },
+    "settings": {
+      "title": "Settings",
+      "customize": "Custom time",
+      "autoStart": "Auto start next mode",
+      "openSettings": "Open Settings"
+    },
+    "dontShowAgain": "Don't show again",
+    "gotIt": "Start focusing"
   },
   "timerSettings": {
     "title": "Timer Settings",
@@ -462,10 +509,10 @@
           "subtitle": "Pomodoro countdown clock",
           "description": "The Timer page is the center of the app, where you:",
           "points": [
-            "Start/pause Pomodoro sessions",
-            "Choose task to focus on",
-            "Track work time",
-            "Automatically switch to break when time is up"
+            "Work, Short Break & Long Break modes",
+            "Link tasks & auto-sync Pomodoro progress",
+            "Valid session rule: ≥50% time to count",
+            "Space: Start/Pause · R: Reset · Skip session"
           ],
           "cta": "Go to Timer"
         },
@@ -493,9 +540,65 @@
           ],
           "cta": "Go to History"
         },
+        "chatAI": {
+          "title": "Chat AI",
+          "subtitle": "Bro Chat – your study buddy",
+          "description": "Chat with AI assistant for:",
+          "points": [
+            "Pomodoro technique & study tips",
+            "Time management advice",
+            "App usage help",
+            "Conversation history saved"
+          ],
+          "cta": "Open Bro Chat"
+        },
+        "entertainment": {
+          "title": "Entertainment",
+          "subtitle": "Mini games for breaks",
+          "description": "Relax during breaks with games:",
+          "points": [
+            "Snake, 2048, Brick Breaker",
+            "Space Shooter, Memory Match",
+            "Tic Tac Toe vs AI",
+            "High scores tracked locally"
+          ],
+          "cta": "Play Games"
+        },
+        "leaderboard": {
+          "title": "Leaderboard",
+          "subtitle": "Compete & stay motivated",
+          "description": "See how you rank:",
+          "points": [
+            "Global Pomodoro rankings",
+            "Weekly & monthly charts",
+            "Build healthy competition"
+          ],
+          "cta": "View Leaderboard"
+        },
+        "focus": {
+          "title": "Focus Mode",
+          "subtitle": "Minimal distraction-free UI",
+          "description": "Focus mode helps you:",
+          "points": [
+            "Hide sidebar for full screen",
+            "Streak tracking & motivation",
+            "Dedicated focus workspace"
+          ],
+          "cta": "Enter Focus Mode"
+        },
+        "feedback": {
+          "title": "Feedback",
+          "subtitle": "Help us improve",
+          "description": "Share your thoughts:",
+          "points": [
+            "Report bugs",
+            "Suggest features",
+            "Rate your experience"
+          ],
+          "cta": "Send Feedback"
+        },
         "settings": {
           "title": "Settings",
-
           "subtitle": "Customize experience",
           "description": "Settings page allows you to:",
           "points": [
@@ -530,10 +633,12 @@
       "emailPlaceholder": "example@email.com",
       "type": "Feedback Type",
       "typeOptions": {
-        "feature": "✨ Feature Suggestion",
-        "bug": "🐛 Bug Report",
-        "other": "📝 Other"
+        "feature": "Feature",
+        "bug": "Bug",
+        "question": "Question",
+        "other": "Other"
       },
+      "rating": "How would you rate your experience? (Optional)",
       "message": "Content",
       "messagePlaceholder": "Describe your feedback in detail...",
       "required": "*",
@@ -609,17 +714,22 @@
     }
   },
   "entertainment": {
-    "title": "Entertainment",
-    "subtitle": "Take a break and relax",
+    "title": "Arcade Zone",
+    "subtitle": "Take a break and have some fun!",
+    "gamesCount": "{count} games available",
+    "yourBest": "Your Best",
     "games": {
       "spaceShooter": {
         "title": "Space Shooter",
-        "description": "Defend Earth from alien invaders in this classic arcade shooter"
+        "description": "Classic space shooter with endless waves of enemies",
+        "instructions": "Move your spaceship with mouse/touch to dodge enemies and collect power-ups. Your ship fires automatically - focus on positioning! Every 1000 points unlocks a new level with faster, smarter enemies.",
+        "tips": "Stay near the center for better mobility"
       },
       "memoryMatch": {
         "title": "Memory Match",
-        "description": "Find matching pairs to train your memory",
-        "instructions": "Flip 2 cards each turn to find matching pairs",
+        "description": "Test your memory with this classic card matching game",
+        "instructions": "Flip 2 cards each turn to find matching pairs. Remember card positions to minimize moves! Score is based on fewer moves and faster completion time. Perfect for brain training!",
+        "tips": "Start from corners, work inward",
         "clicks": "Moves",
         "time": "Time",
         "moves": "moves",
@@ -628,8 +738,9 @@
       },
       "ticTacToe": {
         "title": "Tic Tac Toe",
-        "description": "Classic strategy game against smart AI",
-        "instructions": "Choose your mode and challenge the AI",
+        "description": "Challenge the AI in this strategic classic",
+        "instructions": "Battle against a smart AI opponent! Choose 3x3 grid for classic gameplay or 4x4 for an extra challenge. The AI uses the Minimax algorithm - can you outsmart it?",
+        "tips": "Control the center and corners first",
         "mode3x3": "3x3 GRID",
         "mode3x3Desc": "Classic mode - Easy to play",
         "mode4x4": "4x4 GRID",
@@ -643,6 +754,55 @@
         "aiWins": "AI wins! Try again!",
         "draw": "It's a draw!",
         "newGame": "New Game"
+      },
+      "snake": {
+        "title": "Snake",
+        "description": "Guide the snake and grow as long as possible",
+        "instructions": "Control your snake with arrow keys or WASD (swipe on mobile). Eat the glowing food to grow longer. Each level increases speed and adds obstacles. Don't hit walls or yourself!",
+        "tips": "Plan your path 3-4 moves ahead",
+        "score": "Score",
+        "length": "Length",
+        "level": "Level",
+        "speed": "Speed",
+        "obstacles": "Obstacles"
+      },
+      "game2048": {
+        "title": "2048",
+        "description": "Slide and merge tiles to reach 2048",
+        "instructions": "Use arrow keys or swipe to slide all tiles. When two tiles with the same number touch, they merge into one! Reach 2048 to win, but you can keep playing for higher scores.",
+        "tips": "Keep your highest tile in a corner",
+        "score": "Score",
+        "best": "Best",
+        "youWin": "You Win!",
+        "keepGoing": "Can you reach higher?",
+        "continue": "Keep Going",
+        "newGame": "New Game"
+      },
+      "brickBreaker": {
+        "title": "Brick Breaker",
+        "description": "Break all bricks with your bouncing ball",
+        "instructions": "Move the paddle with mouse/touch or arrow keys to bounce the ball. Break all bricks to advance to the next level! Hit multiple bricks in a row for combo bonus points.",
+        "tips": "Aim for corners to create chain reactions",
+        "start": "Start Game",
+        "score": "Score",
+        "level": "Level",
+        "lives": "Lives",
+        "gameOver": "Game Over",
+        "finalScore": "Final Score",
+        "reachedLevel": "Reached Level",
+        "levelComplete": "Level Complete!",
+        "nextLevel": "Next Level",
+        "playAgain": "Play Again"
+      }
+    },
+    "leaderboard": {
+      "title": "Global Leaderboard",
+      "comingSoon": "Coming Soon",
+      "description": "Compete with players worldwide! Global rankings will be available soon.",
+      "features": {
+        "global": "Global Rankings",
+        "weekly": "Weekly Challenges",
+        "rewards": "Exclusive Rewards"
       }
     },
     "playNow": "Play Now",
@@ -652,7 +812,23 @@
     "instructions": "Move mouse or touch to control the spaceship. Shoot down enemies and avoid collisions!",
     "loading": "Loading game...",
     "highScore": "High Score",
-    "lastScore": "Last Score"
+    "lastScore": "Last Score",
+    "howToPlay": "How to Play",
+    "tips": "Pro Tip",
+    "startGame": "Start Game",
+    "loadingStages": {
+      "initializing": "Initializing",
+      "loadingAssets": "Loading assets",
+      "preparingGraphics": "Preparing graphics",
+      "settingUpControls": "Setting up controls",
+      "almostReady": "Almost ready",
+      "startingGame": "Starting game"
+    },
+    "controlTypes": {
+      "keyboard": "Keyboard",
+      "mouse": "Mouse",
+      "touch": "Touch"
+    }
   },
   "tooltips": {
     "toggleTheme": "Toggle theme",
@@ -947,7 +1123,7 @@
       "focusMode": "Deep Work Mode",
       "title": "Master Your",
       "titleHighlight": "Focus",
-      "subtitle": "The advanced Pomodoro timer engineered for peak performance. Eliminate distractions, achieve flow state, and track your progress with precision analytics.",
+      "subtitle": "Pomodoro timer with task linking and valid-session tracking. Bro Chat AI coach, mini games for breaks, leaderboard, focus mode, and analytics—all in one place.",
       "getStarted": "Start for Free",
       "tryDemo": "Watch Demo",
       "aiChat": "New: AI Productivity Coach",
@@ -1042,7 +1218,7 @@
         },
         "q2": {
           "question": "Is the platform free to use?",
-          "answer": "Yes. The core productivity suite—including the timer, task management, and basic analytics—is free forever. We offer a Professional tier for advanced power users."
+          "answer": "Yes. The full suite is free: Pomodoro timer with task linking, Bro Chat AI, mini games, leaderboard, focus mode, history, and analytics. A Professional tier may launch later for power users."
         },
         "q3": {
           "question": "Can I tailor the workflow to my needs?",
@@ -1079,28 +1255,36 @@
       "subtitle": "A comprehensive suite of tools designed to facilitate flow state and maximize creative output.",
       "items": {
         "timer": {
-          "title": "Precision Timer",
-          "description": "Customizable intervals with automated transitions"
+          "title": "Pomodoro Timer",
+          "description": "Work, short & long break modes. Task linking, valid-session rule (≥50%), keyboard shortcuts."
         },
         "tasks": {
-          "title": "Task Orchestration",
-          "description": "Seamlessly link objectives to focus sessions"
+          "title": "Task Management",
+          "description": "Create, prioritize, and link tasks to Pomodoro sessions. Filter by status and date."
         },
         "analytics": {
-          "title": "Performance Analytics",
-          "description": "Deep dive into your productivity metrics"
+          "title": "History & Analytics",
+          "description": "Session history, stats by day/week/month, productivity charts."
+        },
+        "chatAI": {
+          "title": "Bro Chat AI",
+          "description": "AI coach for Pomodoro tips, study advice, and time management. Conversation history saved."
+        },
+        "entertainment": {
+          "title": "Mini Games",
+          "description": "Snake, 2048, Brick Breaker, Space Shooter, Memory Match, Tic Tac Toe—play during breaks."
         },
         "sounds": {
           "title": "Acoustic Focus",
-          "description": "Premium Lo-fi and white noise soundscapes"
+          "description": "Nature sounds, Spotify & YouTube. Lo-fi and white noise soundscapes."
         },
         "streaks": {
-          "title": "Consistency Tracking",
-          "description": "Visualize your commitment with daily streaks"
+          "title": "Focus Mode & Streaks",
+          "description": "Minimal UI, streak tracking, and motivation in dedicated focus mode."
         },
         "themes": {
           "title": "Adaptive Interface",
-          "description": "Light and Dark modes tailored for eye comfort"
+          "description": "Light and Dark modes, custom backgrounds. Multiple clock styles."
         }
       }
     },
@@ -1123,11 +1307,15 @@
         "description": "Essential tools for focus",
         "cta": "Get Started",
         "features": {
-          "timer": "Standard Pomodoro Timer",
-          "tasks": "Up to 5 Active Tasks",
-          "history": "7-Day History Retention",
-          "themes": "System Light/Dark Mode",
-          "sounds": "Standard Soundscapes",
+          "timer": "Pomodoro Timer (Work, Breaks, Task Linking)",
+          "tasks": "Task Management & Filters",
+          "history": "Session History & Analytics",
+          "chatAI": "Bro Chat AI Coach",
+          "games": "Mini Games (Snake, 2048, etc.)",
+          "leaderboard": "Global Leaderboard",
+          "focus": "Focus Mode & Streaks",
+          "themes": "Light/Dark & Backgrounds",
+          "sounds": "Sounds, Spotify & YouTube",
           "stats": "Core Analytics"
         }
       },

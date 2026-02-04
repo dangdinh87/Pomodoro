@@ -9,6 +9,8 @@ import {
   Music,
   Palette,
   Flame,
+  MessageSquare,
+  Gamepad2,
 } from 'lucide-react';
 import { t } from '@/lib/server-translations';
 import { cn } from '@/lib/utils';
@@ -31,6 +33,18 @@ const FEATURES = [
     icon: BarChart3,
     color: 'bg-purple-600',
     bgGlow: 'from-purple-600/20 to-transparent',
+  },
+  {
+    key: 'chatAI',
+    icon: MessageSquare,
+    color: 'bg-cyan-600',
+    bgGlow: 'from-cyan-600/20 to-transparent',
+  },
+  {
+    key: 'entertainment',
+    icon: Gamepad2,
+    color: 'bg-emerald-600',
+    bgGlow: 'from-emerald-600/20 to-transparent',
   },
   {
     key: 'sounds',
@@ -67,7 +81,7 @@ export function FeaturesSSR() {
         </div>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {FEATURES.map((feature) => {
             const Icon = feature.icon;
             return (

@@ -32,7 +32,7 @@ const AnimatedIcon = ({ Icon, className, isActive }: AnimatedIconProps) => {
             whileHover={isActive ? "active" : "hover"}
             className="flex items-center justify-center"
         >
-            <Icon className={cn("h-4 w-4", className)} />
+            <Icon className={cn("size-5", className)} />
         </motion.div>
     )
 }

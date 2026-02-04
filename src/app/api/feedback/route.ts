@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase-server';
 
 export async function POST(req: Request) {
     try {
+        const supabase = await createClient();
         const body = await req.json();
-        const { name, email, type, message } = body;
+        const { name, email, type, message, rating } = body;
 
         if (!message) {
             return NextResponse.json(
@@ -12,13 +14,41 @@ export async function POST(req: Request) {
             );
         }
 
-        // In a real app, you would save this to a database
-        // For now, we'll just log it to the console
-        console.log('--- NEW FEEDBACK RECEIVED ---');
-        console.log('Type:', type);
-        console.log('From:', name || 'Anonymous', email ? `<${email}>` : '');
-        console.log('Message:', message);
-        console.log('-----------------------------');
+        if (!type || !['feature', 'bug', 'question', 'other'].includes(type)) {
+            return NextResponse.json(
+                { error: 'Invalid feedback type' },
+                { status: 400 }
+            );
+        }
+
+        if (rating !== undefined && (rating < 1 || rating > 5)) {
+            return NextResponse.json(
+                { error: 'Rating must be between 1 and 5' },
+                { status: 400 }
+            );
+        }
+
+        // Get authenticated user (optional - anonymous feedback allowed)
+        const { data: { user } } = await supabase.auth.getUser();
+
+        const { error } = await supabase
+            .from('feedbacks')
+            .insert({
+                user_id: user?.id || null,
+                type,
+                message,
+                rating: rating || null,
+                name: name || null,
+                email: email || null,
+            });
+
+        if (error) {
+            console.error('Feedback insert error:', error);
+            return NextResponse.json(
+                { error: 'Failed to save feedback' },
+                { status: 500 }
+            );
+        }
 
         return NextResponse.json({ success: true });
     } catch (error) {
