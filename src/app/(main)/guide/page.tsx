@@ -13,7 +13,6 @@ import {
     MessageSquare,
     Gamepad2,
     Trophy,
-    Shield,
     Send,
 } from 'lucide-react';
 import { useI18n } from '@/contexts/i18n-context';
@@ -351,37 +350,6 @@ export default function GuidePage() {
                                 className="inline-flex items-center text-sm font-medium text-primary hover:underline mt-3"
                             >
                                 {t('guide.howToUse.features.leaderboard.cta')} <ArrowRight className="ml-1 h-4 w-4" />
-                            </Link>
-                        </CardContent>
-                    </Card>
-
-                    {/* Focus Feature */}
-                    <Card className="hover:shadow-lg transition-shadow">
-                        <CardHeader>
-                            <div className="flex items-center gap-3 mb-2">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                                    <Shield className="h-6 w-6 text-primary" />
-                                </div>
-                                <CardTitle>{t('guide.howToUse.features.focus.title')}</CardTitle>
-                            </div>
-                            <CardDescription>
-                                {t('guide.howToUse.features.focus.subtitle')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            <p className="text-sm text-muted-foreground">
-                                {t('guide.howToUse.features.focus.description')}
-                            </p>
-                            <ul className="text-sm space-y-2 text-muted-foreground">
-                                {Array.isArray(dict.guide?.howToUse?.features?.focus?.points) && dict.guide.howToUse.features.focus.points.map((point: string, index: number) => (
-                                    <li key={index}>• {point}</li>
-                                ))}
-                            </ul>
-                            <Link
-                                href="/focus"
-                                className="inline-flex items-center text-sm font-medium text-primary hover:underline mt-3"
-                            >
-                                {t('guide.howToUse.features.focus.cta')} <ArrowRight className="ml-1 h-4 w-4" />
                             </Link>
                         </CardContent>
                     </Card>

@@ -7,7 +7,6 @@ import {
   Timer,
   BarChart3,
   CheckSquare,
-  Shield,
   Music,
   Menu,
   X,
@@ -40,12 +39,6 @@ export function Navigation() {
       label: t('nav.timer'),
       icon: <Timer className="h-4 w-4" />,
       href: '/timer',
-    },
-    {
-      id: 'focus',
-      label: t('nav.focus'),
-      icon: <Shield className="h-4 w-4" />,
-      href: '/focus',
     },
     {
       id: 'tasks',
