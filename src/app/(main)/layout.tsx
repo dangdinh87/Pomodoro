@@ -17,6 +17,7 @@ import { BotMessageSquare } from '@/components/animate-ui/icons/bot-message-squa
 import { Button } from '@/components/ui/button';
 import { usePathname } from 'next/navigation';
 import { AppProviders } from '@/components/providers/app-providers';
+import { MascotFloating } from '@/components/mascot';
 
 export default function MainLayout({
   children,
@@ -68,6 +69,8 @@ export default function MainLayout({
             </div>
             <GlobalChat />
           </div>
+          {/* Floating Mascot - appears on all pages */}
+          <MascotFloating />
         </SidebarInset>
       </SidebarProvider>
     </AppProviders>
