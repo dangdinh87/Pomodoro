@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://www.pomodoro-focus.site';
+  const baseUrl = 'https://www.improcode.com';
 
   return [
     {
