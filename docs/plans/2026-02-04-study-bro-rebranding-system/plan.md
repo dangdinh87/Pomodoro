@@ -21,8 +21,9 @@ Transform Study Bro from a standard productivity app into a playful, engaging ex
 |-------|-------------|--------|--------|
 | [Phase 01](./phase-01-design-tokens-color-system.md) | Design Tokens & Color System | 4h | ✅ completed |
 | [Phase 02](./phase-02-typography-base-components.md) | Typography & Base Components | 3h | ✅ completed |
-| [Phase 03](./phase-03-mascot-system-assets.md) | Mascot System & Assets | 8h | pending |
-| [Phase 04](./phase-04-gamification-ui-components.md) | Gamification UI Components | 10h | pending |
+| [Phase 03](./phase-03-mascot-system-assets.md) | Mascot Foundation (SVG) | 8h | ✅ completed |
+| [Phase 03b](./phase-03b-mascot-enhancements.md) | **Lottie Mascot + Speech Bubbles** | 6h | 🔥 pending |
+| [Phase 04](./phase-04-gamification-ui-components.md) | Gamification UI (XP/Levels) | 10h | pending |
 | [Phase 05](./phase-05-theme-redesign.md) | Theme Redesign (11 themes) | 4h | pending |
 | [Phase 06](./phase-06-animations-polish.md) | Animations & Polish | 3h | pending |
 
@@ -35,38 +36,44 @@ src/
 │   └── gamification.ts    # NEW: XP/level/badge configs
 ├── stores/
 │   ├── gamification-store.ts  # NEW: Zustand store for XP/coins/badges
-│   └── mascot-store.ts        # NEW: Mascot state machine
+│   └── mascot-store.ts        # ✅ DONE: Mascot state machine + messages
 ├── components/
 │   ├── mascot/
-│   │   ├── MascotProvider.tsx
-│   │   ├── Mascot.tsx
-│   │   └── expressions/      # 8 SVG expression components
+│   │   ├── MascotProvider.tsx    # ✅ DONE
+│   │   ├── Mascot.tsx            # ✅ DONE (SVG) → Upgrade to Lottie
+│   │   ├── LottieMascot.tsx      # NEW: Lottie player wrapper
+│   │   ├── SpeechBubble.tsx      # NEW: Animated speech bubbles
+│   │   ├── MascotFloating.tsx    # NEW: Global floating container
+│   │   ├── expressions/          # ✅ DONE: 8 SVG components (fallback)
+│   │   └── messages/             # NEW: Tips, greetings, celebrations
 │   ├── gamification/
 │   │   ├── XPProgress.tsx
 │   │   ├── LevelBadge.tsx
-│   │   ├── StreakFlame.tsx   # Enhanced streak tracker
 │   │   ├── AchievementCard.tsx
 │   │   └── CoinDisplay.tsx
 │   └── animations/
 │       ├── Confetti.tsx
 │       └── LevelUpCelebration.tsx
-├── app/globals.css        # Update: new CSS variables
-└── tailwind.config.js     # Update: new tokens + keyframes
+├── public/mascot/          # NEW: Lottie animation files (.lottie)
+├── app/globals.css         # ✅ DONE: new CSS variables
+└── tailwind.config.js      # ✅ DONE: new tokens + keyframes
 ```
 
 ## Key Dependencies
 
 - **Existing**: Framer Motion v12, shadcn/ui, Zustand, next-themes, canvas-confetti
-- **Add**: Google Fonts (Nunito, Poppins)
+- **Add**: Google Fonts (Nunito) ✅, `@lottiefiles/dotlottie-react`
 
 ## Success Criteria
 
-1. New color palette applied across all UI (green #4ADE80 primary)
-2. Studie mascot renders with 8 expressions, reacts to app state
-3. Gamification dashboard: streaks, XP bar, level display, badge grid
-4. All 11 themes updated with mascot variants
-5. Celebration animations on achievements (confetti, level-up glow)
-6. Respects `prefers-reduced-motion`
+1. ✅ New color palette applied across all UI (green #4ADE80 primary)
+2. ✅ Studie mascot renders with 8 expressions, reacts to app state
+3. 🔥 Mascot appears on ALL pages with Lottie animations
+4. 🔥 Speech bubbles show motivational tips and celebrations
+5. Gamification dashboard: XP bar, level display, badge grid
+6. All 11 themes updated with mascot variants
+7. Celebration animations on achievements (confetti, level-up glow)
+8. Respects `prefers-reduced-motion` + custom toggle in settings
 
 ## Risk Mitigation
 
@@ -89,23 +96,26 @@ src/
 | Decision | Choice | Impact |
 |----------|--------|--------|
 | **Data Persistence** | localStorage only | No backend changes needed, offline-first |
-| **Mascot Design** | AI generate (DALL-E/Midjourney) + vectorize | Need extra step to convert to SVG |
-| **Streak Migration** | Auto-migrate on first load | Preserve user history, delete old key |
-| **Gamification Scope** | Iterative (2 releases) | Release 1: Core (XP+Levels+Streaks), Release 2: Badges+Coins |
+| **Mascot Design** | Lottie animations (replaced SVG) | Better animations, ~80KB bundle |
+| **Mascot Placement** | Floating on ALL pages | Global presence, page-aware expressions |
+| **Speech Bubbles** | Motivational tips + celebrations | Engaging, Vietnamese localized |
+| **Focus/Streak Page** | ~~Removed~~ | Gamification moved to XP system |
+| **Gamification Scope** | Iterative (2 releases) | Release 1: Core (XP+Levels), Release 2: Badges+Coins |
 | **Animation Accessibility** | Toggle in app settings | Custom control, not just OS prefers-reduced-motion |
 
 ### Action Items
 
-- [ ] **Phase 03**: Add step for AI image generation → SVG conversion workflow
-- [ ] **Phase 04**: Split into 4a (Core: XP/Levels/Streaks) and 4b (Badges/Coins/Shop)
-- [ ] **Phase 06**: Add animation toggle to settings UI instead of only OS detection
-- [ ] **Phase 04**: Add migration logic from `pomodoro-streak` localStorage key
+- [x] ~~Phase 03~~: Mascot foundation completed (SVG expressions)
+- [ ] **Phase 03b**: Upgrade to Lottie + add speech bubbles
+- [ ] **Phase 04**: XP/Levels gamification (streaks removed with Focus page)
+- [ ] **Phase 06**: Add animation toggle to settings UI
 
 ### Release Strategy (Updated)
 
 **Release 1 - Core Rebranding:**
-- Phase 01-03: Colors, Typography, Mascot
-- Phase 04a: XP/Levels/Enhanced Streaks
+- Phase 01-03: Colors, Typography, Mascot Foundation ✅
+- Phase 03b: Lottie Mascot + Speech Bubbles 🔥
+- Phase 04: XP/Levels Gamification
 - Phase 05-06: Themes, Animations
 
 **Release 2 - Full Gamification:**
