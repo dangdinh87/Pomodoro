@@ -102,9 +102,7 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
         setLongStr(String(normalized.longBreakDuration))
         setIntervalStr(String(normalized.longBreakInterval))
         updateSettings(normalized)
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('pomodoro-timer-settings', JSON.stringify(normalized))
-        }
+        // FIX: Removed dead localStorage.setItem - Zustand persist handles storage
         toast.success(t('timerSettings.toasts.saved'))
         onClose?.()
     }

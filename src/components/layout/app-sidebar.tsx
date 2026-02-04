@@ -1,25 +1,48 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator,
+  useSidebar,
 } from '@/components/ui/sidebar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useAuthStore } from '@/stores/auth-store';
 import { supabase } from '@/lib/supabase-client';
 import { toast } from 'sonner';
 import {
   LogOut,
+  Settings,
+  BookOpen,
+  MessageSquare,
+  Globe,
+  Moon,
+  Sun,
+  Monitor,
+  ChevronsUpDown,
 } from 'lucide-react';
 import { BotMessageSquare } from '@/components/animate-ui/icons/bot-message-square';
 import {
@@ -27,23 +50,55 @@ import {
   AnimatedTasks,
   AnimatedHistory,
   AnimatedLeaderboard,
-  AnimatedSettings,
-  AnimatedGuide,
-  AnimatedFeedback,
   AnimatedEntertainment,
 } from '@/components/ui/animated-sidebar-icons';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Image from 'next/image';
 import { AnimateIcon } from '../animate-ui/icons/icon';
-import { Clock } from '../animate-ui/icons/clock';
-import { useI18n } from '@/contexts/i18n-context';
-import { LanguageSwitcher } from './language-switcher';
-import { AnimatedThemeToggler } from '../ui/animated-theme-toggler';
+import { useI18n, LANGS, Lang } from '@/contexts/i18n-context';
+import { useTheme } from 'next-themes';
+import { cn } from '@/lib/utils';
+import { useEffect, useState } from 'react';
+
+// Navigation item component - using default shadcn styling
+function NavItem({
+  href,
+  icon,
+  label,
+  isActive,
+  tooltip,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  label: string;
+  isActive: boolean;
+  tooltip?: string;
+}) {
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton asChild isActive={isActive} tooltip={tooltip || label}>
+        <Link href={href}>
+          {icon}
+          <span suppressHydrationWarning>{label}</span>
+        </Link>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+}
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const user = useAuthStore((state) => state.user);
-  const { t } = useI18n();
+  const { t, lang, setLang } = useI18n();
+  const { state } = useSidebar();
+  const { theme, resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const isCollapsed = state === 'collapsed';
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleSignOut = async () => {
     if (!supabase) {
@@ -64,172 +119,385 @@ export function AppSidebar() {
     }
   };
 
+  const currentLang = LANGS.find((l) => l.code === lang);
+
   return (
-    <Sidebar collapsible="offcanvas">
-      <SidebarHeader>
+    <Sidebar collapsible="offcanvas" className="border-r-0">
+      {/* Header - Brand */}
+      <SidebarHeader className="border-b border-sidebar-border/50 dark:border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <Link href="/timer">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg text-sidebar-primary-foreground">
-                  <Image alt="StudyBro" width={40} height={40} src="/images/logo.png" />
+            <SidebarMenuButton
+              size="lg"
+              asChild
+              className="hover:bg-sidebar-accent/50 dark:hover:bg-sidebar-accent/70 transition-all duration-200"
+            >
+              <Link href="/timer" className="group/brand">
+                <div
+                  className={cn(
+                    'flex aspect-square size-9 items-center justify-center rounded-xl',
+                    'bg-gradient-to-br from-primary/10 to-primary/5',
+                    'dark:from-sidebar-primary/20 dark:to-sidebar-primary/5',
+                    'ring-1 ring-primary/10 dark:ring-sidebar-primary/20',
+                    'transition-transform duration-200 group-hover/brand:scale-105'
+                  )}
+                >
+                  <Image
+                    alt="StudyBro"
+                    width={32}
+                    height={32}
+                    src="/images/logo.png"
+                    className="rounded-lg"
+                  />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold" suppressHydrationWarning>{t('brand.title')}</span>
-                  <span className="truncate text-xs" suppressHydrationWarning>{t('brand.subtitle')}</span>
+                  <span
+                    className="truncate font-semibold tracking-tight"
+                    suppressHydrationWarning
+                  >
+                    {t('brand.title')}
+                  </span>
+                  <span
+                    className="truncate text-xs text-muted-foreground/80 dark:text-sidebar-foreground/50"
+                    suppressHydrationWarning
+                  >
+                    {t('brand.subtitle')}
+                  </span>
                 </div>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel suppressHydrationWarning>{t('nav.navigation')}</SidebarGroupLabel>
+
+      <SidebarContent className="px-1">
+        {/* Primary Actions - Core Features */}
+        <SidebarGroup className="py-3">
           <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname === '/timer'}>
-                  <Link href="/timer">
-                    <AnimatedTimer isActive={pathname === '/timer'} />
-                    <span suppressHydrationWarning>{t('nav.timer')}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname === '/tasks'}>
-                  <Link href="/tasks">
-                    <AnimatedTasks isActive={pathname === '/tasks'} />
-                    <span suppressHydrationWarning>{t('nav.tasks')}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+            <SidebarMenu className="gap-0.5">
+              <NavItem
+                href="/timer"
+                icon={<AnimatedTimer isActive={pathname === '/timer'} />}
+                label={t('nav.timer')}
+                isActive={pathname === '/timer'}
+              />
+              <NavItem
+                href="/tasks"
+                icon={<AnimatedTasks isActive={pathname === '/tasks'} />}
+                label={t('nav.tasks')}
+                isActive={pathname === '/tasks'}
+              />
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarSeparator className="mx-3 bg-sidebar-border/50 dark:bg-sidebar-border" />
+
+        {/* Analytics & Progress */}
+        <SidebarGroup className="py-3">
+          <SidebarGroupContent>
+            <SidebarMenu className="gap-0.5">
+              <NavItem
+                href="/history"
+                icon={<AnimatedHistory isActive={pathname === '/history'} />}
+                label={t('nav.history')}
+                isActive={pathname === '/history'}
+              />
+              <NavItem
+                href="/leaderboard"
+                icon={
+                  <AnimatedLeaderboard isActive={pathname === '/leaderboard'} />
+                }
+                label={t('nav.leaderboard')}
+                isActive={pathname === '/leaderboard'}
+              />
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarSeparator className="mx-3 bg-sidebar-border/50 dark:bg-sidebar-border" />
+
+        {/* Tools & Entertainment */}
+        <SidebarGroup className="py-3">
+          <SidebarGroupContent>
+            <SidebarMenu className="gap-0.5">
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
-                  isActive={pathname === '/history'}
+                  isActive={pathname === '/chat'}
+                  tooltip="Bro Chat"
                 >
-                  <Link href="/history">
-                    <AnimatedHistory isActive={pathname === '/history'} />
-                    <span suppressHydrationWarning>{t('nav.history')}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname === '/leaderboard'}>
-                  <Link href="/leaderboard">
-                    <AnimatedLeaderboard isActive={pathname === '/leaderboard'} />
-                    <span suppressHydrationWarning>{t('nav.leaderboard')}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname === '/chat'}>
-                  <Link href="/chat" className="group/chat">
-                    <AnimateIcon animateOnHover className="group-hover/chat:text-primary">
-                      <BotMessageSquare animate={pathname === '/chat'} loop={pathname === '/chat'} className="size-5" />
+                  <Link href="/chat">
+                    <AnimateIcon animateOnHover>
+                      <BotMessageSquare
+                        animate={pathname === '/chat'}
+                        loop={pathname === '/chat'}
+                        className="size-5"
+                      />
                     </AnimateIcon>
                     <span suppressHydrationWarning>Bro Chat</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname === '/entertainment'}>
-                  <Link href="/entertainment">
-                    <AnimatedEntertainment isActive={pathname === '/entertainment'} />
-                    <span suppressHydrationWarning>{t('nav.entertainment')}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel suppressHydrationWarning>{t('nav.system')}</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname === '/settings'}>
-                  <Link href="/settings">
-                    <AnimatedSettings isActive={pathname === '/settings'} />
-                    <span suppressHydrationWarning>{t('nav.settings')}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              <NavItem
+                href="/entertainment"
+                icon={
+                  <AnimatedEntertainment
+                    isActive={pathname === '/entertainment'}
+                  />
+                }
+                label={t('nav.entertainment')}
+                isActive={pathname === '/entertainment'}
+              />
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
+
+      {/* Footer - User Menu Dropdown */}
+      <SidebarFooter className="border-t border-sidebar-border/50 dark:border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild isActive={pathname === '/guide'}>
-              <Link href="/guide">
-                <AnimatedGuide isActive={pathname === '/guide'} />
-                <span suppressHydrationWarning>{t('nav.guide')}</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild isActive={pathname === '/feedback'}>
-              <Link href="/feedback">
-                <AnimatedFeedback isActive={pathname === '/feedback'} />
-                <span suppressHydrationWarning>{t('nav.feedback')}</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-
-
-
-        <SidebarSeparator className="mx-0" />
-
-        <div className="flex items-center justify-between px-2 py-2 gap-2 group-data-[collapsible=icon]:flex-col">
-          <LanguageSwitcher className="w-full border-none shadow-none bg-transparent focus:ring-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" />
-          <AnimatedThemeToggler className="p-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md transition-colors" />
-        </div>
-
-        <SidebarMenu>
-          <SidebarMenuItem>
-            {user ? (
-              <SidebarMenuButton
-                size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-              >
-                <Avatar className="h-8 w-8 rounded-lg shrink-0">
-                  <AvatarImage
-                    src={user.avatarUrl || ''}
-                    alt={user.name || ''}
-                  />
-                  <AvatarFallback className="rounded-lg">
-                    {user.name?.charAt(0)?.toUpperCase() ?? 'U'}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-                  <span className="truncate font-semibold">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
-                </div>
-                <div
-                  onClick={handleSignOut}
-                  className="group-data-[collapsible=icon]:hidden"
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  className={cn(
+                    'group/user transition-all duration-200',
+                    'hover:bg-sidebar-accent/50 dark:hover:bg-sidebar-accent/70',
+                    'data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
+                  )}
+                  tooltip={user?.name || t('nav.loginNow')}
                 >
-                  <LogOut className="ml-auto size-4" />
-                </div>
-              </SidebarMenuButton>
-            ) : (
-              <SidebarMenuButton
-                variant="outline"
-                asChild
-                size="lg"
+                  {user ? (
+                    <>
+                      <Avatar
+                        className={cn(
+                          'h-8 w-8 shrink-0 rounded-lg',
+                          'ring-2 ring-sidebar-border/50 dark:ring-sidebar-border',
+                          'transition-all duration-200 group-hover/user:ring-primary/30 dark:group-hover/user:ring-sidebar-primary/30'
+                        )}
+                      >
+                        <AvatarImage src={user.avatarUrl || ''} alt={user.name || ''} />
+                        <AvatarFallback
+                          className={cn(
+                            'rounded-lg',
+                            'bg-gradient-to-br from-primary/20 to-primary/10',
+                            'dark:from-sidebar-primary/30 dark:to-sidebar-primary/10',
+                            'text-primary dark:text-sidebar-primary',
+                            'font-medium'
+                          )}
+                        >
+                          {user.name?.charAt(0)?.toUpperCase() ?? 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
+                        <span className="truncate font-medium">{user.name}</span>
+                        <span className="truncate text-xs text-muted-foreground/80 dark:text-sidebar-foreground/50">
+                          {user.email}
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div
+                        className={cn(
+                          'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
+                          'bg-sidebar-accent dark:bg-sidebar-accent/70',
+                          'text-sidebar-foreground/70'
+                        )}
+                      >
+                        <LogOut className="size-4 rotate-180" />
+                      </div>
+                      <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
+                        <span className="truncate font-medium" suppressHydrationWarning>
+                          {t('nav.loginNow')}
+                        </span>
+                        <span className="truncate text-xs text-muted-foreground/80 dark:text-sidebar-foreground/50">
+                          Sign in to sync
+                        </span>
+                      </div>
+                    </>
+                  )}
+                  <ChevronsUpDown className="ml-auto size-4 opacity-50 group-data-[collapsible=icon]:hidden" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
 
+              <DropdownMenuContent
+                className={cn(
+                  'w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg',
+                  'bg-popover/95 backdrop-blur-xl',
+                  'dark:bg-popover/90 dark:backdrop-blur-2xl',
+                  'border-border/50 dark:border-border/30'
+                )}
+                side={isCollapsed ? 'right' : 'top'}
+                align="start"
+                sideOffset={8}
               >
-                <Link href="/login" className="font-bold justify-center">
-                  <span className="group-data-[collapsible=icon]:hidden" suppressHydrationWarning>{t('nav.loginNow')}</span>
-                  <LogOut className="hidden group-data-[collapsible=icon]:block size-4 rotate-180" />
-                </Link>
-              </SidebarMenuButton>
-            )}
+                {/* User Info Header */}
+                {user && (
+                  <>
+                    <DropdownMenuLabel className="p-0 font-normal">
+                      <div className="flex items-center gap-3 px-2 py-2.5 text-left">
+                        <Avatar className="h-9 w-9 rounded-lg">
+                          <AvatarImage src={user.avatarUrl || ''} alt={user.name || ''} />
+                          <AvatarFallback className="rounded-lg bg-primary/10 text-primary font-medium">
+                            {user.name?.charAt(0)?.toUpperCase() ?? 'U'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="grid flex-1 text-left text-sm leading-tight">
+                          <span className="truncate font-semibold">{user.name}</span>
+                          <span className="truncate text-xs text-muted-foreground">
+                            {user.email}
+                          </span>
+                        </div>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+
+                {/* Navigation Items */}
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    className="cursor-pointer gap-3"
+                    onClick={() => router.push('/guide')}
+                  >
+                    <BookOpen className="size-4 text-muted-foreground" />
+                    <span suppressHydrationWarning>{t('nav.guide')}</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer gap-3"
+                    onClick={() => router.push('/feedback')}
+                  >
+                    <MessageSquare className="size-4 text-muted-foreground" />
+                    <span suppressHydrationWarning>{t('nav.feedback')}</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer gap-3"
+                    onClick={() => router.push('/settings')}
+                  >
+                    <Settings className="size-4 text-muted-foreground" />
+                    <span suppressHydrationWarning>{t('nav.settings')}</span>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+
+                <DropdownMenuSeparator />
+
+                {/* Language Submenu */}
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger className="gap-3 cursor-pointer">
+                    <Globe className="size-4 text-muted-foreground" />
+                    <span suppressHydrationWarning>{t('common.language')}</span>
+                    <span className="ml-auto text-xs text-muted-foreground">
+                      {currentLang?.label}
+                    </span>
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuSubContent
+                      className={cn(
+                        'rounded-lg',
+                        'bg-popover/95 backdrop-blur-xl',
+                        'dark:bg-popover/90 dark:backdrop-blur-2xl'
+                      )}
+                    >
+                      <DropdownMenuRadioGroup
+                        value={lang}
+                        onValueChange={(value) => setLang(value as Lang)}
+                      >
+                        {LANGS.map((l) => (
+                          <DropdownMenuRadioItem
+                            key={l.code}
+                            value={l.code}
+                            className="cursor-pointer gap-2"
+                          >
+                            {l.label}
+                          </DropdownMenuRadioItem>
+                        ))}
+                      </DropdownMenuRadioGroup>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuPortal>
+                </DropdownMenuSub>
+
+                {/* Theme Submenu */}
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger className="gap-3 cursor-pointer">
+                    {mounted && resolvedTheme === 'dark' ? (
+                      <Moon className="size-4 text-muted-foreground" />
+                    ) : (
+                      <Sun className="size-4 text-muted-foreground" />
+                    )}
+                    <span suppressHydrationWarning>{t('settings.general.theme.title')}</span>
+                    <span className="ml-auto text-xs text-muted-foreground">
+                      {mounted && (
+                        theme === 'system'
+                          ? t('settings.general.theme.system')
+                          : resolvedTheme === 'dark'
+                            ? t('settings.general.theme.dark')
+                            : t('settings.general.theme.light')
+                      )}
+                    </span>
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuSubContent
+                      className={cn(
+                        'rounded-lg',
+                        'bg-popover/95 backdrop-blur-xl',
+                        'dark:bg-popover/90 dark:backdrop-blur-2xl'
+                      )}
+                    >
+                      <DropdownMenuRadioGroup
+                        value={theme || 'system'}
+                        onValueChange={(value) => setTheme(value)}
+                      >
+                        <DropdownMenuRadioItem
+                          value="light"
+                          className="cursor-pointer gap-2"
+                        >
+                          <Sun className="size-4" />
+                          <span suppressHydrationWarning>{t('settings.general.theme.light')}</span>
+                        </DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem
+                          value="dark"
+                          className="cursor-pointer gap-2"
+                        >
+                          <Moon className="size-4" />
+                          <span suppressHydrationWarning>{t('settings.general.theme.dark')}</span>
+                        </DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem
+                          value="system"
+                          className="cursor-pointer gap-2"
+                        >
+                          <Monitor className="size-4" />
+                          <span suppressHydrationWarning>{t('settings.general.theme.system')}</span>
+                        </DropdownMenuRadioItem>
+                      </DropdownMenuRadioGroup>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuPortal>
+                </DropdownMenuSub>
+
+                <DropdownMenuSeparator />
+
+                {/* Login/Logout */}
+                {user ? (
+                  <DropdownMenuItem
+                    className="cursor-pointer gap-3 text-destructive focus:text-destructive focus:bg-destructive/10"
+                    onClick={handleSignOut}
+                  >
+                    <LogOut className="size-4" />
+                    <span suppressHydrationWarning>{t('nav.logout')}</span>
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem
+                    className="cursor-pointer gap-3"
+                    onClick={() => router.push('/login')}
+                  >
+                    <LogOut className="size-4 rotate-180 text-muted-foreground" />
+                    <span suppressHydrationWarning>{t('nav.loginNow')}</span>
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

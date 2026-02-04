@@ -1,13 +1,28 @@
 'use client';
 
-import { useState, Suspense, lazy, useEffect, useCallback } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { useState, Suspense, lazy, useEffect, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/contexts/i18n-context';
-import { X, Rocket, Gamepad2, Trophy, Layers, Grid3X3 } from 'lucide-react';
+import {
+  X,
+  Rocket,
+  Gamepad2,
+  Trophy,
+  Layers,
+  Grid3X3,
+  Zap,
+  Hash,
+  Sparkles,
+  Play,
+  Keyboard,
+  Mouse,
+  Smartphone,
+  Lightbulb,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
 
-// Lazy load game components to reduce initial bundle size
+// Lazy load game components
 const SpaceShooterGame = lazy(() =>
   import('@/components/entertainment/space-shooter-game').then(mod => ({
     default: mod.SpaceShooterGame
@@ -26,32 +41,83 @@ const TicTacToeGame = lazy(() =>
   }))
 );
 
-type GameId = 'space-shooter' | 'neon-flip' | 'tic-tac-toe' | null;
+const SnakeGame = lazy(() =>
+  import('@/components/entertainment/snake-game').then(mod => ({
+    default: mod.SnakeGame
+  }))
+);
 
-const games = [
+const Game2048 = lazy(() =>
+  import('@/components/entertainment/game-2048').then(mod => ({
+    default: mod.Game2048
+  }))
+);
+
+const BrickBreakerGame = lazy(() =>
+  import('@/components/entertainment/brick-breaker-game').then(mod => ({
+    default: mod.BrickBreakerGame
+  }))
+);
+
+type GameId = 'space-shooter' | 'neon-flip' | 'tic-tac-toe' | 'snake' | 'game-2048' | 'brick-breaker' | null;
+
+interface GameConfig {
+  id: NonNullable<GameId>;
+  icon: React.ElementType;
+  color: string;
+  storageKey: string;
+  translationKey: string;
+  controls: ('keyboard' | 'mouse' | 'touch')[];
+}
+
+const games: GameConfig[] = [
   {
-    id: 'space-shooter' as const,
+    id: 'space-shooter',
     icon: Rocket,
-    gradient: 'from-violet-600 via-purple-600 to-fuchsia-600',
-    bgPattern: 'radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.3) 0%, transparent 50%)',
+    color: '#a855f7',
     storageKey: 'space-shooter-scores',
     translationKey: 'spaceShooter',
+    controls: ['mouse', 'touch'],
   },
   {
-    id: 'neon-flip' as const,
+    id: 'snake',
+    icon: Zap,
+    color: '#22c55e',
+    storageKey: 'snake-scores',
+    translationKey: 'snake',
+    controls: ['keyboard', 'touch'],
+  },
+  {
+    id: 'neon-flip',
     icon: Layers,
-    gradient: 'from-amber-500 via-orange-500 to-rose-500',
-    bgPattern: 'radial-gradient(circle at 30% 70%, rgba(251, 191, 36, 0.3) 0%, transparent 50%), radial-gradient(circle at 70% 30%, rgba(244, 63, 94, 0.3) 0%, transparent 50%)',
+    color: '#f97316',
     storageKey: 'memory-match-scores',
     translationKey: 'memoryMatch',
+    controls: ['mouse', 'touch'],
   },
   {
-    id: 'tic-tac-toe' as const,
+    id: 'game-2048',
+    icon: Hash,
+    color: '#f59e0b',
+    storageKey: 'game-2048-scores',
+    translationKey: 'game2048',
+    controls: ['keyboard', 'touch'],
+  },
+  {
+    id: 'tic-tac-toe',
     icon: Grid3X3,
-    gradient: 'from-green-500 via-emerald-500 to-teal-500',
-    bgPattern: 'radial-gradient(circle at 30% 70%, rgba(34, 197, 94, 0.3) 0%, transparent 50%), radial-gradient(circle at 70% 30%, rgba(20, 184, 166, 0.3) 0%, transparent 50%)',
+    color: '#3b82f6',
     storageKey: 'tic-tac-toe-scores',
     translationKey: 'ticTacToe',
+    controls: ['mouse', 'touch'],
+  },
+  {
+    id: 'brick-breaker',
+    icon: Sparkles,
+    color: '#ec4899',
+    storageKey: 'brick-breaker-scores',
+    translationKey: 'brickBreaker',
+    controls: ['keyboard', 'mouse', 'touch'],
   },
 ];
 
@@ -92,73 +158,262 @@ function useGameScores(storageKey: string): [GameScores, (score: number) => void
   return [scores, updateScore];
 }
 
-function FullscreenGameLoader() {
+// Dynamic loading screen with real progress
+function GameLoadingScreen({ gameName, gameColor }: { gameName: string; gameColor: string }) {
   const { t } = useI18n();
+  const [progress, setProgress] = useState(0);
+  const [loadingTextKey, setLoadingTextKey] = useState('initializing');
+  const [particles, setParticles] = useState<Array<{ x: number; opacity: number; scale: number; duration: number; delay: number }>>([]);
+  const startTimeRef = useRef(Date.now());
+
+  useEffect(() => {
+    const newParticles = [...Array(20)].map(() => ({
+      x: Math.random() * 100,
+      opacity: 0.3 + Math.random() * 0.5,
+      scale: 0.5 + Math.random() * 1,
+      duration: 2 + Math.random() * 3,
+      delay: Math.random() * 2
+    }));
+    setParticles(newParticles);
+  }, []);
+
+  useEffect(() => {
+    const loadingStages = [
+      { threshold: 15, key: 'loadingAssets' },
+      { threshold: 35, key: 'preparingGraphics' },
+      { threshold: 55, key: 'settingUpControls' },
+      { threshold: 75, key: 'almostReady' },
+      { threshold: 90, key: 'startingGame' },
+    ];
+
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTimeRef.current;
+      const newProgress = Math.min(95, Math.floor(100 * (1 - Math.exp(-elapsed / 400))));
+      setProgress(newProgress);
+
+      for (const stage of loadingStages) {
+        if (newProgress >= stage.threshold) {
+          setLoadingTextKey(stage.key);
+        }
+      }
+    }, 30);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center">
-      {/* Animated background */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-purple-900/20 via-black to-cyan-900/20" />
-        {/* Animated stars */}
-        {[...Array(30)].map((_, i) => (
-          <div
+    <div className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center overflow-hidden">
+      <div className="absolute inset-0">
+        {particles.map((particle, i) => (
+          <motion.div
             key={i}
-            className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
-            style={{
-              left: `${(i * 37) % 100}%`,
-              top: `${(i * 53) % 100}%`,
-              animationDelay: `${(i * 0.1) % 2}s`,
-              opacity: 0.3 + (i % 5) * 0.1,
+            className="absolute w-1 h-1 rounded-full"
+            style={{ backgroundColor: gameColor, left: `${particle.x}%` }}
+            initial={{ y: '100vh', opacity: particle.opacity, scale: particle.scale }}
+            animate={{
+              y: '-10px',
+              transition: { duration: particle.duration, repeat: Infinity, ease: 'linear', delay: particle.delay }
             }}
           />
         ))}
       </div>
 
-      {/* Loading content */}
-      <div className="relative z-10 flex flex-col items-center gap-6">
-        <div className="relative">
-          <div className="absolute inset-0 blur-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 opacity-50 animate-pulse" />
-          <Rocket className="relative w-20 h-20 text-cyan-400 animate-bounce" />
+      <motion.div
+        className="relative z-10 flex flex-col items-center gap-8"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <motion.div className="relative" animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 1.5, repeat: Infinity }}>
+          <div className="absolute inset-0 blur-2xl opacity-50" style={{ backgroundColor: gameColor }} />
+          <div className="relative p-6 rounded-2xl" style={{ backgroundColor: `${gameColor}20` }}>
+            <Gamepad2 className="w-16 h-16" style={{ color: gameColor }} />
+          </div>
+        </motion.div>
+
+        <h2 className="text-2xl font-bold text-white">{gameName}</h2>
+
+        <div className="w-64 h-2 bg-white/10 rounded-full overflow-hidden">
+          <motion.div
+            className="h-full rounded-full"
+            style={{ backgroundColor: gameColor }}
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.1 }}
+          />
         </div>
 
-        <div className="flex flex-col items-center gap-3">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-cyan-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
-            <div className="w-3 h-3 bg-purple-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
-            <div className="w-3 h-3 bg-fuchsia-400 rounded-full animate-bounce" />
-          </div>
-          <p className="text-gray-400 text-lg" suppressHydrationWarning>
-            {t('entertainment.loading')}
-          </p>
+        <div className="flex flex-col items-center gap-1">
+          <span className="text-white/60 text-sm" suppressHydrationWarning>
+            {t(`entertainment.loadingStages.${loadingTextKey}`)}...
+          </span>
+          <span className="text-white font-mono text-lg">{progress}%</span>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
 
+// Enhanced Game instruction popup with tips
+interface GameInstructionPopupProps {
+  game: GameConfig;
+  highScore: number;
+  onStart: () => void;
+  onClose: () => void;
+}
+
+function GameInstructionPopup({ game, highScore, onStart, onClose }: GameInstructionPopupProps) {
+  const { t } = useI18n();
+  const Icon = game.icon;
+
+  const controlIcons = {
+    keyboard: { icon: Keyboard, labelKey: 'keyboard' },
+    mouse: { icon: Mouse, labelKey: 'mouse' },
+    touch: { icon: Smartphone, labelKey: 'touch' },
+  };
+
+  const tips = t(`entertainment.games.${game.translationKey}.tips`);
+  const hasTips = tips && !tips.includes('entertainment.games');
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <motion.div
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        onClick={onClose}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      />
+
+      <motion.div
+        className="relative w-full max-w-md bg-background backdrop-blur-md rounded-2xl border border-border shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
+        initial={{ scale: 0.9, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.9, opacity: 0, y: 20 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+      >
+        {/* Header */}
+        <div className="relative p-5 sm:p-6">
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 rounded-full hover:bg-muted transition-colors"
+          >
+            <X className="w-5 h-5 text-muted-foreground" />
+          </button>
+
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="p-3 sm:p-4 rounded-xl" style={{ backgroundColor: `${game.color}15` }}>
+              <Icon className="w-7 h-7 sm:w-8 sm:h-8" style={{ color: game.color }} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground truncate" suppressHydrationWarning>
+                {t(`entertainment.games.${game.translationKey}.title`)}
+              </h2>
+              <p className="text-sm text-muted-foreground mt-0.5 line-clamp-1" suppressHydrationWarning>
+                {t(`entertainment.games.${game.translationKey}.description`)}
+              </p>
+            </div>
+          </div>
+
+          {highScore > 0 && (
+            <div className="flex items-center gap-2 mt-4 p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
+              <Trophy className="w-5 h-5 text-yellow-500 shrink-0" />
+              <div className="flex-1">
+                <span className="text-xs text-yellow-600 dark:text-yellow-400 uppercase tracking-wide" suppressHydrationWarning>
+                  {t('entertainment.yourBest')}
+                </span>
+                <p className="text-lg font-bold text-yellow-500">{highScore.toLocaleString()}</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Content */}
+        <div className="px-5 pb-5 sm:px-6 sm:pb-6 space-y-4">
+          {/* How to play */}
+          <div className="bg-muted/50 rounded-xl p-4">
+            <h3 className="text-sm font-semibold text-foreground/80 mb-2 uppercase tracking-wide flex items-center gap-2" suppressHydrationWarning>
+              <Play className="w-4 h-4" />
+              {t('entertainment.howToPlay')}
+            </h3>
+            <p className="text-sm text-muted-foreground leading-relaxed" suppressHydrationWarning>
+              {t(`entertainment.games.${game.translationKey}.instructions`)}
+            </p>
+          </div>
+
+          {/* Pro Tips */}
+          {hasTips && (
+            <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-xl p-4 border border-amber-500/20">
+              <h3 className="text-sm font-semibold text-amber-600 dark:text-amber-400 mb-2 uppercase tracking-wide flex items-center gap-2" suppressHydrationWarning>
+                <Lightbulb className="w-4 h-4" />
+                {t('entertainment.tips')}
+              </h3>
+              <p className="text-sm text-amber-700 dark:text-amber-300/80" suppressHydrationWarning>
+                {tips}
+              </p>
+            </div>
+          )}
+
+          {/* Controls */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs text-muted-foreground uppercase tracking-wide" suppressHydrationWarning>
+              {t('entertainment.controls')}:
+            </span>
+            {game.controls.map(control => {
+              const ControlIcon = controlIcons[control].icon;
+              const label = t(`entertainment.controlTypes.${controlIcons[control].labelKey}`);
+              return (
+                <div
+                  key={control}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-muted/50 border border-border/50"
+                  title={label}
+                >
+                  <ControlIcon className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground" suppressHydrationWarning>{label}</span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Start button */}
+          <Button
+            onClick={onStart}
+            className="w-full h-12 text-base font-semibold rounded-xl gap-2 mt-2"
+            style={{ backgroundColor: game.color, color: 'white' }}
+          >
+            <Play className="w-5 h-5" />
+            <span suppressHydrationWarning>{t('entertainment.startGame')}</span>
+          </Button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// Fullscreen game wrapper
 interface FullscreenGameProps {
-  gameId: 'space-shooter' | 'neon-flip' | 'tic-tac-toe';
+  gameId: NonNullable<GameId>;
   onClose: () => void;
   onScoreUpdate: (score: number) => void;
 }
 
 function FullscreenGame({ gameId, onClose, onScoreUpdate }: FullscreenGameProps) {
   const [isLoaded, setIsLoaded] = useState(false);
+  const game = games.find(g => g.id === gameId)!;
+  const { t } = useI18n();
+  const gameName = t(`entertainment.games.${game.translationKey}.title`);
 
   useEffect(() => {
-    // Simulate minimum loading time for smooth transition
-    const timer = setTimeout(() => setIsLoaded(true), 800);
+    const timer = setTimeout(() => setIsLoaded(true), 1200);
     return () => clearTimeout(timer);
   }, []);
 
   if (!isLoaded) {
-    return <FullscreenGameLoader />;
+    return <GameLoadingScreen gameName={gameName} gameColor={game.color} />;
   }
 
   return (
     <div className="fixed inset-0 z-50 bg-black">
-      {/* Close button */}
       <Button
         variant="ghost"
         size="icon"
@@ -168,160 +423,174 @@ function FullscreenGame({ gameId, onClose, onScoreUpdate }: FullscreenGameProps)
         <X className="h-6 w-6" />
       </Button>
 
-      {/* Game container */}
       <div className="w-full h-full">
-        <Suspense fallback={<FullscreenGameLoader />}>
-          {gameId === 'space-shooter' && (
-            <SpaceShooterGame onGameEnd={onScoreUpdate} fullscreen />
-          )}
-          {gameId === 'neon-flip' && (
-            <NeonFlipGame onGameEnd={onScoreUpdate} fullscreen />
-          )}
-          {gameId === 'tic-tac-toe' && (
-            <TicTacToeGame onGameEnd={onScoreUpdate} fullscreen />
-          )}
+        <Suspense fallback={<GameLoadingScreen gameName={gameName} gameColor={game.color} />}>
+          {gameId === 'space-shooter' && <SpaceShooterGame onGameEnd={onScoreUpdate} fullscreen />}
+          {gameId === 'neon-flip' && <NeonFlipGame onGameEnd={onScoreUpdate} fullscreen />}
+          {gameId === 'tic-tac-toe' && <TicTacToeGame onGameEnd={onScoreUpdate} fullscreen />}
+          {gameId === 'snake' && <SnakeGame onGameEnd={onScoreUpdate} fullscreen />}
+          {gameId === 'game-2048' && <Game2048 onGameEnd={onScoreUpdate} fullscreen />}
+          {gameId === 'brick-breaker' && <BrickBreakerGame onGameEnd={onScoreUpdate} fullscreen />}
         </Suspense>
       </div>
     </div>
   );
 }
 
+// Game card with better mobile support
+interface GameCardProps {
+  game: GameConfig;
+  highScore: number;
+  onClick: () => void;
+}
+
+function GameCard({ game, highScore, onClick }: GameCardProps) {
+  const { t } = useI18n();
+  const Icon = game.icon;
+
+  return (
+    <motion.button
+      onClick={onClick}
+      className={cn(
+        "group relative flex flex-col items-center justify-center p-4 sm:p-6 rounded-2xl",
+        "border border-border/50 hover:border-border",
+        "bg-card hover:bg-accent/50",
+        "transition-all duration-200",
+        "active:scale-95 sm:active:scale-100"
+      )}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+    >
+      {highScore > 0 && (
+        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-yellow-500/10">
+          <Trophy className="w-3 h-3 text-yellow-500" />
+          <span className="text-[10px] sm:text-xs font-medium text-yellow-500">{highScore}</span>
+        </div>
+      )}
+
+      <div
+        className="p-3 sm:p-4 rounded-xl mb-2 sm:mb-3 transition-transform group-hover:scale-110 duration-200"
+        style={{ backgroundColor: `${game.color}15` }}
+      >
+        <Icon className="w-6 h-6 sm:w-8 sm:h-8" style={{ color: game.color }} />
+      </div>
+
+      <span className="font-medium text-xs sm:text-sm text-center" suppressHydrationWarning>
+        {t(`entertainment.games.${game.translationKey}.title`)}
+      </span>
+    </motion.button>
+  );
+}
+
 export default function EntertainmentPage() {
   const [selectedGame, setSelectedGame] = useState<GameId>(null);
+  const [showInstructions, setShowInstructions] = useState(false);
+  const [playingGame, setPlayingGame] = useState<GameId>(null);
   const { t } = useI18n();
+
+  // Game scores hooks
   const [spaceShooterScores, updateSpaceShooterScore] = useGameScores('space-shooter-scores');
   const [memoryMatchScores, updateMemoryMatchScore] = useGameScores('memory-match-scores');
   const [ticTacToeScores, updateTicTacToeScore] = useGameScores('tic-tac-toe-scores');
+  const [snakeScores, updateSnakeScore] = useGameScores('snake-scores');
+  const [game2048Scores, updateGame2048Score] = useGameScores('game-2048-scores');
+  const [brickBreakerScores, updateBrickBreakerScore] = useGameScores('brick-breaker-scores');
+
+  const handleGameClick = useCallback((gameId: NonNullable<GameId>) => {
+    setSelectedGame(gameId);
+    setShowInstructions(true);
+  }, []);
+
+  const handleStartGame = useCallback(() => {
+    setShowInstructions(false);
+    setPlayingGame(selectedGame);
+  }, [selectedGame]);
+
+  const handleCloseInstructions = useCallback(() => {
+    setShowInstructions(false);
+    setSelectedGame(null);
+  }, []);
 
   const handleCloseGame = useCallback(() => {
+    setPlayingGame(null);
     setSelectedGame(null);
   }, []);
 
   const handleScoreUpdate = useCallback((gameId: GameId, score: number) => {
-    if (gameId === 'space-shooter') {
-      updateSpaceShooterScore(score);
-    } else if (gameId === 'neon-flip') {
-      updateMemoryMatchScore(score);
-    } else if (gameId === 'tic-tac-toe') {
-      updateTicTacToeScore(score);
+    switch (gameId) {
+      case 'space-shooter': updateSpaceShooterScore(score); break;
+      case 'neon-flip': updateMemoryMatchScore(score); break;
+      case 'tic-tac-toe': updateTicTacToeScore(score); break;
+      case 'snake': updateSnakeScore(score); break;
+      case 'game-2048': updateGame2048Score(score); break;
+      case 'brick-breaker': updateBrickBreakerScore(score); break;
     }
-  }, [updateSpaceShooterScore, updateMemoryMatchScore, updateTicTacToeScore]);
+  }, [updateSpaceShooterScore, updateMemoryMatchScore, updateTicTacToeScore, updateSnakeScore, updateGame2048Score, updateBrickBreakerScore]);
 
-  // Fullscreen game mode
-  if (selectedGame) {
+  const getHighScore = (gameId: GameId): number => {
+    switch (gameId) {
+      case 'space-shooter': return spaceShooterScores.highScore;
+      case 'neon-flip': return memoryMatchScores.highScore;
+      case 'tic-tac-toe': return ticTacToeScores.highScore;
+      case 'snake': return snakeScores.highScore;
+      case 'game-2048': return game2048Scores.highScore;
+      case 'brick-breaker': return brickBreakerScores.highScore;
+      default: return 0;
+    }
+  };
+
+  if (playingGame) {
     return (
       <FullscreenGame
-        gameId={selectedGame}
+        gameId={playingGame}
         onClose={handleCloseGame}
-        onScoreUpdate={(score) => handleScoreUpdate(selectedGame, score)}
+        onScoreUpdate={(score) => handleScoreUpdate(playingGame, score)}
       />
     );
   }
 
   return (
-    <div className="container mx-auto p-4 max-w-4xl">
-      <div className="mb-8">
+    <div className="container mx-auto p-4 md:p-6 max-w-4xl">
+      {/* Header */}
+      <div className="mb-6 sm:mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500">
-            <Gamepad2 className="h-6 w-6 text-white" />
+          <div className="p-2.5 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 shadow-lg shadow-violet-500/20">
+            <Gamepad2 className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
           </div>
-          <h1 className="text-3xl font-bold" suppressHydrationWarning>
-            {t('entertainment.title')}
-          </h1>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold" suppressHydrationWarning>
+              {t('entertainment.title')}
+            </h1>
+            <p className="text-xs sm:text-sm text-muted-foreground" suppressHydrationWarning>
+              {t('entertainment.gamesCount', { count: games.length.toString() })}
+            </p>
+          </div>
         </div>
-        <p className="text-muted-foreground" suppressHydrationWarning>
-          {t('entertainment.subtitle')}
-        </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {games.map((game) => {
-          const Icon = game.icon;
-          const scores = game.id === 'space-shooter'
-            ? spaceShooterScores
-            : game.id === 'neon-flip'
-              ? memoryMatchScores
-              : game.id === 'tic-tac-toe'
-                ? ticTacToeScores
-                : { highScore: 0, lastScore: 0 };
-
-          return (
-            <Card
-              key={game.id}
-              className={cn(
-                "group cursor-pointer overflow-hidden border-0",
-                "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900",
-                "hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300",
-                "hover:-translate-y-1"
-              )}
-              onClick={() => setSelectedGame(game.id)}
-            >
-              {/* Game Preview Area */}
-              <div
-                className="relative h-40 overflow-hidden"
-                style={{ background: game.bgPattern }}
-              >
-                {/* Animated stars background */}
-                <div className="absolute inset-0 overflow-hidden">
-                  <div className="absolute w-1 h-1 bg-white rounded-full animate-pulse left-[10%] top-[20%] opacity-60" />
-                  <div className="absolute w-1 h-1 bg-white rounded-full animate-pulse left-[25%] top-[60%] opacity-80 [animation-delay:0.3s]" />
-                  <div className="absolute w-1 h-1 bg-white rounded-full animate-pulse left-[40%] top-[30%] opacity-50 [animation-delay:0.6s]" />
-                  <div className="absolute w-1 h-1 bg-white rounded-full animate-pulse left-[55%] top-[70%] opacity-70 [animation-delay:0.9s]" />
-                  <div className="absolute w-1 h-1 bg-white rounded-full animate-pulse left-[70%] top-[15%] opacity-60 [animation-delay:1.2s]" />
-                  <div className="absolute w-1 h-1 bg-white rounded-full animate-pulse left-[85%] top-[45%] opacity-80 [animation-delay:1.5s]" />
-                  <div className="absolute w-1 h-1 bg-white rounded-full animate-pulse left-[15%] top-[80%] opacity-50 [animation-delay:0.2s]" />
-                  <div className="absolute w-1 h-1 bg-white rounded-full animate-pulse left-[60%] top-[40%] opacity-70 [animation-delay:0.8s]" />
-                  <div className="absolute w-1 h-1 bg-white rounded-full animate-pulse left-[80%] top-[75%] opacity-60 [animation-delay:1.1s]" />
-                  <div className="absolute w-1 h-1 bg-white rounded-full animate-pulse left-[35%] top-[85%] opacity-80 [animation-delay:1.4s]" />
-                </div>
-
-                {/* Floating icon */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className={cn(
-                    "p-4 rounded-2xl bg-gradient-to-br",
-                    game.gradient,
-                    "shadow-lg shadow-purple-500/30",
-                    "group-hover:scale-110 group-hover:rotate-3 transition-all duration-300"
-                  )}>
-                    <Icon className="h-10 w-10 text-white drop-shadow-lg" />
-                  </div>
-                </div>
-              </div>
-
-              <CardContent className="p-4">
-                <h3 className="font-bold text-lg text-white mb-1" suppressHydrationWarning>
-                  {t(`entertainment.games.${game.translationKey}.title`)}
-                </h3>
-                <p className="text-sm text-gray-400 mb-3 line-clamp-2" suppressHydrationWarning>
-                  {t(`entertainment.games.${game.translationKey}.description`)}
-                </p>
-
-                {/* High Score */}
-                <div className="flex items-center gap-1.5 mb-4 text-sm text-yellow-400">
-                  <Trophy className="h-4 w-4" />
-                  <span className="text-gray-300">{scores.highScore}</span>
-                </div>
-
-                {/* Play button with animation */}
-                <Button
-                  className={cn(
-                    "w-full bg-gradient-to-r relative overflow-hidden text-white",
-                    game.gradient,
-                    "border-0 font-semibold",
-                    "group-hover:shadow-lg group-hover:shadow-purple-500/30",
-                    "transition-all duration-300"
-                  )}
-                  suppressHydrationWarning
-                >
-                  {/* Animated shine effect on hover */}
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                  <span className="relative z-10">{t('entertainment.playNow')}</span>
-                </Button>
-              </CardContent>
-            </Card>
-          );
-        })}
+      {/* Game Grid */}
+      <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+        {games.map((game) => (
+          <GameCard
+            key={game.id}
+            game={game}
+            highScore={getHighScore(game.id)}
+            onClick={() => handleGameClick(game.id)}
+          />
+        ))}
       </div>
+
+      {/* Instruction Popup */}
+      <AnimatePresence>
+        {showInstructions && selectedGame && (
+          <GameInstructionPopup
+            game={games.find(g => g.id === selectedGame)!}
+            highScore={getHighScore(selectedGame)}
+            onStart={handleStartGame}
+            onClose={handleCloseInstructions}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

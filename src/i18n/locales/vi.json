@@ -33,12 +33,12 @@
   "nav": {
     "navigation": "Điều hướng",
     "system": "Hệ thống",
-    "timer": "Hẹn giờ",
+    "timer": "Tập trung",
     "tasks": "Công việc",
     "history": "Lịch sử",
     "leaderboard": "Bảng xếp hạng",
     "chatAI": "Chat AI",
-    "entertainment": "Thư giãn",
+    "entertainment": "Giải trí",
     "settings": "Cài đặt",
     "guide": "Hướng dẫn",
     "feedback": "Phản hồi",
@@ -106,7 +106,54 @@
       "title": "Bỏ qua mà không ghi nhận?",
       "description": "Bạn mới hoàn thành chưa đến 50% phiên này. Phiên này sẽ không được tính là một pomodoro hoàn thành.",
       "confirm": "Vẫn bỏ qua"
-    }
+    },
+    "mode_switch_confirm": {
+      "title": "Chuyển chế độ?",
+      "description": "Timer đang chạy. Chuyển chế độ sẽ mất tiến độ hiện tại.",
+      "confirm": "Vẫn chuyển"
+    },
+    "doneAt": "Xong lúc",
+    "breakTask": "Tiếp theo"
+  },
+  "timerGuide": {
+    "title": "Pomodoro hoạt động thế nào",
+    "subtitle": "Tập trung thông minh, không phải lâu hơn",
+    "modes": {
+      "title": "Chu kỳ làm việc",
+      "work": "Work",
+      "workDesc": "25 phút tập trung",
+      "shortBreak": "Short Break",
+      "shortBreakDesc": "5 phút nghỉ ngơi",
+      "longBreak": "Long Break",
+      "longBreakDesc": "15 phút (sau 4 phiên)"
+    },
+    "validSession": {
+      "title": "Phiên hợp lệ",
+      "subtitle": "Đừng làm cheat!",
+      "rule": "≥ 50% thời gian",
+      "ruleDesc": "mới được tính",
+      "skip": "Skip sớm",
+      "skipDesc": "không cộng streak",
+      "badge": "Hệ thống chống fake-focus"
+    },
+    "keyboard": {
+      "title": "Phím tắt",
+      "space": "Bắt đầu / Dừng",
+      "reset": "Đặt lại"
+    },
+    "task": {
+      "title": "Liên kết Task",
+      "select": "Chọn một task",
+      "auto": "Pomodoro tự động đồng bộ tiến độ"
+    },
+    "settings": {
+      "title": "Cài đặt",
+      "customize": "Tùy chỉnh thời gian",
+      "autoStart": "Tự động bắt đầu chế độ tiếp theo",
+      "openSettings": "Mở Cài đặt"
+    },
+    "dontShowAgain": "Không hiện lại",
+    "gotIt": "Bắt đầu tập trung"
   },
   "timerSettings": {
     "title": "Cài đặt Hẹn giờ",
@@ -462,10 +509,10 @@
           "subtitle": "Đồng hồ đếm ngược Pomodoro",
           "description": "Trang Timer là trung tâm của ứng dụng, nơi bạn:",
           "points": [
-            "Bắt đầu/tạm dừng các phiên Pomodoro",
-            "Chọn task để focus vào",
-            "Theo dõi thời gian làm việc",
-            "Tự động chuyển sang break khi hết giờ"
+            "Chế độ Làm việc, Nghỉ ngắn & Nghỉ dài",
+            "Liên kết task & đồng bộ tiến độ Pomodoro tự động",
+            "Quy tắc phiên hợp lệ: ≥50% thời gian mới tính",
+            "Space: Bắt đầu/Tạm dừng · R: Reset · Bỏ qua phiên"
           ],
           "cta": "Đi đến Timer"
         },
@@ -477,7 +524,7 @@
             "Tạo, chỉnh sửa và xóa tasks",
             "Đặt độ ưu tiên và thời hạn",
             "Lọc tasks theo trạng thái, ngày",
-            "Estimate số Pomodoro cần thiết"
+            "Ước tính số Pomodoro cần thiết"
           ],
           "cta": "Đi đến Tasks"
         },
@@ -492,6 +539,63 @@
             "Biểu đồ năng suất"
           ],
           "cta": "Đi đến History"
+        },
+        "chatAI": {
+          "title": "Chat AI",
+          "subtitle": "Bro Chat – bạn đồng hành học tập",
+          "description": "Trò chuyện với trợ lý AI về:",
+          "points": [
+            "Phương pháp Pomodoro & mẹo học tập",
+            "Tư vấn quản lý thời gian",
+            "Hướng dẫn sử dụng app",
+            "Lịch sử hội thoại được lưu"
+          ],
+          "cta": "Mở Bro Chat"
+        },
+        "entertainment": {
+          "title": "Entertainment",
+          "subtitle": "Trò chơi nhỏ khi nghỉ giải lao",
+          "description": "Thư giãn trong giờ nghỉ với:",
+          "points": [
+            "Snake, 2048, Brick Breaker",
+            "Space Shooter, Memory Match",
+            "Tic Tac Toe đấu AI",
+            "Lưu điểm cao cục bộ"
+          ],
+          "cta": "Chơi Game"
+        },
+        "leaderboard": {
+          "title": "Leaderboard",
+          "subtitle": "Thi đua & giữ động lực",
+          "description": "Xem thứ hạng của bạn:",
+          "points": [
+            "Bảng xếp hạng Pomodoro toàn cầu",
+            "Biểu đồ tuần & tháng",
+            "Tạo động lực cạnh tranh lành mạnh"
+          ],
+          "cta": "Xem Leaderboard"
+        },
+        "focus": {
+          "title": "Focus Mode",
+          "subtitle": "Giao diện tối giản, ít phân tâm",
+          "description": "Chế độ focus giúp bạn:",
+          "points": [
+            "Ẩn sidebar để toàn màn hình",
+            "Theo dõi streak & động lực",
+            "Không gian làm việc tập trung"
+          ],
+          "cta": "Vào Focus Mode"
+        },
+        "feedback": {
+          "title": "Feedback",
+          "subtitle": "Giúp chúng tôi cải thiện",
+          "description": "Chia sẻ ý kiến của bạn:",
+          "points": [
+            "Báo lỗi",
+            "Đề xuất tính năng",
+            "Đánh giá trải nghiệm"
+          ],
+          "cta": "Gửi phản hồi"
         },
         "settings": {
           "title": "Settings",
@@ -529,10 +633,12 @@
       "emailPlaceholder": "example@email.com",
       "type": "Loại phản hồi",
       "typeOptions": {
-        "feature": "✨ Đề xuất tính năng",
-        "bug": "🐛 Báo cáo lỗi",
-        "other": "📝 Khác"
+        "feature": "Tính năng",
+        "bug": "Lỗi",
+        "question": "Câu hỏi",
+        "other": "Khác"
       },
+      "rating": "Đánh giá trải nghiệm của bạn? (Tùy chọn)",
       "message": "Nội dung",
       "messagePlaceholder": "Mô tả chi tiết ý kiến của bạn...",
       "required": "*",
@@ -608,17 +714,22 @@
     }
   },
   "entertainment": {
-    "title": "Giải trí",
-    "subtitle": "Nghỉ ngơi và thư giãn",
+    "title": "Khu Vui Chơi",
+    "subtitle": "Nghỉ ngơi và giải trí nào!",
+    "gamesCount": "{count} trò chơi",
+    "yourBest": "Kỷ lục",
     "games": {
       "spaceShooter": {
         "title": "Bảo Vệ Không Gian",
-        "description": "Bảo vệ Trái Đất khỏi quân xâm lược ngoài hành tinh trong game bắn súng cổ điển này"
+        "description": "Game bắn phi thuyền kinh điển với vô vàn kẻ thù",
+        "instructions": "Di chuyển phi thuyền bằng chuột/chạm để né địch và nhặt vật phẩm. Phi thuyền tự động bắn - hãy tập trung vào vị trí! Mỗi 1000 điểm mở khóa level mới với kẻ thù nhanh và thông minh hơn.",
+        "tips": "Ở gần trung tâm để di chuyển linh hoạt hơn"
       },
       "memoryMatch": {
         "title": "Lật Thẻ",
-        "description": "Tìm các cặp thẻ giống nhau để rèn luyện trí nhớ",
-        "instructions": "Lật 2 thẻ mỗi lượt để tìm các cặp trùng nhau",
+        "description": "Thử thách trí nhớ với game ghép thẻ kinh điển",
+        "instructions": "Lật 2 thẻ mỗi lượt để tìm cặp trùng nhau. Ghi nhớ vị trí thẻ để giảm số lượt! Điểm dựa trên ít lượt và thời gian nhanh. Tuyệt vời cho rèn luyện não bộ!",
+        "tips": "Bắt đầu từ các góc, đi vào trong",
         "clicks": "Lượt",
         "time": "Thời gian",
         "moves": "lượt",
@@ -627,8 +738,9 @@
       },
       "ticTacToe": {
         "title": "Cờ Caro",
-        "description": "Game chiến thuật cổ điển đấu với AI thông minh",
-        "instructions": "Chọn chế độ và thách đấu AI",
+        "description": "Thách đấu AI trong game chiến thuật kinh điển",
+        "instructions": "Đấu với AI thông minh! Chọn lưới 3x3 cho lối chơi cổ điển hoặc 4x4 cho thử thách cao hơn. AI sử dụng thuật toán Minimax - bạn có thể đánh bại nó không?",
+        "tips": "Chiếm trung tâm và các góc trước",
         "mode3x3": "LƯỚI 3x3",
         "mode3x3Desc": "Chế độ cổ điển - Dễ chơi",
         "mode4x4": "LƯỚI 4x4",
@@ -642,6 +754,55 @@
         "aiWins": "Máy thắng! Thử lại nào!",
         "draw": "Hòa rồi!",
         "newGame": "Ván mới"
+      },
+      "snake": {
+        "title": "Rắn Săn Mồi",
+        "description": "Điều khiển rắn và dài ra càng nhiều càng tốt",
+        "instructions": "Điều khiển rắn bằng phím mũi tên hoặc WASD (vuốt trên điện thoại). Ăn mồi phát sáng để dài ra. Mỗi level tăng tốc độ và thêm chướng ngại vật. Đừng đâm vào tường hoặc chính mình!",
+        "tips": "Lên kế hoạch trước 3-4 bước di chuyển",
+        "score": "Điểm",
+        "length": "Độ dài",
+        "level": "Level",
+        "speed": "Tốc độ",
+        "obstacles": "Chướng ngại"
+      },
+      "game2048": {
+        "title": "2048",
+        "description": "Trượt và ghép ô số để đạt 2048",
+        "instructions": "Dùng phím mũi tên hoặc vuốt để trượt tất cả ô. Khi hai ô cùng số chạm nhau, chúng sẽ ghép lại! Đạt 2048 để thắng, nhưng có thể chơi tiếp để đạt điểm cao hơn.",
+        "tips": "Giữ ô lớn nhất ở một góc",
+        "score": "Điểm",
+        "best": "Cao nhất",
+        "youWin": "Bạn Thắng!",
+        "keepGoing": "Bạn có thể đạt cao hơn không?",
+        "continue": "Tiếp tục",
+        "newGame": "Ván mới"
+      },
+      "brickBreaker": {
+        "title": "Phá Gạch",
+        "description": "Phá hết gạch với quả bóng nảy",
+        "instructions": "Di chuyển thanh đỡ bằng chuột/chạm hoặc phím mũi tên để bật bóng. Phá hết gạch để qua màn tiếp theo! Đánh nhiều gạch liên tiếp để nhận điểm thưởng combo.",
+        "tips": "Nhắm vào các góc để tạo phản ứng dây chuyền",
+        "start": "Bắt đầu",
+        "score": "Điểm",
+        "level": "Màn",
+        "lives": "Mạng",
+        "gameOver": "Thua rồi",
+        "finalScore": "Điểm cuối",
+        "reachedLevel": "Đạt đến màn",
+        "levelComplete": "Qua màn!",
+        "nextLevel": "Màn tiếp",
+        "playAgain": "Chơi lại"
+      }
+    },
+    "leaderboard": {
+      "title": "Bảng Xếp Hạng",
+      "comingSoon": "Sắp Ra Mắt",
+      "description": "Cạnh tranh với người chơi toàn cầu! Bảng xếp hạng sẽ sớm ra mắt.",
+      "features": {
+        "global": "Xếp Hạng Toàn Cầu",
+        "weekly": "Thử Thách Tuần",
+        "rewards": "Phần Thưởng Độc Quyền"
       }
     },
     "playNow": "Chơi ngay",
@@ -651,7 +812,23 @@
     "instructions": "Di chuyển chuột hoặc chạm tay để điều khiển phi thuyền. Bắn hạ kẻ thù và tránh va chạm!",
     "loading": "Đang tải game...",
     "highScore": "Điểm cao nhất",
-    "lastScore": "Điểm gần nhất"
+    "lastScore": "Điểm gần nhất",
+    "howToPlay": "Cách chơi",
+    "tips": "Mẹo Pro",
+    "startGame": "Bắt đầu",
+    "loadingStages": {
+      "initializing": "Khởi tạo",
+      "loadingAssets": "Tải tài nguyên",
+      "preparingGraphics": "Chuẩn bị đồ họa",
+      "settingUpControls": "Thiết lập điều khiển",
+      "almostReady": "Sắp xong",
+      "startingGame": "Khởi động game"
+    },
+    "controlTypes": {
+      "keyboard": "Bàn phím",
+      "mouse": "Chuột",
+      "touch": "Cảm ứng"
+    }
   },
   "tooltips": {
     "toggleTheme": "Chuyển đổi giao diện",
@@ -946,7 +1123,7 @@
       "focusMode": "Chế Độ Làm Việc Sâu",
       "title": "Làm Chủ",
       "titleHighlight": "Sự Tập Trung",
-      "subtitle": "Đồng hồ Pomodoro tiên tiến được thiết kế cho hiệu suất tối đa. Loại bỏ xao nhãng, đạt trạng thái 'Flow' và theo dõi tiến độ với phân tích chính xác.",
+      "subtitle": "Đồng hồ Pomodoro với liên kết task và theo dõi phiên hợp lệ. Bro Chat AI, game giải lao, bảng xếp hạng, chế độ focus và phân tích—tất cả trong một.",
       "getStarted": "Bắt Đầu Miễn Phí",
       "tryDemo": "Xem Demo",
       "aiChat": "Mới: Trợ Lý Năng Suất AI",
@@ -1041,7 +1218,7 @@
         },
         "q2": {
           "question": "Nền tảng có miễn phí không?",
-          "answer": "Có. Bộ công cụ năng suất cốt lõi—bao gồm đồng hồ hẹn giờ, quản lý công việc và phân tích cơ bản—hoàn toàn miễn phí mãi mãi. Chúng tôi cung cấp gói Chuyên Nghiệp cho người dùng có nhu cầu nâng cao."
+          "answer": "Có. Toàn bộ tính năng đều miễn phí: đồng hồ Pomodoro với liên kết task, Bro Chat AI, game giải lao, bảng xếp hạng, chế độ focus, lịch sử và phân tích. Gói Chuyên Nghiệp có thể ra mắt sau cho người dùng nâng cao."
         },
         "q3": {
           "question": "Tôi có thể điều chỉnh quy trình làm việc không?",
@@ -1078,28 +1255,36 @@
       "subtitle": "Một bộ công cụ toàn diện được thiết kế để tạo điều kiện cho trạng thái 'Flow' và tối đa hóa đầu ra sáng tạo.",
       "items": {
         "timer": {
-          "title": "Đồng Hồ Chính Xác",
-          "description": "Các khoảng thời gian có thể tùy chỉnh với chuyển đổi tự động"
+          "title": "Đồng Hồ Pomodoro",
+          "description": "Chế độ Làm việc, Nghỉ ngắn & Nghỉ dài. Liên kết task, quy tắc phiên hợp lệ (≥50%), phím tắt."
         },
         "tasks": {
-          "title": "Điều Phối Nhiệm Vụ",
-          "description": "Liên kết mượt mà các mục tiêu với phiên tập trung"
+          "title": "Quản Lý Công Việc",
+          "description": "Tạo, ưu tiên và liên kết task với phiên Pomodoro. Lọc theo trạng thái và ngày."
         },
         "analytics": {
-          "title": "Phân Tích Hiệu Suất",
-          "description": "Đi sâu vào các chỉ số năng suất của bạn"
+          "title": "Lịch Sử & Phân Tích",
+          "description": "Lịch sử phiên, thống kê theo ngày/tuần/tháng, biểu đồ năng suất."
+        },
+        "chatAI": {
+          "title": "Bro Chat AI",
+          "description": "Trợ lý AI cho mẹo Pomodoro, học tập và quản lý thời gian. Lịch sử hội thoại được lưu."
+        },
+        "entertainment": {
+          "title": "Game Giải Lao",
+          "description": "Snake, 2048, Brick Breaker, Space Shooter, Memory Match, Tic Tac Toe—chơi khi nghỉ."
         },
         "sounds": {
           "title": "Âm Thanh Tập Trung",
-          "description": "Cảnh quan âm thanh Lo-fi và tiếng ồn trắng cao cấp"
+          "description": "Âm thanh thiên nhiên, Spotify & YouTube. Lo-fi và tiếng ồn trắng."
         },
         "streaks": {
-          "title": "Theo Dõi Nhất Quán",
-          "description": "Trực quan hóa cam kết của bạn với chuỗi ngày"
+          "title": "Focus Mode & Streak",
+          "description": "Giao diện tối giản, theo dõi streak và động lực trong chế độ focus."
         },
         "themes": {
           "title": "Giao Diện Thích Ứng",
-          "description": "Chế độ Sáng và Tối được thiết kế để thoải mái cho mắt"
+          "description": "Chế độ Sáng và Tối, background tùy chọn. Nhiều kiểu đồng hồ."
         }
       }
     },
@@ -1122,12 +1307,16 @@
         "description": "Công cụ thiết yếu cho sự tập trung",
         "cta": "Bắt Đầu Ngay",
         "features": {
-          "timer": "Đồng hồ Pomodoro Tiêu Chuẩn",
-          "tasks": "Tối đa 5 Nhiệm vụ Hoạt động",
-          "history": "Lưu trữ Lịch sử 7 Ngày",
-          "themes": "Chế độ Sáng/Tối Hệ thống",
-          "sounds": "Cảnh Quan Âm Thanh Tiêu Chuẩn",
-          "stats": "Phân Tích Cốt Lỗi"
+          "timer": "Đồng hồ Pomodoro (Làm việc, Nghỉ, Liên kết task)",
+          "tasks": "Quản lý Task & Bộ lọc",
+          "history": "Lịch sử phiên & Phân tích",
+          "chatAI": "Bro Chat AI Coach",
+          "games": "Game giải lao (Snake, 2048, ...)",
+          "leaderboard": "Bảng xếp hạng toàn cầu",
+          "focus": "Focus Mode & Streak",
+          "themes": "Sáng/Tối & Nền",
+          "sounds": "Âm thanh, Spotify & YouTube",
+          "stats": "Phân tích cốt lõi"
         }
       },
       "pro": {

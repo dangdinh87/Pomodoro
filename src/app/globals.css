@@ -350,3 +350,53 @@ html.dark .custom-scrollbar {
 .pulse-primary {
   animation: pulse-primary 2s infinite;
 }
+
+/* Safe area utilities for notched devices (iOS, Android) */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.pl-safe {
+  padding-left: env(safe-area-inset-left, 0px);
+}
+
+.pr-safe {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Sidebar-specific enhancements */
+[data-sidebar="sidebar"] {
+  /* Smooth scrolling for sidebar content */
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Enhanced focus states for accessibility */
+[data-sidebar="menu-button"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px hsl(var(--sidebar-ring) / 0.5);
+}
+
+/* Sidebar separator with gradient effect */
+[data-sidebar="separator"] {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    hsl(var(--sidebar-border)) 20%,
+    hsl(var(--sidebar-border)) 80%,
+    transparent 100%
+  );
+}
+
+/* Active nav item left indicator glow effect */
+[data-sidebar="menu-button"][data-active="true"]::before {
+  box-shadow: 0 0 8px 1px hsl(var(--sidebar-primary) / 0.3);
+}
+
+.dark [data-sidebar="menu-button"][data-active="true"]::before {
+  box-shadow: 0 0 12px 2px hsl(var(--sidebar-primary) / 0.4);
+}

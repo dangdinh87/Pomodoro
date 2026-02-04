@@ -119,31 +119,73 @@ export const useTimerStore = create<TimerState>()(
         set((state: TimerState) => ({
           completedSessions: state.completedSessions + 1,
         })),
-      setTotalFocusTime: (totalFocusTime: number) => set({ totalFocusTime }),
+      // BUG-07 FIX: Protect against overflow (max ~31 years in seconds)
+      setTotalFocusTime: (totalFocusTime: number) => {
+        const MAX_FOCUS_TIME = 999_999_999; // ~31 years
+        const validTime =
+          Number.isFinite(totalFocusTime) && totalFocusTime >= 0
+            ? Math.min(totalFocusTime, MAX_FOCUS_TIME)
+            : 0;
+        set({ totalFocusTime: validTime });
+      },
       setLastSessionTimeLeft: (lastSessionTimeLeft: number) =>
         set({ lastSessionTimeLeft }),
 
       // Settings update respects plan mode: do not override timeLeft in plan mode
       updateSettings: (newSettings: Partial<TimerSettings>) =>
         set((state: TimerState) => {
+          // BUG-01 FIX: Validate longBreakInterval >= 1 to prevent division issues
+          if (
+            newSettings.longBreakInterval !== undefined &&
+            newSettings.longBreakInterval < 1
+          ) {
+            newSettings.longBreakInterval = 1;
+          }
+          // BUG-08 FIX: Validate duration settings >= 1 minute
+          if (
+            newSettings.workDuration !== undefined &&
+            newSettings.workDuration < 1
+          ) {
+            newSettings.workDuration = 1;
+          }
+          if (
+            newSettings.shortBreakDuration !== undefined &&
+            newSettings.shortBreakDuration < 1
+          ) {
+            newSettings.shortBreakDuration = 1;
+          }
+          if (
+            newSettings.longBreakDuration !== undefined &&
+            newSettings.longBreakDuration < 1
+          ) {
+            newSettings.longBreakDuration = 1;
+          }
+
           const nextSettings = { ...state.settings, ...newSettings };
           const nextState: Partial<TimerState> = {
             settings: nextSettings,
           };
           // If timer is not running and NOT using a custom plan, update timeLeft per mode and changed durations
+          // FIX: Also sync lastSessionTimeLeft to prevent incorrect duration calculations
           if (!state.isRunning && !state.usePlan) {
             if (state.mode === 'work' && newSettings.workDuration) {
-              nextState.timeLeft = newSettings.workDuration * 60;
+              const newTimeLeft = newSettings.workDuration * 60;
+              nextState.timeLeft = newTimeLeft;
+              nextState.lastSessionTimeLeft = newTimeLeft;
             } else if (
               state.mode === 'shortBreak' &&
               newSettings.shortBreakDuration
             ) {
-              nextState.timeLeft = newSettings.shortBreakDuration * 60;
+              const newTimeLeft = newSettings.shortBreakDuration * 60;
+              nextState.timeLeft = newTimeLeft;
+              nextState.lastSessionTimeLeft = newTimeLeft;
             } else if (
               state.mode === 'longBreak' &&
               newSettings.longBreakDuration
             ) {
-              nextState.timeLeft = newSettings.longBreakDuration * 60;
+              const newTimeLeft = newSettings.longBreakDuration * 60;
+              nextState.timeLeft = newTimeLeft;
+              nextState.lastSessionTimeLeft = newTimeLeft;
             }
           }
           return nextState;
@@ -288,7 +330,11 @@ export const useTimerStore = create<TimerState>()(
             const remainingMs = Math.max(0, state.deadlineAt - now);
             const remaining = Math.ceil(remainingMs / 1000);
             state.timeLeft = remaining;
-            // If already elapsed, keep isRunning true; UI effect will handle completion
+            // BUG-02 FIX: If deadline already elapsed, reset isRunning to prevent stuck state
+            if (remaining <= 0) {
+              state.isRunning = false;
+              state.deadlineAt = null;
+            }
           } else if (
             typeof state.timeLeft !== 'number' ||
             state.timeLeft <= 0

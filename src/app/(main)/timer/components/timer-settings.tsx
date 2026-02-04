@@ -50,9 +50,7 @@ export function TimerSettings({ isOpen, onClose, settings, onSettingsChange }: T
 
   const saveSettings = () => {
     onSettingsChange(localSettings)
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('pomodoro-timer-settings', JSON.stringify(localSettings))
-    }
+    // FIX: Removed dead localStorage.setItem - Zustand persist handles storage
     toast.success(t('timerSettings.toasts.saved'))
     onClose()
   }

@@ -1,10 +1,10 @@
 /**
- * Landing Page - Server Component
- * Uses SSR components for SEO, client components for interactivity
+ * Landing Page - Client Components for i18n support
+ * Uses client components for multi-language support
  */
-import { NavbarSSR } from '@/components/landing/NavbarSSR';
-import { HeroSSR } from '@/components/landing/HeroSSR';
-import { FeaturesSSR } from '@/components/landing/FeaturesSSR';
+import { Navbar } from '@/components/landing/Navbar';
+import { Hero } from '@/components/landing/Hero';
+import { Features } from '@/components/landing/Features';
 import { Pricing } from '@/components/landing/Pricing';
 import { Footer } from '@/components/landing/Footer';
 import { AIChatIndicator } from '@/components/landing/AIChatIndicator';
@@ -15,32 +15,31 @@ import { Metadata } from 'next';
 
 // SEO Metadata - rendered server-side
 export const metadata: Metadata = {
-  title: 'Study Bro - AI-Powered Pomodoro Timer for Maximum Focus',
+  title: 'Study Bro - Pomodoro Timer, Bro Chat AI & Focus Tools',
   description:
-    'Boost your productivity with Study Bro. Smart Pomodoro timer with AI insights, task management, ambient sounds, and detailed analytics. Free to use.',
-  keywords: ['pomodoro', 'timer', 'productivity', 'focus', 'study', 'AI', 'task management'],
+    'Pomodoro timer with task linking, valid-session tracking, Bro Chat AI coach, mini games for breaks, leaderboard, focus mode, and analytics. Free to use.',
+  keywords: ['pomodoro', 'timer', 'productivity', 'focus', 'study', 'AI', 'Bro Chat', 'task management', 'leaderboard'],
   openGraph: {
-    title: 'Study Bro - AI-Powered Pomodoro Timer',
-    description: 'Boost your productivity with Study Bro. Smart Pomodoro timer with AI insights.',
+    title: 'Study Bro - Pomodoro Timer & Bro Chat AI',
+    description: 'Pomodoro timer, AI coach, mini games, leaderboard, and focus tools. Free to use.',
     type: 'website',
     url: 'https://www.pomodoro-focus.site',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Study Bro - AI-Powered Pomodoro Timer',
-    description: 'Boost your productivity with Study Bro. Smart Pomodoro timer with AI insights.',
+    title: 'Study Bro - Pomodoro Timer & Bro Chat AI',
+    description: 'Pomodoro timer, AI coach, mini games, leaderboard, and focus tools. Free to use.',
   },
 };
 
-// Server Component - Static HTML rendered on server for SEO
+// Landing page with client components for i18n support
 export default function LandingPage() {
   return (
     <>
-      {/* SSR Components - Content visible to search engines */}
-      <NavbarSSR />
+      <Navbar />
       <main>
-        <HeroSSR />
-        <FeaturesSSR />
+        <Hero />
+        <Features />
         <HowItWorks />
         <AIChatIndicator />
         <Pricing />

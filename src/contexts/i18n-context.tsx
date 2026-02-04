@@ -3,12 +3,13 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import en from '@/i18n/locales/en.json';
 import vi from '@/i18n/locales/vi.json';
+import ja from '@/i18n/locales/ja.json';
 
-export type Lang = 'en' | 'vi';
+export type Lang = 'en' | 'vi' | 'ja';
 
 type Dict = Record<string, any>;
 
-const dictionaries: Record<Lang, Dict> = { en, vi };
+const dictionaries: Record<Lang, Dict> = { en, vi, ja };
 
 const I18N_STORAGE_KEY = 'app.lang';
 const DEFAULT_LANG: Lang = 'en';
@@ -27,7 +28,7 @@ function getSavedLang(): Lang | null {
   if (typeof window === 'undefined') return null;
   try {
     const saved = window.localStorage.getItem(I18N_STORAGE_KEY) as Lang | null;
-    if (saved === 'en' || saved === 'vi') return saved;
+    if (saved === 'en' || saved === 'vi' || saved === 'ja') return saved;
   } catch { }
   return null;
 }
@@ -43,6 +44,7 @@ function detectInitialLang(): Lang {
   try {
     const n = navigator?.language?.toLowerCase?.() || '';
     if (n.startsWith('vi')) return 'vi';
+    if (n.startsWith('ja')) return 'ja';
   } catch { }
 
   return DEFAULT_LANG;
@@ -131,4 +133,5 @@ export function useTranslation() {
 export const LANGS: Array<{ code: Lang; label: string }> = [
   { code: 'en', label: 'English' },
   { code: 'vi', label: 'Tiếng Việt' },
+  { code: 'ja', label: '日本語' },
 ];

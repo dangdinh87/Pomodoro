@@ -1,7 +1,41 @@
 import { useEffect, useRef } from 'react';
 import { useTimerStore, TimerMode } from '@/stores/timer-store';
+import { useTasksStore } from '@/stores/task-store';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import confetti from 'canvas-confetti';
+
+// Confetti celebration for work session completion
+const fireWorkCompleteConfetti = () => {
+  const duration = 2000;
+  const animationEnd = Date.now() + duration;
+  const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6'];
+
+  const frame = () => {
+    confetti({
+      particleCount: 3,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0 },
+      colors: colors,
+      zIndex: 9999,
+    });
+    confetti({
+      particleCount: 3,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1 },
+      colors: colors,
+      zIndex: 9999,
+    });
+
+    if (Date.now() < animationEnd) {
+      requestAnimationFrame(frame);
+    }
+  };
+
+  frame();
+};
 
 export function useTimerEngine() {
   const isRunning = useTimerStore((state) => state.isRunning);
@@ -27,6 +61,8 @@ export function useTimerEngine() {
   const prevRemainingRef = useRef(timeLeftRef.current);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const totalFocusTimeRef = useRef(useTimerStore.getState().totalFocusTime);
+  // BUG-05 FIX: Mutex to prevent concurrent handleLoopComplete calls
+  const isCompletingRef = useRef(false);
 
   // Sync refs with store changes (one-way sync for loop usage)
   useEffect(() => {
@@ -38,20 +74,34 @@ export function useTimerEngine() {
     return () => unsub();
   }, []);
 
+  // BUG-03 FIX: Reset refs when mode changes to prevent stale values
+  useEffect(() => {
+    const currentTimeLeft = useTimerStore.getState().timeLeft;
+    timeLeftRef.current = currentTimeLeft;
+    prevRemainingRef.current = currentTimeLeft;
+    // Clear timerEndRef so new deadline is calculated on next start
+    timerEndRef.current = null;
+  }, [mode]);
+
   const queryClient = useQueryClient();
 
   // Helper: Completion Logic (replicated from original to ensure engine handles auto-completion)
   // NOTE: This logic is slightly duplicated in TimerControls for manual skip.
   // Ideally, we'd extract this to a shared "SessionManager" helper class or hook.
   // For this refactor, we focus on re-render, so keeping it inside the engine loop is safe.
-  const handleLoopComplete = async () => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-    timerEndRef.current = null;
-    setDeadlineAt(null);
-    setIsRunning(false);
+  const handleLoopComplete = () => {
+    // BUG-05 FIX: Prevent concurrent completion calls
+    if (isCompletingRef.current) return;
+    isCompletingRef.current = true;
+
+    try {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      timerEndRef.current = null;
+      setDeadlineAt(null);
+      setIsRunning(false);
 
     // Completion logic
     const currentMode = useTimerStore.getState().mode; // Read fresh state
@@ -66,48 +116,65 @@ export function useTimerEngine() {
       audio.play().catch(() => {});
     } catch {}
 
-    // Record session
-    const duration =
-      (currentMode === 'work'
-        ? currentSettings.workDuration
-        : currentMode === 'shortBreak'
-          ? currentSettings.shortBreakDuration
-          : currentSettings.longBreakDuration) * 60; // Approximate for auto-complete
+    // FIX: Calculate duration BEFORE using it in toast
+    const lastSessionTimeLeft = useTimerStore.getState().lastSessionTimeLeft;
+    const configDuration = (currentMode === 'work'
+      ? currentSettings.workDuration
+      : currentMode === 'shortBreak'
+        ? currentSettings.shortBreakDuration
+        : currentSettings.longBreakDuration) * 60;
+    const duration = lastSessionTimeLeft > 0 ? lastSessionTimeLeft : configDuration;
+
+    // Toast notification for session completion
+    const formatDuration = (seconds: number) => {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
+    };
+
+    if (currentMode === 'work') {
+      // Fire confetti celebration
+      fireWorkCompleteConfetti();
+      toast.success(`🍅 Work session complete!`, {
+        description: `${formatDuration(configDuration)} of focused work`,
+      });
+    } else {
+      toast.success(
+        currentMode === 'shortBreak' ? `☕ Short break complete!` : `🍊 Long break complete!`,
+        { description: `Ready to focus again` }
+      );
+    }
 
     if (currentMode === 'work') {
       incrementCompletedSessions();
-      try {
-        const { activeTaskId } = await import('@/stores/task-store').then((m) =>
-          m.useTasksStore.getState(),
-        );
-        await fetch('/api/tasks/session-complete', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            taskId: activeTaskId || null,
-            durationSec: duration,
-            mode: 'work',
-          }),
-        });
+      // Use imported store directly instead of dynamic import
+      const activeTaskId = useTasksStore.getState().activeTaskId;
+      fetch('/api/tasks/session-complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          taskId: activeTaskId || null,
+          durationSec: duration,
+          mode: 'work',
+        }),
+      }).then(() => {
         queryClient.invalidateQueries({ queryKey: ['stats'] });
         queryClient.invalidateQueries({ queryKey: ['tasks'] });
         queryClient.invalidateQueries({ queryKey: ['history'] });
-      } catch (error) {
+      }).catch((error) => {
         console.error('Session record error', error);
-      }
+      });
     } else {
-      // Break recording...
-      try {
-        await fetch('/api/tasks/session-complete', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            taskId: null,
-            durationSec: duration,
-            mode: currentMode,
-          }),
-        });
-      } catch {}
+      // Break recording (non-blocking)
+      fetch('/api/tasks/session-complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          taskId: null,
+          durationSec: duration,
+          mode: currentMode,
+        }),
+      }).catch(() => {});
     }
 
     // Auto-Transition
@@ -133,6 +200,10 @@ export function useTimerEngine() {
       setTimeLeft(newDuration);
       useTimerStore.getState().setLastSessionTimeLeft(newDuration);
       if (currentSettings.autoStartWork) setIsRunning(true);
+    }
+    } finally {
+      // BUG-05 FIX: Always reset mutex
+      isCompletingRef.current = false;
     }
   };
 
