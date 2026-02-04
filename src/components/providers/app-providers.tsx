@@ -10,6 +10,7 @@ import { QueryProvider } from '@/components/providers/query-provider';
 import { I18nProvider } from '@/contexts/i18n-context';
 import { SupabaseAuthProvider } from '@/components/providers/supabase-auth-provider';
 import { BackgroundRenderer } from '@/components/background/background-renderer';
+import { MascotProvider } from '@/components/mascot/MascotProvider';
 import { Toaster } from 'sonner';
 import NextTopLoader from 'nextjs-toploader';
 
@@ -34,10 +35,12 @@ export function AppProviders({ children }: AppProvidersProps) {
       />
       <I18nProvider>
         <QueryProvider>
-          <SupabaseAuthProvider />
-          <BackgroundRenderer />
-          {children}
-          <Toaster />
+          <MascotProvider>
+            <SupabaseAuthProvider />
+            <BackgroundRenderer />
+            {children}
+            <Toaster />
+          </MascotProvider>
         </QueryProvider>
       </I18nProvider>
     </ThemeProvider>

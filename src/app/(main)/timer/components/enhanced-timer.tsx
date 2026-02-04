@@ -6,9 +6,11 @@ import { cn } from '@/lib/utils';
 import { useTimerEngine } from '../hooks/use-timer-engine';
 import { useTimerHotkeys } from '../hooks/use-timer-hotkeys';
 import { usePageTitle } from '../hooks/use-page-title';
+import { useMascotEvents } from '../hooks/use-mascot-events';
 
 // Imported sub-components
 import { TimerModeSelector } from './timer-mode-selector';
+import { Mascot } from '@/components/mascot';
 import { TimerClockDisplay } from './timer-clock-display';
 import { TimerControls } from './timer-controls';
 import { DailyProgress } from './daily-progress';
@@ -25,6 +27,7 @@ export function EnhancedTimer() {
     // 2. Initialize Helpers
     useTimerHotkeys();
     usePageTitle();
+    useMascotEvents();
 
     // 3. Timer Guide state
     const [showGuide, setShowGuide] = useState(false);
@@ -53,6 +56,11 @@ export function EnhancedTimer() {
                 <div className="w-full max-w-xl mx-auto z-10">
                     <div className={cn('bg-transparent border-0')}>
                         <div className="text-center relative">
+                            {/* Studie the Shiba mascot */}
+                            <div className="flex justify-center mb-4">
+                                <Mascot size="lg" />
+                            </div>
+
                             <TimerModeSelector />
 
                             <div className="pb-8 pt-4">
