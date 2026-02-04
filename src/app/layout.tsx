@@ -4,12 +4,12 @@
  * Providers are added in group-specific layouts ((main), (auth))
  */
 import type { Metadata } from 'next';
-import { Be_Vietnam_Pro, Space_Grotesk } from 'next/font/google';
+import { Be_Vietnam_Pro, Space_Grotesk, Nunito } from 'next/font/google';
 import Script from 'next/script';
 import './globals.css';
 
 const beVietnamPro = Be_Vietnam_Pro({
-  subsets: ['latin'],
+  subsets: ['latin', 'vietnamese'],
   weight: ['300', '400', '500', '600', '700'],
   display: 'swap',
   variable: '--font-be-vietnam-pro',
@@ -20,6 +20,13 @@ const spaceGrotesk = Space_Grotesk({
   weight: ['300', '400', '500', '600', '700'],
   display: 'swap',
   variable: '--font-space-grotesk',
+});
+
+const nunito = Nunito({
+  subsets: ['latin', 'vietnamese'],
+  weight: ['400', '500', '600', '700', '800'],
+  display: 'swap',
+  variable: '--font-nunito',
 });
 
 export const metadata: Metadata = {
@@ -74,7 +81,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${spaceGrotesk.variable} ${beVietnamPro.variable}`}>
+      <body className={`${nunito.variable} ${spaceGrotesk.variable} ${beVietnamPro.variable} font-sans`}>
         {/* JSON-LD structured data for SEO */}
         <script
           type="application/ld+json"

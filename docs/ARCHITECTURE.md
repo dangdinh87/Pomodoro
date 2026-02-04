@@ -82,12 +82,30 @@ Hệ thống AI được thiết kế linh hoạt qua gói **MegaLLM**:
 
 ## 🎨 6. Phong cách & Định dạng (Style, Format & Design)
 
-- **Typography**: Sử dụng **Be Vietnam Pro** (cho sự chuyên nghiệp tiếng Việt) và **Space Grotesk** (cho các con số và phong cách Tech).
-- **Design System**:
-  - Dựa trên hệ màu HSL linh hoạt (Primary, Secondary, Accent).
-  - **Glassmorphism**: Sử dụng `backdrop-blur` mạnh kết hợp với border mờ tạo hiệu ứng lớp kính cao cấp.
-  - **Dark Mode**: Hỗ trợ toàn diện qua `next-themes` và Tailwind `dark:` prefix.
-- **Animations**: Quy chuẩn "Micro-interactions" - mọi tương tác (click, hover, chuyển trang) đều có phản hồi thị giác mượt mà.
+### Typography Stack (Phase 02)
+- **UI Elements & Headers**: **Nunito** (rounded, friendly, weights: 400-800 with Vietnamese subset)
+- **Body Text**: **Be Vietnam Pro** (Vietnamese text support, weights: 300-700)
+- **Numbers/Timer**: **Space Grotesk** (monospace, tech aesthetic, weights: 300-700)
+
+### Design System
+- **Border Radius Scale**: Increased for friendlier feel
+  - `--radius-sm`: 0.5rem
+  - `--radius` (default): 0.75rem
+  - `--radius-lg`: 1rem
+  - `--radius-xl`: 1.5rem
+- **Color System**: HSL-based (Primary: Growth Green #58B368, Secondary, Accent)
+- **Shadows**: Soft shadow palette with glow effect for focus states
+  - `--shadow-sm`: 0 1px 2px rgba(0, 0, 0, 0.04)
+  - `--shadow-md`: 0 4px 6px -1px rgba(0, 0, 0, 0.06)
+  - `--shadow-lg`: 0 10px 15px -3px rgba(0, 0, 0, 0.07)
+  - `--shadow-glow`: Primary color glow for interactive states
+- **Glassmorphism**: `backdrop-blur` with soft borders for premium feel
+- **Dark Mode**: Full support via `next-themes` with warm tints (24 10% 6% base)
+
+### Component Enhancements
+- **Buttons**: font-semibold, hover lift effect (translate-y -0.5), sizes: sm/default/lg/icon
+- **Inputs**: rounded-md, focus glow effect using --shadow-glow variable
+- **Cards**: rounded-lg for softer appearance
 
 ---
 

@@ -1,8 +1,9 @@
 ---
 title: "Phase 02: Typography & Base Components"
-status: pending
+status: DONE
 effort: 3h
 dependencies: [phase-01]
+completed: 2026-02-04
 ---
 
 # Phase 02: Typography & Base Components
@@ -161,19 +162,37 @@ const buttonVariants = cva(
 - Ensure uses `rounded-md` (maps to --radius)
 - Add subtle focus glow
 
-## Todo
+## Implementation Summary (Completed 2026-02-04)
 
-- [ ] Add Nunito font import to layout.tsx
-- [ ] Update body className with font variables
-- [ ] Update Tailwind fontFamily config
-- [ ] Add radius scale variables to globals.css
-- [ ] Add shadow variables to globals.css
-- [ ] Update Tailwind borderRadius/boxShadow
-- [ ] Update button.tsx with new padding/hover effects
-- [ ] Update card.tsx border radius
-- [ ] Update input.tsx border radius and focus
-- [ ] Test font rendering across pages
-- [ ] Verify Vietnamese text still renders correctly
+All requirements successfully implemented:
+
+### Fonts Added
+- **Nunito** (400/500/600/700/800, latin + vietnamese)
+- **Be Vietnam Pro** (300/400/500/600/700, latin + vietnamese)
+- **Space Grotesk** (300/400/500/600/700, latin)
+
+### CSS Variables Defined
+- Border radius scale: --radius-sm/--radius/--radius-lg/--radius-xl
+- Shadow palette: --shadow-sm/--shadow-md/--shadow-lg/--shadow-glow
+
+### Components Updated
+| Component | Changes |
+|-----------|---------|
+| layout.tsx | Nunito font import + variable configuration |
+| globals.css | New radius and shadow variables |
+| tailwind.config.js | fontFamily, borderRadius, boxShadow extensions |
+| button.tsx | font-semibold, hover:-translate-y-0.5 lift effect, px-5 py-2.5 default |
+| input.tsx | rounded-md, focus-visible:shadow-glow |
+
+## Verification Checklist
+
+- [x] Nunito font loads with Vietnamese subset
+- [x] Buttons have friendlier appearance with hover lift
+- [x] Cards/inputs use increased border radius
+- [x] Vietnamese text renders correctly with proper fallback
+- [x] Timer continues using Space Grotesk for monospace digits
+- [x] All shadow variables implemented in Tailwind config
+- [x] Focus states use --shadow-glow for visual feedback
 
 ## Success Criteria
 

@@ -1,7 +1,7 @@
 ---
 title: "Study Bro Full Rebranding System"
 description: "Playful branding with Shiba mascot, gamification, and themed UI"
-status: pending
+status: in-progress
 priority: P1
 effort: 32h
 branch: feature/update-UI
@@ -20,7 +20,7 @@ Transform Study Bro from a standard productivity app into a playful, engaging ex
 | Phase | Description | Effort | Status |
 |-------|-------------|--------|--------|
 | [Phase 01](./phase-01-design-tokens-color-system.md) | Design Tokens & Color System | 4h | ✅ completed |
-| [Phase 02](./phase-02-typography-base-components.md) | Typography & Base Components | 3h | pending |
+| [Phase 02](./phase-02-typography-base-components.md) | Typography & Base Components | 3h | ✅ completed |
 | [Phase 03](./phase-03-mascot-system-assets.md) | Mascot System & Assets | 8h | pending |
 | [Phase 04](./phase-04-gamification-ui-components.md) | Gamification UI Components | 10h | pending |
 | [Phase 05](./phase-05-theme-redesign.md) | Theme Redesign (11 themes) | 4h | pending |

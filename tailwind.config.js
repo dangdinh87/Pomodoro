@@ -18,7 +18,9 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        'space-grotesk': ['var(--font-space-grotesk)', 'sans-serif'],
+        sans: ['var(--font-nunito)', 'var(--font-be-vietnam-pro)', 'system-ui', 'sans-serif'],
+        'space-grotesk': ['var(--font-space-grotesk)', 'monospace'],
+        mono: ['var(--font-space-grotesk)', 'JetBrains Mono', 'monospace'],
       },
       colors: {
         'background-light': '#F8F9FA',
@@ -110,9 +112,16 @@ module.exports = {
         },
       },
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        lg: 'var(--radius-lg)',
+        md: 'var(--radius)',
+        sm: 'var(--radius-sm)',
+        xl: 'var(--radius-xl)',
+      },
+      boxShadow: {
+        sm: 'var(--shadow-sm)',
+        md: 'var(--shadow-md)',
+        lg: 'var(--shadow-lg)',
+        glow: 'var(--shadow-glow)',
       },
       keyframes: {
         'accordion-down': {
