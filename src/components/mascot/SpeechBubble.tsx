@@ -55,8 +55,8 @@ export function SpeechBubble({ message, onDismiss, className }: SpeechBubbleProp
           animate="visible"
           exit="exit"
           className={cn(
-            'absolute bottom-full left-1/2 -translate-x-1/2 mb-3',
-            'min-w-[180px] max-w-[280px]',
+            'absolute bottom-full right-0 mb-3',
+            'min-w-[200px] max-w-[320px] w-max',
             className
           )}
         >
@@ -90,7 +90,7 @@ export function SpeechBubble({ message, onDismiss, className }: SpeechBubbleProp
             {/* Bubble tail */}
             <div
               className={cn(
-                'absolute -bottom-2 left-1/2 -translate-x-1/2',
+                'absolute -bottom-2 right-6',
                 'w-4 h-4 rotate-45',
                 message.type === 'celebration'
                   ? 'bg-purple-500'
