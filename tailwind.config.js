@@ -87,6 +87,27 @@ module.exports = {
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))',
         },
+        // Gamification colors
+        streak: {
+          flame: 'hsl(var(--streak-flame))',
+          ember: 'hsl(var(--streak-ember))',
+          'at-risk': 'hsl(var(--streak-at-risk))',
+        },
+        xp: {
+          fill: 'hsl(var(--xp-fill))',
+        },
+        level: {
+          glow: 'hsl(var(--level-glow))',
+        },
+        badge: {
+          bronze: 'hsl(var(--badge-bronze))',
+          silver: 'hsl(var(--badge-silver))',
+          gold: 'hsl(var(--badge-gold))',
+        },
+        coin: {
+          DEFAULT: 'hsl(var(--coin-primary))',
+          shine: 'hsl(var(--coin-shine))',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',
