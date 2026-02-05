@@ -28,6 +28,7 @@ import {
 import { TemplateManager } from './components/template-manager'
 import { useTimerStore } from '@/stores/timer-store'
 import { useMascotStore } from '@/stores/mascot-store'
+import { useGamificationStore } from '@/stores/gamification-store'
 import { useQueryClient } from '@tanstack/react-query'
 import {
   AlertDialog,
@@ -141,9 +142,10 @@ export function TaskManagement() {
     setTogglingTaskIds(prev => new Set(prev).add(task.id))
     try {
       await updateTask({ id: task.id, input: { status: newStatus } })
-      // Trigger mascot celebration when task is completed
+      // Trigger mascot celebration and gamification when task is completed
       if (isNowDone) {
         useMascotStore.getState().handleEvent('TASK_COMPLETE')
+        useGamificationStore.getState().completeTask()
       }
     } finally {
       setTogglingTaskIds(prev => {
@@ -184,9 +186,10 @@ export function TaskManagement() {
     setTogglingTaskIds(prev => new Set(prev).add(taskId))
     try {
       await updateTask({ id: taskId, input: { status: newStatus } })
-      // Trigger mascot celebration when task is completed
+      // Trigger mascot celebration and gamification when task is completed
       if (isNowDone) {
         useMascotStore.getState().handleEvent('TASK_COMPLETE')
+        useGamificationStore.getState().completeTask()
       }
     } finally {
       setTogglingTaskIds(prev => {

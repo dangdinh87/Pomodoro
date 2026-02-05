@@ -7,6 +7,7 @@ import { useTimerEngine } from '../hooks/use-timer-engine';
 import { useTimerHotkeys } from '../hooks/use-timer-hotkeys';
 import { usePageTitle } from '../hooks/use-page-title';
 import { useMascotEvents } from '../hooks/use-mascot-events';
+import { useGamificationEvents } from '../hooks/use-gamification-events';
 
 // Imported sub-components
 import { TimerModeSelector } from './timer-mode-selector';
@@ -27,6 +28,7 @@ export function EnhancedTimer() {
     useTimerHotkeys();
     usePageTitle();
     useMascotEvents();
+    useGamificationEvents();
 
     // 3. Timer Guide state
     const [showGuide, setShowGuide] = useState(false);
