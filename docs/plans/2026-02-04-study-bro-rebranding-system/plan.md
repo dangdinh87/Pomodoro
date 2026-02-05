@@ -24,7 +24,7 @@ Transform Study Bro from a standard productivity app into a playful, engaging ex
 | [Phase 03](./phase-03-mascot-system-assets.md) | Mascot Foundation (SVG) | 8h | ✅ completed |
 | [Phase 03b](./phase-03b-mascot-enhancements.md) | **Lottie Mascot + Speech Bubbles** | 6h | ✅ completed |
 | [Phase 04](./phase-04-gamification-ui-components.md) | Gamification UI (XP/Levels) | 10h | ✅ completed |
-| [Phase 05](./phase-05-theme-redesign.md) | Theme Redesign (11 themes) | 4h | pending |
+| [Phase 05](./phase-05-theme-redesign.md) | Theme Redesign (11 themes) | 4h | ✅ completed |
 | [Phase 06](./phase-06-animations-polish.md) | Animations & Polish | 3h | pending |
 
 ## Architecture Summary

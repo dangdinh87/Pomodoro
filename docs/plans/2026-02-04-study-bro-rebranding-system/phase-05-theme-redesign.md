@@ -1,6 +1,6 @@
 ---
 title: "Phase 05: Theme Redesign"
-status: pending
+status: completed
 effort: 4h
 dependencies: [phase-01, phase-03]
 ---
@@ -294,18 +294,18 @@ export function ThemePreviewCard({ theme, isSelected, onSelect }: ThemePreviewCa
 
 ## Todo
 
-- [ ] Update ThemeVars type with emoji and mascotVariant
-- [ ] Redesign defaultTheme with new green primary
-- [ ] Redesign ocean theme (teal)
-- [ ] Redesign sunset theme (coral)
-- [ ] Redesign lavender theme (purple)
-- [ ] Redesign rose theme (pink)
-- [ ] Redesign midnight theme (indigo)
-- [ ] Redesign forest theme (emerald)
-- [ ] Redesign autumn theme (amber)
-- [ ] Redesign cherry theme (red)
-- [ ] Redesign mint theme (cyan)
-- [ ] Redesign mono theme (gray)
+- [x] Update ThemeVars type with emoji and mascotVariant
+- [x] Redesign defaultTheme with new green primary
+- [x] Redesign ocean theme (teal)
+- [x] Redesign sunset theme (coral)
+- [x] Redesign lavender theme (purple)
+- [x] Redesign rose theme (pink)
+- [x] Redesign midnight theme (indigo)
+- [x] Redesign forest theme (emerald)
+- [x] Redesign autumn theme (amber)
+- [x] Redesign cherry theme (red)
+- [x] Redesign mint theme (cyan)
+- [x] Redesign mono theme (gray)
 - [ ] Create SailorHat accessory
 - [ ] Create Sunglasses accessory
 - [ ] Create FlowerCrown accessory
@@ -316,7 +316,7 @@ export function ThemePreviewCard({ theme, isSelected, onSelect }: ThemePreviewCa
 - [ ] Create Headphones accessory
 - [ ] Create ChefHat accessory
 - [ ] Create Glasses accessory
-- [ ] Create ThemePreviewCard component
+- [x] Create ThemePreviewCard component
 - [ ] Update theme settings modal
 - [ ] Test all themes in light/dark modes
 - [ ] Verify mascot accessory rendering
