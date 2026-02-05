@@ -4,3 +4,4 @@ export { LevelBadge } from './LevelBadge';
 export { AchievementCard, AchievementGrid } from './AchievementCard';
 export { CoinDisplay } from './CoinDisplay';
 export { GamificationDashboard, GamificationWidget } from './GamificationDashboard';
+export { GamificationCelebrationProvider } from './GamificationCelebrationProvider';

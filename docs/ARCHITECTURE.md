@@ -109,7 +109,41 @@ Hệ thống AI được thiết kế linh hoạt qua gói **MegaLLM**:
 
 ---
 
-## ⚙️ 7. Cấu hình & Môi trường (Config & Env)
+## 🎬 7. Hệ thống Animation & Polish (Animation System - Phase 06)
+
+### Animation Architecture
+- **Config**: Centralized in `/src/config/animations.ts` with variants, durations, and easings
+- **Components**: Reusable animation components (Confetti, LevelUpCelebration, XPFlyNumber)
+- **Hooks**: Accessibility-first hooks (useReducedMotion, useGamificationCelebrations)
+- **Provider**: Global GamificationCelebrationProvider for celebration rendering
+
+### Animation Variants
+- **Duration Scale**: fast (0.15s), normal (0.3s), slow (0.5s), celebration (2s)
+- **Easing Functions**: bounce, smooth, spring (physics-based)
+- **Predefined Sets**: Button hover/tap, card scale, badge unlock, XP fly, level up, glow ring
+- **Mascot States**: 8 emotion animations (happy, focused, encouraging, sleepy, excited, worried, sad, celebrating)
+
+### Celebration Components
+1. **Confetti** - Canvas-based particle effect with intensity control (low/medium/high)
+2. **LevelUpCelebration** - Full-screen modal with confetti and expanding glow ring
+3. **XPFlyNumber/CoinFlyNumber** - Floating numbers with fade + rise animation
+4. **GamificationCelebrationProvider** - Global provider for automatic celebration triggers
+
+### Accessibility Features
+- **useReducedMotion()**: Detects `prefers-reduced-motion: reduce` OS preference
+- **Animation Skipping**: All animations respect user motion preferences
+- **Instant Feedback**: Modals appear instantly, confetti completes immediately when motion disabled
+
+### Configuration Details
+- **Confetti Colors**: Green (#4ADE80), Orange (#FB923C), Cyan (#2DD4BF), Amber (#FBBF24), Pink (#F472B6)
+- **Z-Index Stack**: Confetti (9999), Level-up modal (50), page content (0)
+- **Celebration Triggers**: Level up detection, badge unlock, task completion
+
+For detailed implementation, see `/docs/PHASE-06-ANIMATIONS-POLISH.md`
+
+---
+
+## ⚙️ 8. Cấu hình & Môi trường (Config & Env)
 
 ### Môi trường (.env):
 
@@ -125,7 +159,7 @@ Hệ thống AI được thiết kế linh hoạt qua gói **MegaLLM**:
 
 ---
 
-## � 8. Bảo mật & Hiệu năng (Security & Performance)
+## 🔒 9. Bảo mật & Hiệu năng (Security & Performance)
 
 - **Middleware Security**: Sử dụng Supabase SSR để kiểm soát phiên làm việc (Session) ở tầng Edge, đảm bảo người dùng chưa đăng nhập không bao giờ thấy được dữ liệu nhạy cảm.
 - **Database RLS**: Filter dữ liệu trực tiếp trong Postgres. Mỗi user chỉ thấy data của chính mình (`user_id = auth.uid()`).

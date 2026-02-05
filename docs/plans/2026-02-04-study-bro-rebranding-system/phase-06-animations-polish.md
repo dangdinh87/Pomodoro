@@ -1,6 +1,7 @@
 ---
 title: "Phase 06: Animations & Polish"
-status: pending
+status: completed
+completedDate: 2026-02-05
 effort: 3h
 dependencies: [phase-03, phase-04]
 ---
