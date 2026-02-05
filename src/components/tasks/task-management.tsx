@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/use-auth'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useCallback } from 'react'
 import { Task, useTasksStore, TaskStatus } from '@/stores/task-store'
 import { TaskFilters } from './components/task-filters'
 import { TaskFormModal } from './components/task-form-modal'
@@ -63,33 +63,33 @@ export function TaskManagement() {
   const router = useRouter()
   const { t } = useI18n()
 
-  if (isAuthLoading) {
-    return null // Or a loading spinner
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="flex flex-col items-center justify-center flex-1 min-h-[60vh] space-y-4">
-        <h2 className="text-xl font-semibold text-center">{t('auth.signInToManageTasks')}</h2>
-        <Button onClick={() => router.push('/login?redirect=/tasks')}>{t('auth.signInButton')}</Button>
-      </div>
-    )
-  }
-
   const { activeTaskId, setActiveTask, viewMode } = useTasksStore()
   const { editingId, setEditingId, resetEditingState } = useEditingState()
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const { saveAsTemplate } = useTemplates()
 
-  // Delete confirmation state
-
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
   const [togglingTaskIds, setTogglingTaskIds] = useState<Set<string>>(new Set())
+  const queryClient = useQueryClient()
 
   const editingTask = useMemo(
     () => (editingId ? tasks.find((task) => task.id === editingId) ?? null : null),
     [editingId, tasks],
   )
+
+  const uniqueTags = useMemo(() => {
+    const tags = new Set<string>()
+    tasks.forEach(task => task.tags.forEach(tag => tags.add(tag)))
+    return Array.from(tags).sort()
+  }, [tasks])
+
+  // Task statistics - use filteredTasks to match displayed content
+  const taskStats = useMemo(() => {
+    const todo = tasks.filter(t => t.status === 'todo').length
+    const doing = tasks.filter(t => t.status === 'doing').length
+    const done = tasks.filter(t => t.status === 'done').length
+    return { todo, doing, done, total: tasks.length }
+  }, [tasks])
 
   const handleFormSubmit = async (payload: any) => {
     try {
@@ -104,9 +104,8 @@ export function TaskManagement() {
       // Error handled by hook
     }
   }
-  const queryClient = useQueryClient()
 
-  const handleToggleStatus = async (task: Task) => {
+  const handleToggleStatus = useCallback(async (task: Task) => {
     const isNowDone = task.status !== 'done'
     const newStatus: TaskStatus = isNowDone ? 'done' : 'todo'
 
@@ -147,9 +146,9 @@ export function TaskManagement() {
         return next
       })
     }
-  }
+  }, [activeTaskId, queryClient, setActiveTask, updateTask])
 
-  const handleUpdateStatus = async (taskId: string, newStatus: TaskStatus) => {
+  const handleUpdateStatus = useCallback(async (taskId: string, newStatus: TaskStatus) => {
     const isNowDone = newStatus === 'done'
 
     if (isNowDone && activeTaskId === taskId) {
@@ -186,7 +185,7 @@ export function TaskManagement() {
         return next
       })
     }
-  }
+  }, [activeTaskId, queryClient, setActiveTask, updateTask])
 
   const handleToggleActive = (task: Task) => {
     const { timeLeft, setLastSessionTimeLeft } = useTimerStore.getState()
@@ -255,9 +254,9 @@ export function TaskManagement() {
     }
   }
 
-  const handleDeleteRequest = (id: string) => {
+  const handleDeleteRequest = useCallback((id: string) => {
     setDeleteConfirmId(id)
-  }
+  }, [])
 
   const confirmDelete = async () => {
     if (!deleteConfirmId) return
@@ -280,39 +279,38 @@ export function TaskManagement() {
     }
   }
 
-  const handleEdit = (task: Task) => {
+  const handleEdit = useCallback((task: Task) => {
     setEditingId(task.id)
-  }
+  }, [setEditingId])
 
-  const handleClone = async (taskId: string) => {
+  const handleClone = useCallback(async (taskId: string) => {
     try {
       await cloneTask(taskId)
     } catch (error) {
       // Error handled by hook
     }
-  }
+  }, [cloneTask])
 
-  const handleSaveAsTemplate = async (taskId: string) => {
+  const handleSaveAsTemplate = useCallback(async (taskId: string) => {
     try {
       await saveAsTemplate(taskId)
     } catch (error) {
       // Error handled by hook
     }
+  }, [saveAsTemplate])
+
+  if (isAuthLoading) {
+    return null // Or a loading spinner
   }
 
-  const uniqueTags = useMemo(() => {
-    const tags = new Set<string>()
-    tasks.forEach(task => task.tags.forEach(tag => tags.add(tag)))
-    return Array.from(tags).sort()
-  }, [tasks])
-
-  // Task statistics - use filteredTasks to match displayed content
-  const taskStats = useMemo(() => {
-    const todo = tasks.filter(t => t.status === 'todo').length
-    const doing = tasks.filter(t => t.status === 'doing').length
-    const done = tasks.filter(t => t.status === 'done').length
-    return { todo, doing, done, total: tasks.length }
-  }, [tasks])
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center flex-1 min-h-[60vh] space-y-4">
+        <h2 className="text-xl font-semibold text-center">{t('auth.signInToManageTasks')}</h2>
+        <Button onClick={() => router.push('/login?redirect=/tasks')}>{t('auth.signInButton')}</Button>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-4">
