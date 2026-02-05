@@ -55,3 +55,13 @@ export const CELEBRATIONS: MascotMessage[] = [
 export function getRandomCelebration(): MascotMessage {
   return CELEBRATIONS[Math.floor(Math.random() * CELEBRATIONS.length)];
 }
+
+// Get celebration by event type
+export function getCelebrationForEvent(
+  event: 'task' | 'pomodoro' | 'milestone' | 'break'
+): MascotMessage {
+  const filtered = CELEBRATIONS.filter((c) => c.id.includes(event));
+  return filtered.length > 0
+    ? filtered[Math.floor(Math.random() * filtered.length)]
+    : CELEBRATIONS[0];
+}

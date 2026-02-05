@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Minus, Plus } from 'lucide-react';
 import { usePathname } from 'next/navigation';
@@ -8,12 +8,12 @@ import { cn } from '@/lib/utils';
 import { useMascotStore, type MascotState } from '@/stores/mascot-store';
 import { Mascot } from './Mascot';
 import { SpeechBubble } from './SpeechBubble';
-import { TIPS, getGreeting } from './messages';
+import { getRandomTip, getGreeting } from './messages';
 import type { MascotMessage } from './messages';
 
 // Page-specific default expressions
 const PAGE_EXPRESSIONS: Record<string, MascotState> = {
-  '/timer': 'focused',
+  '/timer': 'happy',
   '/tasks': 'encouraging',
   '/progress': 'happy',
   '/settings': 'happy',
@@ -24,58 +24,161 @@ const PAGE_EXPRESSIONS: Record<string, MascotState> = {
 // Pages where mascot should be hidden
 const HIDDEN_PAGES = ['/chat'];
 
+// Idle detection constants
+const IDLE_TIMEOUT = 5 * 60 * 1000; // 5 minutes
+const IDLE_COOLDOWN = 30 * 60 * 1000; // 30 minutes between idle tips
+
 interface MascotFloatingProps {
   className?: string;
 }
 
 export function MascotFloating({ className }: MascotFloatingProps) {
   const pathname = usePathname();
-  const { currentState, setState, reducedMotion } = useMascotStore();
+  const {
+    currentState,
+    setState,
+    reducedMotion,
+    currentMessage: storeMessage,
+    dismissMessage,
+    queueMessage,
+  } = useMascotStore();
 
   const [isMinimized, setIsMinimized] = useState(false);
-  const [currentMessage, setCurrentMessage] = useState<MascotMessage | null>(null);
+  const [localMessage, setLocalMessage] = useState<MascotMessage | null>(null);
   const [hasShownGreeting, setHasShownGreeting] = useState(false);
 
-  // Set page-specific expression
+  // Idle detection refs
+  const lastActivityRef = useRef(Date.now());
+  const lastIdleTipRef = useRef(0);
+  const idleCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Combine store message and local message (store takes priority)
+  const currentMessage = storeMessage || localMessage;
+
+  // Set page-specific expression (only when not overridden by events)
   useEffect(() => {
     const pageExpression = PAGE_EXPRESSIONS[pathname];
-    if (pageExpression && currentState !== pageExpression) {
-      setState(pageExpression);
+    if (pageExpression) {
+      // Only set if not in an animated/temporary state
+      const isTemporaryState = ['celebrating', 'excited', 'sad'].includes(currentState);
+      if (!isTemporaryState) {
+        setState(pageExpression);
+      }
     }
-  }, [pathname, currentState, setState]);
+  }, [pathname, setState, currentState]);
 
   // Show greeting on first load
   useEffect(() => {
     if (!hasShownGreeting) {
       const timer = setTimeout(() => {
-        setCurrentMessage(getGreeting());
+        setLocalMessage(getGreeting());
         setHasShownGreeting(true);
       }, 1500);
       return () => clearTimeout(timer);
     }
   }, [hasShownGreeting]);
 
-  // Auto-dismiss messages with duration
+  // Auto-dismiss local messages with duration
   useEffect(() => {
-    if (currentMessage?.duration) {
+    if (localMessage?.duration) {
       const timer = setTimeout(() => {
-        setCurrentMessage(null);
-      }, currentMessage.duration);
+        setLocalMessage(null);
+      }, localMessage.duration);
       return () => clearTimeout(timer);
     }
-  }, [currentMessage]);
+  }, [localMessage]);
+
+  // Track user activity for idle detection
+  useEffect(() => {
+    const updateActivity = () => {
+      lastActivityRef.current = Date.now();
+    };
+
+    // Track various user activities
+    window.addEventListener('click', updateActivity);
+    window.addEventListener('keydown', updateActivity);
+    window.addEventListener('mousemove', updateActivity);
+    window.addEventListener('scroll', updateActivity);
+    window.addEventListener('touchstart', updateActivity);
+
+    return () => {
+      window.removeEventListener('click', updateActivity);
+      window.removeEventListener('keydown', updateActivity);
+      window.removeEventListener('mousemove', updateActivity);
+      window.removeEventListener('scroll', updateActivity);
+      window.removeEventListener('touchstart', updateActivity);
+    };
+  }, []);
+
+  // Idle detection - show encouragement after 5 minutes idle
+  useEffect(() => {
+    idleCheckIntervalRef.current = setInterval(() => {
+      const now = Date.now();
+      const timeSinceActivity = now - lastActivityRef.current;
+      const timeSinceLastIdleTip = now - lastIdleTipRef.current;
+
+      // Check if idle and cooldown passed
+      if (
+        timeSinceActivity >= IDLE_TIMEOUT &&
+        timeSinceLastIdleTip >= IDLE_COOLDOWN &&
+        !isMinimized &&
+        !currentMessage
+      ) {
+        lastIdleTipRef.current = now;
+
+        // Show idle encouragement
+        const idleMessages: MascotMessage[] = [
+          {
+            id: `idle-${now}`,
+            type: 'tip',
+            text: 'Bạn còn đó không? 👋',
+            expression: 'worried',
+            duration: 6000,
+          },
+          {
+            id: `idle-${now}`,
+            type: 'tip',
+            text: 'Nghỉ ngơi đủ rồi, bắt đầu lại nào! 💪',
+            expression: 'encouraging',
+            duration: 6000,
+          },
+          {
+            id: `idle-${now}`,
+            type: 'tip',
+            text: 'Mình vẫn chờ bạn ở đây! 🐕',
+            expression: 'happy',
+            duration: 6000,
+          },
+        ];
+
+        const randomIdleMessage =
+          idleMessages[Math.floor(Math.random() * idleMessages.length)];
+        queueMessage(randomIdleMessage);
+      }
+    }, 30000); // Check every 30 seconds
+
+    return () => {
+      if (idleCheckIntervalRef.current) {
+        clearInterval(idleCheckIntervalRef.current);
+      }
+    };
+  }, [isMinimized, currentMessage, queueMessage]);
 
   // Handle mascot click
   const handleClick = useCallback(() => {
+    // Update activity on click
+    lastActivityRef.current = Date.now();
+
     if (isMinimized) {
       setIsMinimized(false);
       return;
     }
 
-    // Show random tip on click
-    const randomTip = TIPS[Math.floor(Math.random() * TIPS.length)];
-    setCurrentMessage(randomTip);
-  }, [isMinimized]);
+    // Show random tip on click (only if no current message)
+    if (!currentMessage) {
+      setLocalMessage(getRandomTip());
+    }
+  }, [isMinimized, currentMessage]);
 
   // Handle minimize toggle
   const handleMinimize = useCallback((e: React.MouseEvent) => {
@@ -85,8 +188,12 @@ export function MascotFloating({ className }: MascotFloatingProps) {
 
   // Dismiss message
   const handleDismiss = useCallback(() => {
-    setCurrentMessage(null);
-  }, []);
+    if (storeMessage) {
+      dismissMessage();
+    } else {
+      setLocalMessage(null);
+    }
+  }, [storeMessage, dismissMessage]);
 
   // Hide on certain pages
   if (HIDDEN_PAGES.includes(pathname)) {
@@ -112,10 +219,7 @@ export function MascotFloating({ className }: MascotFloatingProps) {
     >
       {/* Speech bubble (only when not minimized) */}
       {!isMinimized && (
-        <SpeechBubble
-          message={currentMessage}
-          onDismiss={handleDismiss}
-        />
+        <SpeechBubble message={currentMessage} onDismiss={handleDismiss} />
       )}
 
       {/* Mascot container */}

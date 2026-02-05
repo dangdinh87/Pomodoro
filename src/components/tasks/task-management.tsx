@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { TemplateManager } from './components/template-manager'
 import { useTimerStore } from '@/stores/timer-store'
+import { useMascotStore } from '@/stores/mascot-store'
 import { useQueryClient } from '@tanstack/react-query'
 import {
   AlertDialog,
@@ -140,6 +141,10 @@ export function TaskManagement() {
     setTogglingTaskIds(prev => new Set(prev).add(task.id))
     try {
       await updateTask({ id: task.id, input: { status: newStatus } })
+      // Trigger mascot celebration when task is completed
+      if (isNowDone) {
+        useMascotStore.getState().handleEvent('TASK_COMPLETE')
+      }
     } finally {
       setTogglingTaskIds(prev => {
         const next = new Set(prev)
@@ -179,6 +184,10 @@ export function TaskManagement() {
     setTogglingTaskIds(prev => new Set(prev).add(taskId))
     try {
       await updateTask({ id: taskId, input: { status: newStatus } })
+      // Trigger mascot celebration when task is completed
+      if (isNowDone) {
+        useMascotStore.getState().handleEvent('TASK_COMPLETE')
+      }
     } finally {
       setTogglingTaskIds(prev => {
         const next = new Set(prev)

@@ -10,14 +10,34 @@ export function useMascotEvents() {
   const handleEvent = useMascotStore((state) => state.handleEvent);
   const prevModeRef = useRef<TimerMode | null>(null);
   const prevIsRunningRef = useRef<boolean | null>(null);
+  const prevCompletedSessionsRef = useRef<number | null>(null);
+  const lastMilestoneRef = useRef<number>(0);
 
   useEffect(() => {
     // Subscribe to timer store changes
     const unsub = useTimerStore.subscribe((state, prevState) => {
-      const { mode, isRunning } = state;
+      const { mode, isRunning, completedSessions } = state;
 
       // Detect mode changes
       if (prevModeRef.current !== null && prevModeRef.current !== mode) {
+        // Mode changed from work to break = SESSION_END
+        if (prevModeRef.current === 'work' && (mode === 'shortBreak' || mode === 'longBreak')) {
+          handleEvent('SESSION_END');
+
+          // Check for milestones (5, 10, 15, 20...)
+          const milestones = [5, 10, 15, 20, 25, 30, 50, 100];
+          for (const milestone of milestones) {
+            if (completedSessions >= milestone && lastMilestoneRef.current < milestone) {
+              lastMilestoneRef.current = milestone;
+              // Delay milestone event to not overlap with SESSION_END
+              setTimeout(() => {
+                handleEvent('MILESTONE_REACHED');
+              }, 5000);
+              break;
+            }
+          }
+        }
+
         // Mode changed
         if (mode === 'work') {
           // Starting a work session
@@ -35,20 +55,28 @@ export function useMascotEvents() {
         if (isRunning && mode === 'work') {
           // Work session started/resumed
           handleEvent('SESSION_START');
-        } else if (!isRunning && mode === 'work' && prevIsRunningRef.current) {
-          // Work session paused (not triggering event here, only on complete)
         }
       }
 
       // Update refs
       prevModeRef.current = mode;
       prevIsRunningRef.current = isRunning;
+      prevCompletedSessionsRef.current = completedSessions;
     });
 
     // Initialize refs with current state
-    const { mode, isRunning } = useTimerStore.getState();
+    const { mode, isRunning, completedSessions } = useTimerStore.getState();
     prevModeRef.current = mode;
     prevIsRunningRef.current = isRunning;
+    prevCompletedSessionsRef.current = completedSessions;
+
+    // Initialize milestone tracking
+    const milestones = [5, 10, 15, 20, 25, 30, 50, 100];
+    for (const milestone of milestones) {
+      if (completedSessions >= milestone) {
+        lastMilestoneRef.current = milestone;
+      }
+    }
 
     // Set initial mascot state based on current timer state
     if (isRunning && mode === 'work') {
