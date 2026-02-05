@@ -24,14 +24,14 @@ export function NavbarSSR() {
           <div className="flex h-9 w-9 items-center justify-center">
             <Image
               src="/images/logo.png"
-              alt="Study Bro"
+              alt="Improcode"
               width={36}
               height={36}
               className="drop-shadow-lg"
               priority
             />
           </div>
-          <span className="text-lg font-bold tracking-tight">Study Bro</span>
+          <span className="text-lg font-bold tracking-tight">Improcode</span>
         </Link>
 
         {/* Desktop Nav - Static links */}

@@ -229,7 +229,7 @@ export function FocusMode() {
               <Separator />
               <div className="p-4 bg-muted rounded-lg">
                 <p className="text-center italic text-muted-foreground">
-                  "{currentQuote}"
+                  &quot;{currentQuote}&quot;
                 </p>
               </div>
             </>
