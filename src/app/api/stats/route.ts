@@ -98,7 +98,7 @@ export async function GET(request: Request) {
         // 3. Fetch Streak
         const { data: streakData, error: streakError } = await supabase
             .from('streaks')
-            .select('current, longest')
+            .select('current, longest, last_session')
             .eq('user_id', userId)
             .single()
 
@@ -115,6 +115,7 @@ export async function GET(request: Request) {
                 streak: {
                     current: streakData?.current || 0,
                     longest: streakData?.longest || 0,
+                    last_session: streakData?.last_session || null,
                 }
             },
             dailyFocus: Object.entries(dailyFocus).map(([date, duration]) => ({
