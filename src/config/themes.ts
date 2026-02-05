@@ -1,6 +1,8 @@
 export type ThemeVars = {
     name: string;
     key: string;
+    emoji: string;
+    mascotVariant?: string;
     light: Record<string, string>;
     dark: Record<string, string>;
 };
@@ -8,6 +10,8 @@ export type ThemeVars = {
 export const defaultTheme: ThemeVars = {
     name: 'Default',
     key: 'default',
+    emoji: '🌿',
+    mascotVariant: 'normal',
     light: {
         // Brand colors - Growth Green
         background: '30 15% 99%',
@@ -72,6 +76,8 @@ export const themePresets: ThemeVars[] = [
     {
         name: 'Rose',
         key: 'rose',
+        emoji: '🌹',
+        mascotVariant: 'bowtie',
         light: {
             background: '0 10% 99%',
             foreground: '350 10% 10%',
@@ -134,8 +140,10 @@ export const themePresets: ThemeVars[] = [
         },
     },
     {
-        name: 'Green',
+        name: 'Forest',
         key: 'emerald',
+        emoji: '🌲',
+        mascotVariant: 'leaf',
         light: {
             background: '150 15% 99%',
             foreground: '150 10% 10%',
@@ -209,8 +217,10 @@ export const themePresets: ThemeVars[] = [
         },
     },
     {
-        name: 'Indigo',
+        name: 'Midnight',
         key: 'indigo',
+        emoji: '🌙',
+        mascotVariant: 'starcape',
         light: {
             background: '225 20% 99%',
             foreground: '222 15% 12%',
@@ -273,8 +283,10 @@ export const themePresets: ThemeVars[] = [
         },
     },
     {
-        name: 'Violet',
+        name: 'Lavender',
         key: 'violet',
+        emoji: '💜',
+        mascotVariant: 'flowercrown',
         light: {
             background: '265 18% 99%',
             foreground: '265 12% 12%',
@@ -337,8 +349,10 @@ export const themePresets: ThemeVars[] = [
         },
     },
     {
-        name: 'Amber',
+        name: 'Autumn',
         key: 'amber',
+        emoji: '🍂',
+        mascotVariant: 'scarf',
         light: {
             background: '40 18% 99%',
             foreground: '38 15% 12%',
@@ -401,8 +415,10 @@ export const themePresets: ThemeVars[] = [
         },
     },
     {
-        name: 'Cyan',
+        name: 'Mint',
         key: 'cyan',
+        emoji: '🍃',
+        mascotVariant: 'chefhat',
         light: {
             background: '190 18% 99%',
             foreground: '192 12% 12%',
@@ -465,8 +481,10 @@ export const themePresets: ThemeVars[] = [
         },
     },
     {
-        name: 'Teal',
+        name: 'Ocean',
         key: 'teal',
+        emoji: '🌊',
+        mascotVariant: 'sailor',
         light: {
             background: '175 18% 99%',
             foreground: '176 12% 12%',
@@ -529,8 +547,10 @@ export const themePresets: ThemeVars[] = [
         },
     },
     {
-        name: 'Hồng bánh bèo',
+        name: 'Sunset',
         key: 'pink-light',
+        emoji: '🌅',
+        mascotVariant: 'sunglasses',
         light: {
             background: '340 100% 99%', // Very light pink background
             foreground: '340 10% 10%',
@@ -593,8 +613,10 @@ export const themePresets: ThemeVars[] = [
         },
     },
     {
-        name: 'Pink-Mild',
+        name: 'Cherry',
         key: 'pink-mild',
+        emoji: '🍒',
+        mascotVariant: 'headphones',
         light: {
             background: '0 0% 100%',
             foreground: '340 10% 5%',
@@ -654,6 +676,72 @@ export const themePresets: ThemeVars[] = [
             'sidebar-accent-foreground': '340 10% 95%',
             'sidebar-border': '335 20% 15%',
             'sidebar-ring': '335 70% 60%',
+        },
+    },
+    {
+        name: 'Monochrome',
+        key: 'mono',
+        emoji: '⚫',
+        mascotVariant: 'glasses',
+        light: {
+            background: '0 0% 99%',
+            foreground: '0 0% 10%',
+            card: '0 0% 98%',
+            'card-foreground': '0 0% 10%',
+            popover: '0 0% 97%',
+            'popover-foreground': '0 0% 10%',
+            primary: '0 0% 35%',
+            'primary-foreground': '0 0% 98%',
+            secondary: '0 0% 94%',
+            'secondary-foreground': '0 0% 15%',
+            muted: '0 0% 95%',
+            'muted-foreground': '0 0% 45%',
+            accent: '0 0% 93%',
+            'accent-foreground': '0 0% 15%',
+            destructive: '0 84% 60%',
+            'destructive-foreground': '0 0% 98%',
+            border: '0 0% 88%',
+            input: '0 0% 90%',
+            ring: '0 0% 35%',
+            'timer-foreground': '0 0% 35%',
+            'sidebar-background': '0 0% 97%',
+            'sidebar-foreground': '0 0% 10%',
+            'sidebar-primary': '0 0% 35%',
+            'sidebar-primary-foreground': '0 0% 98%',
+            'sidebar-accent': '0 0% 93%',
+            'sidebar-accent-foreground': '0 0% 15%',
+            'sidebar-border': '0 0% 90%',
+            'sidebar-ring': '0 0% 35%',
+        },
+        dark: {
+            background: '0 0% 6%',
+            foreground: '0 0% 95%',
+            card: '0 0% 8%',
+            'card-foreground': '0 0% 95%',
+            popover: '0 0% 7%',
+            'popover-foreground': '0 0% 95%',
+            primary: '0 0% 70%',
+            'primary-foreground': '0 0% 10%',
+            secondary: '0 0% 18%',
+            'secondary-foreground': '0 0% 95%',
+            muted: '0 0% 16%',
+            'muted-foreground': '0 0% 60%',
+            accent: '0 0% 15%',
+            'accent-foreground': '0 0% 95%',
+            destructive: '0 62% 30%',
+            'destructive-foreground': '0 0% 98%',
+            border: '0 0% 18%',
+            input: '0 0% 16%',
+            ring: '0 0% 70%',
+            'timer-foreground': '0 0% 70%',
+            'sidebar-background': '0 0% 6%',
+            'sidebar-foreground': '0 0% 95%',
+            'sidebar-primary': '0 0% 70%',
+            'sidebar-primary-foreground': '0 0% 10%',
+            'sidebar-accent': '0 0% 15%',
+            'sidebar-accent-foreground': '0 0% 95%',
+            'sidebar-border': '0 0% 18%',
+            'sidebar-ring': '0 0% 70%',
         },
     },
 ];
