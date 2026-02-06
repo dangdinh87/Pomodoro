@@ -1,6 +1,6 @@
 {
   "brand": {
-    "title": "StudyBro",
+    "title": "Improcode",
     "subtitle": "ポモドーロタイマー 集中"
   },
   "common": {
@@ -323,7 +323,7 @@
   "leaderboard": {
     "title": "ランキング",
     "comingSoon": "近日公開",
-    "description": "StudyBroコミュニティと競争しよう。誰が一番集中できるか！",
+    "description": "Improcodeコミュニティと競争しよう。誰が一番集中できるか！",
     "tabs": {
       "focusTime": "集中時間",
       "completedTasks": "完了タスク"
@@ -459,7 +459,7 @@
   },
   "guide": {
     "title": "ユーザーガイド",
-    "subtitle": "ポモドーロメソッドとStudy Broを使って学習と仕事の生産性を最適化する方法を学びましょう",
+    "subtitle": "ポモドーロメソッドとImprocodeを使って学習と仕事の生産性を最適化する方法を学びましょう",
     "pomodoro": {
       "badge": "ポモドーロメソッド",
       "title": "ポモドーロとは？",
@@ -502,8 +502,8 @@
     },
     "howToUse": {
       "badge": "ウェブサイトガイド",
-      "title": "Study Broの使い方",
-      "description": "Study Broはポモドーロメソッドを効果的に適用するためのツールを提供します。",
+      "title": "Improcodeの使い方",
+      "description": "Improcodeはポモドーロメソッドを効果的に適用するためのツールを提供します。",
       "features": {
         "timer": {
           "title": "タイマー",
@@ -543,7 +543,7 @@
         },
         "chatAI": {
           "title": "AIチャット",
-          "subtitle": "Bro Chat – あなたの勉強仲間",
+          "subtitle": "Improcode AI – あなたの勉強仲間",
           "description": "AIアシスタントとチャット：",
           "points": [
             "ポモドーロテクニック＆勉強のヒント",
@@ -551,7 +551,7 @@
             "アプリの使い方ヘルプ",
             "会話履歴の保存"
           ],
-          "cta": "Bro Chatを開く"
+          "cta": "Improcode AIを開く"
         },
         "entertainment": {
           "title": "エンタメ",
@@ -615,7 +615,7 @@
     "getStarted": {
       "badge": "はじめよう",
       "title": "準備はいいですか？",
-      "description": "Study Broで生産的な作業の旅を始めましょう！",
+      "description": "Improcodeで生産的な作業の旅を始めましょう！",
       "steps": [
         "<link>タスク</link>ページで最初のタスクを作成",
         "必要に応じて設定を調整（オプション）",
@@ -672,7 +672,7 @@
     "deleteConfirmDescription": "この操作は元に戻せません。この会話とすべてのメッセージが完全に削除されます。",
     "thread": {
       "welcome": "こんにちは！👋",
-      "welcomeSubtitle": "私はBro Chat - あなたの勉強仲間です！",
+      "welcomeSubtitle": "私はImprocode AI - あなたの勉強仲間です！",
       "scrollToBottom": "一番下にスクロール",
       "inputPlaceholder": "何でも聞いてください...",
       "sendMessage": "メッセージを送信",
@@ -851,24 +851,24 @@
   },
   "metadata": {
     "timer": {
-      "title": "タイマー • Study Bro App",
+      "title": "タイマー • Improcode App",
       "description": "洗練されたポモドーロタイマーと統合設定で作業と休憩セッションを管理。"
     },
     "tasks": {
-      "title": "タスク • Study Bro App",
+      "title": "タスク • Improcode App",
       "description": "タスク管理システムでタスクを効率的に整理・管理。"
     },
     "history": {
-      "title": "履歴 • Study Bro App",
+      "title": "履歴 • Improcode App",
       "description": "時間の経過とともに集中パフォーマンスと生産性統計を確認。"
     },
     "guide": {
-      "title": "ユーザーガイド • Study Bro App",
-      "description": "ポモドーロメソッドとStudy Broの機能の使い方を学ぶ。"
+      "title": "ユーザーガイド • Improcode App",
+      "description": "ポモドーロメソッドとImprocodeの機能の使い方を学ぶ。"
     }
   },
   "login": {
-    "title": "Study Broにログイン",
+    "title": "Improcodeにログイン",
     "description": "ログインして勉強のリズムを保ち、すべてのポモドーロセッションを同期しましょう。",
     "form": {
       "email": "メールアドレス",
@@ -898,7 +898,7 @@
     }
   },
   "signup": {
-    "title": "Study Broに登録",
+    "title": "Improcodeに登録",
     "description": "無料で登録してプリセット、集中履歴を保存し、デバイス間でタスクを同期しましょう。",
     "form": {
       "email": "メールアドレス",
@@ -1124,7 +1124,7 @@
       "focusMode": "ディープワークモード",
       "title": "あなたの",
       "titleHighlight": "集中力",
-      "subtitle": "タスク連携と有効セッション追跡付きのポモドーロタイマー。Bro Chat AIコーチ、休憩用ミニゲーム、ランキング、集中モード、分析機能—すべてが一箇所に。",
+      "subtitle": "タスク連携と有効セッション追跡付きのポモドーロタイマー。Improcode AI AIコーチ、休憩用ミニゲーム、ランキング、集中モード、分析機能—すべてが一箇所に。",
       "getStarted": "無料で始める",
       "tryDemo": "デモを見る",
       "aiChat": "新機能：AI生産性コーチ",
@@ -1208,7 +1208,7 @@
       "badge": "FAQ",
       "title": "よくある",
       "titleHighlight": "質問",
-      "subtitle": "Study Broエコシステムについて知っておくべきすべて",
+      "subtitle": "Improcodeエコシステムについて知っておくべきすべて",
       "stillHaveQuestions": "さらにサポートが必要ですか？",
       "sendMessage": "サポートに連絡",
       "items": {
@@ -1218,7 +1218,7 @@
         },
         "q2": {
           "question": "プラットフォームは無料で使えますか？",
-          "answer": "はい。すべての機能が無料です：タスク連携付きポモドーロタイマー、Bro Chat AI、ミニゲーム、ランキング、集中モード、履歴、分析。パワーユーザー向けのプロフェッショナルティアは後日提供予定です。"
+          "answer": "はい。すべての機能が無料です：タスク連携付きポモドーロタイマー、Improcode AI AI、ミニゲーム、ランキング、集中モード、履歴、分析。パワーユーザー向けのプロフェッショナルティアは後日提供予定です。"
         },
         "q3": {
           "question": "ワークフローを自分のニーズに合わせてカスタマイズできますか？",
@@ -1234,7 +1234,7 @@
         },
         "q6": {
           "question": "プラットフォームの互換性は？",
-          "answer": "Study Broは、デスクトップ、タブレット、モバイルデバイスのすべての最新ブラウザに最適化されたプログレッシブウェブアプリケーションです。ネイティブアプリケーションは開発中です。"
+          "answer": "Improcodeは、デスクトップ、タブレット、モバイルデバイスのすべての最新ブラウザに最適化されたプログレッシブウェブアプリケーションです。ネイティブアプリケーションは開発中です。"
         }
       }
     },
@@ -1267,7 +1267,7 @@
           "description": "セッション履歴、日別/週別/月別の統計、生産性チャート。"
         },
         "chatAI": {
-          "title": "Bro Chat AI",
+          "title": "Improcode AI AI",
           "description": "ポモドーロのヒント、勉強アドバイス、時間管理のAIコーチ。会話履歴を保存。"
         },
         "entertainment": {
@@ -1309,7 +1309,7 @@
           "timer": "ポモドーロタイマー（作業、休憩、タスク連携）",
           "tasks": "タスク管理＆フィルター",
           "history": "セッション履歴＆分析",
-          "chatAI": "Bro Chat AIコーチ",
+          "chatAI": "Improcode AI AIコーチ",
           "games": "ミニゲーム（スネーク、2048など）",
           "leaderboard": "グローバルランキング",
           "focus": "集中モード＆連続記録",

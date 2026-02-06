@@ -143,7 +143,7 @@ export function AppSidebar() {
                   )}
                 >
                   <Image
-                    alt="StudyBro"
+                    alt="Improcode"
                     width={32}
                     height={32}
                     src="/images/logo.png"
@@ -225,7 +225,7 @@ export function AppSidebar() {
                 <SidebarMenuButton
                   asChild
                   isActive={pathname === '/chat'}
-                  tooltip="Bro Chat"
+                  tooltip="Improcode AI"
                 >
                   <Link href="/chat">
                     <AnimateIcon animateOnHover>
@@ -235,7 +235,7 @@ export function AppSidebar() {
                         className="size-5"
                       />
                     </AnimateIcon>
-                    <span suppressHydrationWarning>Bro Chat</span>
+                    <span suppressHydrationWarning>Improcode AI</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
