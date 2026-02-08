@@ -196,15 +196,21 @@ export function FocusMode() {
           <Separator />
 
           <div className="space-y-4">
-            <Label>Blocked Websites</Label>
+            <Label htmlFor="blocked-site-input">Blocked Websites</Label>
             <div className="flex gap-2">
               <Input
+                id="blocked-site-input"
                 placeholder="Enter website URL (e.g., facebook.com)"
                 value={newSiteUrl}
                 onChange={(e) => setNewSiteUrl(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && addBlockedSite()}
               />
-              <Button onClick={addBlockedSite} size="icon" variant="transparent">
+              <Button
+                onClick={addBlockedSite}
+                size="icon"
+                variant="ghost"
+                aria-label="Add blocked site"
+              >
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
@@ -215,7 +221,8 @@ export function FocusMode() {
                   {site.url}
                   <button
                     onClick={() => removeBlockedSite(site.id)}
-                    className="ml-1 hover:text-destructive"
+                    className="ml-1 hover:text-destructive focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none rounded-sm"
+                    aria-label={`Remove ${site.url}`}
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -229,7 +236,7 @@ export function FocusMode() {
               <Separator />
               <div className="p-4 bg-muted rounded-lg">
                 <p className="text-center italic text-muted-foreground">
-                  "{currentQuote}"
+                  &quot;{currentQuote}&quot;
                 </p>
               </div>
             </>
