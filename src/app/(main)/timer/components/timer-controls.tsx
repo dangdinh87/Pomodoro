@@ -11,6 +11,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useTimerStore } from '@/stores/timer-store';
+import { useAnalogClockState } from './clocks/use-analog-clock-state';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -53,6 +54,9 @@ export const TimerControls = memo(function TimerControls() {
     const setTimeLeft = useTimerStore((state) => state.setTimeLeft);
     const setDeadlineAt = useTimerStore((state) => state.setDeadlineAt);
     const sessionCount = useTimerStore((state) => state.sessionCount);
+
+    // Clock state for color sync
+    const clockState = useAnalogClockState({ timeLeft, isRunning });
 
     // Local state
     const [skipConfirmOpen, setSkipConfirmOpen] = useState(false);
@@ -183,7 +187,8 @@ export const TimerControls = memo(function TimerControls() {
     const handleSkipClick = () => {
         if (isProcessing) return;
 
-        if (mode === 'work' && getCompletionPercent() < MINIMUM_COMPLETION_PERCENT) {
+        // Always show confirmation when timer is running
+        if (isRunning) {
             setSkipConfirmOpen(true);
             return;
         }
@@ -192,7 +197,8 @@ export const TimerControls = memo(function TimerControls() {
 
     const handleConfirmedSkip = () => {
         setSkipConfirmOpen(false);
-        handleSessionComplete(true);
+        const skipWithoutRecording = mode === 'work' && getCompletionPercent() < MINIMUM_COMPLETION_PERCENT;
+        handleSessionComplete(skipWithoutRecording);
     };
 
     const toggleTimer = () => {
@@ -206,17 +212,18 @@ export const TimerControls = memo(function TimerControls() {
 
     return (
         <>
-            <div className="flex items-center justify-center gap-6">
+            <div className="flex items-center justify-center gap-3">
                 <Button
                     onClick={resetTimer}
                     disabled={isProcessing}
                     aria-label={t('timer.controls.aria.reset')}
                     title={t('timer.controls.reset_hint')}
-                    variant="secondary"
+                    variant="ghost"
                     size="icon"
-                    className="h-12 w-12 rounded-2xl bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground shadow-sm transition-all"
+                    className="h-10 w-10 rounded-full opacity-70 hover:opacity-100 transition-all"
+                    style={{ color: clockState.color }}
                 >
-                    <RotateCcw size={20} />
+                    <RotateCcw size={16} />
                 </Button>
 
                 <Button
@@ -225,17 +232,17 @@ export const TimerControls = memo(function TimerControls() {
                     aria-label={isRunning ? t('timer.controls.aria.pause') : t('timer.controls.aria.start')}
                     title={isRunning ? t('timer.controls.pause_hint') : t('timer.controls.start_hint')}
                     className={cn(
-                        "h-16 px-8 rounded-2xl text-lg font-bold shadow-lg shadow-primary/25 transition-all hover:scale-105 active:scale-95",
-                        "bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+                        "h-12 px-6 rounded-full text-sm font-semibold shadow-md transition-all hover:scale-105 active:scale-95 hover:brightness-110",
                     )}
+                    style={{ backgroundColor: clockState.color, color: 'hsl(var(--background))' }}
                 >
                     {isRunning ? (
-                        <span className="inline-flex items-center gap-2">
-                            <Pause size={24} fill="currentColor" /> {t('timer.controls.pause')}
+                        <span className="inline-flex items-center gap-1.5">
+                            <Pause size={16} fill="currentColor" /> {t('timer.controls.pause')}
                         </span>
                     ) : (
-                        <span className="inline-flex items-center gap-2">
-                            <Play size={24} fill="currentColor" /> {t('timer.controls.start').toUpperCase()}
+                        <span className="inline-flex items-center gap-1.5">
+                            <Play size={16} fill="currentColor" /> {t('timer.controls.start').toUpperCase()}
                         </span>
                     )}
                 </Button>
@@ -243,12 +250,13 @@ export const TimerControls = memo(function TimerControls() {
                 <Button
                     onClick={handleSkipClick}
                     disabled={isProcessing}
-                    variant="secondary"
+                    variant="ghost"
                     size="icon"
                     title={t('timer.controls.skip_hint')}
-                    className="h-12 w-12 rounded-2xl bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground shadow-sm transition-all"
+                    className="h-10 w-10 rounded-full opacity-70 hover:opacity-100 transition-all"
+                    style={{ color: clockState.color }}
                 >
-                    <SkipForwardIcon size={20} />
+                    <SkipForwardIcon size={16} />
                 </Button>
             </div>
 

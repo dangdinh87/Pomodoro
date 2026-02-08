@@ -7,6 +7,9 @@ import React, {
   useEffect,
   ReactNode,
 } from 'react';
+import { detectFormatSupport } from '@/lib/format-detection';
+import { findImageById } from '@/data/background-packs';
+import { PATH_TO_ID_MAP } from '@/data/background-migration';
 
 type BGType = 'none' | 'solid' | 'image' | 'gradient' | 'random';
 
@@ -83,6 +86,14 @@ const migrateBackground = (bg: BackgroundSettings): BackgroundSettings => {
     };
   }
 
+  // Migrate old path-based values to new pack IDs
+  if (bg.type === 'image' && bg.value && !findImageById(bg.value)) {
+    const newId = PATH_TO_ID_MAP[bg.value];
+    if (newId) {
+      return { ...bg, value: newId };
+    }
+  }
+
   return bg;
 };
 
@@ -96,45 +107,51 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load config on mount
+  // Detect format support + load config on mount
   useEffect(() => {
-    const saved = localStorage.getItem('background-settings');
+    async function init() {
+      // Detect AVIF/WebP support before resolving URLs
+      await detectFormatSupport();
 
-    // Case 1: saved config exists
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved) as BackgroundSettings;
-        const migrated = migrateBackground(parsed);
+      const saved = localStorage.getItem('background-settings');
 
-        setBackgroundState(migrated);
-        if (migrated !== parsed) {
-          localStorage.setItem('background-settings', JSON.stringify(migrated));
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved) as BackgroundSettings;
+          const migrated = migrateBackground(parsed);
+
+          setBackgroundState(migrated);
+          if (migrated !== parsed) {
+            localStorage.setItem('background-settings', JSON.stringify(migrated));
+          }
+        } catch {
+          setBackgroundState(defaultBackground);
+          localStorage.setItem(
+            'background-settings',
+            JSON.stringify(defaultBackground),
+          );
         }
-      } catch {
-        setBackgroundState(defaultBackground);
-        localStorage.setItem(
-          'background-settings',
-          JSON.stringify(defaultBackground),
-        );
+      } else {
+        // First time user → choose lightweight or default
+        const firstBG = shouldUseLightweightBackground()
+          ? {
+            showDottedMap: false,
+            type: 'solid' as const,
+            value: 'hsl(var(--background))',
+            opacity: 1,
+            blur: 0,
+            brightness: 100,
+          }
+          : defaultBackground;
+
+        setBackgroundState(firstBG);
+        localStorage.setItem('background-settings', JSON.stringify(firstBG));
       }
-    } else {
-      // Case 2: First time user → choose lightweight or default
-      const firstBG = shouldUseLightweightBackground()
-        ? {
-          showDottedMap: false,
-          type: 'solid' as const,
-          value: 'hsl(var(--background))',
-          opacity: 1,
-          blur: 0,
-          brightness: 100,
-        }
-        : defaultBackground;
 
-      setBackgroundState(firstBG);
-      localStorage.setItem('background-settings', JSON.stringify(firstBG));
+      setIsLoading(false);
     }
 
-    setIsLoading(false);
+    init();
   }, []);
 
   // ---------------------------------------------------------------
@@ -170,6 +187,7 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
 
   const setBackground = persist;
 
+  /** Preview only — updates state without persisting to localStorage */
   const setBackgroundTemp = (bg: BackgroundSettings) => {
     setBackgroundState(bg);
   };

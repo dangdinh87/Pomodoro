@@ -183,12 +183,6 @@ export function TimerSettings({ isOpen, onClose, settings, onSettingsChange }: T
                     {t('timerSettings.labels.analog')}
                   </div>
                 </SelectItem>
-                <SelectItem value="progress">
-                  <div className="flex items-center gap-2">
-                    <Activity className="h-4 w-4" />
-                    {t('timerSettings.labels.progress')}
-                  </div>
-                </SelectItem>
                 <SelectItem value="flip">
                   <div className="flex items-center gap-2">
                     <Zap className="h-4 w-4" />

@@ -11,473 +11,7 @@ import { Separator } from "@/components/ui/separator"
 import { useI18n, LANGS } from "@/contexts/i18n-context"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
-
-// Theme Presets Logic (Adapted from ThemeSettingsModal)
-type ThemeVars = {
-    name: string
-    key: string
-    light: Record<string, string>
-    dark: Record<string, string>
-}
-
-const defaultTheme: ThemeVars = {
-    name: 'Default',
-    key: 'default',
-    light: {
-        primary: '0 0% 9%',
-        border: '0 0% 89.8%',
-    },
-    dark: {
-        primary: '0 0% 98%',
-        border: '0 0% 14.9%',
-    },
-}
-
-const themePresets: ThemeVars[] = [
-    {
-        name: 'Rose',
-        key: 'rose',
-        light: {
-            background: '0 0% 100%',
-            foreground: '240 10% 3.9%',
-            card: '0 0% 100%',
-            'card-foreground': '240 10% 3.9%',
-            popover: '0 0% 100%',
-            'popover-foreground': '240 10% 3.9%',
-            primary: '346.8 77.2% 49.8%',
-            'primary-foreground': '355.7 100% 97.3%',
-            secondary: '240 4.8% 95.9%',
-            'secondary-foreground': '240 5.9% 10%',
-            muted: '240 4.8% 95.9%',
-            'muted-foreground': '240 3.8% 46.1%',
-            accent: '240 4.8% 95.9%',
-            'accent-foreground': '240 5.9% 10%',
-            destructive: '0 84.2% 60.2%',
-            'destructive-foreground': '0 0% 98%',
-            border: '240 5.9% 90%',
-            input: '240 5.9% 90%',
-            ring: '346.8 77.2% 49.8%',
-            'timer-foreground': '346.8 77.2% 49.8%',
-        },
-        dark: {
-            background: '20 14.3% 4.1%',
-            foreground: '0 0% 95%',
-            popover: '0 0% 9%',
-            'popover-foreground': '0 0% 95%',
-            card: '24 9.8% 10%',
-            'card-foreground': '0 0% 95%',
-            primary: '346.8 77.2% 49.8%',
-            'primary-foreground': '355.7 100% 97.3%',
-            secondary: '240 3.7% 15.9%',
-            'secondary-foreground': '0 0% 98%',
-            muted: '0 0% 15%',
-            'muted-foreground': '240 5% 64.9%',
-            accent: '12 6.5% 15.1%',
-            'accent-foreground': '0 0% 98%',
-            destructive: '0 62.8% 30.6%',
-            'destructive-foreground': '0 85.7% 97.3%',
-            border: '240 3.7% 15.9%',
-            input: '240 3.7% 15.9%',
-            ring: '346.8 77.2% 49.8%',
-            'timer-foreground': '346 84% 65%',
-        },
-    },
-    {
-        name: 'Green',
-        key: 'emerald',
-        light: {
-            background: '0 0% 100%',
-            foreground: '240 10% 3.9%',
-            card: '0 0% 100%',
-            'card-foreground': '240 10% 3.9%',
-            popover: '0 0% 100%',
-            'popover-foreground': '240 10% 3.9%',
-            primary: '142.1 76.2% 36.3%',
-            'primary-foreground': '355.7 100% 97.3%',
-            secondary: '240 4.8% 95.9%',
-            'secondary-foreground': '240 5.9% 10%',
-            muted: '240 4.8% 95.9%',
-            'muted-foreground': '240 3.8% 46.1%',
-            accent: '240 4.8% 95.9%',
-            'accent-foreground': '240 5.9% 10%',
-            destructive: '0 84.2% 60.2%',
-            'destructive-foreground': '0 0% 98%',
-            border: '240 5.9% 90%',
-            input: '240 5.9% 90%',
-            ring: '142.1 76.2% 36.3%',
-            'timer-foreground': '142 71% 45%',
-            radius: '0.65rem',
-            'chart-1': '12 76% 61%',
-            'chart-2': '173 58% 39%',
-            'chart-3': '197 37% 24%',
-            'chart-4': '43 74% 66%',
-            'chart-5': '27 87% 67%',
-        },
-        dark: {
-            background: '20 14.3% 4.1%',
-            foreground: '0 0% 95%',
-            popover: '0 0% 9%',
-            'popover-foreground': '0 0% 95%',
-            card: '24 9.8% 10%',
-            'card-foreground': '0 0% 95%',
-            primary: '142.1 70.6% 45.3%',
-            'primary-foreground': '144.9 80.4% 10%',
-            secondary: '240 3.7% 15.9%',
-            'secondary-foreground': '0 0% 98%',
-            muted: '0 0% 15%',
-            'muted-foreground': '240 5% 64.9%',
-            accent: '12 6.5% 15.1%',
-            'accent-foreground': '0 0% 98%',
-            destructive: '0 62.8% 30.6%',
-            'destructive-foreground': '0 85.7% 97.3%',
-            border: '240 3.7% 15.9%',
-            input: '240 3.7% 15.9%',
-            ring: '142.4 71.8% 29.2%',
-            'timer-foreground': '142 76% 60%',
-            'chart-1': '220 70% 50%',
-            'chart-2': '160 60% 45%',
-            'chart-3': '30 80% 55%',
-            'chart-4': '280 65% 60%',
-            'chart-5': '340 75% 55%',
-        },
-    },
-    {
-        name: 'Indigo',
-        key: 'indigo',
-        light: {
-            background: '0 0% 100%',
-            foreground: '222.2 84% 4.9%',
-            card: '0 0% 100%',
-            'card-foreground': '222.2 84% 4.9%',
-            popover: '0 0% 100%',
-            'popover-foreground': '222.2 84% 4.9%',
-            primary: '226 70% 55%',
-            'primary-foreground': '210 40% 98%',
-            secondary: '210 40% 96.1%',
-            'secondary-foreground': '222.2 47.4% 11.2%',
-            muted: '210 40% 96.1%',
-            'muted-foreground': '215.4 16.3% 46.9%',
-            accent: '210 40% 96.1%',
-            'accent-foreground': '222.2 47.4% 11.2%',
-            destructive: '0 84.2% 60.2%',
-            'destructive-foreground': '210 40% 98%',
-            border: '214.3 31.8% 91.4%',
-            input: '214.3 31.8% 91.4%',
-            ring: '226 70% 55%',
-            'timer-foreground': '226 70% 55%',
-        },
-        dark: {
-            background: '222.2 84% 4.9%',
-            foreground: '210 40% 98%',
-            card: '222.2 84% 4.9%',
-            'card-foreground': '210 40% 98%',
-            popover: '222.2 84% 4.9%',
-            'popover-foreground': '210 40% 98%',
-            primary: '227 82% 60%',
-            'primary-foreground': '222.2 47.4% 11.2%',
-            secondary: '217.2 32.6% 17.5%',
-            'secondary-foreground': '210 40% 98%',
-            muted: '217.2 32.6% 17.5%',
-            'muted-foreground': '215 20.2% 65.1%',
-            accent: '217.2 32.6% 17.5%',
-            'accent-foreground': '210 40% 98%',
-            destructive: '0 62.8% 30.6%',
-            'destructive-foreground': '210 40% 98%',
-            border: '217.2 32.6% 17.5%',
-            input: '217.2 32.6% 17.5%',
-            ring: '227 82% 60%',
-            'timer-foreground': '210 40% 98%',
-        },
-    },
-    {
-        name: 'Violet',
-        key: 'violet',
-        light: {
-            background: '0 0% 100%',
-            foreground: '240 10% 3.9%',
-            card: '0 0% 100%',
-            'card-foreground': '240 10% 3.9%',
-            popover: '0 0% 100%',
-            'popover-foreground': '240 10% 3.9%',
-            primary: '262 83% 57%',
-            'primary-foreground': '0 0% 98%',
-            secondary: '240 4.8% 95.9%',
-            'secondary-foreground': '240 5.9% 10%',
-            muted: '240 4.8% 95.9%',
-            'muted-foreground': '240 3.8% 46.1%',
-            accent: '240 4.8% 95.9%',
-            'accent-foreground': '240 5.9% 10%',
-            destructive: '0 84.2% 60.2%',
-            'destructive-foreground': '0 0% 98%',
-            border: '240 5.9% 90%',
-            input: '240 5.9% 90%',
-            ring: '262 83% 57%',
-            'timer-foreground': '262 83% 57%',
-        },
-        dark: {
-            background: '240 10% 4%',
-            foreground: '0 0% 98%',
-            card: '240 10% 4%',
-            'card-foreground': '0 0% 98%',
-            popover: '240 10% 4%',
-            'popover-foreground': '0 0% 98%',
-            primary: '262 83% 57%',
-            'primary-foreground': '240 10% 4%',
-            secondary: '240 3.7% 15.9%',
-            'secondary-foreground': '0 0% 98%',
-            muted: '240 3.7% 15.9%',
-            'muted-foreground': '240 5% 64.9%',
-            accent: '240 3.7% 15.9%',
-            'accent-foreground': '0 0% 98%',
-            destructive: '0 62% 30%',
-            'destructive-foreground': '0 0% 98%',
-            border: '240 3.7% 15.9%',
-            input: '240 3.7% 15.9%',
-            ring: '262 83% 57%',
-            'timer-foreground': '262 84% 70%',
-        },
-    },
-    {
-        name: 'Amber',
-        key: 'amber',
-        light: {
-            background: '0 0% 100%',
-            foreground: '20 14.3% 4.1%',
-            card: '0 0% 100%',
-            'card-foreground': '20 14.3% 4.1%',
-            popover: '0 0% 100%',
-            'popover-foreground': '20 14.3% 4.1%',
-            primary: '38 92% 50%',
-            'primary-foreground': '60 9.1% 97.8%',
-            secondary: '60 4.8% 95.9%',
-            'secondary-foreground': '24 9.8% 10%',
-            muted: '60 4.8% 95.9%',
-            'muted-foreground': '25 5.3% 44.7%',
-            accent: '60 4.8% 95.9%',
-            'accent-foreground': '24 9.8% 10%',
-            destructive: '0 84.2% 60.2%',
-            'destructive-foreground': '60 9.1% 97.8%',
-            border: '20 5.9% 90%',
-            input: '20 5.9% 90%',
-            ring: '38 92% 50%',
-            'timer-foreground': '38 92% 50%',
-        },
-        dark: {
-            background: '20 14.3% 4.1%',
-            foreground: '60 9.1% 97.8%',
-            card: '20 14.3% 4.1%',
-            'card-foreground': '60 9.1% 97.8%',
-            popover: '20 14.3% 4.1%',
-            'popover-foreground': '60 9.1% 97.8%',
-            primary: '35 92% 47%',
-            'primary-foreground': '60 9.1% 97.8%',
-            secondary: '12 6.5% 15.1%',
-            'secondary-foreground': '60 9.1% 97.8%',
-            muted: '12 6.5% 15.1%',
-            'muted-foreground': '24 5.4% 63.9%',
-            accent: '12 6.5% 15.1%',
-            'accent-foreground': '60 9.1% 97.8%',
-            destructive: '0 72.2% 50.6%',
-            'destructive-foreground': '60 9.1% 97.8%',
-            border: '12 6.5% 15.1%',
-            input: '12 6.5% 15.1%',
-            ring: '35 92% 47%',
-            'timer-foreground': '38 92% 60%',
-        },
-    },
-    {
-        name: 'Cyan',
-        key: 'cyan',
-        light: {
-            background: '0 0% 100%',
-            foreground: '240 10% 3.9%',
-            card: '0 0% 100%',
-            'card-foreground': '240 10% 3.9%',
-            popover: '0 0% 100%',
-            'popover-foreground': '240 10% 3.9%',
-            primary: '189 94% 43%',
-            'primary-foreground': '0 0% 98%',
-            secondary: '240 4.8% 95.9%',
-            'secondary-foreground': '240 5.9% 10%',
-            muted: '240 4.8% 95.9%',
-            'muted-foreground': '240 3.8% 46.1%',
-            accent: '240 4.8% 95.9%',
-            'accent-foreground': '240 5.9% 10%',
-            destructive: '0 84.2% 60.2%',
-            'destructive-foreground': '0 0% 98%',
-            border: '240 5.9% 90%',
-            input: '240 5.9% 90%',
-            ring: '189 94% 43%',
-            'timer-foreground': '189 94% 43%',
-        },
-        dark: {
-            background: '222.2 84% 4.9%',
-            foreground: '210 40% 98%',
-            card: '222.2 84% 4.9%',
-            'card-foreground': '210 40% 98%',
-            popover: '222.2 84% 4.9%',
-            'popover-foreground': '210 40% 98%',
-            primary: '190 90% 45%',
-            'primary-foreground': '222.2 47.4% 11.2%',
-            secondary: '217.2 32.6% 17.5%',
-            'secondary-foreground': '210 40% 98%',
-            muted: '217.2 32.6% 17.5%',
-            'muted-foreground': '215 20.2% 65.1%',
-            accent: '217.2 32.6% 17.5%',
-            'accent-foreground': '210 40% 98%',
-            destructive: '0 62.8% 30.6%',
-            'destructive-foreground': '210 40% 98%',
-            border: '217.2 32.6% 17.5%',
-            input: '217.2 32.6% 17.5%',
-            ring: '190 90% 45%',
-            'timer-foreground': '210 40% 98%',
-        },
-    },
-    {
-        name: 'Teal',
-        key: 'teal',
-        light: {
-            background: '0 0% 100%',
-            foreground: '240 10% 3.9%',
-            card: '0 0% 100%',
-            'card-foreground': '240 10% 3.9%',
-            popover: '0 0% 100%',
-            'popover-foreground': '240 10% 3.9%',
-            primary: '174 72% 40%',
-            'primary-foreground': '0 0% 98%',
-            secondary: '240 4.8% 95.9%',
-            'secondary-foreground': '240 5.9% 10%',
-            muted: '240 4.8% 95.9%',
-            'muted-foreground': '240 3.8% 46.1%',
-            accent: '240 4.8% 95.9%',
-            'accent-foreground': '240 5.9% 10%',
-            destructive: '0 84.2% 60.2%',
-            'destructive-foreground': '0 0% 98%',
-            border: '240 5.9% 90%',
-            input: '240 5.9% 90%',
-            ring: '174 72% 40%',
-            'timer-foreground': '174 72% 40%',
-        },
-        dark: {
-            background: '222.2 84% 4.9%',
-            foreground: '210 40% 98%',
-            card: '222.2 84% 4.9%',
-            'card-foreground': '210 40% 98%',
-            popover: '222.2 84% 4.9%',
-            'popover-foreground': '210 40% 98%',
-            primary: '175 80% 45%',
-            'primary-foreground': '222.2 47.4% 11.2%',
-            secondary: '217.2 32.6% 17.5%',
-            'secondary-foreground': '210 40% 98%',
-            muted: '217.2 32.6% 17.5%',
-            'muted-foreground': '215 20.2% 65.1%',
-            accent: '217.2 32.6% 17.5%',
-            'accent-foreground': '210 40% 98%',
-            destructive: '0 62.8% 30.6%',
-            'destructive-foreground': '210 40% 98%',
-            border: '217.2 32.6% 17.5%',
-            input: '217.2 32.6% 17.5%',
-            ring: '175 80% 45%',
-            'timer-foreground': '210 40% 98%',
-        },
-    },
-    {
-        name: 'Hồng bánh bèo',
-        key: 'pink-light',
-        light: {
-            background: '0 0% 100%',
-            foreground: '240 10% 10%',
-            card: '0 0% 100%',
-            'card-foreground': '240 10% 10%',
-            popover: '0 0% 100%',
-            'popover-foreground': '240 10% 10%',
-            primary: '330 60% 80%',
-            'primary-foreground': '0 0% 98%',
-            secondary: '240 4.8% 97%',
-            'secondary-foreground': '240 5.9% 15%',
-            muted: '240 4.8% 97%',
-            'muted-foreground': '240 3.8% 50%',
-            accent: '240 4.8% 97%',
-            'accent-foreground': '240 5.9% 15%',
-            destructive: '0 70% 75%',
-            'destructive-foreground': '0 0% 98%',
-            border: '240 5.9% 93%',
-            input: '240 5.9% 93%',
-            ring: '330 60% 80%',
-            'timer-foreground': '330 60% 80%',
-        },
-        dark: {
-            background: '222.2 84% 7%',
-            foreground: '210 40% 98%',
-            card: '222.2 84% 7%',
-            'card-foreground': '210 40% 98%',
-            popover: '222.2 84% 7%',
-            'popover-foreground': '210 40% 98%',
-            primary: '330 60% 82%',
-            'primary-foreground': '222.2 47.4% 12%',
-            secondary: '217.2 30% 25%',
-            'secondary-foreground': '210 40% 98%',
-            muted: '217.2 30% 25%',
-            'muted-foreground': '215 20.2% 70%',
-            accent: '217.2 30% 25%',
-            'accent-foreground': '210 40% 98%',
-            destructive: '0 55% 50%',
-            'destructive-foreground': '210 40% 98%',
-            border: '217.2 30% 25%',
-            input: '217.2 30% 25%',
-            ring: '330 60% 82%',
-            'timer-foreground': '210 40% 98%',
-        },
-    },
-    {
-        name: 'Pink-Mild',
-        key: 'pink-mild',
-        light: {
-            background: '0 0% 100%',
-            foreground: '240 10% 5%',
-            card: '0 0% 100%',
-            'card-foreground': '240 10% 5%',
-            popover: '0 0% 100%',
-            'popover-foreground': '240 10% 5%',
-            primary: '330 75% 70%',
-            'primary-foreground': '0 0% 98%',
-            secondary: '240 4.8% 96%',
-            'secondary-foreground': '240 5.9% 12%',
-            muted: '240 4.8% 96%',
-            'muted-foreground': '240 3.8% 48%',
-            accent: '240 4.8% 96%',
-            'accent-foreground': '240 5.9% 12%',
-            destructive: '0 80% 65%',
-            'destructive-foreground': '0 0% 98%',
-            border: '240 5.9% 91%',
-            input: '240 5.9% 91%',
-            ring: '330 75% 70%',
-            'timer-foreground': '330 75% 70%',
-        },
-        dark: {
-            background: '222.2 84% 6%',
-            foreground: '210 40% 98%',
-            card: '222.2 84% 6%',
-            'card-foreground': '210 40% 98%',
-            popover: '222.2 84% 6%',
-            'popover-foreground': '210 40% 98%',
-            primary: '330 75% 72%',
-            'primary-foreground': '222.2 47.4% 12%',
-            secondary: '217.2 32% 22%',
-            'secondary-foreground': '210 40% 98%',
-            muted: '217.2 32% 22%',
-            'muted-foreground': '215 20.2% 68%',
-            accent: '217.2 32% 22%',
-            'accent-foreground': '210 40% 98%',
-            destructive: '0 65% 45%',
-            'destructive-foreground': '210 40% 98%',
-            border: '217.2 32% 22%',
-            input: '217.2 32% 22%',
-            ring: '330 75% 72%',
-            'timer-foreground': '210 40% 98%',
-        },
-    }
-]
+import { defaultTheme, themePresets, type ThemeVars } from '@/config/themes'
 
 const FONTS = [
     { name: 'Inter', value: 'var(--font-inter)', class: 'font-sans' },
@@ -489,7 +23,8 @@ export function GeneralSettings() {
     const { theme, setTheme } = useTheme()
     const { lang, setLang, t } = useI18n()
     const [selectedThemeKey, setSelectedThemeKey] = useState<string>('default')
-    const [selectedFont, setSelectedFont] = useState<string>('Inter')
+    const [selectedFont, setSelectedFont] = useState<string>('Nunito')
+    const [fontSize, setFontSize] = useState<string>('medium')
 
     // Theme Injection Logic
     const styleTagId = 'app-theme-vars'
@@ -534,6 +69,14 @@ export function GeneralSettings() {
   --input: ${themeData.light.input};
   --ring: ${themeData.light.ring};
   --timer-foreground: ${themeData.light['timer-foreground']};
+  --sidebar-background: ${themeData.light['sidebar-background'] || themeData.light.background};
+  --sidebar-foreground: ${themeData.light['sidebar-foreground'] || themeData.light.foreground};
+  --sidebar-primary: ${themeData.light['sidebar-primary'] || themeData.light.primary};
+  --sidebar-primary-foreground: ${themeData.light['sidebar-primary-foreground'] || themeData.light['primary-foreground']};
+  --sidebar-accent: ${themeData.light['sidebar-accent'] || themeData.light.accent};
+  --sidebar-accent-foreground: ${themeData.light['sidebar-accent-foreground'] || themeData.light['accent-foreground']};
+  --sidebar-border: ${themeData.light['sidebar-border'] || themeData.light.border};
+  --sidebar-ring: ${themeData.light['sidebar-ring'] || themeData.light.ring};
 ${optionalLight}
 }
 .dark {
@@ -557,6 +100,14 @@ ${optionalLight}
   --input: ${themeData.dark.input};
   --ring: ${themeData.dark.ring};
   --timer-foreground: ${themeData.dark['timer-foreground']};
+  --sidebar-background: ${themeData.dark['sidebar-background'] || themeData.dark.background};
+  --sidebar-foreground: ${themeData.dark['sidebar-foreground'] || themeData.dark.foreground};
+  --sidebar-primary: ${themeData.dark['sidebar-primary'] || themeData.dark.primary};
+  --sidebar-primary-foreground: ${themeData.dark['sidebar-primary-foreground'] || themeData.dark['primary-foreground']};
+  --sidebar-accent: ${themeData.dark['sidebar-accent'] || themeData.dark.accent};
+  --sidebar-accent-foreground: ${themeData.dark['sidebar-accent-foreground'] || themeData.dark['accent-foreground']};
+  --sidebar-border: ${themeData.dark['sidebar-border'] || themeData.dark.border};
+  --sidebar-ring: ${themeData.dark['sidebar-ring'] || themeData.dark.ring};
 ${optionalDark}
 }
 `.trim()
@@ -586,7 +137,33 @@ ${optionalDark}
         const savedFont = localStorage.getItem('ui-font')
         if (savedFont) {
             setSelectedFont(savedFont)
-            document.body.style.fontFamily = savedFont === 'Inter' ? '' : (savedFont === 'Space Grotesk' ? 'var(--font-space-grotesk)' : 'var(--font-be-vietnam-pro)')
+            if (savedFont === 'Inter') {
+                document.body.style.fontFamily = ''
+            } else if (savedFont === 'Space Grotesk') {
+                document.body.style.fontFamily = 'var(--font-space-grotesk)'
+            } else if (savedFont === 'System UI') {
+                document.body.style.fontFamily = 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+            } else if (savedFont === 'Nunito') {
+                document.body.style.fontFamily = 'var(--font-nunito)'
+            } else {
+                document.body.style.fontFamily = ''
+            }
+        } else {
+            // Default to Nunito if no saved font preference
+            setSelectedFont('Nunito')
+            document.body.style.fontFamily = 'var(--font-nunito)'
+        }
+
+        const savedFontSize = localStorage.getItem('ui-font-size')
+        if (savedFontSize) {
+            setFontSize(savedFontSize)
+            if (savedFontSize === 'small') {
+                document.documentElement.style.fontSize = '14px'
+            } else if (savedFontSize === 'large') {
+                document.documentElement.style.fontSize = '18px'
+            } else {
+                document.documentElement.style.fontSize = '16px'
+            }
         }
     }, [])
 
@@ -598,7 +175,7 @@ ${optionalDark}
             }
             localStorage.removeItem('ui-theme-key')
             setSelectedThemeKey('default')
-            toast.success(t('settings.general.theme.themeApplied', { name: 'Default' }))
+            toast.success(t('settings.general.theme.themeApplied', { name: t('settings.general.theme.themes.default') }))
             return
         }
         const themeData = themePresets.find((theme) => theme.key === key)
@@ -606,7 +183,7 @@ ${optionalDark}
         injectTheme(themeData)
         localStorage.setItem('ui-theme-key', key)
         setSelectedThemeKey(key)
-        toast.success(t('settings.general.theme.themeApplied', { name: themeData.name }))
+        toast.success(t('settings.general.theme.themeApplied', { name: t(`settings.general.theme.themes.${key}`) || themeData.name }))
     }
 
     const handleFontChange = (fontName: string) => {
@@ -618,18 +195,25 @@ ${optionalDark}
             document.body.style.fontFamily = ''
         } else if (fontName === 'Space Grotesk') {
             document.body.style.fontFamily = 'var(--font-space-grotesk)'
-        } else if (fontName === 'Be Vietnam Pro') {
-            // Assuming Be Vietnam Pro variable is set in layout or globals
-            // Based on layout.tsx, Be Vietnam Pro is imported but not assigned a variable in the body class
-            // I need to check how to apply it.
-            // layout.tsx: const beVietnamPro = Be_Vietnam_Pro(...)
-            // It's not added to body className.
-            // I should probably add it to layout.tsx variable or just use the class if available.
-            // For now, I'll assume I can set it via style if I have the variable, or I might need to update layout.tsx to expose it.
-            // Let's assume I'll fix layout.tsx to expose it as --font-be-vietnam-pro
-            document.body.style.fontFamily = 'var(--font-be-vietnam-pro)'
+        } else if (fontName === 'System UI') {
+            document.body.style.fontFamily = 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+        } else if (fontName === 'Nunito') {
+            document.body.style.fontFamily = 'var(--font-nunito)'
         }
         toast.success(t('settings.general.theme.fontChanged', { font: fontName }))
+    }
+
+    const handleFontSizeChange = (size: string) => {
+        setFontSize(size)
+        localStorage.setItem('ui-font-size', size)
+
+        if (size === 'small') {
+            document.documentElement.style.fontSize = '14px'
+        } else if (size === 'large') {
+            document.documentElement.style.fontSize = '18px'
+        } else {
+            document.documentElement.style.fontSize = '16px'
+        }
     }
 
     return (
@@ -685,26 +269,59 @@ ${optionalDark}
                         </div>
                         <Select value={selectedThemeKey} onValueChange={applyTheme}>
                             <SelectTrigger className="w-[200px]">
-                                <SelectValue placeholder={t('settings.general.theme.selectColorPlaceholder')} />
+                                <SelectValue placeholder={t('settings.general.theme.selectColorPlaceholder')}>
+                                    {(() => {
+                                        const allThemes = [defaultTheme, ...themePresets]
+                                        const selected = allThemes.find(p => p.key === selectedThemeKey)
+                                        if (!selected) return null
+                                        return (
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm">{selected.emoji}</span>
+                                                <div
+                                                    className="w-3 h-3 rounded-full border shadow-sm ring-1 ring-black/5"
+                                                    style={{ backgroundColor: `hsl(${selected.light.primary})` }}
+                                                />
+                                                <span>{t(`settings.general.theme.themes.${selected.key}`) || selected.name}</span>
+                                            </div>
+                                        )
+                                    })()}
+                                </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                                {[defaultTheme, ...themePresets].map((t) => (
-                                    <SelectItem key={t.key} value={t.key}>
-                                        <div className="flex items-center gap-2">
-                                            <div className="flex items-center gap-1">
-                                                <div
-                                                    className="w-3 h-3 rounded-full border shadow-sm"
-                                                    style={{ backgroundColor: `hsl(${t.light.primary})` }}
-                                                />
-                                                <div
-                                                    className="w-3 h-3 rounded-full border shadow-sm"
-                                                    style={{ backgroundColor: `hsl(${t.dark.primary})` }}
-                                                />
-                                            </div>
-                                            <span>{t.name}</span>
-                                        </div>
-                                    </SelectItem>
-                                ))}
+                                {(() => {
+                                    const allThemes = [defaultTheme, ...themePresets]
+                                    const mono = allThemes.find(t => t.key === 'mono')
+                                    const others = allThemes.filter(t => t.key !== 'mono' && t.key !== 'default')
+                                    const orderedThemes = mono
+                                        ? [defaultTheme, mono, ...others]
+                                        : allThemes
+                                    return orderedThemes.map((preset) => {
+                                        const isSelected = selectedThemeKey === preset.key
+                                        return (
+                                            <SelectItem
+                                                key={preset.key}
+                                                value={preset.key}
+                                                className={cn(
+                                                    'py-2.5',
+                                                    isSelected && 'font-medium'
+                                                )}
+                                                style={isSelected ? { backgroundColor: `hsl(${preset.light.primary} / 0.1)` } : undefined}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-sm">{preset.emoji}</span>
+                                                    <div
+                                                        className="w-3 h-3 rounded-full border shadow-sm ring-1 ring-black/5"
+                                                        style={{ backgroundColor: `hsl(${preset.light.primary})` }}
+                                                    />
+                                                    <div className="flex flex-col">
+                                                        <span>{t(`settings.general.theme.themes.${preset.key}`) || preset.name}</span>
+                                                        <span className="text-xs text-muted-foreground">{t(`settings.general.theme.themeDescriptions.${preset.key}`) || preset.description}</span>
+                                                    </div>
+                                                </div>
+                                            </SelectItem>
+                                        )
+                                    })
+                                })()}
                             </SelectContent>
                         </Select>
                     </div>
@@ -719,27 +336,62 @@ ${optionalDark}
                         </div>
                         <Select value={selectedFont} onValueChange={handleFontChange}>
                             <SelectTrigger className="w-[200px]">
-                                <SelectValue placeholder={t('settings.general.theme.selectFontPlaceholder')} />
+                                <SelectValue placeholder={t('settings.general.theme.selectFontPlaceholder')}>
+                                    {selectedFont}
+                                </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="Inter">
-                                    <div className="flex items-center gap-2">
-                                        <Type className="h-4 w-4" />
-                                        <span>Inter</span>
-                                    </div>
-                                </SelectItem>
-                                <SelectItem value="Be Vietnam Pro" style={{ fontFamily: 'var(--font-be-vietnam-pro)' }}>
-                                    <div className="flex items-center gap-2">
-                                        <Type className="h-4 w-4" />
-                                        <span>Be Vietnam Pro</span>
-                                    </div>
-                                </SelectItem>
                                 <SelectItem value="Space Grotesk" style={{ fontFamily: 'var(--font-space-grotesk)' }}>
                                     <div className="flex items-center gap-2">
                                         <Type className="h-4 w-4" />
                                         <span>Space Grotesk</span>
                                     </div>
                                 </SelectItem>
+                                <SelectItem value="Nunito" style={{ fontFamily: 'var(--font-nunito)' }}>
+                                    <div className="flex items-center justify-between w-full gap-2">
+                                        <div className="flex items-center gap-2">
+                                            <Type className="h-4 w-4" />
+                                            <span>Nunito</span>
+                                        </div>
+                                        <span className="text-[10px] font-medium bg-primary/10 text-primary px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                                            {t('settings.general.theme.themes.recommended')}
+                                        </span>
+                                    </div>
+                                </SelectItem>
+                                <SelectItem value="Inter">
+                                    <div className="flex items-center gap-2">
+                                        <Type className="h-4 w-4" />
+                                        <span>Inter</span>
+                                    </div>
+                                </SelectItem>
+                                <SelectItem value="System UI" style={{ fontFamily: 'system-ui' }}>
+                                    <div className="flex items-center gap-2">
+                                        <Type className="h-4 w-4" />
+                                        <span>System UI</span>
+                                    </div>
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    {/* Font Size */}
+                    <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                            <Label>{t('settings.general.theme.fontSize')}</Label>
+                            <p className="text-sm text-muted-foreground">
+                                {t('settings.general.theme.fontSizeDescription')}
+                            </p>
+                        </div>
+                        <Select value={fontSize} onValueChange={handleFontSizeChange}>
+                            <SelectTrigger className="w-[200px]">
+                                <SelectValue placeholder={t('settings.general.theme.selectFontSizePlaceholder')}>
+                                    {t(`settings.general.theme.sizes.${fontSize}`)}
+                                </SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="small">{t('settings.general.theme.sizes.small')}</SelectItem>
+                                <SelectItem value="medium">{t('settings.general.theme.sizes.medium')}</SelectItem>
+                                <SelectItem value="large">{t('settings.general.theme.sizes.large')}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

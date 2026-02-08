@@ -5,7 +5,6 @@ import {
     AnalogClock,
     DigitalClock,
     FlipClock,
-    ProgressBarClock,
 } from './clocks';
 import { TimerSettings } from '@/stores/timer-store';
 
@@ -16,7 +15,6 @@ interface ClockDisplayProps {
     timeLeft: number;
     progressPercent: number;
     isRunning: boolean;
-    timeRef: React.RefObject<HTMLDivElement>;
 }
 
 export const ClockDisplay = memo(
@@ -27,9 +25,7 @@ export const ClockDisplay = memo(
         timeLeft,
         progressPercent,
         isRunning,
-        timeRef,
     }: ClockDisplayProps) => {
-        const lowWarnEnabled = settings.lowTimeWarningEnabled ?? true;
         const clockSize = settings.clockSize || 'medium';
 
         switch (settings.clockType) {
@@ -40,14 +36,7 @@ export const ClockDisplay = memo(
                         totalTimeForMode={totalTimeForMode}
                         timeLeft={timeLeft}
                         clockSize={clockSize}
-                    />
-                );
-            case 'progress':
-                return (
-                    <ProgressBarClock
-                        formattedTime={formattedTime}
-                        progressPercent={progressPercent}
-                        clockSize={clockSize}
+                        isRunning={isRunning}
                     />
                 );
             case 'flip':
@@ -58,16 +47,16 @@ export const ClockDisplay = memo(
                         clockSize={clockSize}
                     />
                 );
+            case 'progress':
+                // Progress clock type removed from UI; fallback to digital
             case 'digital':
             default:
                 return (
                     <DigitalClock
-                        timeRef={timeRef}
                         formattedTime={formattedTime}
                         isRunning={isRunning}
-                        progressPercent={progressPercent}
-                        lowWarnEnabled={lowWarnEnabled}
                         timeLeft={timeLeft}
+                        totalTimeForMode={totalTimeForMode}
                         clockSize={clockSize}
                     />
                 );
