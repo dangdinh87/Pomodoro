@@ -14,9 +14,9 @@ export const FlipClock = memo(
 
     // Size mappings
     const sizeClasses = {
-      small: { digit: 'text-5xl md:text-6xl', padding: 'p-4 md:p-5', separator: 'text-5xl md:text-6xl' },
-      medium: { digit: 'text-7xl md:text-8xl', padding: 'p-6 md:p-8', separator: 'text-7xl md:text-8xl' },
-      large: { digit: 'text-8xl md:text-9xl', padding: 'p-8 md:p-10', separator: 'text-8xl md:text-9xl' },
+      small: { digit: 'text-5xl md:text-6xl lg:text-7xl', padding: 'p-4 md:p-5 lg:p-6', separator: 'text-5xl md:text-6xl lg:text-7xl' },
+      medium: { digit: 'text-7xl md:text-8xl lg:text-9xl', padding: 'p-6 md:p-8 lg:p-10', separator: 'text-7xl md:text-8xl lg:text-9xl' },
+      large: { digit: 'text-8xl md:text-9xl lg:text-[10rem]', padding: 'p-8 md:p-10 lg:p-12', separator: 'text-8xl md:text-9xl lg:text-[10rem]' },
     };
 
     const size = sizeClasses[clockSize];

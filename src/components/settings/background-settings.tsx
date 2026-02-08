@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useMemo, ChangeEvent } from 'react';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Check, X, Upload, Link, FolderHeart } from 'lucide-react';
+import { Check, X, Upload, Link, FolderHeart, Loader2 } from 'lucide-react';
 import { useBackground } from '@/contexts/background-context';
 import { toast } from 'sonner';
 import { useI18n } from '@/contexts/i18n-context';
@@ -78,6 +78,9 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
   const startPreview = () => {
     if (!styleValue.startsWith('system:')) onPreviewChange?.(true);
   };
+
+  // Loading state for background image preload
+  const [loadingValue, setLoadingValue] = useState<string | null>(null);
 
   // Custom images
   const { images: customImages, addImage, addImageByUrl, canAddMore } = useCustomBackgrounds();
@@ -179,10 +182,11 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
     onClose?.();
   };
 
-  /** Select an image and show preview */
+  /** Select an image and show preview with loading indicator */
   const selectImage = (value: string) => {
     setStyleValue(value);
     if (value.startsWith('system:')) {
+      setLoadingValue(null);
       setBackgroundTemp({
         ...background,
         type: 'solid',
@@ -192,7 +196,14 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
         brightness: 100,
       });
     } else {
+      setLoadingValue(value);
       const img = findImageById(value);
+      // Preload full-res image to track loading
+      const fullSrc = img?.sources ? getBestImageUrl(img.sources) : value;
+      const preloader = new window.Image();
+      preloader.onload = () => setLoadingValue((prev) => prev === value ? null : prev);
+      preloader.onerror = () => setLoadingValue((prev) => prev === value ? null : prev);
+      preloader.src = fullSrc;
       setBackgroundTemp({
         ...background,
         type: 'image',
@@ -338,6 +349,7 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
                     <PackGrid
                       pack={pack}
                       styleValue={styleValue}
+                      loadingValue={loadingValue}
                       onSelect={selectImage}
                       t={t}
                     />
@@ -454,11 +466,13 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
 function PackGrid({
   pack,
   styleValue,
+  loadingValue,
   onSelect,
   t,
 }: {
   pack: BackgroundPack;
   styleValue: string;
+  loadingValue: string | null;
   onSelect: (v: string) => void;
   t: (key: string) => string;
 }) {
@@ -467,6 +481,7 @@ function PackGrid({
       {pack.items.map((item) => {
         const value = itemToStyleValue(item);
         const selected = styleValue === value || styleValue === item.id;
+        const isLoading = loadingValue === value || loadingValue === item.id;
 
         return (
           <PackThumbnail
@@ -474,6 +489,7 @@ function PackGrid({
             item={item}
             value={value}
             selected={selected}
+            isLoading={isLoading}
             onSelect={onSelect}
             t={t}
           />
@@ -487,12 +503,14 @@ function PackThumbnail({
   item,
   value,
   selected,
+  isLoading,
   onSelect,
   t,
 }: {
   item: BackgroundImage;
   value: string;
   selected: boolean;
+  isLoading?: boolean;
   onSelect: (v: string) => void;
   t: (key: string) => string;
 }) {
@@ -508,9 +526,14 @@ function PackThumbnail({
       title={label}
     >
       <ThumbnailContent item={item} label={label} />
-      {selected && (
+      {selected && !isLoading && (
         <div className="absolute top-2 right-2 bg-primary text-primary-foreground rounded-full p-0.5 shadow-sm">
           <Check className="h-3 w-3" />
+        </div>
+      )}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
+          <Loader2 className="h-5 w-5 text-white animate-spin" />
         </div>
       )}
       <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-[1px] text-white text-xs py-1.5 text-center font-medium">

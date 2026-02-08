@@ -101,7 +101,7 @@ export function NavbarClient({ navLinks }: NavbarClientProps) {
                       {t('auth.login')}
                     </Button>
                   </Link>
-                  <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link href="/timer" onClick={() => setIsMobileMenuOpen(false)}>
                     <Button className="w-full bg-gradient-to-r from-blue-500 to-violet-600 hover:from-blue-600 hover:to-violet-700 text-white cursor-pointer">
                       {t('landing.hero.getStarted')}
                       <ArrowRight className="ml-2 h-4 w-4" />
