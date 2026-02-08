@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/use-auth'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useCallback } from 'react'
 import { Task, useTasksStore, TaskStatus } from '@/stores/task-store'
 import { TaskFilters } from './components/task-filters'
 import { TaskFormModal } from './components/task-form-modal'
@@ -106,12 +106,15 @@ export function TaskManagement() {
   }
   const queryClient = useQueryClient()
 
-  const handleToggleStatus = async (task: Task) => {
+  const handleToggleStatus = useCallback(async (task: Task) => {
     const isNowDone = task.status !== 'done'
     const newStatus: TaskStatus = isNowDone ? 'done' : 'todo'
 
+    // Use getState() to avoid dependency on activeTaskId
+    const currentActiveId = useTasksStore.getState().activeTaskId
+
     // Auto-unfocus logic
-    if (isNowDone && activeTaskId === task.id) {
+    if (isNowDone && currentActiveId === task.id) {
       // Record partial session before unfocusing for accuracy
       const { mode, timeLeft, lastSessionTimeLeft, setLastSessionTimeLeft } = useTimerStore.getState()
       if (mode === 'work') {
@@ -147,12 +150,13 @@ export function TaskManagement() {
         return next
       })
     }
-  }
+  }, [updateTask, queryClient, setActiveTask])
 
-  const handleUpdateStatus = async (taskId: string, newStatus: TaskStatus) => {
+  const handleUpdateStatus = useCallback(async (taskId: string, newStatus: TaskStatus) => {
     const isNowDone = newStatus === 'done'
+    const currentActiveId = useTasksStore.getState().activeTaskId
 
-    if (isNowDone && activeTaskId === taskId) {
+    if (isNowDone && currentActiveId === taskId) {
       const { mode, timeLeft, lastSessionTimeLeft, setLastSessionTimeLeft } = useTimerStore.getState()
       if (mode === 'work') {
         const durationSec = Math.max(0, lastSessionTimeLeft - timeLeft)
@@ -186,12 +190,15 @@ export function TaskManagement() {
         return next
       })
     }
-  }
+  }, [updateTask, queryClient, setActiveTask])
 
-  const handleToggleActive = (task: Task) => {
+  // handleToggleActive is not passed to TaskTable, but used in Kanban
+  // It also depends on activeTaskId, so we should use getState if we want it to be stable
+  const handleToggleActive = useCallback((task: Task) => {
     const { timeLeft, setLastSessionTimeLeft } = useTimerStore.getState()
+    const currentActiveId = useTasksStore.getState().activeTaskId
 
-    if (activeTaskId === task.id) {
+    if (currentActiveId === task.id) {
       // Recording when manual unfocus too for accuracy
       const { mode, lastSessionTimeLeft } = useTimerStore.getState()
       if (mode === 'work') {
@@ -214,7 +221,7 @@ export function TaskManagement() {
       setActiveTask(null)
     } else {
       // Record time for the PREVIOUS active task if any
-      if (activeTaskId) {
+      if (currentActiveId) {
         const { mode, lastSessionTimeLeft } = useTimerStore.getState()
         if (mode === 'work') {
           const durationSec = Math.max(0, lastSessionTimeLeft - timeLeft)
@@ -223,7 +230,7 @@ export function TaskManagement() {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                taskId: activeTaskId,
+                taskId: currentActiveId,
                 durationSec,
                 mode: 'work',
               }),
@@ -244,20 +251,20 @@ export function TaskManagement() {
         updateTask({ id: task.id, input: { status: 'doing' } })
       }
     }
-  }
+  }, [updateTask, queryClient, setActiveTask])
 
-  const handleOpenChange = (open: boolean) => {
+  const handleOpenChange = useCallback((open: boolean) => {
     if (!open) {
       setIsCreateModalOpen(false)
       resetEditingState()
     } else {
       setIsCreateModalOpen(true)
     }
-  }
+  }, [resetEditingState])
 
-  const handleDeleteRequest = (id: string) => {
+  const handleDeleteRequest = useCallback((id: string) => {
     setDeleteConfirmId(id)
-  }
+  }, [])
 
   const confirmDelete = async () => {
     if (!deleteConfirmId) return
@@ -280,25 +287,25 @@ export function TaskManagement() {
     }
   }
 
-  const handleEdit = (task: Task) => {
+  const handleEdit = useCallback((task: Task) => {
     setEditingId(task.id)
-  }
+  }, [setEditingId])
 
-  const handleClone = async (taskId: string) => {
+  const handleClone = useCallback(async (taskId: string) => {
     try {
       await cloneTask(taskId)
     } catch (error) {
       // Error handled by hook
     }
-  }
+  }, [cloneTask])
 
-  const handleSaveAsTemplate = async (taskId: string) => {
+  const handleSaveAsTemplate = useCallback(async (taskId: string) => {
     try {
       await saveAsTemplate(taskId)
     } catch (error) {
       // Error handled by hook
     }
-  }
+  }, [saveAsTemplate])
 
   const uniqueTags = useMemo(() => {
     const tags = new Set<string>()
