@@ -33,6 +33,10 @@ export async function POST(req: Request) {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
+    if (!user || authError) {
+        return new Response("Unauthorized", { status: 401 });
+    }
+
     let { messages, model = "moonshotai/kimi-k2-instruct-0905", conversationId } = await req.json();
 
     console.log("[Chat API] Received:", {
@@ -97,11 +101,16 @@ export async function POST(req: Request) {
         // Store USER message
         const lastUserMessage = convertedMessages.filter(m => m.role === "user").pop();
         if (lastUserMessage) {
-            await supabase.from("messages").insert({
+            const { error } = await supabase.from("messages").insert({
                 conversation_id: conversationId,
                 role: "user",
                 content: lastUserMessage.content,
             });
+
+            if (error) {
+                console.error("[Chat API] Failed to save message:", error);
+                return new Response("Forbidden: Unable to save message", { status: 403 });
+            }
         }
     }
 
