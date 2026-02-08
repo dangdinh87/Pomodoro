@@ -55,7 +55,7 @@ export function HeroSSR() {
 
         {/* CTA Buttons */}
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link href="/signup">
+          <Link href="/timer">
             <Button
               size="lg"
               className="w-full sm:w-auto bg-gradient-to-r from-blue-600 via-violet-600 to-purple-600 hover:from-blue-700 hover:via-violet-700 hover:to-purple-700 text-white shadow-xl shadow-violet-500/25 text-base px-8 py-6 cursor-pointer group rounded-xl"

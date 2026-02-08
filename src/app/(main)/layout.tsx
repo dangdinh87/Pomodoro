@@ -18,6 +18,7 @@ import { BotMessageSquare } from '@/components/animate-ui/icons/bot-message-squa
 import { Button } from '@/components/ui/button';
 import { usePathname } from 'next/navigation';
 import { AppProviders } from '@/components/providers/app-providers';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function MainLayout({
   children,
@@ -25,8 +26,9 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   const { isFocusMode, isChatPanelOpen, setChatPanelOpen } = useSystemStore();
+  const { isAuthenticated } = useAuth();
   const pathname = usePathname();
-  const showChatToggle = pathname !== '/chat';
+  const showChatToggle = pathname !== '/chat' && isAuthenticated;
 
   return (
     <AppProviders>

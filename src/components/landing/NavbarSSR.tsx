@@ -56,7 +56,7 @@ export function NavbarSSR() {
               {t('auth.login')}
             </Button>
           </Link>
-          <Link href="/signup">
+          <Link href="/timer">
             <Button
               size="sm"
               className="relative bg-gradient-to-r from-blue-500 to-violet-600 hover:from-blue-600 hover:to-violet-700 text-white shadow-lg shadow-violet-500/20 cursor-pointer text-sm font-medium rounded-lg px-4 group overflow-hidden"

@@ -232,9 +232,9 @@ export const TimerControls = memo(function TimerControls() {
                     aria-label={isRunning ? t('timer.controls.aria.pause') : t('timer.controls.aria.start')}
                     title={isRunning ? t('timer.controls.pause_hint') : t('timer.controls.start_hint')}
                     className={cn(
-                        "h-12 px-6 rounded-full text-sm font-semibold shadow-md transition-all hover:scale-105 active:scale-95 hover:brightness-110",
+                        "h-12 min-w-[120px] px-6 rounded-full text-sm font-semibold shadow-md transition-all hover:scale-105 active:scale-95 hover:brightness-110",
                     )}
-                    style={{ backgroundColor: clockState.color, color: 'hsl(var(--background))' }}
+                    style={{ backgroundColor: 'hsl(var(--foreground))', color: 'hsl(var(--background))' }}
                 >
                     {isRunning ? (
                         <span className="inline-flex items-center gap-1.5">

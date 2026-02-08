@@ -1,9 +1,9 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Task, useTasksStore } from '@/stores/task-store';
 import { useTasks } from '@/hooks/use-tasks';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Target, Play, Square, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Target, Play, Square, CheckCircle2, ArrowRight, PartyPopper } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Dialog,
@@ -46,6 +46,8 @@ export function TaskSelector({ className }: TaskSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingTaskId, setPendingTaskId] = useState<string | null>(null);
+  const [taskCompleteOpen, setTaskCompleteOpen] = useState(false);
+  const completedTaskRef = useRef<Task | null>(null);
 
   // Filter to eligible (incomplete) tasks
   const pendingTasks = tasks.filter((task) => {
@@ -56,13 +58,20 @@ export function TaskSelector({ className }: TaskSelectorProps) {
 
   const activeTask = pendingTasks.find((task) => task.id === activeTaskId);
 
-  // Clear stale activeTaskId when the task is no longer eligible (done, completed, or deleted)
+  // When active task completes all pomodoros, show completion dialog instead of silently clearing
   useEffect(() => {
     if (!activeTaskId || isLoading) return;
     if (!pendingTasks.some((t) => t.id === activeTaskId)) {
-      setActiveTask(null);
+      // Check if task exists but pomodoros are complete (not deleted/already done)
+      const fullTask = tasks.find((t) => t.id === activeTaskId);
+      if (fullTask && fullTask.status !== 'done' && fullTask.actualPomodoros >= fullTask.estimatePomodoros) {
+        completedTaskRef.current = fullTask;
+        setTaskCompleteOpen(true);
+      } else {
+        setActiveTask(null);
+      }
     }
-  }, [activeTaskId, pendingTasks, isLoading, setActiveTask]);
+  }, [activeTaskId, pendingTasks, tasks, isLoading, setActiveTask]);
 
   const handleSelectTask = (taskId: string) => {
     // If clicking the current active task -> deselect (un-focus)
@@ -270,6 +279,53 @@ export function TaskSelector({ className }: TaskSelectorProps) {
                 </AlertDialogCancel>
                 <AlertDialogAction onClick={() => pendingTaskId && selectTask(pendingTaskId)}>
                   {t('common.confirm')}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
+          {/* Task pomodoro completion dialog */}
+          <AlertDialog open={taskCompleteOpen} onOpenChange={(open) => {
+            if (!open) {
+              setTaskCompleteOpen(false);
+              setActiveTask(null);
+              completedTaskRef.current = null;
+            }
+          }}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center gap-2">
+                  <PartyPopper className="h-5 w-5 text-amber-500" />
+                  {t('timerComponents.taskSelector.taskComplete.title') || 'Task complete!'}
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  {completedTaskRef.current && (
+                    <>
+                      <span className="font-semibold text-foreground">{completedTaskRef.current.title}</span>
+                      {' '}
+                      {t('timerComponents.taskSelector.taskComplete.description') || 'has reached all planned pomodoros. Mark as done?'}
+                    </>
+                  )}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => {
+                  setTaskCompleteOpen(false);
+                  setActiveTask(null);
+                  completedTaskRef.current = null;
+                }}>
+                  {t('timerComponents.taskSelector.taskComplete.skip') || 'Skip'}
+                </AlertDialogCancel>
+                <AlertDialogAction onClick={() => {
+                  if (completedTaskRef.current) {
+                    updateTask({ id: completedTaskRef.current.id, input: { status: 'done' } });
+                  }
+                  setTaskCompleteOpen(false);
+                  setActiveTask(null);
+                  completedTaskRef.current = null;
+                }}>
+                  <CheckCircle2 className="h-4 w-4 mr-1.5" />
+                  {t('timerComponents.taskSelector.taskComplete.markDone') || 'Mark as done'}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
