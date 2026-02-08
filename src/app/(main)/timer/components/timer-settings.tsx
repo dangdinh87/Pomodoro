@@ -50,9 +50,7 @@ export function TimerSettings({ isOpen, onClose, settings, onSettingsChange }: T
 
   const saveSettings = () => {
     onSettingsChange(localSettings)
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('pomodoro-timer-settings', JSON.stringify(localSettings))
-    }
+    // FIX: Removed dead localStorage.setItem - Zustand persist handles storage
     toast.success(t('timerSettings.toasts.saved'))
     onClose()
   }
@@ -183,12 +181,6 @@ export function TimerSettings({ isOpen, onClose, settings, onSettingsChange }: T
                   <div className="flex items-center gap-2">
                     <Timer className="h-4 w-4" />
                     {t('timerSettings.labels.analog')}
-                  </div>
-                </SelectItem>
-                <SelectItem value="progress">
-                  <div className="flex items-center gap-2">
-                    <Activity className="h-4 w-4" />
-                    {t('timerSettings.labels.progress')}
                   </div>
                 </SelectItem>
                 <SelectItem value="flip">

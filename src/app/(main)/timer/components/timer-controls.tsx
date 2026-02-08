@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useState } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
     Pause,
@@ -11,6 +11,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useTimerStore } from '@/stores/timer-store';
+import { useAnalogClockState } from './clocks/use-analog-clock-state';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -23,6 +24,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import { useConfetti } from '@/hooks/use-confetti';
+import { useTasksStore } from '@/stores/task-store';
 
 // Minimum completion percentage to count as a valid pomodoro
 const MINIMUM_COMPLETION_PERCENT = 50;
@@ -30,6 +33,7 @@ const MINIMUM_COMPLETION_PERCENT = 50;
 export const TimerControls = memo(function TimerControls() {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
+    const { fireWorkComplete } = useConfetti();
 
     // ATOMIC SUBSCRIPTION
     const isRunning = useTimerStore((state) => state.isRunning);
@@ -48,7 +52,11 @@ export const TimerControls = memo(function TimerControls() {
     const incrementSessionCount = useTimerStore((state) => state.incrementSessionCount);
     const setMode = useTimerStore((state) => state.setMode);
     const setTimeLeft = useTimerStore((state) => state.setTimeLeft);
+    const setDeadlineAt = useTimerStore((state) => state.setDeadlineAt);
     const sessionCount = useTimerStore((state) => state.sessionCount);
+
+    // Clock state for color sync
+    const clockState = useAnalogClockState({ timeLeft, isRunning });
 
     // Local state
     const [skipConfirmOpen, setSkipConfirmOpen] = useState(false);
@@ -65,9 +73,18 @@ export const TimerControls = memo(function TimerControls() {
 
     const getCompletionPercent = () => {
         const total = getTotalTimeForMode();
-        const completed = total - timeLeft;
-        return (completed / total) * 100;
+        // BUG-06 FIX: Clamp to 0-100 range to handle edge cases
+        if (total <= 0) return 0;
+        const completed = Math.max(0, total - timeLeft);
+        return Math.min(100, Math.max(0, (completed / total) * 100));
     };
+
+    // BUG-04 FIX: Close skip dialog when timer completes (timeLeft reaches 0)
+    useEffect(() => {
+        if (timeLeft <= 0 && skipConfirmOpen) {
+            setSkipConfirmOpen(false);
+        }
+    }, [timeLeft, skipConfirmOpen]);
 
     const playNotificationSound = () => {
         // NOTE: We might want to move this to a shared sound utility or store later
@@ -81,10 +98,12 @@ export const TimerControls = memo(function TimerControls() {
         } catch { }
     };
 
-    const handleSessionComplete = async (skipWithoutRecording: boolean = false) => {
+    const handleSessionComplete = (skipWithoutRecording: boolean = false) => {
         if (isProcessing) return;
         setIsProcessing(true);
         setIsRunning(false);
+        // Clear deadline before mode transition to prevent stale deadline reuse
+        setDeadlineAt(null);
 
         const totalTime = getTotalTimeForMode();
         const completedDuration = totalTime - timeLeft;
@@ -94,24 +113,27 @@ export const TimerControls = memo(function TimerControls() {
         if (mode === 'work') {
             if (isValidSession) {
                 incrementCompletedSessions();
-                try {
-                    const { activeTaskId } = await import('@/stores/task-store').then((m) => m.useTasksStore.getState());
-                    await fetch('/api/tasks/session-complete', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            taskId: activeTaskId || null,
-                            durationSec: completedDuration,
-                            mode: 'work',
-                        }),
-                    });
+                // Fire confetti celebration
+                fireWorkComplete();
+                playNotificationSound();
+
+                // Record session in background (non-blocking)
+                const activeTaskId = useTasksStore.getState().activeTaskId;
+                fetch('/api/tasks/session-complete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        taskId: activeTaskId || null,
+                        durationSec: completedDuration,
+                        mode: 'work',
+                    }),
+                }).then(() => {
                     queryClient.invalidateQueries({ queryKey: ['stats'] });
                     queryClient.invalidateQueries({ queryKey: ['tasks'] });
                     queryClient.invalidateQueries({ queryKey: ['history'] });
-                } catch (error) {
+                }).catch((error) => {
                     console.error('Failed to record session:', error);
-                }
-                playNotificationSound();
+                });
             } else {
                 toast.info(t('timer.skipped_not_recorded') || 'Session skipped - not recorded');
             }
@@ -120,32 +142,53 @@ export const TimerControls = memo(function TimerControls() {
             playNotificationSound();
         }
 
-        // Transition Logic
-        if (mode === 'work') {
-            const newSessionCount = sessionCount + 1;
-            if (isValidSession) incrementSessionCount();
+        // Transition Logic - use requestAnimationFrame to let UI settle first
+        requestAnimationFrame(() => {
+            if (mode === 'work') {
+                // FIX: Only increment sessionCount for valid sessions, then read updated value
+                if (isValidSession) {
+                    incrementSessionCount();
+                }
+                // Read updated sessionCount from store for accurate long break check
+                const updatedSessionCount = useTimerStore.getState().sessionCount;
 
-            if (newSessionCount % settings.longBreakInterval === 0) {
-                setMode('longBreak');
-                setTimeLeft(settings.longBreakDuration * 60);
-                if (settings.autoStartBreak && !skipWithoutRecording) setIsRunning(true);
+                // Only check for long break if we have valid sessions
+                if (updatedSessionCount > 0 && updatedSessionCount % settings.longBreakInterval === 0) {
+                    setMode('longBreak');
+                    const newDuration = settings.longBreakDuration * 60;
+                    setTimeLeft(newDuration);
+                    useTimerStore.getState().setLastSessionTimeLeft(newDuration);
+                    // Defer auto-start to next frame for smooth transition
+                    if (settings.autoStartBreak && !skipWithoutRecording) {
+                        requestAnimationFrame(() => setIsRunning(true));
+                    }
+                } else {
+                    setMode('shortBreak');
+                    const newDuration = settings.shortBreakDuration * 60;
+                    setTimeLeft(newDuration);
+                    useTimerStore.getState().setLastSessionTimeLeft(newDuration);
+                    if (settings.autoStartBreak && !skipWithoutRecording) {
+                        requestAnimationFrame(() => setIsRunning(true));
+                    }
+                }
             } else {
-                setMode('shortBreak');
-                setTimeLeft(settings.shortBreakDuration * 60);
-                if (settings.autoStartBreak && !skipWithoutRecording) setIsRunning(true);
+                setMode('work');
+                const newDuration = settings.workDuration * 60;
+                setTimeLeft(newDuration);
+                useTimerStore.getState().setLastSessionTimeLeft(newDuration);
+                if (settings.autoStartWork && !skipWithoutRecording) {
+                    requestAnimationFrame(() => setIsRunning(true));
+                }
             }
-        } else {
-            setMode('work');
-            setTimeLeft(settings.workDuration * 60);
-            if (settings.autoStartWork && !skipWithoutRecording) setIsRunning(true);
-        }
-        setIsProcessing(false);
+            setIsProcessing(false);
+        });
     };
 
     const handleSkipClick = () => {
         if (isProcessing) return;
 
-        if (mode === 'work' && getCompletionPercent() < MINIMUM_COMPLETION_PERCENT) {
+        // Always show confirmation when timer is running
+        if (isRunning) {
             setSkipConfirmOpen(true);
             return;
         }
@@ -154,7 +197,8 @@ export const TimerControls = memo(function TimerControls() {
 
     const handleConfirmedSkip = () => {
         setSkipConfirmOpen(false);
-        handleSessionComplete(true);
+        const skipWithoutRecording = mode === 'work' && getCompletionPercent() < MINIMUM_COMPLETION_PERCENT;
+        handleSessionComplete(skipWithoutRecording);
     };
 
     const toggleTimer = () => {
@@ -168,17 +212,18 @@ export const TimerControls = memo(function TimerControls() {
 
     return (
         <>
-            <div className="flex items-center justify-center gap-6">
+            <div className="flex items-center justify-center gap-3">
                 <Button
                     onClick={resetTimer}
                     disabled={isProcessing}
                     aria-label={t('timer.controls.aria.reset')}
                     title={t('timer.controls.reset_hint')}
-                    variant="secondary"
+                    variant="ghost"
                     size="icon"
-                    className="h-12 w-12 rounded-2xl bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground shadow-sm transition-all"
+                    className="h-10 w-10 rounded-full opacity-70 hover:opacity-100 transition-all"
+                    style={{ color: clockState.color }}
                 >
-                    <RotateCcw size={20} />
+                    <RotateCcw size={16} />
                 </Button>
 
                 <Button
@@ -187,17 +232,17 @@ export const TimerControls = memo(function TimerControls() {
                     aria-label={isRunning ? t('timer.controls.aria.pause') : t('timer.controls.aria.start')}
                     title={isRunning ? t('timer.controls.pause_hint') : t('timer.controls.start_hint')}
                     className={cn(
-                        "h-16 px-8 rounded-2xl text-lg font-bold shadow-lg shadow-primary/25 transition-all hover:scale-105 active:scale-95",
-                        "bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+                        "h-12 px-6 rounded-full text-sm font-semibold shadow-md transition-all hover:scale-105 active:scale-95 hover:brightness-110",
                     )}
+                    style={{ backgroundColor: clockState.color, color: 'hsl(var(--background))' }}
                 >
                     {isRunning ? (
-                        <span className="inline-flex items-center gap-2">
-                            <Pause size={24} fill="currentColor" /> {t('timer.controls.pause')}
+                        <span className="inline-flex items-center gap-1.5">
+                            <Pause size={16} fill="currentColor" /> {t('timer.controls.pause')}
                         </span>
                     ) : (
-                        <span className="inline-flex items-center gap-2">
-                            <Play size={24} fill="currentColor" /> {t('timer.controls.start').toUpperCase()}
+                        <span className="inline-flex items-center gap-1.5">
+                            <Play size={16} fill="currentColor" /> {t('timer.controls.start').toUpperCase()}
                         </span>
                     )}
                 </Button>
@@ -205,12 +250,13 @@ export const TimerControls = memo(function TimerControls() {
                 <Button
                     onClick={handleSkipClick}
                     disabled={isProcessing}
-                    variant="secondary"
+                    variant="ghost"
                     size="icon"
                     title={t('timer.controls.skip_hint')}
-                    className="h-12 w-12 rounded-2xl bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground shadow-sm transition-all"
+                    className="h-10 w-10 rounded-full opacity-70 hover:opacity-100 transition-all"
+                    style={{ color: clockState.color }}
                 >
-                    <SkipForwardIcon size={20} />
+                    <SkipForwardIcon size={16} />
                 </Button>
             </div>
 

@@ -1,30 +1,52 @@
+/**
+ * Landing Page - Client Components for i18n support
+ * Uses client components for multi-language support
+ */
 import { Navbar } from '@/components/landing/Navbar';
 import { Hero } from '@/components/landing/Hero';
 import { Features } from '@/components/landing/Features';
-import { Testimonials } from '@/components/landing/Testimonials';
 import { Pricing } from '@/components/landing/Pricing';
 import { Footer } from '@/components/landing/Footer';
 import { AIChatIndicator } from '@/components/landing/AIChatIndicator';
 import { CTA } from '@/components/landing/CTA';
 import { FAQ } from '@/components/landing/FAQ';
 import { HowItWorks } from '@/components/landing/HowItWorks';
+import { Metadata } from 'next';
 
+// SEO Metadata - rendered server-side
+export const metadata: Metadata = {
+  title: 'Study Bro - Pomodoro Timer, Bro Chat AI & Focus Tools',
+  description:
+    'Pomodoro timer with task linking, valid-session tracking, Bro Chat AI coach, mini games for breaks, leaderboard, focus mode, and analytics. Free to use.',
+  keywords: ['pomodoro', 'timer', 'productivity', 'focus', 'study', 'AI', 'Bro Chat', 'task management', 'leaderboard'],
+  openGraph: {
+    title: 'Study Bro - Pomodoro Timer & Bro Chat AI',
+    description: 'Pomodoro timer, AI coach, mini games, leaderboard, and focus tools. Free to use.',
+    type: 'website',
+    url: 'https://www.pomodoro-focus.site',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Study Bro - Pomodoro Timer & Bro Chat AI',
+    description: 'Pomodoro timer, AI coach, mini games, leaderboard, and focus tools. Free to use.',
+  },
+};
+
+// Landing page with client components for i18n support
 export default function LandingPage() {
-    return (
-        <>
-            <Navbar />
-            <main>
-                <Hero />
-                <Features />
-                <HowItWorks />
-                <AIChatIndicator />
-                {/* <Testimonials /> */}
-                <Pricing />
-                <FAQ />
-                <CTA />
-            </main>
-            <Footer />
-        </>
-    );
+  return (
+    <>
+      <Navbar />
+      <main>
+        <Hero />
+        <Features />
+        <HowItWorks />
+        <AIChatIndicator />
+        <Pricing />
+        <FAQ />
+        <CTA />
+      </main>
+      <Footer />
+    </>
+  );
 }
-

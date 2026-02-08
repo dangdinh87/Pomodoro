@@ -3,13 +3,6 @@
 import { BorderBeam } from '@/components/ui/border-beam';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useI18n } from '@/contexts/i18n-context';
 import { useAuthStore } from '@/stores/auth-store';
@@ -17,18 +10,46 @@ import {
     CheckCircle2,
     Loader2,
     Send,
+    Star,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-const feedbackTypeConfig = {
-    feature: { label: '✨ Đề xuất tính năng' },
-    bug: { label: '🐛 Báo cáo lỗi' },
-    question: { label: '❓ Câu hỏi / Góp ý' },
-    other: { label: '📝 Khác' },
-};
+const FEEDBACK_TYPES = [
+    { key: 'feature', emoji: '✨', color: 'bg-purple-500/10 border-purple-500/30 hover:border-purple-500/60 text-purple-600 dark:text-purple-400' },
+    { key: 'bug', emoji: '🐛', color: 'bg-red-500/10 border-red-500/30 hover:border-red-500/60 text-red-600 dark:text-red-400' },
+    { key: 'question', emoji: '❓', color: 'bg-blue-500/10 border-blue-500/30 hover:border-blue-500/60 text-blue-600 dark:text-blue-400' },
+    { key: 'other', emoji: '📝', color: 'bg-amber-500/10 border-amber-500/30 hover:border-amber-500/60 text-amber-600 dark:text-amber-400' },
+] as const;
 
-type FeedbackType = keyof typeof feedbackTypeConfig;
+type FeedbackType = (typeof FEEDBACK_TYPES)[number]['key'];
+
+function StarRating({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+    const [hover, setHover] = useState(0);
+
+    return (
+        <div className="flex gap-1">
+            {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                    key={star}
+                    type="button"
+                    onClick={() => onChange(star)}
+                    onMouseEnter={() => setHover(star)}
+                    onMouseLeave={() => setHover(0)}
+                    className="transition-transform hover:scale-110 active:scale-95"
+                >
+                    <Star
+                        className={`h-7 w-7 transition-colors ${
+                            star <= (hover || value)
+                                ? 'fill-yellow-400 text-yellow-400'
+                                : 'text-muted-foreground/30'
+                        }`}
+                    />
+                </button>
+            ))}
+        </div>
+    );
+}
 
 export default function FeedbackPage() {
     const { t } = useI18n();
@@ -40,9 +61,9 @@ export default function FeedbackPage() {
         email: '',
         type: 'feature' as FeedbackType,
         message: '',
+        rating: 0,
     });
 
-    // Pre-fill name/email from user data
     useEffect(() => {
         if (user) {
             setFormData(prev => ({
@@ -61,14 +82,17 @@ export default function FeedbackPage() {
             const res = await fetch('/api/feedback', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({
+                    ...formData,
+                    rating: formData.rating || undefined,
+                }),
             });
 
             if (!res.ok) throw new Error('Failed to submit feedback');
 
             setSuccess(true);
             toast.success(t('feedback.toast.success'));
-        } catch (error) {
+        } catch {
             toast.error(t('feedback.toast.error'));
         } finally {
             setLoading(false);
@@ -77,7 +101,7 @@ export default function FeedbackPage() {
 
     if (success) {
         return (
-            <div className="flex min-h-[calc(100vh-8rem)] flex-col items-center justify-center p-4 text-center animate-in fade-in zoom-in duration-300">
+            <div className="mx-auto flex max-w-lg flex-col items-center justify-center px-4 py-16 text-center animate-in fade-in zoom-in duration-300">
                 <div className="mb-4 rounded-full bg-green-100 p-4 text-green-600 dark:bg-green-900/30">
                     <CheckCircle2 className="h-12 w-12" />
                 </div>
@@ -89,7 +113,7 @@ export default function FeedbackPage() {
                     size="lg"
                     onClick={() => {
                         setSuccess(false);
-                        setFormData({ ...formData, message: '' });
+                        setFormData(prev => ({ ...prev, message: '', rating: 0 }));
                     }}
                 >
                     {t('feedback.success.cta')}
@@ -99,104 +123,123 @@ export default function FeedbackPage() {
     }
 
     return (
-        <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center p-4">
-            <div className="w-full max-w-2xl">
-                {/* Header Section */}
-                <div className="mb-8 text-center">
-                    <h1 className="text-3xl font-bold tracking-tight">{t('feedback.title')}</h1>
-                    <p className="mt-2 text-muted-foreground">
-                        {t('feedback.subtitle')}
-                    </p>
-                </div>
+        <div className="mx-auto max-w-lg px-4 py-8">
+            {/* Header */}
+            <div className="mb-6 text-center">
+                <h1 className="text-2xl font-bold tracking-tight">{t('feedback.title')}</h1>
+                <p className="mt-1.5 text-sm text-muted-foreground">
+                    {t('feedback.subtitle')}
+                </p>
+            </div>
 
-                {/* Form Card */}
-                <form
-                    onSubmit={handleSubmit}
-                    className="relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-b from-card/80 to-card/50 p-8 shadow-lg backdrop-blur-xl"
-                >
+            {/* Form Card */}
+            <form
+                onSubmit={handleSubmit}
+                className="relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-b from-card/80 to-card/50 p-6 shadow-lg backdrop-blur-xl"
+            >
+                <BorderBeam />
 
-                    <div className="space-y-6">
-                        {/* 1. Feedback Type - First for context */}
-                        <div className="space-y-2">
-                            <label htmlFor="type" className="text-sm font-medium text-foreground/80">
-                                {t('feedback.form.type')}
-                            </label>
-                            <Select
-                                value={formData.type}
-                                onValueChange={(val) => setFormData({ ...formData, type: val as FeedbackType })}
-                            >
-                                <SelectTrigger className="h-11">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {Object.entries(feedbackTypeConfig).map(([key, config]) => (
-                                        <SelectItem key={key} value={key}>
-                                            {config.label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                <div className="space-y-5">
+                    {/* Feedback Type Cards */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-foreground/80">
+                            {t('feedback.form.type')}
+                        </label>
+                        <div className="grid grid-cols-4 gap-2">
+                            {FEEDBACK_TYPES.map((ft) => {
+                                const isSelected = formData.type === ft.key;
+                                return (
+                                    <button
+                                        key={ft.key}
+                                        type="button"
+                                        onClick={() => setFormData({ ...formData, type: ft.key })}
+                                        className={`flex flex-col items-center gap-1 rounded-xl border-2 p-2.5 transition-all ${
+                                            isSelected
+                                                ? `${ft.color} ring-2 ring-offset-2 ring-offset-background scale-[1.02]`
+                                                : 'border-border/50 hover:border-border bg-card/50'
+                                        }`}
+                                    >
+                                        <span className="text-xl">{ft.emoji}</span>
+                                        <span className={`text-xs font-medium ${isSelected ? '' : 'text-muted-foreground'}`}>
+                                            {t(`feedback.form.typeOptions.${ft.key}`)}
+                                        </span>
+                                    </button>
+                                );
+                            })}
                         </div>
+                    </div>
 
-                        {/* 2. Message Content - Main required field */}
-                        <div className="space-y-2">
-                            <label htmlFor="message" className="text-sm font-medium text-foreground/80">
-                                {t('feedback.form.message')} <span className="text-red-500">{t('feedback.form.required')}</span>
+                    {/* Star Rating */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-foreground/80">
+                            {t('feedback.form.rating')}
+                        </label>
+                        <StarRating
+                            value={formData.rating}
+                            onChange={(v) => setFormData({ ...formData, rating: v })}
+                        />
+                    </div>
+
+                    {/* Message */}
+                    <div className="space-y-2">
+                        <label htmlFor="message" className="text-sm font-medium text-foreground/80">
+                            {t('feedback.form.message')} <span className="text-red-500">{t('feedback.form.required')}</span>
+                        </label>
+                        <Textarea
+                            id="message"
+                            placeholder={t('feedback.form.messagePlaceholder')}
+                            className="min-h-[120px] resize-none"
+                            required
+                            value={formData.message}
+                            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                                setFormData({ ...formData, message: e.target.value })
+                            }
+                        />
+                    </div>
+
+                    {/* Name & Email */}
+                    <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="space-y-1.5">
+                            <label htmlFor="name" className="text-sm font-medium text-foreground/80">
+                                {t('feedback.form.name')}
                             </label>
-                            <Textarea
-                                id="message"
-                                placeholder={t('feedback.form.messagePlaceholder')}
-                                className="min-h-[140px] resize-none"
-                                required
-                                value={formData.message}
-                                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, message: e.target.value })}
+                            <Input
+                                id="name"
+                                placeholder={t('feedback.form.namePlaceholder')}
+                                value={formData.name}
+                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             />
                         </div>
-
-                        {/* 3. Optional Info - Name & Email at the end */}
-                        <div className="grid gap-4 sm:grid-cols-2">
-                            <div className="space-y-2">
-                                <label htmlFor="name" className="text-sm font-medium text-foreground/80">
-                                    {t('feedback.form.name')}
-                                </label>
-                                <Input
-                                    id="name"
-                                    placeholder={t('feedback.form.namePlaceholder')}
-                                    className="h-11"
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label htmlFor="email" className="text-sm font-medium text-foreground/80">
-                                    {t('feedback.form.email')}
-                                </label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder={t('feedback.form.emailPlaceholder')}
-                                    className="h-11"
-                                    value={formData.email}
-                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                />
-                            </div>
+                        <div className="space-y-1.5">
+                            <label htmlFor="email" className="text-sm font-medium text-foreground/80">
+                                {t('feedback.form.email')}
+                            </label>
+                            <Input
+                                id="email"
+                                type="email"
+                                placeholder={t('feedback.form.emailPlaceholder')}
+                                value={formData.email}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            />
                         </div>
-
-                        {/* Submit Button - Full width */}
-                        <Button
-                            type="submit"
-                            size="lg"
-                            className="w-full"
-                            disabled={loading || !formData.message.trim()}
-                        >
-                            {loading && (
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            )}
-                            {t('feedback.form.submit')}
-                        </Button>
                     </div>
-                </form>
-            </div>
+
+                    {/* Submit */}
+                    <Button
+                        type="submit"
+                        size="lg"
+                        className="w-full"
+                        disabled={loading || !formData.message.trim()}
+                    >
+                        {loading ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                            <Send className="mr-2 h-4 w-4" />
+                        )}
+                        {t('feedback.form.submit')}
+                    </Button>
+                </div>
+            </form>
         </div>
     );
 }

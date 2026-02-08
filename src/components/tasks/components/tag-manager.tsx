@@ -20,9 +20,10 @@ interface TagManagerProps {
     isLoading?: boolean
     onAddTag: (tag: string) => Promise<boolean> | void
     onRemoveTag: (tag: string) => Promise<boolean> | void
+    trigger?: React.ReactNode
 }
 
-export function TagManager({ tags, isLoading, onAddTag, onRemoveTag }: TagManagerProps) {
+export function TagManager({ tags, isLoading: isInitialLoading, onAddTag, onRemoveTag, trigger }: TagManagerProps) {
     const { t } = useI18n()
     const [isOpen, setIsOpen] = useState(false)
     const [newTag, setNewTag] = useState('')
@@ -54,10 +55,12 @@ export function TagManager({ tags, isLoading, onAddTag, onRemoveTag }: TagManage
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" className="h-10 px-4 gap-2">
-                    <Tag className="h-4 w-4" />
-                    {t('tasks.manageTags')}
-                </Button>
+                {trigger || (
+                    <Button variant="outline" className="h-10 px-4 gap-2">
+                        <Tag className="h-4 w-4" />
+                        {t('tasks.manageTags')}
+                    </Button>
+                )}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[400px]">
                 <DialogHeader>
@@ -106,7 +109,7 @@ export function TagManager({ tags, isLoading, onAddTag, onRemoveTag }: TagManage
 
                     {/* Tag list */}
                     <div className="space-y-2">
-                        {isLoading ? (
+                        {isInitialLoading ? (
                             <div className="flex items-center justify-center py-4">
                                 <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                             </div>

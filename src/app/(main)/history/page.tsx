@@ -55,10 +55,10 @@ export default function HistoryPage() {
 
     return (
         <main
-            className="w-full h-full p-4 md:p-8"
+            className="w-full h-full p-4 md:py-2 md:px-8"
             aria-label="History and statistics page"
         >
-            <div className="max-w-5xl mx-auto space-y-6">
+            <div className="max-w-5xl mx-auto space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-bold">{t('history.title')}</h1>
@@ -90,7 +90,7 @@ export default function HistoryPage() {
                         </div>
                     </div>
                 ) : !statsData || !historyData || (statsData.summary.totalFocusTime === 0 && historyData.sessions.length === 0) ? (
-                    <section className="rounded-xl border bg-card/70 backdrop-blur p-4 md:p-6">
+                    <section className="rounded-xl border bg-card/70 backdrop-blur p-3 md:p-4">
                         <StatsEmpty />
                     </section>
                 ) : (
@@ -101,7 +101,7 @@ export default function HistoryPage() {
                             streak={statsData.summary.streak}
                         />
 
-                        <section className="rounded-xl border bg-card/70 backdrop-blur p-4 md:p-6 space-y-8">
+                        <section className="rounded-xl border bg-card/70 backdrop-blur p-3 md:p-4 space-y-6">
                             <div className="space-y-4">
                                 <h3 className="text-xl font-semibold">{t('history.charts.focusOverview')}</h3>
                                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">

@@ -1,17 +1,12 @@
-import { BackgroundRenderer } from '@/components/background/background-renderer';
-import { ThemeProvider } from '@/components/layout/theme-provider';
-import { QueryProvider } from '@/components/providers/query-provider';
-import GATracker from '@/components/trackings/ga';
-import { I18nProvider } from '@/contexts/i18n-context';
+/**
+ * Root Layout - Server Component
+ * NO client providers here to enable SSR for landing page
+ * Providers are added in group-specific layouts ((main), (auth))
+ */
 import type { Metadata } from 'next';
-import { Be_Vietnam_Pro, Space_Grotesk } from 'next/font/google';
+import { Be_Vietnam_Pro, Space_Grotesk, Nunito } from 'next/font/google';
 import Script from 'next/script';
-import { Toaster } from 'sonner';
 import './globals.css';
-import { SupabaseAuthProvider } from '@/components/providers/supabase-auth-provider';
-
-import Head from 'next/head';
-import NextTopLoader from 'nextjs-toploader';
 
 const beVietnamPro = Be_Vietnam_Pro({
   subsets: ['latin'],
@@ -27,26 +22,40 @@ const spaceGrotesk = Space_Grotesk({
   variable: '--font-space-grotesk',
 });
 
+const nunito = Nunito({
+  subsets: ['latin', 'vietnamese'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  display: 'swap',
+  variable: '--font-nunito',
+});
+
 export const metadata: Metadata = {
   title: 'Study Bro App',
   description:
     'A comprehensive Pomodoro Timer web application for focus enhancement and productivity tracking',
   manifest: '/manifest.json',
-  icons: {
-    icon: '/favicon.svg',
-    apple: '/apple-touch-icon.png',
-  },
+  metadataBase: new URL('https://www.pomodoro-focus.site'),
+  keywords: [
+    'Pomodoro Timer',
+    'Study Timer',
+    'Focus Timer',
+    'Productivity Tool',
+    'Study Bro',
+    'Focus Enhancement',
+    'Time Management',
+  ],
   openGraph: {
-    title: 'Pomodoro Focus App',
-    description: 'A comprehensive Pomodoro Timer web application for focus enhancement and productivity tracking',
+    title: 'Study Bro App',
+    description:
+      'A comprehensive Pomodoro Timer web application for focus enhancement and productivity tracking',
     url: 'https://www.pomodoro-focus.site',
-    siteName: 'Pomodoro Focus App',
+    siteName: 'Study Bro App',
     images: [
       {
-        url: 'https://www.pomodoro-focus.site/backgrounds/travelling7.jpg',
+        url: '/card.jpg',
         width: 1200,
         height: 630,
-        alt: 'Pomodoro Focus App',
+        alt: 'Study Bro App',
       },
     ],
     locale: 'en_US',
@@ -54,22 +63,11 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Pomodoro Focus App',
-    description: 'A comprehensive Pomodoro Timer web application for focus enhancement and productivity tracking',
-    images: ['https://www.pomodoro-focus.site/backgrounds/travelling7.jpg'],
+    title: 'Study Bro App',
+    description:
+      'A comprehensive Pomodoro Timer web application for focus enhancement and productivity tracking',
+    images: ['/card.jpg'],
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
-  keywords: ['pomodoro', 'focus', 'productivity', 'timer', 'task management'],
 };
 
 export default function RootLayout({
@@ -79,10 +77,35 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <Head>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <body className={`${spaceGrotesk.variable} ${beVietnamPro.variable}`}>
+      <body className={`${spaceGrotesk.variable} ${beVietnamPro.variable} ${nunito.variable}`}>
+        {/* JSON-LD structured data for SEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebApplication',
+              name: 'Study Bro',
+              description: 'AI-Powered Pomodoro Timer for Maximum Focus and Productivity',
+              url: 'https://www.pomodoro-focus.site',
+              applicationCategory: 'ProductivityApplication',
+              operatingSystem: 'Web Browser',
+              offers: {
+                '@type': 'Offer',
+                price: '0',
+                priceCurrency: 'USD',
+              },
+              featureList: [
+                'Pomodoro Timer',
+                'Task Management',
+                'Progress Analytics',
+                'Ambient Sounds',
+                'Daily Streaks',
+                'Custom Themes',
+              ],
+            }),
+          }}
+        />
         {process.env.NEXT_PUBLIC_GA_ID ? (
           <>
             <Script
@@ -98,29 +121,7 @@ export default function RootLayout({
             `}</Script>
           </>
         ) : null}
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <NextTopLoader
-            color="hsl(var(--primary))"
-            showSpinner={false}
-            height={3}
-            crawlSpeed={200}
-            speed={200}
-          />
-          <I18nProvider>
-            <QueryProvider>
-              <SupabaseAuthProvider />
-              <BackgroundRenderer />
-              {process.env.NEXT_PUBLIC_GA_ID ? <GATracker /> : null}
-              {children}
-              <Toaster />
-            </QueryProvider>
-          </I18nProvider>
-        </ThemeProvider>
+        {children}
       </body>
     </html>
   );

@@ -1,5 +1,5 @@
 const priorityValues = ['LOW', 'MEDIUM', 'HIGH'] as const
-const statusValues = ['PENDING', 'IN_PROGRESS', 'DONE'] as const
+const statusValues = ['TODO', 'DOING', 'DONE'] as const
 
 export type TaskPriorityDb = (typeof priorityValues)[number]
 export type TaskStatusDb = (typeof statusValues)[number]
@@ -10,10 +10,14 @@ export interface CreateTaskPayload {
   priority: TaskPriorityDb
   estimate_pomodoros: number
   tags: string[]
+  due_date?: string | null
+  parent_task_id?: string | null
+  is_template?: boolean
 }
 
 export interface UpdateTaskPayload extends Partial<CreateTaskPayload> {
   status?: TaskStatusDb
+  display_order?: number
 }
 
 interface ValidationErrorDetail {
@@ -114,6 +118,9 @@ export function validateCreateTask(body: unknown): ValidationResult<CreateTaskPa
       priority: parsePriority(body.priority),
       estimate_pomodoros: parseEstimate(body.estimate_pomodoros),
       tags: normalizeTags(body.tags),
+      due_date: body.due_date ? String(body.due_date) : null,
+      parent_task_id: body.parent_task_id ? String(body.parent_task_id) : null,
+      is_template: Boolean(body.is_template),
     }
 
     return { success: true, data: normalized }
@@ -167,6 +174,25 @@ export function validateUpdateTask(body: unknown): ValidationResult<UpdateTaskPa
     } else {
       normalized.status = status
     }
+  }
+
+  if (body.due_date !== undefined) {
+    normalized.due_date = body.due_date ? String(body.due_date) : null
+  }
+
+  if (body.parent_task_id !== undefined) {
+    normalized.parent_task_id = body.parent_task_id ? String(body.parent_task_id) : null
+  }
+
+  if (body.display_order !== undefined) {
+    const order = Number(body.display_order)
+    if (!Number.isNaN(order)) {
+      normalized.display_order = Math.max(0, Math.round(order))
+    }
+  }
+
+  if (body.is_template !== undefined) {
+    normalized.is_template = Boolean(body.is_template)
   }
 
   if (!Object.keys(normalized).length) {

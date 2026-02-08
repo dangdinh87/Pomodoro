@@ -4,13 +4,24 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Timer, CheckSquare, BarChart3, Settings, ArrowRight } from 'lucide-react';
+import {
+    Timer,
+    CheckSquare,
+    BarChart3,
+    Settings,
+    ArrowRight,
+    MessageSquare,
+    Gamepad2,
+    Trophy,
+    Shield,
+    Send,
+} from 'lucide-react';
 import { useI18n } from '@/contexts/i18n-context';
 
 export default function GuidePage() {
     const { t, dict } = useI18n();
     return (
-        <main className="max-w-5xl mx-auto space-y-12">
+        <main className="max-w-5xl mx-auto space-y-12 py-8 pb-16 px-4 lg:px-8">
             {/* Header */}
             <div className="text-center space-y-4">
                 <h1 className="text-4xl font-bold tracking-tight">
@@ -157,7 +168,7 @@ export default function GuidePage() {
                     {t('guide.howToUse.description')}
                 </p>
 
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {/* Timer Feature */}
                     <Card className="hover:shadow-lg transition-shadow">
                         <CardHeader>
@@ -247,6 +258,161 @@ export default function GuidePage() {
                                 className="inline-flex items-center text-sm font-medium text-primary hover:underline mt-3"
                             >
                                 {t('guide.howToUse.features.history.cta')} <ArrowRight className="ml-1 h-4 w-4" />
+                            </Link>
+                        </CardContent>
+                    </Card>
+
+                    {/* Chat AI Feature */}
+                    <Card className="hover:shadow-lg transition-shadow">
+                        <CardHeader>
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                                    <MessageSquare className="h-6 w-6 text-primary" />
+                                </div>
+                                <CardTitle>{t('guide.howToUse.features.chatAI.title')}</CardTitle>
+                            </div>
+                            <CardDescription>
+                                {t('guide.howToUse.features.chatAI.subtitle')}
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                            <p className="text-sm text-muted-foreground">
+                                {t('guide.howToUse.features.chatAI.description')}
+                            </p>
+                            <ul className="text-sm space-y-2 text-muted-foreground">
+                                {Array.isArray(dict.guide?.howToUse?.features?.chatAI?.points) && dict.guide.howToUse.features.chatAI.points.map((point: string, index: number) => (
+                                    <li key={index}>• {point}</li>
+                                ))}
+                            </ul>
+                            <Link
+                                href="/chat"
+                                className="inline-flex items-center text-sm font-medium text-primary hover:underline mt-3"
+                            >
+                                {t('guide.howToUse.features.chatAI.cta')} <ArrowRight className="ml-1 h-4 w-4" />
+                            </Link>
+                        </CardContent>
+                    </Card>
+
+                    {/* Entertainment Feature */}
+                    <Card className="hover:shadow-lg transition-shadow">
+                        <CardHeader>
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                                    <Gamepad2 className="h-6 w-6 text-primary" />
+                                </div>
+                                <CardTitle>{t('guide.howToUse.features.entertainment.title')}</CardTitle>
+                            </div>
+                            <CardDescription>
+                                {t('guide.howToUse.features.entertainment.subtitle')}
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                            <p className="text-sm text-muted-foreground">
+                                {t('guide.howToUse.features.entertainment.description')}
+                            </p>
+                            <ul className="text-sm space-y-2 text-muted-foreground">
+                                {Array.isArray(dict.guide?.howToUse?.features?.entertainment?.points) && dict.guide.howToUse.features.entertainment.points.map((point: string, index: number) => (
+                                    <li key={index}>• {point}</li>
+                                ))}
+                            </ul>
+                            <Link
+                                href="/entertainment"
+                                className="inline-flex items-center text-sm font-medium text-primary hover:underline mt-3"
+                            >
+                                {t('guide.howToUse.features.entertainment.cta')} <ArrowRight className="ml-1 h-4 w-4" />
+                            </Link>
+                        </CardContent>
+                    </Card>
+
+                    {/* Leaderboard Feature */}
+                    <Card className="hover:shadow-lg transition-shadow">
+                        <CardHeader>
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                                    <Trophy className="h-6 w-6 text-primary" />
+                                </div>
+                                <CardTitle>{t('guide.howToUse.features.leaderboard.title')}</CardTitle>
+                            </div>
+                            <CardDescription>
+                                {t('guide.howToUse.features.leaderboard.subtitle')}
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                            <p className="text-sm text-muted-foreground">
+                                {t('guide.howToUse.features.leaderboard.description')}
+                            </p>
+                            <ul className="text-sm space-y-2 text-muted-foreground">
+                                {Array.isArray(dict.guide?.howToUse?.features?.leaderboard?.points) && dict.guide.howToUse.features.leaderboard.points.map((point: string, index: number) => (
+                                    <li key={index}>• {point}</li>
+                                ))}
+                            </ul>
+                            <Link
+                                href="/leaderboard"
+                                className="inline-flex items-center text-sm font-medium text-primary hover:underline mt-3"
+                            >
+                                {t('guide.howToUse.features.leaderboard.cta')} <ArrowRight className="ml-1 h-4 w-4" />
+                            </Link>
+                        </CardContent>
+                    </Card>
+
+                    {/* Focus Feature */}
+                    <Card className="hover:shadow-lg transition-shadow">
+                        <CardHeader>
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                                    <Shield className="h-6 w-6 text-primary" />
+                                </div>
+                                <CardTitle>{t('guide.howToUse.features.focus.title')}</CardTitle>
+                            </div>
+                            <CardDescription>
+                                {t('guide.howToUse.features.focus.subtitle')}
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                            <p className="text-sm text-muted-foreground">
+                                {t('guide.howToUse.features.focus.description')}
+                            </p>
+                            <ul className="text-sm space-y-2 text-muted-foreground">
+                                {Array.isArray(dict.guide?.howToUse?.features?.focus?.points) && dict.guide.howToUse.features.focus.points.map((point: string, index: number) => (
+                                    <li key={index}>• {point}</li>
+                                ))}
+                            </ul>
+                            <Link
+                                href="/focus"
+                                className="inline-flex items-center text-sm font-medium text-primary hover:underline mt-3"
+                            >
+                                {t('guide.howToUse.features.focus.cta')} <ArrowRight className="ml-1 h-4 w-4" />
+                            </Link>
+                        </CardContent>
+                    </Card>
+
+                    {/* Feedback Feature */}
+                    <Card className="hover:shadow-lg transition-shadow">
+                        <CardHeader>
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                                    <Send className="h-6 w-6 text-primary" />
+                                </div>
+                                <CardTitle>{t('guide.howToUse.features.feedback.title')}</CardTitle>
+                            </div>
+                            <CardDescription>
+                                {t('guide.howToUse.features.feedback.subtitle')}
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                            <p className="text-sm text-muted-foreground">
+                                {t('guide.howToUse.features.feedback.description')}
+                            </p>
+                            <ul className="text-sm space-y-2 text-muted-foreground">
+                                {Array.isArray(dict.guide?.howToUse?.features?.feedback?.points) && dict.guide.howToUse.features.feedback.points.map((point: string, index: number) => (
+                                    <li key={index}>• {point}</li>
+                                ))}
+                            </ul>
+                            <Link
+                                href="/feedback"
+                                className="inline-flex items-center text-sm font-medium text-primary hover:underline mt-3"
+                            >
+                                {t('guide.howToUse.features.feedback.cta')} <ArrowRight className="ml-1 h-4 w-4" />
                             </Link>
                         </CardContent>
                     </Card>

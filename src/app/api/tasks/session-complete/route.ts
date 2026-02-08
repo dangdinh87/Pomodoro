@@ -29,12 +29,31 @@ export async function POST(request: Request) {
 
     const duration = Math.max(0, Math.round(durationSec))
 
-    // 2. Record session
+    // 2. Validate taskId if provided
+    let validatedTaskId: string | null = null
+
+    if (taskId) {
+      const { data: taskData, error: taskError } = await supabase
+        .from('tasks')
+        .select('id')
+        .eq('id', taskId)
+        .eq('user_id', userId)
+        .single()
+
+      if (taskError || !taskData) {
+        console.warn(`Invalid taskId ${taskId} for user ${userId}: ${taskError?.message || 'not found'}`)
+        validatedTaskId = null
+      } else {
+        validatedTaskId = taskId
+      }
+    }
+
+    // 3. Record session
     const { data: sessionData, error: sessionError } = await supabase
       .from('sessions')
       .insert({
         user_id: userId,
-        task_id: taskId ?? null,
+        task_id: validatedTaskId,
         duration,
         mode, // 'work', 'shortBreak', or 'longBreak'
       })
@@ -49,10 +68,10 @@ export async function POST(request: Request) {
       )
     }
 
-    // 3. Update Task progress (if applicable)
-    if (taskId && mode === 'work') {
+    // 4. Update Task progress (if applicable)
+    if (validatedTaskId && mode === 'work') {
       const { error: incError } = await supabase.rpc('increment_task_pomodoro', {
-        task_id_input: taskId,
+        task_id_input: validatedTaskId,
         user_id_input: userId,
         duration_ms_input: duration * 1000,
       })
@@ -62,7 +81,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // 4. Update Streak (only for 'work' sessions)
+    // 5. Update Streak (only for 'work' sessions)
     if (mode === 'work') {
       // Fetch current streak
       const { data: streakData, error: streakFetchError } = await supabase

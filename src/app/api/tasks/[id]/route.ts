@@ -35,6 +35,10 @@ function buildUpdatePayload(payload: UpdateTaskPayload) {
   }
   if (payload.tags !== undefined) updates.tags = payload.tags
   if (payload.status !== undefined) updates.status = payload.status
+  if (payload.due_date !== undefined) updates.due_date = payload.due_date
+  if (payload.parent_task_id !== undefined) updates.parent_task_id = payload.parent_task_id
+  if (payload.display_order !== undefined) updates.display_order = payload.display_order
+  if (payload.is_template !== undefined) updates.is_template = payload.is_template
   updates.updated_at = new Date().toISOString()
   return updates
 }
