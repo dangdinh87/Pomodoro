@@ -1,10 +1,10 @@
 
+import type { Metadata } from 'next';
 
-// Since this is a server component, we can probably just use the dictionary directly 
-// or simpler: just client component with useTranslation if we want to be consistent with others.
-// But checking other pages... page.tsx in (landing) might be server or client.
-// Let's use a client component for consistency with the rest of the landing components seen so far
-// actually, let's keep it simple.
+export const metadata: Metadata = {
+    title: 'Privacy Policy • Improcode',
+    description: 'Privacy Policy for Improcode. Learn how we handle your data and protect your privacy.',
+};
 
 export default function PrivacyPage() {
     return (

@@ -1,3 +1,11 @@
+
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: 'Terms of Service • Improcode',
+    description: 'Terms of Service for Improcode. Read our terms and conditions for using the application.',
+};
+
 export default function TermsPage() {
     return (
         <div className="container mx-auto px-4 py-24 min-h-[60vh]">
