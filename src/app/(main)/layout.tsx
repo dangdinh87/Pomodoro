@@ -4,6 +4,7 @@
  * Main App Layout - Client Component
  * Wraps authenticated app sections with providers
  */
+import { Suspense } from 'react';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import {
   SidebarInset,
@@ -61,7 +62,11 @@ export default function MainLayout({
                   </div>
                 </header>
               )}
-              {process.env.NEXT_PUBLIC_GA_ID ? <GATracker /> : null}
+              {process.env.NEXT_PUBLIC_GA_ID ? (
+                <Suspense fallback={null}>
+                  <GATracker />
+                </Suspense>
+              ) : null}
               <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 lg:px-0">
                 {children}
               </div>

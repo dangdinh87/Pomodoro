@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Loader2, LogIn } from 'lucide-react';
 import { toast } from 'sonner';
@@ -25,10 +25,23 @@ import { useI18n } from '@/contexts/i18n-context';
 import { BorderBeam } from '@/components/ui/border-beam';
 import Image from 'next/image';
 
-export default function LoginPage() {
-  const { t } = useI18n();
+// Component that handles redirect logic with useSearchParams
+function LoginRedirect() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const user = useAuthStore((state) => state.user);
+
+  useEffect(() => {
+    if (!user) return;
+    const redirectUrl = searchParams.get('redirect') ?? '/timer';
+    router.replace(redirectUrl);
+  }, [user, router, searchParams]);
+
+  return null;
+}
+
+export default function LoginPage() {
+  const { t } = useI18n();
   const user = useAuthStore((state) => state.user);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -41,12 +54,6 @@ export default function LoginPage() {
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  useEffect(() => {
-    if (!mounted || !user) return;
-    const redirectUrl = searchParams.get('redirect') ?? '/timer';
-    router.replace(redirectUrl);
-  }, [user, router, searchParams, mounted]);
 
   if (!mounted) return null;
 
@@ -114,9 +121,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-8">
-      <Card className="relative w-full max-w-md overflow-hidden border-white/10 bg-background/80 shadow-2xl backdrop-blur">
-        <BorderBeam size={250} duration={12} delay={0} />
+    <>
+      <Suspense fallback={null}>
+        <LoginRedirect />
+      </Suspense>
+      <div className="flex min-h-screen items-center justify-center px-4 py-8">
+        <Card className="relative w-full max-w-md overflow-hidden border-white/10 bg-background/80 shadow-2xl backdrop-blur">
+          <BorderBeam size={250} duration={12} delay={0} />
         <CardHeader className="space-y-2 text-center">
           <CardTitle className="text-2xl font-semibold flex flex-col items-center gap-2">
             <Image src="/images/logo.svg" alt={t('brand.title')} width={52} height={52} />
@@ -243,5 +254,6 @@ export default function LoginPage() {
         </CardFooter>
       </Card>
     </div>
+    </>
   );
 }
