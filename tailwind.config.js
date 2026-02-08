@@ -87,6 +87,22 @@ module.exports = {
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))',
         },
+        streak: {
+          flame: 'hsl(var(--streak-flame))',
+          ember: 'hsl(var(--streak-ember))',
+          'at-risk': 'hsl(var(--streak-at-risk))',
+        },
+        xp: { fill: 'hsl(var(--xp-fill))' },
+        level: { glow: 'hsl(var(--level-glow))' },
+        badge: {
+          bronze: 'hsl(var(--badge-bronze))',
+          silver: 'hsl(var(--badge-silver))',
+          gold: 'hsl(var(--badge-gold))',
+        },
+        coin: {
+          DEFAULT: 'hsl(var(--coin-primary))',
+          shine: 'hsl(var(--coin-shine))',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -148,6 +164,14 @@ module.exports = {
             opacity: 1,
           },
         },
+        'clock-pulse': {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.02)' },
+        },
+        'clock-dot-pulse': {
+          '0%, 100%': { opacity: '0' },
+          '50%': { opacity: '0.4' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -156,6 +180,8 @@ module.exports = {
         'slide-in-from-top': 'slide-in-from-top 0.3s ease-out',
         'slide-in-from-bottom': 'slide-in-from-bottom 0.3s ease-out',
         'pulse-ring': 'pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'clock-pulse': 'clock-pulse 1s ease-in-out infinite',
+        'clock-dot-pulse': 'clock-dot-pulse 2s ease-in-out infinite',
       },
     },
   },

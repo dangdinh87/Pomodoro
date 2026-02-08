@@ -10,6 +10,7 @@ import { QueryProvider } from '@/components/providers/query-provider';
 import { I18nProvider } from '@/contexts/i18n-context';
 import { SupabaseAuthProvider } from '@/components/providers/supabase-auth-provider';
 import { BackgroundRenderer } from '@/components/background/background-renderer';
+import { ThemeRestorer } from '@/components/providers/theme-restorer';
 import { Toaster } from 'sonner';
 import NextTopLoader from 'nextjs-toploader';
 
@@ -21,7 +22,7 @@ export function AppProviders({ children }: AppProvidersProps) {
   return (
     <ThemeProvider
       attribute="class"
-      defaultTheme="system"
+      defaultTheme="dark"
       enableSystem
       disableTransitionOnChange
     >
@@ -35,6 +36,7 @@ export function AppProviders({ children }: AppProvidersProps) {
       <I18nProvider>
         <QueryProvider>
           <SupabaseAuthProvider />
+          <ThemeRestorer />
           <BackgroundRenderer />
           {children}
           <Toaster />

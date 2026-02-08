@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react';
 import { useTimerStore, TimerMode } from '@/stores/timer-store';
 import { useTasksStore } from '@/stores/task-store';
 import { useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
 
 // Confetti celebration for work session completion
@@ -125,24 +124,9 @@ export function useTimerEngine() {
         : currentSettings.longBreakDuration) * 60;
     const duration = lastSessionTimeLeft > 0 ? lastSessionTimeLeft : configDuration;
 
-    // Toast notification for session completion
-    const formatDuration = (seconds: number) => {
-      const mins = Math.floor(seconds / 60);
-      const secs = seconds % 60;
-      return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
-    };
-
     if (currentMode === 'work') {
-      // Fire confetti celebration
+      // Fire confetti celebration (visual feedback is sufficient, no toast needed)
       fireWorkCompleteConfetti();
-      toast.success(`🍅 Work session complete!`, {
-        description: `${formatDuration(configDuration)} of focused work`,
-      });
-    } else {
-      toast.success(
-        currentMode === 'shortBreak' ? `☕ Short break complete!` : `🍊 Long break complete!`,
-        { description: `Ready to focus again` }
-      );
     }
 
     if (currentMode === 'work') {

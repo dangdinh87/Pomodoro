@@ -13,8 +13,6 @@ import {
   X,
   HelpCircle,
 } from 'lucide-react';
-import { ThemeToggle } from './theme-toggle';
-import { AnimatedThemeToggler } from '@/components/ui/animated-theme-toggler';
 import { useNavigationStore } from '@/stores/navigation-store';
 import { useTranslation } from '@/contexts/i18n-context';
 import { UserGuideModal } from '@/components/user-guide/user-guide-modal';
@@ -144,15 +142,6 @@ export function Navigation() {
                   </Button>
                 }
               />
-              <Button
-                variant="ghost"
-                size="icon"
-                title={t('tooltips.toggleTheme')}
-                className="transition-all duration-200"
-                asChild
-              >
-                <AnimatedThemeToggler className="w-4 h-4" />
-              </Button>
               <Button
                 variant="ghost"
                 size="icon"
