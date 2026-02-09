@@ -4,7 +4,7 @@ import { audioManager, AudioSource } from '@/lib/audio/audio-manager'
 import { soundCatalog } from '@/lib/audio/sound-catalog'
 
 export interface CurrentlyPlayingAudio {
-  type: 'ambient' | 'youtube' | 'spotify'
+  type: 'ambient' | 'youtube'
   id: string
   name: string
   vn?: string
@@ -311,11 +311,6 @@ export const useAudioStore = create<AudioState>()(
         const success = await audioManager.play(source)
 
         if (success) {
-          // For non-ambient sources, we do NOT stop ambients anymore (mixed playback)
-          // if (source.type === 'youtube' || source.type === 'spotify') {
-          //   await get().stopAllAmbient()
-          // }
-
           get().setCurrentlyPlaying({
             type: source.type as any,
             id: source.id,

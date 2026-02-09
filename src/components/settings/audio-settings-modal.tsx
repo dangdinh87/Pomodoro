@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,6 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import {
   Volume2,
@@ -21,20 +20,14 @@ import {
   Building2,
   Play,
   Pause,
-  Square,
-  Dice3,
   Music,
   Loader2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAudioStore } from '@/stores/audio-store';
-import { useSystemStore } from '@/stores/system-store';
-import audioManager from '@/lib/audio/audio-manager';
 import { soundCatalog } from '@/lib/audio/sound-catalog';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from '@/components/animate-ui/primitives/animate/tabs';
-import { Input } from '@/components/ui/input';
-import SpotifyPane from '@/components/audio/spotify/spotify-pane';
 import YouTubePane from '@/components/audio/youtube/youtube-pane';
 import { AudioLines } from '@/components/animate-ui/icons/audio-lines';
 import { getYouTubeThumbnailUrl } from '@/data/youtube-suggestions';
@@ -47,8 +40,6 @@ export function AudioSettingsModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const { updateSoundSettings } = useSystemStore();
-
   // Use useShallow for object selectors to ensure proper re-renders
   const {
     audioSettings,
@@ -58,7 +49,6 @@ export function AudioSettingsModal({
     toggleMute,
     toggleAmbient,
     togglePlayPause,
-    stopAllAmbient,
     updateAudioSettings,
     updateCurrentlyPlayingForAmbients,
   } = useAudioStore(
@@ -70,7 +60,6 @@ export function AudioSettingsModal({
       toggleMute: state.toggleMute,
       toggleAmbient: state.toggleAmbient,
       togglePlayPause: state.togglePlayPause,
-      stopAllAmbient: state.stopAllAmbient,
       updateAudioSettings: state.updateAudioSettings,
       updateCurrentlyPlayingForAmbients: state.updateCurrentlyPlayingForAmbients,
     }))
@@ -125,72 +114,6 @@ export function AudioSettingsModal({
         setIsLoadingAudio(false);
       }, 300);
     }
-  };
-
-  // This useEffect is no longer needed as audio state is managed by useAudioStore
-  // useEffect(() => {
-  //   setAmbientVolume(audioSettings.volume);
-  //   setFadeInOut(audioSettings.fadeInOut);
-  //   setSelectedAmbientSound(audioSettings.selectedAmbientSound);
-  // }, [audioSettings]);
-
-  // This useEffect is no longer needed as audio state is managed by useAudioStore
-  // useEffect(() => {
-  //   return () => {
-  //     audioManager.stop();
-  //   };
-  // }, []);
-
-  // This useEffect is no longer needed as audio state is managed by useAudioStore
-  // useEffect(() => {
-  //   Object.values(ambientAudiosRef.current).forEach((el) => {
-  //     try {
-  //       el.volume = ambientVolume / 100;
-  //       if (isMuted) {
-  //         el.pause();
-  //       } else {
-  //         if (el.paused) el.play().catch(() => { });
-  //       }
-  //     } catch { }
-  //   });
-  // }, [isMuted, ambientVolume]);
-
-  // This function is no longer needed as playAmbient from useAudioStore handles it
-  // const playSoundPreview = async (soundId: string) => {
-  //   const sound = ambientSounds.find((s) => s.id === soundId);
-  //   if (!sound) return;
-
-  //   // If muted (paused), unmute (play) when interacting with a new sound
-  //   if (isMuted) {
-  //     setIsMuted(false);
-  //   }
-
-  //   const isActive = activeAmbientIds.includes(sound.id);
-  //   if (isActive) {
-  //     const el = ambientAudiosRef.current[sound.id];
-  //     if (el) {
-  //       try {
-  //         el.pause();
-  //       } catch { }
-  //       delete ambientAudiosRef.current[sound.id];
-  //     }
-  //     setActiveAmbientIds((prev) => prev.filter((id) => id !== sound.id));
-  //   } else {
-  //     const el = new Audio(sound.url);
-  //     el.loop = true;
-  //     el.volume = ambientVolume / 100;
-  //     try {
-  //       await el.play();
-  //     } catch { }
-  //     ambientAudiosRef.current[sound.id] = el;
-  //     setActiveAmbientIds((prev) => [...prev, sound.id]);
-  //   }
-  // };
-
-  // This function is no longer needed as settings are updated directly via store actions
-  const handleSave = () => {
-    toast.success('Audio settings saved successfully!');
-    onClose();
   };
 
   const iconForUrl = (url: string) => {
@@ -267,18 +190,6 @@ export function AudioSettingsModal({
         })}
       </div>
     </div>
-  );
-
-  const SpotifyIcon = ({ className }: { className?: string }) => (
-    <svg
-      role="img"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      fill="currentColor"
-    >
-      <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141 4.32-1.32 9.84-.6 13.5 1.56.42.18.6.78.241 1.26zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 14.82 1.14.54.3.72 1.02.42 1.56-.3.54-1.02.72-1.56.42z" />
-    </svg>
   );
 
   const YouTubeIcon = ({ className }: { className?: string }) => (
@@ -429,7 +340,7 @@ export function AudioSettingsModal({
 
           <Tabs value={selectedTab} onValueChange={handleTabChange} className="flex-1 flex flex-col overflow-hidden">
             <div className="px-6 py-2 shrink-0">
-              <TabsList className="grid w-full grid-cols-3 gap-1 bg-muted/40 p-1 rounded-xl border border-border/50">
+              <TabsList className="grid w-full grid-cols-2 gap-1 bg-muted/40 p-1 rounded-xl border border-border/50">
                 <TabsTrigger
                   value="sources"
                   className="flex items-center justify-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-all hover:bg-muted/50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-md data-[state=active]:font-semibold data-[state=active]:border data-[state=active]:border-border"
@@ -442,13 +353,6 @@ export function AudioSettingsModal({
                 >
                   <YouTubeIcon className="h-4 w-4" />
                   YouTube
-                </TabsTrigger>
-                <TabsTrigger
-                  value="spotify"
-                  className="flex items-center justify-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-all hover:bg-muted/50 data-[state=active]:bg-background data-[state=active]:text-[#1DB954] data-[state=active]:shadow-md data-[state=active]:font-semibold data-[state=active]:border data-[state=active]:border-border"
-                >
-                  <SpotifyIcon className="h-4 w-4" />
-                  Spotify
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -506,10 +410,6 @@ export function AudioSettingsModal({
 
                   <TabsContent value="player" className="h-full">
                     <YouTubePane />
-                  </TabsContent>
-
-                  <TabsContent value="spotify" className="h-full">
-                    <SpotifyPane />
                   </TabsContent>
                 </TabsContents>
               </div>
