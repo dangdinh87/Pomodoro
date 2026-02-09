@@ -1,0 +1,528 @@
+
+> pomodoro-focus-app@0.1.0 prebuild /app
+> node scripts/optimize-backgrounds.mjs
+
+🖼️  Background optimization starting...
+
+
+📊 Summary:
+  Images processed: 0
+  Images skipped (up-to-date): 24
+  Total images in manifest: 24
+  Videos: 0 copied
+
+✅ Done!
+
+
+> pomodoro-focus-app@0.1.0 build /app
+> next build
+
+  ▲ Next.js 14.2.35
+
+   Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (126kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+
+warn - The class `duration-[3000ms]` is ambiguous and matches multiple utilities.
+warn - If this is content and not a class, replace it with `duration-&lsqb;3000ms&rsqb;` to silence this warning.
+ ⚠ Compiled with warnings
+
+./node_modules/.pnpm/@supabase+realtime-js@2.81.1/node_modules/@supabase/realtime-js/dist/module/lib/websocket-factory.js
+A Node.js API is used (process.versions at line: 32) which is not supported in the Edge Runtime.
+Learn more: https://nextjs.org/docs/api-reference/edge-runtime
+
+Import trace for requested module:
+./node_modules/.pnpm/@supabase+realtime-js@2.81.1/node_modules/@supabase/realtime-js/dist/module/lib/websocket-factory.js
+./node_modules/.pnpm/@supabase+realtime-js@2.81.1/node_modules/@supabase/realtime-js/dist/module/index.js
+./node_modules/.pnpm/@supabase+supabase-js@2.81.1/node_modules/@supabase/supabase-js/dist/module/index.js
+./node_modules/.pnpm/@supabase+ssr@0.7.0_@supabase+supabase-js@2.81.1/node_modules/@supabase/ssr/dist/module/createBrowserClient.js
+./node_modules/.pnpm/@supabase+ssr@0.7.0_@supabase+supabase-js@2.81.1/node_modules/@supabase/ssr/dist/module/index.js
+
+./node_modules/.pnpm/@supabase+supabase-js@2.81.1/node_modules/@supabase/supabase-js/dist/module/index.js
+A Node.js API is used (process.version at line: 24) which is not supported in the Edge Runtime.
+Learn more: https://nextjs.org/docs/api-reference/edge-runtime
+
+Import trace for requested module:
+./node_modules/.pnpm/@supabase+supabase-js@2.81.1/node_modules/@supabase/supabase-js/dist/module/index.js
+./node_modules/.pnpm/@supabase+ssr@0.7.0_@supabase+supabase-js@2.81.1/node_modules/@supabase/ssr/dist/module/createBrowserClient.js
+./node_modules/.pnpm/@supabase+ssr@0.7.0_@supabase+supabase-js@2.81.1/node_modules/@supabase/ssr/dist/module/index.js
+
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+   Generating static pages (0/39) ...
+   Generating static pages (9/39)
+   Generating static pages (19/39)
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 3598 (/app/.next/server/app/(auth)/login/page.js:1:2789)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98962
+    at t (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:99165) {
+  digest: '14081601'
+}
+
+Error occurred prerendering page "/login". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 3598 (/app/.next/server/app/(auth)/login/page.js:1:2789)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98962
+    at t (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:99165)
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 58694 (/app/.next/server/app/(auth)/signup/page.js:1:1830)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98962
+    at t (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:99165) {
+  digest: '2643198315'
+}
+
+Error occurred prerendering page "/signup". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 58694 (/app/.next/server/app/(auth)/signup/page.js:1:1830)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98962
+    at t (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:99165)
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 39881 (/app/.next/server/chunks/7973.js:1:251)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98962
+    at t (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:99165) {
+  digest: '2845967221'
+}
+
+Error occurred prerendering page "/entertainment". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 39881 (/app/.next/server/chunks/7973.js:1:251)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98962
+    at t (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:99165)
+   Generating static pages (29/39)
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 39881 (/app/.next/server/chunks/7973.js:1:251)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98962
+    at t (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:99165) {
+  digest: '2845967221'
+}
+
+Error occurred prerendering page "/guide". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 39881 (/app/.next/server/chunks/7973.js:1:251)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98962
+    at t (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:99165)
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 39881 (/app/.next/server/chunks/7973.js:1:251)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98962
+    at t (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:99165) {
+  digest: '2845967221'
+}
+
+Error occurred prerendering page "/feedback". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 39881 (/app/.next/server/chunks/7973.js:1:251)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98962
+    at t (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:99165)
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 39881 (/app/.next/server/chunks/7973.js:1:251)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98962
+    at t (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:99165) {
+  digest: '2845967221'
+}
+
+Error occurred prerendering page "/chat". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 39881 (/app/.next/server/chunks/7973.js:1:251)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98962
+    at t (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:99165)
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 60023 (/app/.next/server/chunks/7973.js:1:70912)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 3726 (/app/.next/server/app/(main)/leaderboard/page.js:1:2281)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875 {
+  digest: '2461210252'
+}
+
+Error occurred prerendering page "/leaderboard". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 60023 (/app/.next/server/chunks/7973.js:1:70912)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 3726 (/app/.next/server/app/(main)/leaderboard/page.js:1:2281)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 39881 (/app/.next/server/chunks/7973.js:1:251)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98962
+    at t (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:99165) {
+  digest: '2845967221'
+}
+
+Error occurred prerendering page "/progress". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 39881 (/app/.next/server/chunks/7973.js:1:251)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98962
+    at t (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:99165)
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 39881 (/app/.next/server/chunks/7973.js:1:251)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98962
+    at t (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:99165) {
+  digest: '2845967221'
+}
+
+Error occurred prerendering page "/settings". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 39881 (/app/.next/server/chunks/7973.js:1:251)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98962
+    at t (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:99165)
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 39881 (/app/.next/server/chunks/7973.js:1:251)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98962
+    at t (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:99165) {
+  digest: '2845967221'
+}
+
+Error occurred prerendering page "/timer". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 39881 (/app/.next/server/chunks/7973.js:1:251)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98962
+    at t (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:99165)
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 60023 (/app/.next/server/chunks/7973.js:1:70912)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 79960 (/app/.next/server/app/(main)/tasks/page.js:1:9656)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875 {
+  digest: '3084097095'
+}
+
+Error occurred prerendering page "/tasks". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 60023 (/app/.next/server/chunks/7973.js:1:70912)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 79960 (/app/.next/server/app/(main)/tasks/page.js:1:9656)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 60023 (/app/.next/server/chunks/7973.js:1:70912)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 76245 (/app/.next/server/app/(main)/history/page.js:1:402529)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875 {
+  digest: '3106819900'
+}
+
+Error occurred prerendering page "/history". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 60023 (/app/.next/server/chunks/7973.js:1:70912)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 76245 (/app/.next/server/app/(main)/history/page.js:1:402529)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 39881 (/app/.next/server/chunks/7973.js:1:251)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98962
+    at t (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:99165) {
+  digest: '2845967221'
+}
+
+Error occurred prerendering page "/focus". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at rE (/app/.next/server/chunks/4986.js:34:51517)
+    at 13680 (/app/.next/server/chunks/5719.js:1:20399)
+    at t (/app/.next/server/webpack-runtime.js:1:143)
+    at 39881 (/app/.next/server/chunks/7973.js:1:251)
+    at Object.t [as require] (/app/.next/server/webpack-runtime.js:1:143)
+    at require (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:18811)
+    at s (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88330)
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98875
+    at /app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98962
+    at t (/app/node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:99165)
+ ✓ Generating static pages (39/39)
+
+> Export encountered errors on following paths:
+	/(auth)/login/page: /login
+	/(auth)/signup/page: /signup
+	/(main)/chat/page: /chat
+	/(main)/entertainment/page: /entertainment
+	/(main)/feedback/page: /feedback
+	/(main)/focus/page: /focus
+	/(main)/guide/page: /guide
+	/(main)/history/page: /history
+	/(main)/leaderboard/page: /leaderboard
+	/(main)/progress/page: /progress
+	/(main)/settings/page: /settings
+	/(main)/tasks/page: /tasks
+	/(main)/timer/page: /timer
+ ELIFECYCLE  Command failed with exit code 1.

@@ -63,19 +63,6 @@ export function TaskManagement() {
   const router = useRouter()
   const { t } = useI18n()
 
-  if (isAuthLoading) {
-    return null // Or a loading spinner
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="flex flex-col items-center justify-center flex-1 min-h-[60vh] space-y-4">
-        <h2 className="text-xl font-semibold text-center">{t('auth.signInToManageTasks')}</h2>
-        <Button onClick={() => router.push('/login?redirect=/tasks')}>{t('auth.signInButton')}</Button>
-      </div>
-    )
-  }
-
   const { activeTaskId, setActiveTask, viewMode } = useTasksStore()
   const { editingId, setEditingId, resetEditingState } = useEditingState()
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
@@ -90,6 +77,7 @@ export function TaskManagement() {
     () => (editingId ? tasks.find((task) => task.id === editingId) ?? null : null),
     [editingId, tasks],
   )
+  const queryClient = useQueryClient()
 
   const handleFormSubmit = async (payload: any) => {
     try {
@@ -104,7 +92,6 @@ export function TaskManagement() {
       // Error handled by hook
     }
   }
-  const queryClient = useQueryClient()
 
   const handleToggleStatus = async (task: Task) => {
     const isNowDone = task.status !== 'done'
@@ -314,6 +301,19 @@ export function TaskManagement() {
     return { todo, doing, done, total: tasks.length }
   }, [tasks])
 
+  if (isAuthLoading) {
+    return null // Or a loading spinner
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center flex-1 min-h-[60vh] space-y-4">
+        <h2 className="text-xl font-semibold text-center">{t('auth.signInToManageTasks')}</h2>
+        <Button onClick={() => router.push('/login?redirect=/tasks')}>{t('auth.signInButton')}</Button>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-4">
       {/* Header Section */}
@@ -364,7 +364,7 @@ export function TaskManagement() {
             <TaskViewSwitcher />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" className="h-9 w-9">
+                <Button variant="outline" size="icon" className="h-9 w-9" aria-label={t('common.settings')}>
                   <Settings className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
