@@ -206,7 +206,8 @@ export class AudioManager {
   private currentPlayer: AudioPlayer | null = null
   private currentSource: AudioSource | null = null
   private ambientPlayers: Map<string, HTMLAudioPlayer> = new Map()
-  private volume = 50
+  private ambientVolumes: Map<string, number> = new Map() // per-sound volumes (0-100)
+  private masterVolume = 50
   private isMuted = false
   private fadeInMs = 300
   private fadeOutMs = 300
@@ -275,11 +276,11 @@ export class AudioManager {
       }
 
       // Apply current settings
-      this.currentPlayer.setVolume(this.isMuted ? 0 : this.volume)
+      this.currentPlayer.setVolume(this.isMuted ? 0 : this.masterVolume)
 
       // Play with fade in if enabled
       if (this.fadeInMs > 0) {
-        await this.fadeIn(this.currentPlayer, this.volume)
+        await this.fadeIn(this.currentPlayer, this.masterVolume)
       } else {
         await this.currentPlayer.play()
       }
@@ -356,29 +357,48 @@ export class AudioManager {
   }
 
   setVolume(volume: number): void {
-    this.volume = Math.max(0, Math.min(100, volume))
-    const vol = this.isMuted ? 0 : this.volume
+    this.masterVolume = Math.max(0, Math.min(100, volume))
 
     if (this.currentPlayer) {
-      this.currentPlayer.setVolume(vol)
+      this.currentPlayer.setVolume(this.isMuted ? 0 : this.masterVolume)
     }
-    // Apply to all ambient players
-    this.ambientPlayers.forEach(player => {
-      player.setVolume(vol)
+
+    // Recalculate effective volumes for all ambient players
+    this.ambientPlayers.forEach((player, id) => {
+      const soundVol = this.ambientVolumes.get(id) ?? 50
+      const effective = this.isMuted ? 0 : (soundVol / 100) * (this.masterVolume / 100) * 100
+      player.setVolume(effective)
     })
   }
 
   setMute(muted: boolean): void {
     this.isMuted = muted
-    const vol = muted ? 0 : this.volume
 
     if (this.currentPlayer) {
-      this.currentPlayer.setVolume(vol)
+      this.currentPlayer.setVolume(muted ? 0 : this.masterVolume)
     }
-    // Apply to all ambient players
-    this.ambientPlayers.forEach(player => {
-      player.setVolume(vol)
+
+    // Recalculate for all ambient players
+    this.ambientPlayers.forEach((player, id) => {
+      if (muted) {
+        player.setVolume(0)
+      } else {
+        const soundVol = this.ambientVolumes.get(id) ?? 50
+        const effective = (soundVol / 100) * (this.masterVolume / 100) * 100
+        player.setVolume(effective)
+      }
     })
+  }
+
+  // Set per-sound volume for a specific ambient sound
+  setAmbientVolume(soundId: string, soundVolume: number): void {
+    const clamped = Math.max(0, Math.min(100, soundVolume))
+    this.ambientVolumes.set(soundId, clamped)
+    const player = this.ambientPlayers.get(soundId)
+    if (player) {
+      const effective = this.isMuted ? 0 : (soundVolume / 100) * (this.masterVolume / 100) * 100
+      player.setVolume(effective)
+    }
   }
 
   setFadeSettings(fadeInMs: number, fadeOutMs: number): void {
@@ -405,11 +425,16 @@ export class AudioManager {
         return true
       }
 
-      // Create new HTML audio player for this ambient sound
-      const player = new HTMLAudioPlayer(source)
+      // Store per-sound volume (clamped)
+      const soundVolume = Math.max(0, Math.min(100, source.volume))
+      this.ambientVolumes.set(soundId, soundVolume)
 
-      // Set volume
-      player.setVolume(this.isMuted ? 0 : this.volume)
+      // Calculate effective volume
+      const effectiveVolume = this.isMuted ? 0 : (soundVolume / 100) * (this.masterVolume / 100) * 100
+
+      // Create player with effective volume
+      const effectiveSource = { ...source, volume: effectiveVolume }
+      const player = new HTMLAudioPlayer(effectiveSource)
 
       // Play the sound
       await player.play()
@@ -433,6 +458,7 @@ export class AudioManager {
         console.error('Error stopping ambient sound:', error)
       }
       this.ambientPlayers.delete(soundId)
+      this.ambientVolumes.delete(soundId)
     }
   }
 
@@ -450,6 +476,7 @@ export class AudioManager {
     const promises = Array.from(this.ambientPlayers.keys()).map(id => this.stopAmbient(id))
     await Promise.all(promises)
     this.ambientPlayers.clear()
+    this.ambientVolumes.clear()
   }
 
   getActiveAmbientIds(): string[] {
@@ -477,10 +504,10 @@ export class AudioManager {
 
   private async fadeOut(player: AudioPlayer, durationMs: number): Promise<void> {
     const steps = Math.max(1, Math.round(durationMs / 40))
-    const stepVolume = (this.volume / 100) / steps
+    const stepVolume = (this.masterVolume / 100) / steps
 
     for (let i = 0; i < steps; i++) {
-      const volume = Math.max((this.volume / 100) - ((i + 1) * stepVolume), 0)
+      const volume = Math.max((this.masterVolume / 100) - ((i + 1) * stepVolume), 0)
       player.setVolume(volume)
       await this.delay(40)
     }
@@ -507,7 +534,7 @@ export const playAmbientSound = async (soundId: string, volume = 50): Promise<bo
     vn: sound.vn,
     url: sound.url,
     volume,
-    loop: sound.loopRecommended
+    loop: true
   }
 
   return await audioManager.play(source)

@@ -19,7 +19,7 @@ Transform the 800px 3-tab audio modal into a 350px right sidebar soundscape mixe
 | # | Phase | File | Status | Effort |
 |---|-------|------|--------|--------|
 | 1 | Remove Spotify & Clean Legacy | [phase-01](./phase-01-remove-spotify-clean-legacy.md) | completed | 2h |
-| 2 | Restructure Audio Store & Engine | [phase-02](./phase-02-restructure-store-engine.md) | pending | 4h |
+| 2 | Restructure Audio Store & Engine | [phase-02](./phase-02-restructure-store-engine.md) | completed | 4h |
 | 3 | Build Audio Sidebar Panel | [phase-03](./phase-03-audio-sidebar-panel.md) | pending | 5h |
 | 4 | Preset System | [phase-04](./phase-04-preset-system.md) | pending | 3h |
 | 5 | YouTube Exclusive Mode | [phase-05](./phase-05-youtube-exclusive-mode.md) | pending | 2h |

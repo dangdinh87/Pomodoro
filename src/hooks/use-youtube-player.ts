@@ -359,7 +359,7 @@ export const useYouTubePlayer = () => {
   useEffect(() => {
     const player = getGlobalYT();
     if (player && typeof player.setVolume === 'function') {
-      player.setVolume(audioSettings.volume);
+      player.setVolume(audioSettings.masterVolume);
     }
     if (player && typeof player.mute === 'function' && typeof player.unMute === 'function') {
       if (audioSettings.isMuted) {
@@ -368,7 +368,7 @@ export const useYouTubePlayer = () => {
         player.unMute();
       }
     }
-  }, [audioSettings.volume, audioSettings.isMuted]);
+  }, [audioSettings.masterVolume, audioSettings.isMuted]);
 
   return {
     playerState,

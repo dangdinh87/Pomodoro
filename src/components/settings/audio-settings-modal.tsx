@@ -67,8 +67,8 @@ export function AudioSettingsModal({
 
   const ambientSounds = soundCatalog.ambient;
 
-  // State for selected tab with persistence
-  const [selectedTab, setSelectedTab] = useState(audioSettings.selectedTab || 'sources');
+  // Local tab state (no longer persisted in AudioSettings)
+  const [selectedTab, setSelectedTab] = useState('sources');
 
   // Loading state to prevent user interaction during audio initialization
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
@@ -80,7 +80,7 @@ export function AudioSettingsModal({
 
     if (activeAmbientSounds.length > 0) {
       const needsUpdate = !currentlyPlaying ||
-        (activeAmbientSounds.length === 1 && currentlyPlaying.id !== activeAmbientSounds[0]) ||
+        (activeAmbientSounds.length === 1 && currentlyPlaying.id !== activeAmbientSounds[0]?.id) ||
         (activeAmbientSounds.length > 1 && currentlyPlaying.id !== 'mixed-ambient');
 
       if (needsUpdate) {
@@ -89,15 +89,13 @@ export function AudioSettingsModal({
     }
   }, []); // Empty deps - only run on mount
 
-  // Save selected tab when it changes
   const handleTabChange = (value: string) => {
     setSelectedTab(value);
-    updateAudioSettings({ selectedTab: value });
   };
 
   // Helper to check if a sound is currently active in the mix
   const isSoundActive = (soundId: string) => {
-    return activeAmbientSounds.includes(soundId);
+    return activeAmbientSounds.some(s => s.id === soundId);
   };
 
   // Handle play/pause with loading state
@@ -263,7 +261,7 @@ export function AudioSettingsModal({
                     <span className="text-sm font-medium truncate">
                       {currentlyPlaying?.name || (activeAmbientSounds.length > 0
                         ? (activeAmbientSounds.length === 1
-                          ? soundCatalog.ambient.find(s => s.id === activeAmbientSounds[0])?.label || "Ambient Sound"
+                          ? soundCatalog.ambient.find(s => s.id === activeAmbientSounds[0]?.id)?.label || "Ambient Sound"
                           : `Mixed Ambient (${activeAmbientSounds.length} sounds)`)
                         : "No audio playing")}
                     </span>
@@ -319,7 +317,7 @@ export function AudioSettingsModal({
                       )}
                     </Button>
                     <Slider
-                      value={[audioSettings.isMuted ? 0 : audioSettings.volume]}
+                      value={[audioSettings.isMuted ? 0 : audioSettings.masterVolume]}
                       min={0}
                       max={100}
                       step={1}
