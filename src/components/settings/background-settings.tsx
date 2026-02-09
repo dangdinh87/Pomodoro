@@ -22,7 +22,6 @@ import Image from 'next/image';
 
 interface BackgroundSettingsProps {
   onClose?: () => void;
-  /** Whether the slider panel is in preview mode (dialog transparent) */
   isPreview?: boolean;
   onPreviewChange?: (preview: boolean) => void;
 }
@@ -67,7 +66,7 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
   );
   const [blur, setBlur] = useState<number>(background.blur ?? 0);
 
-  // End preview mode on global pointer release
+  // Khi kéo slider: bật preview (ẩn modal) để xem nền; thả chuột thì tắt
   useEffect(() => {
     if (!isPreview) return;
     const endPreview = () => onPreviewChange?.(false);
@@ -234,8 +233,8 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
 
   return (
     <div className="flex flex-col h-full">
-      {/* Fixed Header — hidden during slider preview */}
-      <div className={`flex items-center justify-between px-6 py-4 border-b shrink-0 transition-opacity duration-150 ${isPreview ? 'opacity-0' : ''}`}>
+      {/* Fixed Header — ẩn khi đang kéo slider để xem nền */}
+      <div className={`flex items-center justify-between px-6 py-4 border-b shrink-0 transition-opacity duration-150 ${isPreview ? 'opacity-0 pointer-events-none' : ''}`}>
         <div>
           <h2 className="text-lg font-semibold leading-none tracking-tight">{t('settings.background.selectImage')}</h2>
         </div>
@@ -251,8 +250,8 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
         </div>
       </div>
 
-      {/* Top: 3 main tabs — hidden during slider preview */}
-      <div className={`shrink-0 border-b px-6 transition-opacity duration-150 ${isPreview ? 'opacity-0' : ''}`}>
+      {/* Top: 3 main tabs — ẩn khi đang kéo slider */}
+      <div className={`shrink-0 border-b px-6 transition-opacity duration-150 ${isPreview ? 'opacity-0 pointer-events-none' : ''}`}>
         <div className="flex gap-0" role="tablist" aria-label={t('settings.background.selectImage')}>
           {(['static', 'video', 'personal'] as const).map((tab) => (
             <button
@@ -278,7 +277,7 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
         {/* Left: Vertical category list — only for Ảnh tĩnh (static packs) or Ảnh động (lofi only); Ảnh của tôi has no categories */}
         {showLeftNav && (
           <nav
-            className={`shrink-0 w-36 border-r flex flex-col py-3 gap-0.5 transition-opacity duration-150 ${isPreview ? 'opacity-0' : ''}`}
+            className={`shrink-0 w-36 border-r flex flex-col py-3 gap-0.5 transition-opacity duration-150 ${isPreview ? 'opacity-0 pointer-events-none' : ''}`}
             aria-label={t('settings.background.selectImage')}
           >
             {leftNavPacks.map((pack) => (
@@ -299,8 +298,8 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
           </nav>
         )}
 
-        {/* Center: hidden during slider preview */}
-        <div className={`flex-1 overflow-y-auto p-6 min-w-0 transition-opacity duration-150 ${isPreview ? 'opacity-0' : ''}`}>
+        {/* Center — ẩn khi đang kéo slider */}
+        <div className={`flex-1 overflow-y-auto p-6 min-w-0 transition-opacity duration-150 ${isPreview ? 'opacity-0 pointer-events-none' : ''}`}>
           {activeTab === 'personal' ? (
             <>
               <PersonalTab
@@ -360,11 +359,9 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
           )}
         </div>
 
-        {/* Right: Sliders — stays visible during preview with solid bg */}
+        {/* Right: Sliders — giữ hiện khi kéo để user vẫn thấy và kéo được */}
         <div className={`shrink-0 w-56 p-4 flex flex-col gap-4 overflow-y-auto relative transition-all duration-150 ${
-          isPreview
-            ? 'bg-background/95 backdrop-blur-sm rounded-lg shadow-2xl border'
-            : 'border-l bg-muted/10'
+          isPreview ? 'bg-background/95 backdrop-blur-sm rounded-lg shadow-2xl border' : 'border-l bg-muted/10'
         }`}>
           {styleValue.startsWith('system:') && (
             <div className="absolute inset-0 z-10 bg-background/60 backdrop-blur-[1px] flex items-center justify-center p-6">
@@ -749,7 +746,6 @@ function SliderControl({
         <Label htmlFor={id} className="text-sm">{label}</Label>
         <span className="text-xs font-mono text-muted-foreground">{value}{suffix}</span>
       </div>
-      {/* onPointerDown triggers preview mode; global pointerup ends it */}
       <div onPointerDown={disabled ? undefined : onDragStart}>
         <Slider
           id={id}
