@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Progress • Improcode',
+  title: 'Progress • Study Bro App',
   description: 'Track your long-term progress and achievements.',
 };
 

@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Settings • Improcode',
-  description: 'Customize your Improcode experience: themes, timer settings, notifications, and more.',
+  title: 'Settings • Study Bro App',
+  description: 'Customize your Study Bro App experience: themes, timer settings, notifications, and more.',
 };
 
 export default function SettingsLayout({

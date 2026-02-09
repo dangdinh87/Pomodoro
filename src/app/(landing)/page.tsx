@@ -15,20 +15,20 @@ import { Metadata } from 'next';
 
 // SEO Metadata - rendered server-side
 export const metadata: Metadata = {
-  title: 'Improcode - Pomodoro Timer, AI Coach & Focus Tools',
+  title: 'Study Bro - Pomodoro Timer, Bro Chat AI & Focus Tools',
   description:
-    'Improcode: Pomodoro timer with task linking, valid-session tracking, AI coach, mini games for breaks, leaderboard, focus mode, and analytics. Free to use.',
-  keywords: ['pomodoro', 'timer', 'productivity', 'focus', 'study', 'AI', 'Improcode', 'task management', 'leaderboard', 'Improcode Every Day'],
+    'Pomodoro timer with task linking, valid-session tracking, Bro Chat AI coach, mini games for breaks, leaderboard, focus mode, and analytics. Free to use.',
+  keywords: ['pomodoro', 'timer', 'productivity', 'focus', 'study', 'AI', 'Bro Chat', 'task management', 'leaderboard'],
   openGraph: {
-    title: 'Improcode - Pomodoro Timer, AI Coach & Focus Tools',
-    description: 'Improcode: Pomodoro timer, AI coach, mini games, leaderboard, and focus tools. Free to use.',
+    title: 'Study Bro - Pomodoro Timer & Bro Chat AI',
+    description: 'Pomodoro timer, AI coach, mini games, leaderboard, and focus tools. Free to use.',
     type: 'website',
-    url: 'https://improcode.com',
+    url: 'https://www.pomodoro-focus.site',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Improcode - Pomodoro Timer, AI Coach & Focus Tools',
-    description: 'Improcode: Pomodoro timer, AI coach, mini games, leaderboard, and focus tools. Free to use.',
+    title: 'Study Bro - Pomodoro Timer & Bro Chat AI',
+    description: 'Pomodoro timer, AI coach, mini games, leaderboard, and focus tools. Free to use.',
   },
 };
 

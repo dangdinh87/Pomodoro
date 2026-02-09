@@ -2,8 +2,8 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Terms of Service • Improcode',
-    description: 'Terms of Service for Improcode. Read our terms and conditions for using the application.',
+    title: 'Terms of Service • Study Bro App',
+    description: 'Terms of Service for Study Bro App. Read our terms and conditions for using the application.',
 };
 
 export default function TermsPage() {

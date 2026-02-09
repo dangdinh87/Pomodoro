@@ -2,8 +2,8 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Privacy Policy • Improcode',
-    description: 'Privacy Policy for Improcode. Learn how we handle your data and protect your privacy.',
+    title: 'Privacy Policy • Study Bro App',
+    description: 'Privacy Policy for Study Bro App. Learn how we handle your data and protect your privacy.',
 };
 
 export default function PrivacyPage() {

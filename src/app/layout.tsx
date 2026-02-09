@@ -30,33 +30,32 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: 'Improcode',
+  title: 'Study Bro App',
   description:
-    'A comprehensive Pomodoro Timer web application for focus enhancement and productivity tracking. Improcode Every Day.',
+    'A comprehensive Pomodoro Timer web application for focus enhancement and productivity tracking',
   manifest: '/manifest.json',
-  metadataBase: new URL('https://improcode.com'),
+  metadataBase: new URL('https://www.pomodoro-focus.site'),
   keywords: [
     'Pomodoro Timer',
     'Study Timer',
     'Focus Timer',
     'Productivity Tool',
-    'Improcode',
-    'Improcode Every Day',
+    'Study Bro',
     'Focus Enhancement',
     'Time Management',
   ],
   openGraph: {
-    title: 'Improcode',
+    title: 'Study Bro App',
     description:
-      'A comprehensive Pomodoro Timer web application for focus enhancement and productivity tracking. Improcode Every Day.',
-    url: 'https://improcode.com',
-    siteName: 'Improcode',
+      'A comprehensive Pomodoro Timer web application for focus enhancement and productivity tracking',
+    url: 'https://www.pomodoro-focus.site',
+    siteName: 'Study Bro App',
     images: [
       {
         url: '/card.jpg',
         width: 1200,
         height: 630,
-        alt: 'Improcode',
+        alt: 'Study Bro App',
       },
     ],
     locale: 'en_US',
@@ -64,9 +63,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Improcode',
+    title: 'Study Bro App',
     description:
-      'A comprehensive Pomodoro Timer web application for focus enhancement and productivity tracking. Improcode Every Day.',
+      'A comprehensive Pomodoro Timer web application for focus enhancement and productivity tracking',
     images: ['/card.jpg'],
   },
 };
@@ -86,9 +85,9 @@ export default function RootLayout({
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'WebApplication',
-              name: 'Improcode',
-              description: 'AI-Powered Pomodoro Timer for Maximum Focus and Productivity. Improcode Every Day.',
-              url: 'https://improcode.com',
+              name: 'Study Bro',
+              description: 'AI-Powered Pomodoro Timer for Maximum Focus and Productivity',
+              url: 'https://www.pomodoro-focus.site',
               applicationCategory: 'ProductivityApplication',
               operatingSystem: 'Web Browser',
               offers: {
