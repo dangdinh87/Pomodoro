@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/use-auth'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useCallback } from 'react'
 import { Task, useTasksStore, TaskStatus } from '@/stores/task-store'
 import { TaskFilters } from './components/task-filters'
 import { TaskFormModal } from './components/task-form-modal'
@@ -63,19 +63,6 @@ export function TaskManagement() {
   const router = useRouter()
   const { t } = useI18n()
 
-  if (isAuthLoading) {
-    return null // Or a loading spinner
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="flex flex-col items-center justify-center flex-1 min-h-[60vh] space-y-4">
-        <h2 className="text-xl font-semibold text-center">{t('auth.signInToManageTasks')}</h2>
-        <Button onClick={() => router.push('/login?redirect=/tasks')}>{t('auth.signInButton')}</Button>
-      </div>
-    )
-  }
-
   const { activeTaskId, setActiveTask, viewMode } = useTasksStore()
   const { editingId, setEditingId, resetEditingState } = useEditingState()
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
@@ -90,8 +77,9 @@ export function TaskManagement() {
     () => (editingId ? tasks.find((task) => task.id === editingId) ?? null : null),
     [editingId, tasks],
   )
+  const queryClient = useQueryClient()
 
-  const handleFormSubmit = async (payload: any) => {
+  const handleFormSubmit = useCallback(async (payload: any) => {
     try {
       if (editingId) {
         await updateTask({ id: editingId, input: payload })
@@ -103,15 +91,17 @@ export function TaskManagement() {
     } catch (error) {
       // Error handled by hook
     }
-  }
-  const queryClient = useQueryClient()
+  }, [editingId, updateTask, createTask, resetEditingState])
 
-  const handleToggleStatus = async (task: Task) => {
+  const handleToggleStatus = useCallback(async (task: Task) => {
     const isNowDone = task.status !== 'done'
     const newStatus: TaskStatus = isNowDone ? 'done' : 'todo'
 
+    // Use getState() to avoid dependency on activeTaskId
+    const currentActiveTaskId = useTasksStore.getState().activeTaskId
+
     // Auto-unfocus logic
-    if (isNowDone && activeTaskId === task.id) {
+    if (isNowDone && currentActiveTaskId === task.id) {
       // Record partial session before unfocusing for accuracy
       const { mode, timeLeft, lastSessionTimeLeft, setLastSessionTimeLeft } = useTimerStore.getState()
       if (mode === 'work') {
@@ -147,12 +137,13 @@ export function TaskManagement() {
         return next
       })
     }
-  }
+  }, [updateTask, queryClient, setActiveTask])
 
-  const handleUpdateStatus = async (taskId: string, newStatus: TaskStatus) => {
+  const handleUpdateStatus = useCallback(async (taskId: string, newStatus: TaskStatus) => {
     const isNowDone = newStatus === 'done'
+    const currentActiveTaskId = useTasksStore.getState().activeTaskId
 
-    if (isNowDone && activeTaskId === taskId) {
+    if (isNowDone && currentActiveTaskId === taskId) {
       const { mode, timeLeft, lastSessionTimeLeft, setLastSessionTimeLeft } = useTimerStore.getState()
       if (mode === 'work') {
         const durationSec = Math.max(0, lastSessionTimeLeft - timeLeft)
@@ -186,12 +177,13 @@ export function TaskManagement() {
         return next
       })
     }
-  }
+  }, [updateTask, queryClient, setActiveTask])
 
-  const handleToggleActive = (task: Task) => {
+  const handleToggleActive = useCallback((task: Task) => {
     const { timeLeft, setLastSessionTimeLeft } = useTimerStore.getState()
+    const currentActiveTaskId = useTasksStore.getState().activeTaskId
 
-    if (activeTaskId === task.id) {
+    if (currentActiveTaskId === task.id) {
       // Recording when manual unfocus too for accuracy
       const { mode, lastSessionTimeLeft } = useTimerStore.getState()
       if (mode === 'work') {
@@ -214,7 +206,7 @@ export function TaskManagement() {
       setActiveTask(null)
     } else {
       // Record time for the PREVIOUS active task if any
-      if (activeTaskId) {
+      if (currentActiveTaskId) {
         const { mode, lastSessionTimeLeft } = useTimerStore.getState()
         if (mode === 'work') {
           const durationSec = Math.max(0, lastSessionTimeLeft - timeLeft)
@@ -223,7 +215,7 @@ export function TaskManagement() {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                taskId: activeTaskId,
+                taskId: currentActiveTaskId,
                 durationSec,
                 mode: 'work',
               }),
@@ -244,32 +236,36 @@ export function TaskManagement() {
         updateTask({ id: task.id, input: { status: 'doing' } })
       }
     }
-  }
+  }, [updateTask, queryClient, setActiveTask])
 
-  const handleOpenChange = (open: boolean) => {
+  const handleOpenChange = useCallback((open: boolean) => {
     if (!open) {
       setIsCreateModalOpen(false)
       resetEditingState()
     } else {
       setIsCreateModalOpen(true)
     }
-  }
+  }, [resetEditingState])
 
-  const handleDeleteRequest = (id: string) => {
+  const handleDeleteRequest = useCallback((id: string) => {
     setDeleteConfirmId(id)
-  }
+  }, [])
 
-  const confirmDelete = async () => {
+  const confirmDelete = useCallback(async () => {
     if (!deleteConfirmId) return
 
     try {
+      const currentActiveTaskId = useTasksStore.getState().activeTaskId
       // If deleting the active task, reset active state
-      if (deleteConfirmId === activeTaskId) {
+      if (deleteConfirmId === currentActiveTaskId) {
         setActiveTask(null)
       }
 
       await hardDeleteTask(deleteConfirmId)
 
+      // Access current state editingId? No, editingId is from hook but passed as closure?
+      // editingId is from useEditingState hook which uses useState.
+      // So we need editingId in dependency array.
       if (editingId === deleteConfirmId) {
         resetEditingState()
       }
@@ -278,27 +274,27 @@ export function TaskManagement() {
     } finally {
       setDeleteConfirmId(null)
     }
-  }
+  }, [deleteConfirmId, hardDeleteTask, editingId, resetEditingState, setActiveTask])
 
-  const handleEdit = (task: Task) => {
+  const handleEdit = useCallback((task: Task) => {
     setEditingId(task.id)
-  }
+  }, [setEditingId])
 
-  const handleClone = async (taskId: string) => {
+  const handleClone = useCallback(async (taskId: string) => {
     try {
       await cloneTask(taskId)
     } catch (error) {
       // Error handled by hook
     }
-  }
+  }, [cloneTask])
 
-  const handleSaveAsTemplate = async (taskId: string) => {
+  const handleSaveAsTemplate = useCallback(async (taskId: string) => {
     try {
       await saveAsTemplate(taskId)
     } catch (error) {
       // Error handled by hook
     }
-  }
+  }, [saveAsTemplate])
 
   const uniqueTags = useMemo(() => {
     const tags = new Set<string>()
@@ -313,6 +309,19 @@ export function TaskManagement() {
     const done = tasks.filter(t => t.status === 'done').length
     return { todo, doing, done, total: tasks.length }
   }, [tasks])
+
+  if (isAuthLoading) {
+    return null // Or a loading spinner
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center flex-1 min-h-[60vh] space-y-4">
+        <h2 className="text-xl font-semibold text-center">{t('auth.signInToManageTasks')}</h2>
+        <Button onClick={() => router.push('/login?redirect=/tasks')}>{t('auth.signInButton')}</Button>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-4">
