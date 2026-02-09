@@ -20,7 +20,6 @@ export default function BackgroundSettingsModal({
     <Dialog
       open={isOpen}
       onOpenChange={(open) => {
-        // Prevent closing dialog while user is dragging a slider
         if (!isPreview && !open) onClose();
       }}
     >

@@ -125,7 +125,6 @@ export default function LoginPage() {
       <Suspense fallback={null}>
         <LoginRedirect />
       </Suspense>
-      <div className="flex min-h-screen items-center justify-center px-4 py-8">
         <Card className="relative w-full max-w-md overflow-hidden border-white/10 bg-background/80 shadow-2xl backdrop-blur">
           <BorderBeam size={250} duration={12} delay={0} />
         <CardHeader className="space-y-2 text-center">
@@ -253,7 +252,6 @@ export default function LoginPage() {
           </Button>
         </CardFooter>
       </Card>
-    </div>
     </>
   );
 }

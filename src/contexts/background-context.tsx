@@ -9,7 +9,7 @@ import React, {
 } from 'react';
 import { detectFormatSupport } from '@/lib/format-detection';
 import { findImageById } from '@/data/background-packs';
-import { PATH_TO_ID_MAP } from '@/data/background-migration';
+import { PATH_TO_ID_MAP, REMOVED_BACKGROUND_IDS } from '@/data/background-migration';
 
 type BGType = 'none' | 'solid' | 'image' | 'gradient' | 'random';
 
@@ -87,10 +87,20 @@ const migrateBackground = (bg: BackgroundSettings): BackgroundSettings => {
   }
 
   // Migrate old path-based values to new pack IDs
-  if (bg.type === 'image' && bg.value && !findImageById(bg.value)) {
-    const newId = PATH_TO_ID_MAP[bg.value];
-    if (newId) {
-      return { ...bg, value: newId };
+  if (bg.type === 'image' && bg.value) {
+    if (REMOVED_BACKGROUND_IDS.has(bg.value)) {
+      return {
+        ...bg,
+        type: 'solid',
+        value: 'hsl(var(--background))',
+        opacity: 1,
+        blur: 0,
+        brightness: 100,
+      };
+    }
+    if (!findImageById(bg.value)) {
+      const newId = PATH_TO_ID_MAP[bg.value];
+      if (newId) return { ...bg, value: newId };
     }
   }
 

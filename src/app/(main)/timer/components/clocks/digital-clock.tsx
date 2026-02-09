@@ -14,9 +14,9 @@ export type DigitalClockProps = {
 };
 
 const sizeClasses = {
-  small: 'text-7xl md:text-8xl lg:text-9xl',
-  medium: 'text-8xl md:text-[10rem] lg:text-[12rem]',
-  large: 'text-9xl md:text-[12rem] lg:text-[14rem]',
+  small: 'text-[clamp(3rem,9vmin,6rem)]',
+  medium: 'text-[clamp(4rem,13vmin,9rem)]',
+  large: 'text-[clamp(5rem,16vmin,12rem)]',
 };
 
 const numberFlowTiming = {

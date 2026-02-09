@@ -17,9 +17,9 @@ const RADIUS = 90;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 const sizeClasses = {
-  small: { container: 'w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96', text: 'text-4xl md:text-5xl lg:text-6xl' },
-  medium: { container: 'w-80 h-80 md:w-96 md:h-96 lg:w-[28rem] lg:h-[28rem]', text: 'text-5xl md:text-6xl lg:text-7xl' },
-  large: { container: 'w-96 h-96 md:w-[26rem] md:h-[26rem] lg:w-[32rem] lg:h-[32rem]', text: 'text-6xl md:text-8xl lg:text-9xl' },
+  small: { container: 'w-[clamp(14rem,35vmin,22rem)] h-[clamp(14rem,35vmin,22rem)]', text: 'text-[clamp(2rem,5vmin,3.5rem)]' },
+  medium: { container: 'w-[clamp(16rem,42vmin,26rem)] h-[clamp(16rem,42vmin,26rem)]', text: 'text-[clamp(2.5rem,7vmin,4.5rem)]' },
+  large: { container: 'w-[clamp(20rem,52vmin,30rem)] h-[clamp(20rem,52vmin,30rem)]', text: 'text-[clamp(3.5rem,10vmin,6rem)]' },
 };
 
 const numberFlowTiming = {

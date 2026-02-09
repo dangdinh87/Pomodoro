@@ -371,13 +371,13 @@ html.dark .custom-scrollbar {
   scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
-/* Border Beam Animation */
+/* Border Beam Animation - GPU-composited via transform */
 @keyframes border-beam {
-  0% {
-    offset-distance: var(--initial-offset, 0%);
+  from {
+    transform: rotate(0deg);
   }
-  100% {
-    offset-distance: calc(var(--initial-offset, 0%) + 100%);
+  to {
+    transform: rotate(360deg);
   }
 }
 
