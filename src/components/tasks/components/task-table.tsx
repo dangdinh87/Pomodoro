@@ -125,6 +125,7 @@ export function TaskTable({
                                                     togglingTaskIds?.has(task.id) && "opacity-50"
                                                 )}
                                                 disabled={togglingTaskIds?.has(task.id)}
+                                                aria-label={isDone ? t('tasks.actions.markIncomplete') : t('tasks.actions.markComplete')}
                                             />
                                             {togglingTaskIds?.has(task.id) && (
                                                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -230,6 +231,7 @@ export function TaskTable({
                                                                 onEdit(task)
                                                             }}
                                                             className="h-7 w-7 text-muted-foreground hover:text-blue-500 hover:bg-blue-500/10 transition-colors"
+                                                            aria-label={t('tasks.actions.edit')}
                                                         >
                                                             <AnimatedEdit className="h-3.5 w-3.5" />
                                                         </Button>
@@ -246,6 +248,7 @@ export function TaskTable({
                                                         variant="ghost"
                                                         size="icon"
                                                         className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                                                        aria-label={t('common.actions')}
                                                     >
                                                         <MoreHorizontal className="h-4 w-4" />
                                                     </Button>
@@ -273,13 +276,15 @@ export function TaskTable({
                                 </TableRow>
                             )
                         })}
+                        {tasks.length === 0 && (
+                            <TableRow>
+                                <TableCell colSpan={8} className="text-center py-20 text-muted-foreground bg-muted/5">
+                                    {t('tasks.noTasks')}
+                                </TableCell>
+                            </TableRow>
+                        )}
                     </TableBody>
                 </Table>
-                {tasks.length === 0 && (
-                    <div className="text-center py-20 text-muted-foreground bg-muted/5 border-t border-border">
-                        {t('tasks.noTasks')}
-                    </div>
-                )}
             </div>
             <div className="flex items-center justify-between px-4 py-1.5 bg-background border-t border-border mt-auto h-10">
                 <div className="flex items-center gap-2">
