@@ -94,7 +94,7 @@ export const soundCategories: { key: SoundCategory; label: string; vn: string; s
 
 // Alarm sounds
 export const alarmSounds: AlarmItem[] = [
-  { id: "bell", label: "Bell", vn: "Chuông", url: "/sounds/alarm.mp3" },
+  { id: "bell", label: "Bell", vn: "Chuông", url: "/sounds/alarms/bell.mp3" },
   { id: "chime", label: "Chime", vn: "Chuông nhẹ", url: "/sounds/alarms/chime.mp3" },
   { id: "gong", label: "Gong", vn: "Chuông đồng", url: "/sounds/alarms/gong.mp3" },
   { id: "digital", label: "Digital", vn: "Kỹ thuật số", url: "/sounds/alarms/digital.mp3" },

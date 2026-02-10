@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { useTimerStore, TimerMode } from '@/stores/timer-store';
 import { useTasksStore } from '@/stores/task-store';
+import { useAudioStore } from '@/stores/audio-store';
+import { alarmSounds } from '@/lib/audio/sound-catalog';
 import { useQueryClient } from '@tanstack/react-query';
 import confetti from 'canvas-confetti';
 
@@ -108,11 +110,14 @@ export function useTimerEngine() {
     const currentSessionCount = useTimerStore.getState().sessionCount;
 
     try {
-      // Play sound
-      const audio = new Audio('/sounds/alarm.mp3');
-      // TODO: Get volume from system store if possible, or default
-      audio.volume = 0.5;
-      audio.play().catch(() => {});
+      // Play alarm sound from user settings
+      const { alarmType, alarmVolume } = useAudioStore.getState().audioSettings
+      const alarmEntry = alarmSounds.find(a => a.id === alarmType)
+      const alarmUrl = alarmEntry?.url || '/sounds/alarms/bell.mp3' // Fallback to bell
+      const audio = new Audio(alarmUrl)
+      // Minimum 10% volume ensures alarm is always audible
+      audio.volume = Math.max(0.1, alarmVolume / 100)
+      audio.play().catch(() => {})
     } catch {}
 
     // FIX: Calculate duration BEFORE using it in toast
