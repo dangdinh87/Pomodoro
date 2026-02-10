@@ -491,30 +491,42 @@ export class AudioManager {
     return this.ambientPlayers.size
   }
 
-  private async fadeIn(player: AudioPlayer, targetVolume: number): Promise<void> {
-    const steps = Math.max(1, Math.round(this.fadeInMs / 40))
-    const stepVolume = (targetVolume / 100) / steps
+  private fadeIn(player: AudioPlayer, targetVolume: number): Promise<void> {
+    return new Promise(resolve => {
+      const targetVolumeNormalized = targetVolume / 100
+      const startTime = performance.now()
 
-    for (let i = 0; i < steps; i++) {
-      const volume = Math.min((i + 1) * stepVolume, targetVolume / 100)
-      player.setVolume(volume)
-      await this.delay(40)
-    }
+      const fade = (currentTime: number) => {
+        const elapsed = currentTime - startTime
+        const progress = Math.min(elapsed / this.fadeInMs, 1)
+        player.setVolume(targetVolumeNormalized * progress)
+        if (progress < 1) {
+          requestAnimationFrame(fade)
+        } else {
+          resolve()
+        }
+      }
+      requestAnimationFrame(fade)
+    })
   }
 
-  private async fadeOut(player: AudioPlayer, durationMs: number): Promise<void> {
-    const steps = Math.max(1, Math.round(durationMs / 40))
-    const stepVolume = (this.masterVolume / 100) / steps
+  private fadeOut(player: AudioPlayer, durationMs: number): Promise<void> {
+    return new Promise(resolve => {
+      const startVolume = this.masterVolume / 100
+      const startTime = performance.now()
 
-    for (let i = 0; i < steps; i++) {
-      const volume = Math.max((this.masterVolume / 100) - ((i + 1) * stepVolume), 0)
-      player.setVolume(volume)
-      await this.delay(40)
-    }
-  }
-
-  private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms))
+      const fade = (currentTime: number) => {
+        const elapsed = currentTime - startTime
+        const progress = Math.min(elapsed / durationMs, 1)
+        player.setVolume(startVolume * (1 - progress))
+        if (progress < 1) {
+          requestAnimationFrame(fade)
+        } else {
+          resolve()
+        }
+      }
+      requestAnimationFrame(fade)
+    })
   }
 }
 

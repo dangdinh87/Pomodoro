@@ -28,6 +28,9 @@ const nature: SoundItem[] = [
   { id: "waves", category: "nature", label: "Waves", vn: "Sóng biển", icon: "🌊", url: "/sounds/nature/waves.mp3" },
   { id: "wind-in-trees", category: "nature", label: "Wind in Trees", vn: "Gió trong cây", icon: "🌳", url: "/sounds/nature/wind-in-trees.mp3" },
   { id: "wind", category: "nature", label: "Wind", vn: "Gió", icon: "💨", url: "/sounds/nature/wind.mp3" },
+  { id: "birds", category: "nature", label: "Birds", vn: "Chim hót", icon: "🐦", url: "/sounds/nature/birds.mp3" },
+  { id: "night-crickets", category: "nature", label: "Night Crickets", vn: "Dế đêm", icon: "🦗", url: "/sounds/nature/night-crickets.mp3" },
+  { id: "fireplace", category: "nature", label: "Fireplace", vn: "Lò sưởi", icon: "🪵", url: "/sounds/nature/fireplace.mp3" },
 ]
 
 const rain: SoundItem[] = [
@@ -39,25 +42,22 @@ const rain: SoundItem[] = [
 ]
 
 const noise: SoundItem[] = [
-  // Placeholder URLs — actual files to be added in Phase 7
   { id: "white-noise", category: "noise", label: "White Noise", vn: "Tiếng ồn trắng", icon: "⬜", url: "/sounds/noise/white-noise.mp3" },
   { id: "brown-noise", category: "noise", label: "Brown Noise", vn: "Tiếng ồn nâu", icon: "🟫", url: "/sounds/noise/brown-noise.mp3" },
   { id: "pink-noise", category: "noise", label: "Pink Noise", vn: "Tiếng ồn hồng", icon: "🩷", url: "/sounds/noise/pink-noise.mp3" },
 ]
 
 const study: SoundItem[] = [
-  // Placeholder URLs — actual files to be added in Phase 7
   { id: "library", category: "study", label: "Library", vn: "Thư viện", icon: "📚", url: "/sounds/study/library.mp3" },
   { id: "coffee-shop", category: "study", label: "Coffee Shop", vn: "Quán cà phê", icon: "☕", url: "/sounds/study/coffee-shop.mp3" },
   { id: "coworking", category: "study", label: "Coworking", vn: "Không gian làm việc", icon: "💻", url: "/sounds/study/coworking.mp3" },
 ]
 
 const cozy: SoundItem[] = [
-  { id: "clock", category: "cozy", label: "Clock", vn: "Đồng hồ", icon: "🕐", url: "/sounds/things/clock.mp3" },
-  { id: "singing-bowl", category: "cozy", label: "Singing Bowl", vn: "Chén hát", icon: "🔔", url: "/sounds/things/singing-bowl.mp3" },
-  { id: "vinyl-effect", category: "cozy", label: "Vinyl Effect", vn: "Đĩa than", icon: "💿", url: "/sounds/things/vinyl-effect.mp3" },
-  { id: "wind-chimes", category: "cozy", label: "Wind Chimes", vn: "Chuông gió", icon: "🎐", url: "/sounds/things/wind-chimes.mp3" },
-  // Placeholder — file to be added in Phase 7
+  { id: "clock", category: "cozy", label: "Clock", vn: "Đồng hồ", icon: "🕐", url: "/sounds/cozy/clock.mp3" },
+  { id: "singing-bowl", category: "cozy", label: "Singing Bowl", vn: "Chén hát", icon: "🔔", url: "/sounds/cozy/singing-bowl.mp3" },
+  { id: "vinyl-effect", category: "cozy", label: "Vinyl Effect", vn: "Đĩa than", icon: "💿", url: "/sounds/cozy/vinyl-effect.mp3" },
+  { id: "wind-chimes", category: "cozy", label: "Wind Chimes", vn: "Chuông gió", icon: "🎐", url: "/sounds/cozy/wind-chimes.mp3" },
   { id: "cat-purring", category: "cozy", label: "Cat Purring", vn: "Mèo kêu", icon: "🐱", url: "/sounds/cozy/cat-purring.mp3" },
 ]
 
@@ -69,15 +69,15 @@ const transport: SoundItem[] = [
 ]
 
 const city: SoundItem[] = [
-  { id: "busy-street", category: "city", label: "Busy Street", vn: "Đường đông", icon: "🏙️", url: "/sounds/urban/busy-street.mp3" },
-  { id: "crowd", category: "city", label: "Crowd", vn: "Đám đông", icon: "👥", url: "/sounds/urban/crowd.mp3" },
-  { id: "traffic", category: "city", label: "Traffic", vn: "Giao thông", icon: "🚗", url: "/sounds/urban/traffic.mp3" },
+  { id: "busy-street", category: "city", label: "Busy Street", vn: "Đường đông", icon: "🏙️", url: "/sounds/city/busy-street.mp3" },
+  { id: "crowd", category: "city", label: "Crowd", vn: "Đám đông", icon: "👥", url: "/sounds/city/crowd.mp3" },
+  { id: "traffic", category: "city", label: "Traffic", vn: "Giao thông", icon: "🚗", url: "/sounds/city/traffic.mp3" },
 ]
 
 const machine: SoundItem[] = [
-  { id: "ceiling-fan", category: "machine", label: "Ceiling Fan", vn: "Quạt trần", icon: "🌀", url: "/sounds/things/ceiling-fan.mp3" },
-  { id: "keyboard", category: "machine", label: "Keyboard", vn: "Bàn phím", icon: "⌨️", url: "/sounds/things/keyboard.mp3" },
-  { id: "typewriter", category: "machine", label: "Typewriter", vn: "Máy viết chữ", icon: "📝", url: "/sounds/things/typewriter.mp3" },
+  { id: "ceiling-fan", category: "machine", label: "Ceiling Fan", vn: "Quạt trần", icon: "🌀", url: "/sounds/machine/ceiling-fan.mp3" },
+  { id: "keyboard", category: "machine", label: "Keyboard", vn: "Bàn phím", icon: "⌨️", url: "/sounds/machine/keyboard.mp3" },
+  { id: "typewriter", category: "machine", label: "Typewriter", vn: "Máy viết chữ", icon: "📝", url: "/sounds/machine/typewriter.mp3" },
 ]
 
 // Category definitions with display order
