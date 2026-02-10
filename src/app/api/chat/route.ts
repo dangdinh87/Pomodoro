@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server";
 import {
     createUIMessageStream,
     createUIMessageStreamResponse,
@@ -33,13 +34,20 @@ export async function POST(req: Request) {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
+    if (!user || authError) {
+        return NextResponse.json(
+            { error: "Unauthorized" },
+            { status: 401 }
+        );
+    }
+
     let { messages, model = "moonshotai/kimi-k2-instruct-0905", conversationId } = await req.json();
 
     console.log("[Chat API] Received:", {
         model,
         messagesCount: messages?.length,
         conversationId,
-        userId: user?.id,
+        userId: user.id,
     });
 
     // Create conversation if it doesn't exist
