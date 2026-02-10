@@ -4,7 +4,7 @@ import { MetadataRoute } from 'next';
 export const dynamic = 'force-static';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://www.pomodoro-focus.site';
+  const baseUrl = 'https://improcode.com';
   // Static date - update on each meaningful deploy
   const lastModified = '2026-02-08';
 
