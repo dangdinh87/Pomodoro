@@ -112,6 +112,7 @@ export function TaskItem({
                   togglingTaskIds?.has(task.id) && "opacity-50"
                 )}
                 disabled={togglingTaskIds?.has(task.id)}
+                aria-label={isDone ? t('tasks.actions.markIncomplete') : t('tasks.actions.markComplete')}
               />
               {togglingTaskIds?.has(task.id) && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -214,6 +215,7 @@ export function TaskItem({
                 variant="ghost"
                 size="icon"
                 className="h-7 w-7 rounded-sm hover:bg-muted"
+                aria-label={t('common.actions')}
               >
                 <MoreHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
               </Button>
