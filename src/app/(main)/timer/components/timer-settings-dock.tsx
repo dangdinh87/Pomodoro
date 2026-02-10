@@ -15,7 +15,7 @@ import {
     TooltipTrigger,
 } from '@/components/animate-ui/components/animate/tooltip';
 import { TimerSettingsModal } from '@/components/settings/timer-settings-modal';
-import { AudioSettingsModal } from '@/components/settings/audio-settings-modal';
+import { AudioSidebar } from '@/components/audio/audio-sidebar';
 import BackgroundSettingsModal from '@/components/settings/background-settings-modal';
 import { useSidebar } from '@/components/ui/sidebar';
 
@@ -190,9 +190,9 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                     onClose={() => setTimerSettingsOpen(false)}
                 />
 
-                <AudioSettingsModal
-                    isOpen={audioSettingsOpen}
-                    onClose={() => setAudioSettingsOpen(false)}
+                <AudioSidebar
+                    open={audioSettingsOpen}
+                    onOpenChange={setAudioSettingsOpen}
                 />
 
                 <BackgroundSettingsModal

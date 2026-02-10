@@ -199,7 +199,7 @@ const YouTubePane = memo(() => {
         </div>
 
         <div className="overflow-hidden rounded-lg bg-black/5 mx-1 mb-1">
-          <div className="divide-y divide-border/30 max-h-[450px] overflow-y-auto custom-scrollbar">
+          <div className="divide-y divide-border/30">
             {youtubeSuggestions.map((item) => {
               const isMatch = isSuggestionPlaying(item.url);
               const isPlaying = isMatch && playerState.status === 'playing';

@@ -11,8 +11,10 @@
 | Date | 2026-02-09 |
 | Priority | P1 |
 | Effort | 5h |
-| Implementation | pending |
-| Review | pending |
+| Implementation | **complete** |
+| Review | **approved** |
+| Reviewed By | code-reviewer (2026-02-10) |
+| Report | [code-reviewer-260210-1046-phase3-audio-sidebar.md](../reports/code-reviewer-260210-1046-phase3-audio-sidebar.md) |
 
 Replace the 800px Dialog-based audio modal with a 350px right-side Sheet panel. Build the ambient mixer UI with "Now Playing" section, per-sound volume sliders, icon grid for sound selection, and master volume control.
 
@@ -208,16 +210,16 @@ Grep for remaining imports and remove them.
 - Collapsible: use native `<details>/<summary>` or simple toggle state (KISS)
 
 ## Todo List
-- [ ] Create audio-sidebar.tsx (Sheet + tabs + footer)
-- [ ] Create ambient-mixer.tsx (active sounds + all sounds sections)
-- [ ] Create sound-icon-grid.tsx (collapsible category grid)
-- [ ] Create active-sound-card.tsx (slider + remove per sound)
-- [ ] Update timer-settings-dock.tsx to use AudioSidebar
-- [ ] Adapt youtube-pane.tsx for 350px width
-- [ ] Delete audio-settings-modal.tsx
-- [ ] Test mobile fullscreen overlay
-- [ ] Test keyboard navigation (tab through sliders, Esc to close)
-- [ ] Build verification
+- [x] Create audio-sidebar.tsx (Sheet + tabs + footer)
+- [x] Create ambient-mixer.tsx (active sounds + all sounds sections)
+- [x] Create sound-icon-grid.tsx (collapsible category grid)
+- [x] Create active-sound-card.tsx (slider + remove per sound)
+- [x] Update timer-settings-dock.tsx to use AudioSidebar
+- [x] Adapt youtube-pane.tsx for 350px width
+- [x] Delete audio-settings-modal.tsx
+- [ ] Test mobile fullscreen overlay (requires manual QA)
+- [ ] Test keyboard navigation (requires manual QA)
+- [x] Build verification (PASSED)
 
 ## Success Criteria
 1. Sidebar opens from right on Music button click
