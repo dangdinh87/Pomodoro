@@ -79,7 +79,7 @@ export function HeroSSR() {
               <div className="flex-1 flex justify-center">
                 <div className="px-4 py-1.5 rounded-lg bg-slate-100 dark:bg-white/5 text-xs text-slate-500 dark:text-neutral-400 flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-green-500/50" />
-                  studybro.app
+                  improcode.com
                 </div>
               </div>
             </div>

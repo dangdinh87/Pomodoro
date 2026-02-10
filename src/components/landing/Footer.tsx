@@ -20,13 +20,13 @@ export function Footer() {
               <div className="flex h-8 w-8 items-center justify-center">
                 <Image
                   src="/images/logo.png"
-                  alt="Study Bro"
+                  alt="Improcode"
                   width={32}
                   height={32}
                   className="drop-shadow-lg"
                 />
               </div>
-              <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Study Bro</span>
+              <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Improcode</span>
             </Link>
 
             <div className="flex gap-4">
@@ -69,7 +69,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-slate-200 dark:border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-sm text-slate-500 dark:text-neutral-500">
-            © {new Date().getFullYear()} Study Bro. {t('landing.footer.rightsReserved')}
+            © {new Date().getFullYear()} Improcode. {t('landing.footer.rightsReserved')}
           </p>
           <LanguageSwitcher />
         </div>

@@ -16,10 +16,11 @@ import { t } from '@/lib/server-translations';
 
 // SEO Metadata
 export const metadata: Metadata = {
-  title: 'Study Bro - Free Pomodoro Timer with AI Coach & Task Management',
+  title: 'Improcode - Free Pomodoro Timer with AI Coach & Task Management',
   description:
-    'Free online Pomodoro timer with task linking, AI study coach, mini games for breaks, leaderboard, focus mode, and productivity analytics. No signup required.',
+    'Free online Pomodoro timer with task linking, Improcode AI coach, mini games for breaks, leaderboard, focus mode, and productivity analytics. No signup required.',
   keywords: [
+    'Improcode',
     'pomodoro timer',
     'pomodoro timer online',
     'free pomodoro timer',
@@ -29,7 +30,6 @@ export const metadata: Metadata = {
     'focus timer online',
     'AI study coach',
     'productivity timer',
-    'Study Bro',
     // Vietnamese
     'dong ho pomodoro',
     'ung dung tap trung hoc tap',
@@ -39,24 +39,24 @@ export const metadata: Metadata = {
     'ポモドーロ 無料',
   ],
   alternates: {
-    canonical: 'https://www.pomodoro-focus.site',
+    canonical: 'https://improcode.com',
     languages: {
-      'en': 'https://www.pomodoro-focus.site',
-      'vi': 'https://www.pomodoro-focus.site',
-      'ja': 'https://www.pomodoro-focus.site',
-      'x-default': 'https://www.pomodoro-focus.site',
+      'en': 'https://improcode.com',
+      'vi': 'https://improcode.com',
+      'ja': 'https://improcode.com',
+      'x-default': 'https://improcode.com',
     },
   },
   openGraph: {
-    title: 'Study Bro - Free Pomodoro Timer with AI Coach',
+    title: 'Improcode - Free Pomodoro Timer with AI Coach',
     description:
       'Pomodoro timer, AI coach, mini games, leaderboard, and focus tools. Free to use, no signup required.',
     type: 'website',
-    url: 'https://www.pomodoro-focus.site',
+    url: 'https://improcode.com',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Study Bro - Free Pomodoro Timer with AI Coach',
+    title: 'Improcode - Free Pomodoro Timer with AI Coach',
     description:
       'Pomodoro timer, AI coach, mini games, leaderboard, and focus tools. Free to use.',
   },
