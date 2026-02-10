@@ -82,6 +82,12 @@ interface AudioState {
   saveAmbientState: () => void
   restoreAmbientState: () => Promise<void>
 
+  // Preset management
+  loadPreset: (preset: SoundPreset) => Promise<void>
+  savePreset: (name: string, icon?: string) => void
+  deletePreset: (presetId: string) => void
+  renamePreset: (presetId: string, newName: string) => void
+
   // Favorites/History
   addToFavorites: (soundId: string) => void
   removeFromFavorites: (soundId: string) => void
@@ -461,6 +467,64 @@ export const useAudioStore = create<AudioState>()(
           await get().playAmbient(sound.id, sound.volume)
         }
         set({ savedAmbientState: [] })
+      },
+
+      // --- Preset Management ---
+
+      loadPreset: async (preset) => {
+        // Stop all current ambient sounds
+        await get().stopAllAmbient()
+
+        // Play each sound in preset at its volume (graceful skip on errors)
+        for (const sound of preset.sounds) {
+          try {
+            await get().playAmbient(sound.id, sound.volume)
+          } catch (error) {
+            console.warn(`Skipping sound "${sound.id}" from preset "${preset.name}":`, error)
+            // Continue to next sound (graceful skip)
+          }
+        }
+      },
+
+      savePreset: (name, icon) => {
+        const { activeAmbientSounds, presets } = get()
+
+        // Validation
+        if (activeAmbientSounds.length === 0) {
+          console.warn('Cannot save preset: no active sounds')
+          return
+        }
+
+        const userPresets = presets.filter(p => !p.isBuiltIn)
+        if (userPresets.length >= 10) {
+          console.warn('Cannot save preset: maximum 10 user presets reached')
+          return
+        }
+
+        // Create new user preset
+        const newPreset: SoundPreset = {
+          id: `user-${Date.now()}`,
+          name,
+          icon: icon || '🎵',
+          sounds: [...activeAmbientSounds],
+          isBuiltIn: false,
+        }
+
+        set({ presets: [...presets, newPreset] })
+      },
+
+      deletePreset: (presetId) => {
+        set((state) => ({
+          presets: state.presets.filter(p => p.id !== presetId || p.isBuiltIn)
+        }))
+      },
+
+      renamePreset: (presetId, newName) => {
+        set((state) => ({
+          presets: state.presets.map(p =>
+            p.id === presetId && !p.isBuiltIn ? { ...p, name: newName } : p
+          )
+        }))
       },
 
       updateAudioSettings: (settings) => {

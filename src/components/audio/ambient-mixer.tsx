@@ -6,6 +6,7 @@ import { useAudioStore } from '@/stores/audio-store'
 import { soundCategories, findSound } from '@/lib/audio/sound-catalog'
 import { ActiveSoundCard } from './active-sound-card'
 import { SoundIconGrid } from './sound-icon-grid'
+import { PresetChips } from './preset-chips'
 import { TooltipProvider } from '@/components/ui/tooltip'
 
 export const AmbientMixer = memo(function AmbientMixer() {
@@ -13,6 +14,11 @@ export const AmbientMixer = memo(function AmbientMixer() {
 
   return (
     <div className="flex flex-col gap-4 py-3">
+      {/* Preset chips */}
+      <section>
+        <PresetChips />
+      </section>
+
       {/* Now Playing section */}
       {activeAmbientSounds.length > 0 && (
         <section>
