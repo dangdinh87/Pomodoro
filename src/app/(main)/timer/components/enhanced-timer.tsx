@@ -17,6 +17,8 @@ import { TimerGuideDialog } from '@/components/timer/timer-guide-dialog';
 
 const GUIDE_VERSION = 'v1'; // Increment on major updates
 const GUIDE_STORAGE_KEY = `timer-guide-shown-${GUIDE_VERSION}`;
+/** Set to true to temporarily hide the Pomodoro guide modal on timer page */
+const HIDE_GUIDE_TEMPORARILY = true;
 
 export function EnhancedTimer() {
     // 1. Initialize Engine (Side-effects only, no state returned)
@@ -30,6 +32,7 @@ export function EnhancedTimer() {
     const [showGuide, setShowGuide] = useState(false);
 
     useEffect(() => {
+        if (HIDE_GUIDE_TEMPORARILY) return;
         const hasSeenGuide = localStorage.getItem(GUIDE_STORAGE_KEY);
         if (!hasSeenGuide) {
             // Small delay to let the page render first
@@ -49,18 +52,18 @@ export function EnhancedTimer() {
     // Note: No subscription to 'timeLeft' or 'isRunning' here.
     return (
         <>
-            <div className="w-full min-h-[calc(100vh-6rem)] relative flex flex-col justify-center">
+            <div className="dark w-full min-h-[calc(100vh-6rem)] relative flex flex-col justify-center">
                 <div className="w-full max-w-xl mx-auto z-10">
                     <div className={cn('bg-transparent border-0')}>
                         <div className="text-center relative">
                             <TimerModeSelector />
 
-                            <div className="pb-8 pt-4">
+                            <div className="pb-6 pt-2">
                                 <TimerClockDisplay />
                             </div>
                         </div>
 
-                        <CardContent className="space-y-6">
+                        <CardContent className="space-y-5">
                             <TimerControls />
                             <DailyProgress />
                         </CardContent>

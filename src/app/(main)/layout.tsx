@@ -4,6 +4,7 @@
  * Main App Layout - Client Component
  * Wraps authenticated app sections with providers
  */
+import { Suspense } from 'react';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import {
   SidebarInset,
@@ -17,6 +18,7 @@ import { BotMessageSquare } from '@/components/animate-ui/icons/bot-message-squa
 import { Button } from '@/components/ui/button';
 import { usePathname } from 'next/navigation';
 import { AppProviders } from '@/components/providers/app-providers';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function MainLayout({
   children,
@@ -24,8 +26,9 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   const { isFocusMode, isChatPanelOpen, setChatPanelOpen } = useSystemStore();
+  const { isAuthenticated } = useAuth();
   const pathname = usePathname();
-  const showChatToggle = pathname !== '/chat';
+  const showChatToggle = pathname !== '/chat' && isAuthenticated;
 
   return (
     <AppProviders>
@@ -61,7 +64,11 @@ export default function MainLayout({
                   </div>
                 </header>
               )}
-              {process.env.NEXT_PUBLIC_GA_ID ? <GATracker /> : null}
+              {process.env.NEXT_PUBLIC_GA_ID ? (
+                <Suspense fallback={null}>
+                  <GATracker />
+                </Suspense>
+              ) : null}
               <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 lg:px-0">
                 {children}
               </div>

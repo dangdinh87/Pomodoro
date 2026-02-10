@@ -1,9 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Task, useTasksStore } from '@/stores/task-store';
 import { useTasks } from '@/hooks/use-tasks';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Target, Play, Square, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Target, Play, Square, CheckCircle2, ArrowRight, PartyPopper } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Dialog,
@@ -35,33 +35,43 @@ interface TaskSelectorProps {
 export function TaskSelector({ className }: TaskSelectorProps) {
   const { t } = useI18n();
   const { isAuthenticated } = useAuth();
-  const todayRange = useMemo(() => {
-    const from = new Date();
-    from.setHours(0, 0, 0, 0);
-    const to = new Date();
-    to.setHours(23, 59, 59, 999);
-    return { from, to };
-  }, []);
 
-  const { tasks, updateTask } = useTasks({
-    dateRange: todayRange,
-    dateField: 'created_at',
-    limit: 50 // Get more for the selector
+  // Show all incomplete tasks (no date filter) so tasks created anytime are visible
+  const { tasks, updateTask, isLoading } = useTasks({
+    statusFilter: 'all',
+    limit: 50,
   });
 
   const { activeTaskId, setActiveTask } = useTasksStore();
   const [isOpen, setIsOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingTaskId, setPendingTaskId] = useState<string | null>(null);
+  const [taskCompleteOpen, setTaskCompleteOpen] = useState(false);
+  const completedTaskRef = useRef<Task | null>(null);
 
-  const activeTask = tasks.find((task) => task.id === activeTaskId);
-
-  const todayTasks = tasks.filter((task) => {
+  // Filter to eligible (incomplete) tasks
+  const pendingTasks = tasks.filter((task) => {
     if (task.status === 'done') return false;
-    // Hide if completed pomodoros
     if (task.actualPomodoros >= task.estimatePomodoros) return false;
-    return true; // Already filtered by date Range in useTasks
+    return true;
   });
+
+  const activeTask = pendingTasks.find((task) => task.id === activeTaskId);
+
+  // When active task completes all pomodoros, show completion dialog instead of silently clearing
+  useEffect(() => {
+    if (!activeTaskId || isLoading) return;
+    if (!pendingTasks.some((t) => t.id === activeTaskId)) {
+      // Check if task exists but pomodoros are complete (not deleted/already done)
+      const fullTask = tasks.find((t) => t.id === activeTaskId);
+      if (fullTask && fullTask.status !== 'done' && fullTask.actualPomodoros >= fullTask.estimatePomodoros) {
+        completedTaskRef.current = fullTask;
+        setTaskCompleteOpen(true);
+      } else {
+        setActiveTask(null);
+      }
+    }
+  }, [activeTaskId, pendingTasks, tasks, isLoading, setActiveTask]);
 
   const handleSelectTask = (taskId: string) => {
     // If clicking the current active task -> deselect (un-focus)
@@ -99,8 +109,8 @@ export function TaskSelector({ className }: TaskSelectorProps) {
       <div
         className={cn(
           'group relative flex items-start gap-4 p-4 rounded-xl border transition-all cursor-pointer overflow-hidden',
-          'bg-card/40 backdrop-blur-sm border-muted/40 hover:border-primary/40 hover:shadow-lg hover:bg-primary/5',
-          isActive && 'border-primary bg-primary/5 shadow-md animate-pulse duration-[3000ms]',
+          'bg-card/40 backdrop-blur-sm border-muted/40 hover:border-foreground/40 hover:shadow-lg hover:bg-foreground/5',
+          isActive && 'border-foreground bg-foreground/5 shadow-md animate-pulse duration-[3000ms]',
         )}
         onClick={() => handleSelectTask(task.id)}
       >
@@ -108,7 +118,7 @@ export function TaskSelector({ className }: TaskSelectorProps) {
           <div className="flex items-center flex-wrap gap-2">
             <h4 className={cn(
               "font-bold text-sm uppercase tracking-tight truncate",
-              isActive && "text-primary"
+              isActive && "text-foreground"
             )}>{task.title}</h4>
             <Badge
               variant={
@@ -130,7 +140,7 @@ export function TaskSelector({ className }: TaskSelectorProps) {
               <div className="flex items-center gap-1.5 bg-secondary/30 px-2 py-0.5 rounded-full">
                 <div className="w-16 h-1 bg-muted rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-primary transition-all duration-500"
+                    className="h-full bg-foreground transition-all duration-500"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
@@ -154,11 +164,11 @@ export function TaskSelector({ className }: TaskSelectorProps) {
 
         <div className="shrink-0 pt-1" title={isActive ? t('timerComponents.taskSelector.stopFocus') : t('timerComponents.taskSelector.startFocus')}>
           {isActive ? (
-            <div className="p-1.5 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-110 transition-transform">
+            <div className="p-1.5 rounded-full bg-foreground text-background shadow-lg shadow-foreground/30 scale-110 transition-transform">
               <Square className="h-3 w-3 fill-current" />
             </div>
           ) : (
-            <div className="p-1.5 rounded-full bg-muted/50 text-muted-foreground group-hover:bg-primary/20 group-hover:text-primary transition-colors">
+            <div className="p-1.5 rounded-full bg-muted/50 text-muted-foreground group-hover:bg-foreground/20 group-hover:text-foreground transition-colors">
               <Play className="h-3 w-3" />
             </div>
           )}
@@ -193,12 +203,12 @@ export function TaskSelector({ className }: TaskSelectorProps) {
                 {activeTask ? (
                   <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-background/80 backdrop-blur-md border border-border/50 shadow-sm hover:bg-background/90 transition-colors dark:bg-background/60 dark:hover:bg-background/80">
                     <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-full bg-primary/10 text-primary">
+                      <div className="p-1.5 rounded-full bg-foreground/10 text-foreground">
                         <Target className="w-4 h-4" />
                       </div>
                       <span className="text-xs font-medium text-foreground truncate max-w-[200px]">{activeTask.title}</span>
                     </div>
-                    <span className="bg-primary/10 px-1.5 py-0.5 rounded-full text-[10px] border border-primary/20 text-primary font-semibold">
+                    <span className="bg-foreground/10 px-1.5 py-0.5 rounded-full text-[10px] border border-foreground/20 text-foreground font-semibold">
                       {activeTask.actualPomodoros}/{activeTask.estimatePomodoros}
                     </span>
                   </div>
@@ -224,13 +234,13 @@ export function TaskSelector({ className }: TaskSelectorProps) {
               <div className="h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between mb-1">
-                    <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-widest text-primary border-primary/30 bg-primary/5">
-                      {t('tasks.filters.today') || "Today's Tasks"}
+                    <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-widest text-foreground border-foreground/30 bg-foreground/5">
+                      {t('timerComponents.taskSelector.pendingTasks') || "Pending Tasks"}
                     </Badge>
-                    <span className="text-[10px] text-muted-foreground italic">{todayTasks.length} {t('tasks.count') || "tasks"}</span>
+                    <span className="text-[10px] text-muted-foreground italic">{pendingTasks.length} {t('tasks.count') || "tasks"}</span>
                   </div>
 
-                  {todayTasks.length === 0 ? (
+                  {pendingTasks.length === 0 ? (
                     <div className="text-center py-12 bg-muted/10 rounded-2xl border border-dashed border-muted/50">
                       <Target className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
                       <p className="text-sm font-semibold text-muted-foreground">
@@ -241,7 +251,7 @@ export function TaskSelector({ className }: TaskSelectorProps) {
                       </p>
                     </div>
                   ) : (
-                    todayTasks.map((task) => <TaskItemInternal key={task.id} task={task} />)
+                    pendingTasks.map((task) => <TaskItemInternal key={task.id} task={task} />)
                   )}
                 </div>
               </div>
@@ -269,6 +279,53 @@ export function TaskSelector({ className }: TaskSelectorProps) {
                 </AlertDialogCancel>
                 <AlertDialogAction onClick={() => pendingTaskId && selectTask(pendingTaskId)}>
                   {t('common.confirm')}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
+          {/* Task pomodoro completion dialog */}
+          <AlertDialog open={taskCompleteOpen} onOpenChange={(open) => {
+            if (!open) {
+              setTaskCompleteOpen(false);
+              setActiveTask(null);
+              completedTaskRef.current = null;
+            }
+          }}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center gap-2">
+                  <PartyPopper className="h-5 w-5 text-amber-500" />
+                  {t('timerComponents.taskSelector.taskComplete.title') || 'Task complete!'}
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  {completedTaskRef.current && (
+                    <>
+                      <span className="font-semibold text-foreground">{completedTaskRef.current.title}</span>
+                      {' '}
+                      {t('timerComponents.taskSelector.taskComplete.description') || 'has reached all planned pomodoros. Mark as done?'}
+                    </>
+                  )}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => {
+                  setTaskCompleteOpen(false);
+                  setActiveTask(null);
+                  completedTaskRef.current = null;
+                }}>
+                  {t('timerComponents.taskSelector.taskComplete.skip') || 'Skip'}
+                </AlertDialogCancel>
+                <AlertDialogAction onClick={() => {
+                  if (completedTaskRef.current) {
+                    updateTask({ id: completedTaskRef.current.id, input: { status: 'done' } });
+                  }
+                  setTaskCompleteOpen(false);
+                  setActiveTask(null);
+                  completedTaskRef.current = null;
+                }}>
+                  <CheckCircle2 className="h-4 w-4 mr-1.5" />
+                  {t('timerComponents.taskSelector.taskComplete.markDone') || 'Mark as done'}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

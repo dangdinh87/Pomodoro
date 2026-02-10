@@ -316,12 +316,6 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                                                     {t('timerSettings.labels.analog')}
                                                 </div>
                                             </SelectItem>
-                                            <SelectItem value="progress">
-                                                <div className="flex items-center gap-2">
-                                                    <Gauge className="h-4 w-4" />
-                                                    {t('timerSettings.labels.progress')}
-                                                </div>
-                                            </SelectItem>
                                             <SelectItem value="flip">
                                                 <div className="flex items-center gap-2">
                                                     <FlipHorizontal className="h-4 w-4" />
@@ -359,7 +353,7 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                             <h2 className="text-lg font-semibold">{t('timerSettings.labels.preview')}</h2>
                             <Separator />
                             <div className="rounded-lg border bg-card p-6 flex items-center justify-center min-h-[200px]">
-                                {localSettings.clockType === 'digital' && (() => {
+                                {(localSettings.clockType === 'digital' || localSettings.clockType === 'progress') && (() => {
                                     const sizeClasses = {
                                         small: 'text-2xl',
                                         medium: 'text-4xl',
@@ -369,30 +363,6 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                                         <div className="text-center">
                                             <div className={`${sizeClasses[localSettings.clockSize]} font-bold tabular-nums text-[hsl(var(--timer-foreground))]`}>
                                                 {previewTime}
-                                            </div>
-                                        </div>
-                                    );
-                                })()}
-                                {localSettings.clockType === 'progress' && (() => {
-                                    const sizeClasses = {
-                                        small: { time: 'text-xl', bar: 'h-2', width: 'max-w-[150px]' },
-                                        medium: { time: 'text-2xl', bar: 'h-3', width: 'max-w-[200px]' },
-                                        large: { time: 'text-3xl', bar: 'h-4', width: 'max-w-[250px]' },
-                                    };
-                                    const size = sizeClasses[localSettings.clockSize];
-                                    return (
-                                        <div className={`text-center w-full ${size.width}`}>
-                                            <div className={`${size.time} font-bold tabular-nums text-[hsl(var(--timer-foreground))] mb-2`}>
-                                                {previewTime}
-                                            </div>
-                                            <div className={`w-full bg-muted rounded-full ${size.bar}`}>
-                                                <div
-                                                    className={`${size.bar} rounded-full`}
-                                                    style={{
-                                                        width: '50%',
-                                                        backgroundColor: 'hsl(var(--timer-foreground))',
-                                                    }}
-                                                />
                                             </div>
                                         </div>
                                     );

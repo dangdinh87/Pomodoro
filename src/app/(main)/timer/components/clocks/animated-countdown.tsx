@@ -47,7 +47,7 @@ export function AnimatedCountdown({
       {/* Main countdown display - simple and large like Skiper UI */}
       <div className="relative flex items-center justify-center">
         <div className={cn(
-          'font-mono text-[20vw] sm:text-[18vw] md:text-[16vw] lg:text-[14vw] xl:text-[12vw]',
+          'font-mono text-[clamp(4rem,18vmin,14rem)]',
           'font-bold tracking-tight leading-none',
           textColor
         )}>

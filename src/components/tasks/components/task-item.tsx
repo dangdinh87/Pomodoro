@@ -90,7 +90,7 @@ export function TaskItem({
     <TooltipProvider>
       <article
         className={cn(
-          "group relative rounded-xl border transition-all duration-300 ease-in-out p-3.5",
+          "group relative overflow-hidden rounded-xl border transition-all duration-300 ease-in-out p-3.5",
           "hover:shadow-lg hover:border-primary/40",
           "bg-card/40 backdrop-blur-md border-muted/30",
           isActive
@@ -99,7 +99,7 @@ export function TaskItem({
           isDone && "opacity-60 grayscale-[0.2]"
         )}
       >
-        {isActive && <BorderBeam size={160} duration={6} borderWidth={2.5} radius={12} className="z-10 opacity-80" />}
+        {isActive && <BorderBeam size={160} duration={6} borderWidth={2.5} className="z-10 opacity-80" />}
 
         <div className="flex items-start gap-5">
           <div className="pt-1.5 min-w-[32px] flex justify-center relative">

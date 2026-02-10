@@ -61,6 +61,7 @@ export function TaskFilters({
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
           className="pl-9 h-9 text-sm"
+          aria-label={t('tasks.filters.searchPlaceholder')}
         />
       </div>
 
@@ -77,6 +78,7 @@ export function TaskFilters({
             )}
             onClear={() => onStatusChange('all')}
             showClear={statusFilter !== 'all'}
+            aria-label={t('tasks.filters.status')}
           >
             <SelectValue placeholder={t('tasks.filters.all')} />
           </SelectTrigger>
@@ -102,6 +104,7 @@ export function TaskFilters({
             )}
             onClear={() => onPriorityChange('all')}
             showClear={priorityFilter !== 'all'}
+            aria-label={t('tasks.filters.priority')}
           >
             <SelectValue placeholder={t('tasks.filters.all')} />
           </SelectTrigger>
@@ -127,6 +130,7 @@ export function TaskFilters({
         disabled={!hasActiveFilters}
         title={t('tasks.filters.reset')}
         className="h-9 w-9 shrink-0"
+        aria-label={t('tasks.filters.reset')}
       >
         <FilterX className="h-4 w-4" />
       </Button>

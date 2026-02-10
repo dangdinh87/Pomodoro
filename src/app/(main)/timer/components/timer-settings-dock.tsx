@@ -50,6 +50,7 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                 document.exitFullscreen().then(() => {
                     setIsFullscreen(false);
                     setFocusMode(false);
+                    setSidebarOpen(true);
                 });
             }
         }

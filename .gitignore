@@ -43,3 +43,8 @@ next-env.d.ts
 .agent
 
 .cursor
+
+# Build-generated background assets
+public/backgrounds/full/
+public/backgrounds/thumb/
+public/backgrounds/manifest.json

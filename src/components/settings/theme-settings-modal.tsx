@@ -10,6 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import { useI18n } from '@/contexts/i18n-context';
 
 import { defaultTheme, themePresets, type ThemeVars } from '@/config/themes';
 
@@ -21,6 +22,7 @@ export function ThemeSettingsModal({
   onClose: () => void;
 }) {
 
+  const { t } = useI18n();
   const styleTagId = 'app-theme-vars';
   const [selectedKey, setSelectedKey] = useState<string>('');
 
@@ -141,9 +143,8 @@ ${optionalDark}
   const applyTheme = (key: string) => {
     if (key === 'default') {
       resetTheme(true);
-      localStorage.setItem('ui-theme-key', 'default');
       setSelectedKey('default');
-      toast.success('Theme "Default" applied');
+      toast.success(t('settings.general.theme.themeApplied', { name: t('settings.general.theme.themes.default') }));
       return;
     }
     const theme = themePresets.find((t) => t.key === key);
@@ -151,7 +152,7 @@ ${optionalDark}
     injectTheme(theme);
     localStorage.setItem('ui-theme-key', key);
     setSelectedKey(key);
-    toast.success('Theme "' + theme.name + '" applied');
+    toast.success(t('settings.general.theme.themeApplied', { name: t(`settings.general.theme.themes.${key}`) || theme.name }));
   };
 
   const resetTheme = (silent?: boolean) => {
@@ -161,58 +162,57 @@ ${optionalDark}
     }
     localStorage.removeItem('ui-theme-key');
     setSelectedKey('default');
-    if (!silent) toast.success('Theme reset to default');
+    if (!silent) toast.success(t('settings.general.theme.themeApplied', { name: t('settings.general.theme.themes.default') }));
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Theme Settings</DialogTitle>
+          <DialogTitle>{t('settings.general.theme.colorTheme')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Label className="text-sm">Chọn theme</Label>
+          <div className="space-y-1">
+            <Label className="text-sm">{t('settings.general.theme.colorThemeDescription')}</Label>
+            <p className="text-xs text-muted-foreground">
+              {t('settings.general.theme.systemSolidColorHint')}
+            </p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {[defaultTheme, ...themePresets].map((t) => {
-              const selected =
-                selectedKey === t.key ||
-                (t.key === 'default' && selectedKey === 'default');
+            {[defaultTheme, ...themePresets].map((preset) => {
+              const selected = selectedKey === preset.key;
+              const themeName = t(`settings.general.theme.themes.${preset.key}`) || preset.name;
               return (
                 <button
-                  key={t.key}
+                  key={preset.key}
                   type="button"
-                  onClick={() => applyTheme(t.key)}
+                  onClick={() => applyTheme(preset.key)}
                   className={`relative p-3 rounded-lg border text-left transition-all duration-150 hover:scale-105 ${selected
-                    ? 'border-primary bg-primary/10 ring-2 ring-primary/20'
+                    ? 'ring-2'
                     : 'border-border hover:bg-muted'
                     }`}
-                  title={t.name}
-                  aria-label={`Chọn theme ${t.name}`}
+                  style={selected ? {
+                    borderColor: `hsl(${preset.light.primary})`,
+                    backgroundColor: `hsl(${preset.light.primary} / 0.08)`,
+                    boxShadow: `0 0 0 2px hsl(${preset.light.primary} / 0.2)`,
+                  } : undefined}
+                  title={themeName}
+                  aria-label={themeName}
                 >
                   <div className="mb-3 flex items-center gap-2">
+                    <span className="text-xl">{preset.emoji}</span>
                     <div
-                      className="w-7 h-7 rounded-full border-2 shadow-sm"
-                      style={{
-                        backgroundColor: `hsl(${t.light.primary})`,
-                        borderColor: `hsl(${t.light.border || '0 0% 89.8%'})`,
-                      }}
-                      title="Light primary"
-                    />
-                    <div
-                      className="w-7 h-7 rounded-full border-2 shadow-sm"
-                      style={{
-                        backgroundColor: `hsl(${t.dark.primary})`,
-                        borderColor: `hsl(${t.dark.border || '0 0% 14.9%'})`,
-                      }}
-                      title="Dark primary"
+                      className="w-7 h-7 rounded-full shadow-sm ring-1 ring-black/10"
+                      style={{ backgroundColor: `hsl(${preset.light.primary})` }}
                     />
                   </div>
                   <div className="flex items-center justify-between">
-                    <div className="text-sm font-medium">{t.name}</div>
+                    <div className="text-sm font-medium">{themeName}</div>
                     {selected && (
-                      <div className="w-2 h-2 rounded-full bg-primary" />
+                      <div
+                        className="w-2.5 h-2.5 rounded-full"
+                        style={{ backgroundColor: `hsl(${preset.light.primary})` }}
+                      />
                     )}
                   </div>
                 </button>
@@ -220,12 +220,9 @@ ${optionalDark}
             })}
           </div>
         </div>
-        <div className="flex justify-between pt-3 border-t mt-2">
-          <Button variant="outline" onClick={() => { resetTheme(); }}>
-            Reset to Defaults
-          </Button>
-          <Button onClick={() => { toast.success('Theme settings saved successfully!'); onClose(); }}>
-            Save Settings
+        <div className="flex justify-end pt-3 border-t mt-2">
+          <Button onClick={onClose}>
+            {t('settings.general.theme.themes.default') ? 'OK' : 'OK'}
           </Button>
         </div>
       </DialogContent>
