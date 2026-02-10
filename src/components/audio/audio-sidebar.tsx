@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import {
   Sheet,
   SheetContent,
@@ -37,8 +36,10 @@ export function AudioSidebar({ open, onOpenChange }: AudioSidebarProps) {
   const audioSettings = useAudioStore((s) => s.audioSettings)
   const updateVolume = useAudioStore((s) => s.updateVolume)
   const toggleMute = useAudioStore((s) => s.toggleMute)
+  const setActiveSource = useAudioStore((s) => s.setActiveSource)
 
-  const [tab, setTab] = useState('ambient')
+  // Controlled by activeSource from store
+  const currentTab = audioSettings.activeSource === 'youtube' ? 'youtube' : 'ambient'
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -55,7 +56,11 @@ export function AudioSidebar({ open, onOpenChange }: AudioSidebarProps) {
         </SheetHeader>
 
         {/* Tabs */}
-        <Tabs value={tab} onValueChange={setTab} className="flex-1 flex flex-col overflow-hidden">
+        <Tabs
+          value={currentTab}
+          onValueChange={(v) => setActiveSource(v as 'ambient' | 'youtube')}
+          className="flex-1 flex flex-col overflow-hidden"
+        >
           <div className="px-4 pb-2 shrink-0">
             <TabsList className="grid w-full grid-cols-2 h-9">
               <TabsTrigger value="ambient" className="text-xs">

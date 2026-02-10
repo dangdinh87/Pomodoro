@@ -78,7 +78,7 @@ interface AudioState {
   setSoundVolume: (soundId: string, volume: number) => void
 
   // Source switching
-  setActiveSource: (source: 'ambient' | 'youtube' | 'none') => void
+  setActiveSource: (source: 'ambient' | 'youtube' | 'none') => Promise<void>
   saveAmbientState: () => void
   restoreAmbientState: () => Promise<void>
 
@@ -447,7 +447,30 @@ export const useAudioStore = create<AudioState>()(
         set({ activeAmbientSounds: updated })
       },
 
-      setActiveSource: (source) => {
+      setActiveSource: async (source) => {
+        const current = get().audioSettings.activeSource
+
+        // No-op if already on this source
+        if (current === source) return
+
+        // Switching to YouTube: save and pause ambient
+        if (source === 'youtube') {
+          get().saveAmbientState()
+          await get().stopAllAmbient()
+        }
+
+        // Switching to Ambient: stop YouTube and restore ambient
+        else if (source === 'ambient') {
+          // Stop YouTube via global player
+          const yt = (window as any).__globalYTPlayer
+          if (yt?.stopVideo) {
+            yt.stopVideo()
+          }
+          // Restore ambient state
+          await get().restoreAmbientState()
+        }
+
+        // Update active source in settings
         set((state) => ({
           audioSettings: { ...state.audioSettings, activeSource: source }
         }))
