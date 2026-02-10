@@ -12,7 +12,6 @@ import { Slider } from '@/components/ui/slider'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useAudioStore } from '@/stores/audio-store'
 import { AmbientMixer } from './ambient-mixer'
-import { AlarmSettings } from './alarm-settings'
 import YouTubePane from './youtube/youtube-pane'
 import { cn } from '@/lib/utils'
 
@@ -47,7 +46,7 @@ export function AudioSidebar({ open, onOpenChange }: AudioSidebarProps) {
       <SheetContent
         side="right"
         className={cn(
-          'w-full sm:max-w-[350px] p-0 flex flex-col gap-0',
+          'w-full sm:max-w-[450px] p-0 flex flex-col gap-0',
           'bg-background/95 backdrop-blur-md'
         )}
       >
@@ -85,9 +84,8 @@ export function AudioSidebar({ open, onOpenChange }: AudioSidebarProps) {
           </div>
         </Tabs>
 
-        {/* Fixed footer: master volume + alarm */}
-        <div className="border-t px-4 py-3 shrink-0 space-y-3">
-          {/* Master volume */}
+        {/* Fixed footer: master volume */}
+        <div className="border-t px-4 py-3 shrink-0">
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
@@ -118,9 +116,6 @@ export function AudioSidebar({ open, onOpenChange }: AudioSidebarProps) {
               {audioSettings.isMuted ? 0 : audioSettings.masterVolume}%
             </span>
           </div>
-
-          {/* Alarm settings */}
-          <AlarmSettings />
         </div>
       </SheetContent>
     </Sheet>
