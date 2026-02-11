@@ -70,13 +70,21 @@ export async function POST(req: Request) {
 		error: authError,
 	} = await supabase.auth.getUser();
 
+	if (!user || authError) {
+		return new Response("Unauthorized", { status: 401 });
+	}
+
 	let { messages, model = DEFAULT_CHAT_AI_MODEL, conversationId } = await req.json();
+
+	if (!Array.isArray(messages)) {
+		return new Response("Invalid messages format", { status: 400 });
+	}
 
 	console.log("[Chat API] Received:", {
 		model,
 		messagesCount: messages?.length,
 		conversationId,
-		userId: user?.id,
+		userId: user.id,
 	});
 
 	// Create conversation if it doesn't exist
