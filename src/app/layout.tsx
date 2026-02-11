@@ -6,6 +6,7 @@
 import type { Metadata } from 'next';
 import { Be_Vietnam_Pro, Space_Grotesk, Nunito } from 'next/font/google';
 import Script from 'next/script';
+import { JsonLd } from '@/components/seo/JsonLd';
 import './globals.css';
 
 const beVietnamPro = Be_Vietnam_Pro({
@@ -30,13 +31,16 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: 'Study Bro App',
+  title: {
+    template: '%s | Improcode',
+    default: 'Improcode - Focus Timer & Productivity AI',
+  },
   description:
     'Free Pomodoro timer with task management, AI coach, mini games, focus analytics, and leaderboard. No signup required.',
   manifest: '/manifest.json',
-  metadataBase: new URL('https://www.pomodoro-focus.site'),
+  metadataBase: new URL('https://improcode.com'),
   alternates: {
-    canonical: 'https://www.pomodoro-focus.site',
+    canonical: 'https://improcode.com',
   },
   keywords: [
     'pomodoro timer',
@@ -46,20 +50,23 @@ export const metadata: Metadata = {
     'pomodoro timer with tasks',
     'free pomodoro timer no signup',
     'productivity tool',
-    'Study Bro',
+    'Improcode',
+    'Improcode AI',
+    'focus app',
+    'study with me',
   ],
   openGraph: {
-    title: 'Study Bro - Free Pomodoro Timer & Focus Tools',
+    title: 'Improcode - Master Your Focus with AI & Pomodoro',
     description:
       'Free Pomodoro timer with task management, AI coach, mini games, focus analytics, and leaderboard.',
-    url: 'https://www.pomodoro-focus.site',
-    siteName: 'Study Bro',
+    url: 'https://improcode.com',
+    siteName: 'Improcode',
     images: [
       {
-        url: 'https://www.pomodoro-focus.site/card.jpg',
+        url: 'https://improcode.com/card.jpg',
         width: 1200,
         height: 630,
-        alt: 'Study Bro - Pomodoro Timer App',
+        alt: 'Improcode - Pomodoro Timer App',
       },
     ],
     locale: 'en_US',
@@ -67,10 +74,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Study Bro - Free Pomodoro Timer & Focus Tools',
+    title: 'Improcode - Master Your Focus with AI & Pomodoro',
     description:
       'Free Pomodoro timer with task management, AI coach, mini games, and analytics.',
-    images: ['https://www.pomodoro-focus.site/card.jpg'],
+    images: ['https://improcode.com/card.jpg'],
   },
 };
 
@@ -83,36 +90,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${spaceGrotesk.variable} ${beVietnamPro.variable} ${nunito.variable}`}>
         {/* JSON-LD structured data for SEO */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'WebApplication',
-              name: 'Study Bro',
-              alternateName: 'Study Bro Pomodoro Timer',
-              description:
-                'Free online Pomodoro timer with AI coach, task management, mini games, leaderboard, and focus analytics.',
-              url: 'https://www.pomodoro-focus.site',
-              applicationCategory: 'ProductivityApplication',
-              operatingSystem: 'Web Browser',
-              inLanguage: ['en', 'vi', 'ja'],
-              offers: {
-                '@type': 'Offer',
-                price: '0',
-                priceCurrency: 'USD',
-              },
-              featureList: [
-                'Pomodoro Timer with Task Linking',
-                'AI Study Coach (Bro Chat)',
-                'Mini Games for Breaks',
-                'Focus Mode Analytics',
-                'Daily Streaks & Leaderboard',
-                'Custom Themes & Ambient Sounds',
-              ],
-            }),
-          }}
-        />
+        <JsonLd />
         {process.env.NEXT_PUBLIC_GA_ID ? (
           <>
             <Script
