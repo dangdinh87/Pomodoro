@@ -4,9 +4,10 @@ import { MetadataRoute } from 'next';
 export const dynamic = 'force-static';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://www.pomodoro-focus.site';
-  // Static date - update on each meaningful deploy
-  const lastModified = '2026-02-08';
+  const baseUrl = 'https://improcode.com';
+  // Static date - update on each meaningful deploy.
+  // Since this is force-static, new Date() will be fixed at build time.
+  const lastModified = new Date();
 
   return [
     {
@@ -14,6 +15,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: 'weekly',
       priority: 1,
+    },
+    {
+      url: `${baseUrl}/timer`,
+      lastModified,
+      changeFrequency: 'daily',
+      priority: 0.9,
     },
     {
       url: `${baseUrl}/guide`,
