@@ -1,0 +1,105 @@
+
+> pomodoro-focus-app@0.1.0 dev /app
+> next dev
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+
+ ✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+ ✓ Ready in 1866ms
+ ○ Compiling /src/middleware ...
+ ✓ Compiled /src/middleware in 1258ms (201 modules)
+ ⨯ Error: Your project's URL and Key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at <unknown> (https://supabase.com/dashboard/project/_/settings/api)
+    at createServerClient (webpack-internal:///(middleware)/./node_modules/.pnpm/@supabase+ssr@0.7.0_@supabase+supabase-js@2.81.1/node_modules/@supabase/ssr/dist/module/createServerClient.js:13:15)
+    at Object.middleware [as handler] (webpack-internal:///(middleware)/./src/middleware.ts:16:87)
+    at eval (webpack-internal:///(middleware)/./node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/server/web/adapter.js:197:31)
+    at AsyncLocalStorage.run (node:internal/async_local_storage/async_hooks:91:14)
+    at Object.wrap (webpack-internal:///(middleware)/./node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/server/async-storage/request-async-storage-wrapper.js:105:24)
+    at eval (webpack-internal:///(middleware)/./node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/server/web/adapter.js:188:122)
+    at eval (webpack-internal:///(middleware)/./node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/server/lib/trace/tracer.js:115:36)
+    at NoopContextManager.with (webpack-internal:///(middleware)/./node_modules/.pnpm/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/esm/context/NoopContextManager.js:58:24)
+    at ContextAPI.with (webpack-internal:///(middleware)/./node_modules/.pnpm/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/esm/api/context.js:95:54)
+    at NoopTracer.startActiveSpan (webpack-internal:///(middleware)/./node_modules/.pnpm/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/esm/trace/NoopTracer.js:73:31)
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 1714ms (255 modules)
+ GET /timer 404 in 9ms
+ ○ Compiling /_not-found ...
+
+warn - The class `duration-[3000ms]` is ambiguous and matches multiple utilities.
+warn - If this is content and not a class, replace it with `duration-&lsqb;3000ms&rsqb;` to silence this warning.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⨯ Error: Your project's URL and Key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at <unknown> (https://supabase.com/dashboard/project/_/settings/api)
+    at createServerClient (webpack-internal:///(middleware)/./node_modules/.pnpm/@supabase+ssr@0.7.0_@supabase+supabase-js@2.81.1/node_modules/@supabase/ssr/dist/module/createServerClient.js:13:15)
+    at Object.middleware [as handler] (webpack-internal:///(middleware)/./src/middleware.ts:16:87)
+    at eval (webpack-internal:///(middleware)/./node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/server/web/adapter.js:197:31)
+    at AsyncLocalStorage.run (node:internal/async_local_storage/async_hooks:91:14)
+    at Object.wrap (webpack-internal:///(middleware)/./node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/server/async-storage/request-async-storage-wrapper.js:105:24)
+    at eval (webpack-internal:///(middleware)/./node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/server/web/adapter.js:188:122)
+    at eval (webpack-internal:///(middleware)/./node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/server/lib/trace/tracer.js:115:36)
+    at NoopContextManager.with (webpack-internal:///(middleware)/./node_modules/.pnpm/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/esm/context/NoopContextManager.js:58:24)
+    at ContextAPI.with (webpack-internal:///(middleware)/./node_modules/.pnpm/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/esm/api/context.js:95:54)
+    at NoopTracer.startActiveSpan (webpack-internal:///(middleware)/./node_modules/.pnpm/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/esm/trace/NoopTracer.js:73:31)
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (126kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+ ✓ Compiled /_not-found in 20.5s (806 modules)
+ GET /timer 404 in 4ms
+ ⨯ Error [ERR_HTTP_HEADERS_SENT]: Cannot append headers after they are sent to the client
+    at ServerResponse.appendHeader (node:_http_outgoing:756:11)
+digest: "1762386026"
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⨯ Error [ERR_HTTP_HEADERS_SENT]: Cannot append headers after they are sent to the client
+    at ServerResponse.appendHeader (node:_http_outgoing:756:11)
+digest: "1762386026"
+ ⨯ Error: Your project's URL and Key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at <unknown> (https://supabase.com/dashboard/project/_/settings/api)
+    at createServerClient (webpack-internal:///(middleware)/./node_modules/.pnpm/@supabase+ssr@0.7.0_@supabase+supabase-js@2.81.1/node_modules/@supabase/ssr/dist/module/createServerClient.js:13:15)
+    at Object.middleware [as handler] (webpack-internal:///(middleware)/./src/middleware.ts:16:87)
+    at eval (webpack-internal:///(middleware)/./node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/server/web/adapter.js:197:31)
+    at AsyncLocalStorage.run (node:internal/async_local_storage/async_hooks:91:14)
+    at Object.wrap (webpack-internal:///(middleware)/./node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/server/async-storage/request-async-storage-wrapper.js:105:24)
+    at eval (webpack-internal:///(middleware)/./node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/server/web/adapter.js:188:122)
+    at eval (webpack-internal:///(middleware)/./node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/server/lib/trace/tracer.js:115:36)
+    at NoopContextManager.with (webpack-internal:///(middleware)/./node_modules/.pnpm/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/esm/context/NoopContextManager.js:58:24)
+    at ContextAPI.with (webpack-internal:///(middleware)/./node_modules/.pnpm/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/esm/api/context.js:95:54)
+    at NoopTracer.startActiveSpan (webpack-internal:///(middleware)/./node_modules/.pnpm/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/esm/trace/NoopTracer.js:73:31)
+ ⨯ Error: Your project's URL and Key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at <unknown> (https://supabase.com/dashboard/project/_/settings/api)
+    at createServerClient (webpack-internal:///(middleware)/./node_modules/.pnpm/@supabase+ssr@0.7.0_@supabase+supabase-js@2.81.1/node_modules/@supabase/ssr/dist/module/createServerClient.js:13:15)
+    at Object.middleware [as handler] (webpack-internal:///(middleware)/./src/middleware.ts:16:87)
+    at eval (webpack-internal:///(middleware)/./node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/server/web/adapter.js:197:31)
+    at AsyncLocalStorage.run (node:internal/async_local_storage/async_hooks:91:14)
+    at Object.wrap (webpack-internal:///(middleware)/./node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/server/async-storage/request-async-storage-wrapper.js:105:24)
+    at eval (webpack-internal:///(middleware)/./node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/server/web/adapter.js:188:122)
+    at eval (webpack-internal:///(middleware)/./node_modules/.pnpm/next@14.2.35_@babel+core@7.28.5_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/server/lib/trace/tracer.js:115:36)
+    at NoopContextManager.with (webpack-internal:///(middleware)/./node_modules/.pnpm/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/esm/context/NoopContextManager.js:58:24)
+    at ContextAPI.with (webpack-internal:///(middleware)/./node_modules/.pnpm/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/esm/api/context.js:95:54)
+    at NoopTracer.startActiveSpan (webpack-internal:///(middleware)/./node_modules/.pnpm/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/esm/trace/NoopTracer.js:73:31)
+ GET /timer 404 in 1ms
+ ⨯ Error [ERR_HTTP_HEADERS_SENT]: Cannot append headers after they are sent to the client
+    at ServerResponse.appendHeader (node:_http_outgoing:756:11)
+digest: "1762386026"
+   Reload env: .env.local
+ ✓ Compiled in 4.3s (1034 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (126kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
