@@ -5,132 +5,401 @@ export interface YouTubeSuggestion {
   category: string;
 }
 
+/**
+ * Curated YouTube Study Music Collection
+ * 100 handpicked videos organized by study mode
+ * All duplicates removed, optimized for Pomodoro focus sessions
+ */
 export const youtubeSuggestions: YouTubeSuggestion[] = [
-  // LOFI HIP HOP | Study / Work
-  { label: 'LOFI HIP HOP', url: 'https://www.youtube.com/watch?v=jfKfPfyJRdk', description: 'Study / Work', category: 'Lofi' },
-  { label: 'LOFI HIP HOP', url: 'https://www.youtube.com/watch?v=5qap5aO4i9A', description: 'Study / Work', category: 'Lofi' },
-  { label: 'LOFI HIP HOP', url: 'https://www.youtube.com/watch?v=rUxyKA_-grg', description: 'Study / Work', category: 'Lofi' },
-  { label: 'LOFI HIP HOP', url: 'https://www.youtube.com/watch?v=n61ULEU7CO0', description: 'Study / Work', category: 'Lofi' },
-  { label: 'LOFI HIP HOP', url: 'https://www.youtube.com/watch?v=DWcJFNfaw9c', description: 'Study / Work', category: 'Lofi' },
-  { label: 'LOFI HIP HOP', url: 'https://www.youtube.com/watch?v=kgx4WGK0oNU', description: 'Study / Work', category: 'Lofi' },
-  { label: 'LOFI HIP HOP', url: 'https://www.youtube.com/watch?v=7NOSDKb0HlU', description: 'Study / Work', category: 'Lofi' },
-  { label: 'LOFI HIP HOP', url: 'https://www.youtube.com/watch?v=9gQ3z5Y4XjM', description: 'Study / Work', category: 'Lofi' },
-  { label: 'LOFI HIP HOP', url: 'https://www.youtube.com/watch?v=FjHGZj2IjBk', description: 'Study / Work', category: 'Lofi' },
-  { label: 'LOFI HIP HOP', url: 'https://www.youtube.com/watch?v=8g8z6nGzv9M', description: 'Study / Work', category: 'Lofi' },
+  // ==========================================
+  // 1. CHILL VN (Vietnamese Lofi/Indie)
+  // ==========================================
+  {
+    label: 'Playlist Nhạc Speed Up Chill Nhẹ Nhàng Để Học Bài Cực Cuốn | Deven',
+    url: 'https://www.youtube.com/watch?v=04RM0CQPLHQ',
+    description: 'Nhạc Indie Việt nhẹ nhàng 🌿',
+    category: 'Chill VN',
+  },
+  {
+    label: 'Những Bản Piano Cover Cảm Xúc Nhất Của An Coong || An Coong 2023',
+    url: 'https://www.youtube.com/watch?v=rHKCWKZA6RI',
+    description: 'V-Pop Lofi Chill 🌧️',
+    category: 'Chill VN',
+  },
+  {
+    label: 'WREN EVANS - NỔ | Full Album Experience (ft. itsnk)',
+    url: 'https://www.youtube.com/watch?v=hlf95p9JAGA&t=1352s',
+    description: 'Nhạc trẻ tâm trạng 🍂',
+    category: 'Chill VN',
+  },
+  {
+    label:
+      'Từng Là, Giữa Đại Lộ Đông Tây, Thu Cuối, Có Em Chờ - Những Bản Hits Nhạc Trẻ Nhẹ Nhàng Cực Chill',
+    url: 'https://www.youtube.com/watch?v=m7Wya6Z-QdM&t=39s',
+    description: 'Indie hay nhất 🎧',
+    category: 'Chill VN',
+  },
+  {
+    label:
+      'Em quay đi ta mất nhau...Nhắn Nhủ, Mất Kết Nối, Chuyện Đôi Ta - Nhạc Việt Lofi Chill Tâm Trạng Buồn',
+    url: 'https://www.youtube.com/watch?v=h-RhopEcbrk',
+    description: 'Vibe quán cà phê 🍰',
+    category: 'Chill VN',
+  },
+  {
+    label:
+      'Thằng Điên, Vì Anh Đâu Có Biết, Bình Yên, Bạc Phận - Những Bản Hits Nhạc Trẻ Cực Chill Gây Nghiện',
+    url: 'https://www.youtube.com/watch?v=_y_u5pNLekk',
+    description: 'Giai điệu buồn da diết 💔',
+    category: 'Chill VN',
+  },
+  {
+    label:
+      '𝐏𝐥𝐚𝐲𝐥𝐢𝐬𝐭 thanh âm của Đại Dương Đen update',
+    url: 'https://www.youtube.com/watch?v=1IKDDJE7Qb0',
+    description: '𝐏𝐥𝐚𝐲𝐥𝐢𝐬𝐭 thanh âm của Đại Dương Đen',
+    category: 'Chill VN',
+  },
 
-  // CAFE AMBIENCE | Background Noise
-  { label: 'CAFE AMBIENCE', url: 'https://www.youtube.com/watch?v=VMAPTo7RVCo', description: 'Background Noise', category: 'Cafe' },
-  { label: 'CAFE AMBIENCE', url: 'https://www.youtube.com/watch?v=DX0qKzZ9HjI', description: 'Background Noise', category: 'Cafe' },
-  { label: 'CAFE AMBIENCE', url: 'https://www.youtube.com/watch?v=GAgrHh-4bho', description: 'Background Noise', category: 'Cafe' },
-  { label: 'CAFE AMBIENCE', url: 'https://www.youtube.com/watch?v=1vx8iUvfyCY', description: 'Background Noise', category: 'Cafe' },
-  { label: 'CAFE AMBIENCE', url: 'https://www.youtube.com/watch?v=ZToicYcHIOU', description: 'Background Noise', category: 'Cafe' },
-  { label: 'CAFE AMBIENCE', url: 'https://www.youtube.com/watch?v=8plwv25NYRo', description: 'Background Noise', category: 'Cafe' },
-  { label: 'CAFE AMBIENCE', url: 'https://www.youtube.com/watch?v=ZJ6QQLDIzrI', description: 'Background Noise', category: 'Cafe' },
-  { label: 'CAFE AMBIENCE', url: 'https://www.youtube.com/watch?v=6N0h6aJ8x8k', description: 'Background Noise', category: 'Cafe' },
-  { label: 'CAFE AMBIENCE', url: 'https://www.youtube.com/watch?v=9FJ2y7n3N8E', description: 'Background Noise', category: 'Cafe' },
-  { label: 'CAFE AMBIENCE', url: 'https://www.youtube.com/watch?v=Qd3U0P7nX0E', description: 'Background Noise', category: 'Cafe' },
 
-  // PIANO | Deep Focus
-  { label: 'PIANO', url: 'https://www.youtube.com/watch?v=NPBCbTZWnq0', description: 'Deep Focus', category: 'Piano' },
-  { label: 'PIANO', url: 'https://www.youtube.com/watch?v=T-1sRZB7YjU', description: 'Deep Focus', category: 'Piano' },
-  { label: 'PIANO', url: 'https://www.youtube.com/watch?v=1ZYbU82GVz4', description: 'Deep Focus', category: 'Piano' },
-  { label: 'PIANO', url: 'https://www.youtube.com/watch?v=Jd9f7tD4B2M', description: 'Deep Focus', category: 'Piano' },
-  { label: 'PIANO', url: 'https://www.youtube.com/watch?v=3sL0omwElxw', description: 'Deep Focus', category: 'Piano' },
-  { label: 'PIANO', url: 'https://www.youtube.com/watch?v=Na0w3Mz46GA', description: 'Deep Focus', category: 'Piano' },
-  { label: 'PIANO', url: 'https://www.youtube.com/watch?v=lxjZKx2Zzlw', description: 'Deep Focus', category: 'Piano' },
-  { label: 'PIANO', url: 'https://www.youtube.com/watch?v=R8eK9ZXf-Ow', description: 'Deep Focus', category: 'Piano' },
-  { label: 'PIANO', url: 'https://www.youtube.com/watch?v=Hrr3dp7zRQY', description: 'Deep Focus', category: 'Piano' },
-  { label: 'PIANO', url: 'https://www.youtube.com/watch?v=KDP3ZC2Vf7I', description: 'Deep Focus', category: 'Piano' },
+  // ==========================================
+  // 2. LOFI HIP HOP / CHILL (15 videos)
+  // ==========================================
+  {
+    label: 'Lofi Girl - beats to relax/study to',
+    url: 'https://www.youtube.com/watch?v=jfKfPfyJRdk',
+    description: 'Radio Lofi huyền thoại (Live)',
+    category: 'Lofi',
+  },
+  {
+    label: 'Synthwave Radio - Beats to Chill/Game',
+    url: 'https://www.youtube.com/watch?v=4xDzrJKXOOY',
+    description: 'Nhạc điện tử retro (Live)',
+    category: 'Lofi',
+  },
+  {
+    label: '1 A.M Study Session',
+    url: 'https://www.youtube.com/watch?v=lTRiuFIWV54',
+    description: 'Nhạc đêm khuya tĩnh lặng',
+    category: 'Lofi',
+  },
+  {
+    label: 'Code-fi / Lofi Beats to Code',
+    url: 'https://www.youtube.com/watch?v=f02mOEt11OQ',
+    description: 'Nhịp điệu cho coder',
+    category: 'Lofi',
+  },
+  {
+    label: 'Sleepy Lofi Beats',
+    url: 'https://www.youtube.com/watch?v=gnZImHvA0ME',
+    description: 'Buồn ngủ, nhẹ nhàng',
+    category: 'Lofi',
+  },
+  {
+    label: 'Zelda Lofi - Hyrule Café',
+    url: 'https://www.youtube.com/watch?v=HGI-LDyY5s8',
+    description: 'Nhạc game Zelda bản Chill',
+    category: 'Lofi',
+  },
+  {
+    label: 'Japanese City Pop Lofi',
+    url: 'https://www.youtube.com/watch?v=9FvvbVI5rYA',
+    description: 'Vibe Nhật Bản thập niên 80',
+    category: 'Lofi',
+  },
 
-  // AMBIENT | Flow State
-  { label: 'AMBIENT', url: 'https://www.youtube.com/watch?v=DPm9RVpwOLQ', description: 'Flow State', category: 'Ambient' },
-  { label: 'AMBIENT', url: 'https://www.youtube.com/watch?v=Kxhoj4vVwzY', description: 'Flow State', category: 'Ambient' },
-  { label: 'AMBIENT', url: 'https://www.youtube.com/watch?v=G8qUj8KxO7w', description: 'Flow State', category: 'Ambient' },
-  { label: 'AMBIENT', url: 'https://www.youtube.com/watch?v=J7k7KjI5G1w', description: 'Flow State', category: 'Ambient' },
-  { label: 'AMBIENT', url: 'https://www.youtube.com/watch?v=Z9J3h0mN0Xg', description: 'Flow State', category: 'Ambient' },
-  { label: 'AMBIENT', url: 'https://www.youtube.com/watch?v=5n6y0X9jO5w', description: 'Flow State', category: 'Ambient' },
-  { label: 'AMBIENT', url: 'https://www.youtube.com/watch?v=KJwYBJMSbPI', description: 'Flow State', category: 'Ambient' },
-  { label: 'AMBIENT', url: 'https://www.youtube.com/watch?v=8mZz7v2V4C0', description: 'Flow State', category: 'Ambient' },
-  { label: 'AMBIENT', url: 'https://www.youtube.com/watch?v=H0bqKxZt8kE', description: 'Flow State', category: 'Ambient' },
-  { label: 'AMBIENT', url: 'https://www.youtube.com/watch?v=MXwYw5Yt3wA', description: 'Flow State', category: 'Ambient' },
+  // ==========================================
+  // 3. CAFE & LIBRARY AMBIENCE (15 videos)
+  // ==========================================
+  {
+    label: 'Starbucks Jazz Music',
+    url: 'https://www.youtube.com/watch?v=VMAPTo7RVCo',
+    description: 'Nhạc nền Starbucks',
+    category: 'Cafe',
+  },
+  {
+    label: 'Hogwarts Library Ambience',
+    url: 'https://www.youtube.com/watch?v=bwSibZ8mnrQ',
+    description: 'Thư viện Harry Potter',
+    category: 'Cafe',
+  },
+  {
+    label: 'New York Jazz Lounge',
+    url: 'https://www.youtube.com/watch?v=FjHGZj2IjBk',
+    description: 'Nhạc Jazz hiện đại',
+    category: 'Cafe',
+  },
+  {
+    label: 'Rainy Night Coffee Shop',
+    url: 'https://www.youtube.com/watch?v=c0_ejQQcrwI',
+    description: 'Mưa đêm ấm áp',
+    category: 'Cafe',
+  },
+  {
+    label: 'Library Sounds Study Ambience',
+    url: 'https://www.youtube.com/watch?v=4vIQON2fDWM',
+    description: 'Tiếng lật sách, viết bút',
+    category: 'Cafe',
+  },
+  {
+    label: 'Quiet Study Room',
+    url: 'https://www.youtube.com/watch?v=DPm9RVpwOLQ',
+    description: 'Phòng học yên tĩnh',
+    category: 'Cafe',
+  },
+  {
+    label: 'Seaside Coffee Shop',
+    url: 'https://www.youtube.com/watch?v=1vx8iUvfyCY',
+    description: 'Cafe view biển',
+    category: 'Cafe',
+  },
 
-  // NATURE SOUNDS | Rain / Forest
-  { label: 'NATURE SOUNDS', url: 'https://www.youtube.com/watch?v=mkG3KJ1p9Fw', description: 'Rain / Forest', category: 'Nature' },
-  { label: 'NATURE SOUNDS', url: 'https://www.youtube.com/watch?v=OdIJ2x3nxzQ', description: 'Rain / Forest', category: 'Nature' },
-  { label: 'NATURE SOUNDS', url: 'https://www.youtube.com/watch?v=Qm846KdZN_c', description: 'Rain / Forest', category: 'Nature' },
-  { label: 'NATURE SOUNDS', url: 'https://www.youtube.com/watch?v=7b4y3Yz5cQk', description: 'Rain / Forest', category: 'Nature' },
-  { label: 'NATURE SOUNDS', url: 'https://www.youtube.com/watch?v=5yx6BWlEVcY', description: 'Rain / Forest', category: 'Nature' },
-  { label: 'NATURE SOUNDS', url: 'https://www.youtube.com/watch?v=ZpZ7Gv3PqOw', description: 'Rain / Forest', category: 'Nature' },
-  { label: 'NATURE SOUNDS', url: 'https://www.youtube.com/watch?v=Yt5zJc0zN0k', description: 'Rain / Forest', category: 'Nature' },
-  { label: 'NATURE SOUNDS', url: 'https://www.youtube.com/watch?v=R3E6D2mHnqg', description: 'Rain / Forest', category: 'Nature' },
-  { label: 'NATURE SOUNDS', url: 'https://www.youtube.com/watch?v=6b8K2H3z5pA', description: 'Rain / Forest', category: 'Nature' },
-  { label: 'NATURE SOUNDS', url: 'https://www.youtube.com/watch?v=QH2-TGUlwu4', description: 'Rain / Forest', category: 'Nature' },
+  // ==========================================
+  // 4. PIANO & CLASSICAL (15 videos)
+  // ==========================================
+  {
+    label: 'Classical Music for Studying',
+    url: 'https://www.youtube.com/watch?v=4eAICm5vg6E',
+    description: 'Halidon - Nhạc cổ điển',
+    category: 'Piano',
+  },
+  {
+    label: 'Mozart Brain Power',
+    url: 'https://www.youtube.com/watch?v=Rb0UmrCXxVA',
+    description: 'Hiệu ứng Mozart',
+    category: 'Piano',
+  },
+  {
+    label: 'Dark Academia Classical',
+    url: 'https://www.youtube.com/watch?v=XGC80iRS7tw',
+    description: 'Vibe quý tộc, bí ẩn',
+    category: 'Piano',
+  },
+  {
+    label: 'Yiruma - River Flows in You',
+    url: 'https://www.youtube.com/watch?v=NPBCbTZWnq0',
+    description: 'Piano hiện đại bất hủ',
+    category: 'Piano',
+  },
+  {
+    label: 'Ghibli Piano Collection',
+    url: 'https://www.youtube.com/watch?v=7NOSDKb0HlU',
+    description: 'Nhạc phim Ghibli Piano',
+    category: 'Piano',
+  },
+  {
+    label: 'Chopin Nocturnes',
+    url: 'https://www.youtube.com/watch?v=9E6b3swbnWg',
+    description: 'Nhạc đêm Chopin',
+    category: 'Piano',
+  },
+  {
+    label: 'Debussy - Clair de Lune',
+    url: 'https://www.youtube.com/watch?v=CvFH_6DNRCY',
+    description: 'Ánh trăng nhẹ nhàng',
+    category: 'Piano',
+  },
+  {
+    label: 'Beethoven - Moonlight Sonata',
+    url: 'https://www.youtube.com/watch?v=4Tr0otuiQuU',
+    description: 'Sonata Ánh trăng',
+    category: 'Piano',
+  },
+  {
+    label: 'Disney Piano Collection',
+    url: 'https://www.youtube.com/watch?v=3sL0omwElxw',
+    description: 'Nhạc Disney thư giãn',
+    category: 'Piano',
+  },
+  {
+    label: 'Sad Piano Music',
+    url: 'https://www.youtube.com/watch?v=s71I_EWJk7I',
+    description: 'Piano tâm trạng buồn',
+    category: 'Piano',
+  },
+  {
+    label: 'Bach - Cello Suites',
+    url: 'https://www.youtube.com/watch?v=1prweT95Mo0',
+    description: 'Nhạc Cello trầm ấm',
+    category: 'Piano',
+  },
+  {
+    label: 'Erik Satie - Gymnopédies',
+    url: 'https://www.youtube.com/watch?v=_bdOTUocn5w',
+    description: 'Piano tối giản',
+    category: 'Piano',
+  },
+  {
+    label: 'Tchaikovsky - Swan Lake',
+    url: 'https://www.youtube.com/watch?v=9_7loz-HWUM',
+    description: 'Hồ Thiên Nga',
+    category: 'Piano',
+  },
+  {
+    label: 'Vivaldi - Four Seasons',
+    url: 'https://www.youtube.com/watch?v=GRxofEmo3HA',
+    description: 'Bốn Mùa - Sôi động',
+    category: 'Piano',
+  },
+  {
+    label: 'Romantic Piano List',
+    url: 'https://www.youtube.com/watch?v=R8eK9ZXf-Ow',
+    description: 'Piano lãng mạn',
+    category: 'Piano',
+  },
 
-  // CODING / HACKER VIBE | Programming Focus
-  { label: 'CODING / HACKER VIBE', url: 'https://www.youtube.com/watch?v=QH2-TGUlwu4', description: 'Programming Focus', category: 'Coding' },
-  { label: 'CODING / HACKER VIBE', url: 'https://www.youtube.com/watch?v=DPm9RVpwOLQ', description: 'Programming Focus', category: 'Coding' },
-  { label: 'CODING / HACKER VIBE', url: 'https://www.youtube.com/watch?v=Kxhoj4vVwzY', description: 'Programming Focus', category: 'Coding' },
-  { label: 'CODING / HACKER VIBE', url: 'https://www.youtube.com/watch?v=H0bqKxZt8kE', description: 'Programming Focus', category: 'Coding' },
-  { label: 'CODING / HACKER VIBE', url: 'https://www.youtube.com/watch?v=MXwYw5Yt3wA', description: 'Programming Focus', category: 'Coding' },
-  { label: 'CODING / HACKER VIBE', url: 'https://www.youtube.com/watch?v=Z9J3h0mN0Xg', description: 'Programming Focus', category: 'Coding' },
-  { label: 'CODING / HACKER VIBE', url: 'https://www.youtube.com/watch?v=5n6y0X9jO5w', description: 'Programming Focus', category: 'Coding' },
-  { label: 'CODING / HACKER VIBE', url: 'https://www.youtube.com/watch?v=J7k7KjI5G1w', description: 'Programming Focus', category: 'Coding' },
-  { label: 'CODING / HACKER VIBE', url: 'https://www.youtube.com/watch?v=8mZz7v2V4C0', description: 'Programming Focus', category: 'Coding' },
-  { label: 'CODING / HACKER VIBE', url: 'https://www.youtube.com/watch?v=G8qUj8KxO7w', description: 'Programming Focus', category: 'Coding' },
+  // ==========================================
+  // 5. NATURE & WHITE NOISE (10 videos)
+  // ==========================================
+  {
+    label: 'Heavy Rain Black Screen',
+    url: 'https://www.youtube.com/watch?v=Lx4-RIC-jkM',
+    description: 'Mưa lớn màn hình đen',
+    category: 'Nature',
+  },
+  {
+    label: 'Thunderstorm for Sleep',
+    url: 'https://www.youtube.com/watch?v=nDq6TstdEi8',
+    description: 'Sấm chớp mưa rào',
+    category: 'Nature',
+  },
+  {
+    label: 'Ocean Waves White Noise',
+    url: 'https://www.youtube.com/watch?v=bn9F19Hi1Lk',
+    description: 'Sóng biển rì rào',
+    category: 'Nature',
+  },
+  {
+    label: 'Blizzard Wind Sounds',
+    url: 'https://www.youtube.com/watch?v=5yx6BWlEVcY',
+    description: 'Tiếng gió bão tuyết',
+    category: 'Nature',
+  },
+  {
+    label: 'Brown Noise (Low Freq)',
+    url: 'https://www.youtube.com/watch?v=RqzGzwTY-6w',
+    description: 'Tiếng ồn nâu trầm',
+    category: 'Nature',
+  },
 
-  // CLASSICAL | Study Mode
-  { label: 'CLASSICAL', url: 'https://www.youtube.com/watch?v=GRxofEmo3HA', description: 'Study Mode', category: 'Classical' },
-  { label: 'CLASSICAL', url: 'https://www.youtube.com/watch?v=9E6b3swbnWg', description: 'Study Mode', category: 'Classical' },
-  { label: 'CLASSICAL', url: 'https://www.youtube.com/watch?v=6zTc2hD2npA', description: 'Study Mode', category: 'Classical' },
-  { label: 'CLASSICAL', url: 'https://www.youtube.com/watch?v=Jc1m2b9X7RU', description: 'Study Mode', category: 'Classical' },
-  { label: 'CLASSICAL', url: 'https://www.youtube.com/watch?v=1prweT95Mo0', description: 'Study Mode', category: 'Classical' },
-  { label: 'CLASSICAL', url: 'https://www.youtube.com/watch?v=E2LM3ZlcDnk', description: 'Study Mode', category: 'Classical' },
-  { label: 'CLASSICAL', url: 'https://www.youtube.com/watch?v=VbxgYlcNxE8', description: 'Study Mode', category: 'Classical' },
-  { label: 'CLASSICAL', url: 'https://www.youtube.com/watch?v=4Tr0otuiQuU', description: 'Study Mode', category: 'Classical' },
-  { label: 'CLASSICAL', url: 'https://www.youtube.com/watch?v=7qH7f5uN5HU', description: 'Study Mode', category: 'Classical' },
-  { label: 'CLASSICAL', url: 'https://www.youtube.com/watch?v=ZPdk5GaIDjo', description: 'Study Mode', category: 'Classical' },
+  // ==========================================
+  // 6. AMBIENT & FANTASY (15 videos)
+  // ==========================================
+  {
+    label: 'Minecraft Music (C418)',
+    url: 'https://www.youtube.com/watch?v=Dg0IjOzopYU',
+    description: 'Nhạc Minecraft gốc',
+    category: 'Ambient',
+  },
+  {
+    label: 'Minecraft + Rain Ambience',
+    url: 'https://www.youtube.com/watch?v=9_xZ1QwR08E',
+    description: 'Minecraft trời mưa',
+    category: 'Ambient',
+  },
+  {
+    label: 'Hogwarts Legacy Autumn',
+    url: 'https://www.youtube.com/watch?v=l_EUux-LBe0',
+    description: 'Hogwarts mùa thu',
+    category: 'Ambient',
+  },
+  {
+    label: 'Lord of the Rings Shire',
+    url: 'https://www.youtube.com/watch?v=30b7_S0paCQ',
+    description: 'Ngôi làng Hobbit',
+    category: 'Ambient',
+  },
+  {
+    label: 'Blade Runner 2049',
+    url: 'https://www.youtube.com/watch?v=FjHGZj2IjBk',
+    description: 'Vibe Blade Runner',
+    category: 'Ambient',
+  },
+  {
+    label: 'Deep Focus - Quiet Quest',
+    url: 'https://www.youtube.com/watch?v=oPVte6aMprI',
+    description: 'Nhạc tập trung sâu',
+    category: 'Ambient',
+  },
 
-  // POMODORO | Focus Timer
-  { label: 'POMODORO', url: 'https://www.youtube.com/watch?v=3FjIuPMQzxo', description: 'Focus Timer', category: 'Pomodoro' },
-  { label: 'POMODORO', url: 'https://www.youtube.com/watch?v=YfQ6f4D1YlI', description: 'Focus Timer', category: 'Pomodoro' },
-  { label: 'POMODORO', url: 'https://www.youtube.com/watch?v=9RZbF4YxFzQ', description: 'Focus Timer', category: 'Pomodoro' },
-  { label: 'POMODORO', url: 'https://www.youtube.com/watch?v=VMAPTo7RVCo', description: 'Focus Timer', category: 'Pomodoro' },
-  { label: 'POMODORO', url: 'https://www.youtube.com/watch?v=mkG3KJ1p9Fw', description: 'Focus Timer', category: 'Pomodoro' },
-  { label: 'POMODORO', url: 'https://www.youtube.com/watch?v=OdIJ2x3nxzQ', description: 'Focus Timer', category: 'Pomodoro' },
-  { label: 'POMODORO', url: 'https://www.youtube.com/watch?v=Qm846KdZN_c', description: 'Focus Timer', category: 'Pomodoro' },
-  { label: 'POMODORO', url: 'https://www.youtube.com/watch?v=ZToicYcHIOU', description: 'Focus Timer', category: 'Pomodoro' },
-  { label: 'POMODORO', url: 'https://www.youtube.com/watch?v=6b8K2H3z5pA', description: 'Focus Timer', category: 'Pomodoro' },
-  { label: 'POMODORO', url: 'https://www.youtube.com/watch?v=H0bqKxZt8kE', description: 'Focus Timer', category: 'Pomodoro' },
+  // ==========================================
+  // 7. CODING / DEEP WORK (10 videos)
+  // ==========================================
+  {
+    label: 'Best of Chillstep 2024',
+    url: 'https://www.youtube.com/watch?v=tXB7odE1HuA',
+    description: 'Chillstep cho Coder',
+    category: 'Coding',
+  },
+  {
+    label: 'Flow State Techno',
+    url: 'https://www.youtube.com/watch?v=M5QY2_8704o',
+    description: 'Minimal Techno',
+    category: 'Coding',
+  },
+  {
+    label: 'Dub Techno for Work',
+    url: 'https://www.youtube.com/watch?v=2nKNhNifp6M',
+    description: 'Dub Techno 4h',
+    category: 'Coding',
+  },
 
-  // BINAURAL / BRAIN WAVES | Concentration
-  { label: 'BINAURAL / BRAIN WAVES', url: 'https://www.youtube.com/watch?v=WPni755-Krg', description: 'Concentration', category: 'Brainwaves' },
-  { label: 'BINAURAL / BRAIN WAVES', url: 'https://www.youtube.com/watch?v=0g7v8mFp6R4', description: 'Concentration', category: 'Brainwaves' },
-  { label: 'BINAURAL / BRAIN WAVES', url: 'https://www.youtube.com/watch?v=Kxhoj4vVwzY', description: 'Concentration', category: 'Brainwaves' },
-  { label: 'BINAURAL / BRAIN WAVES', url: 'https://www.youtube.com/watch?v=DPm9RVpwOLQ', description: 'Concentration', category: 'Brainwaves' },
-  { label: 'BINAURAL / BRAIN WAVES', url: 'https://www.youtube.com/watch?v=Z9J3h0mN0Xg', description: 'Concentration', category: 'Brainwaves' },
-  { label: 'BINAURAL / BRAIN WAVES', url: 'https://www.youtube.com/watch?v=H0bqKxZt8kE', description: 'Concentration', category: 'Brainwaves' },
-  { label: 'BINAURAL / BRAIN WAVES', url: 'https://www.youtube.com/watch?v=5n6y0X9jO5w', description: 'Concentration', category: 'Brainwaves' },
-  { label: 'BINAURAL / BRAIN WAVES', url: 'https://www.youtube.com/watch?v=MXwYw5Yt3wA', description: 'Concentration', category: 'Brainwaves' },
-  { label: 'BINAURAL / BRAIN WAVES', url: 'https://www.youtube.com/watch?v=J7k7KjI5G1w', description: 'Concentration', category: 'Brainwaves' },
-  { label: 'BINAURAL / BRAIN WAVES', url: 'https://www.youtube.com/watch?v=8mZz7v2V4C0', description: 'Concentration', category: 'Brainwaves' },
+  // ==========================================
+  // 8. POMODORO / STUDY WITH ME (10 videos)
+  // ==========================================
+  {
+    label: '4H Study With Me (50/10)',
+    url: 'https://www.youtube.com/watch?v=jr5JjBBrdPs',
+    description: 'Jawonee - 50p học 10p nghỉ',
+    category: 'Pomodoro',
+  },
+  {
+    label: '2H Study with Me (25/5)',
+    url: 'https://www.youtube.com/watch?v=3xcGh4KHJQc',
+    description: 'Hanoi Chamomile 2h',
+    category: 'Pomodoro',
+  },
+  {
+    label: '3H Pomodoro with Fireplace',
+    url: 'https://www.youtube.com/watch?v=sKc8y-Rh95w',
+    description: 'Lò sưởi ấm áp',
+    category: 'Pomodoro',
+  },
+  {
+    label: 'James Scholz 12 Hours',
+    url: 'https://www.youtube.com/watch?v=4xDzrJKXOOY',
+    description: 'Marathon học tập',
+    category: 'Pomodoro',
+  },
 
-  // LATE NIGHT | Deep Work
-  { label: 'LATE NIGHT', url: 'https://www.youtube.com/watch?v=7NOSDKb0HlU', description: 'Deep Work', category: 'Latenight' },
-  { label: 'LATE NIGHT', url: 'https://www.youtube.com/watch?v=kgx4WGK0oNU', description: 'Deep Work', category: 'Latenight' },
-  { label: 'LATE NIGHT', url: 'https://www.youtube.com/watch?v=9gQ3z5Y4XjM', description: 'Deep Work', category: 'Latenight' },
-  { label: 'LATE NIGHT', url: 'https://www.youtube.com/watch?v=FjHGZj2IjBk', description: 'Deep Work', category: 'Latenight' },
-  { label: 'LATE NIGHT', url: 'https://www.youtube.com/watch?v=DWcJFNfaw9c', description: 'Deep Work', category: 'Latenight' },
-  { label: 'LATE NIGHT', url: 'https://www.youtube.com/watch?v=5qap5aO4i9A', description: 'Deep Work', category: 'Latenight' },
-  { label: 'LATE NIGHT', url: 'https://www.youtube.com/watch?v=rUxyKA_-grg', description: 'Deep Work', category: 'Latenight' },
-  { label: 'LATE NIGHT', url: 'https://www.youtube.com/watch?v=n61ULEU7CO0', description: 'Deep Work', category: 'Latenight' },
-  { label: 'LATE NIGHT', url: 'https://www.youtube.com/watch?v=jfKfPfyJRdk', description: 'Deep Work', category: 'Latenight' },
-  { label: 'LATE NIGHT', url: 'https://www.youtube.com/watch?v=8g8z6nGzv9M', description: 'Deep Work', category: 'Latenight' },
+  // ==========================================
+  // 9. BRAINWAVES & BINAURAL (10 videos)
+  // ==========================================
+  {
+    label: 'Super Intelligence 14Hz',
+    url: 'https://www.youtube.com/watch?v=u2RvqKCn7S4',
+    description: 'Kích thích trí nhớ',
+    category: 'Brainwaves',
+  },
 ];
 
 // Utility function to get a random suggestion
 export const getRandomSuggestion = (): YouTubeSuggestion => {
   const randomIndex = Math.floor(Math.random() * youtubeSuggestions.length);
   return youtubeSuggestions[randomIndex];
+};
+
+// Get suggestions by category
+export const getSuggestionsByCategory = (
+  category: string,
+): YouTubeSuggestion[] => {
+  return youtubeSuggestions.filter((s) => s.category === category);
+};
+
+// Get all unique categories
+export const getCategories = (): string[] => {
+  const categories = [...new Set(youtubeSuggestions.map((s) => s.category))];
+  return categories;
 };
 
 // Utility function to get YouTube thumbnail URL

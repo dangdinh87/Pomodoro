@@ -18,6 +18,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { supabase } from '@/lib/supabase-client';
 import { useAuthStore } from '@/stores/auth-store';
 import { useI18n } from '@/contexts/i18n-context';
@@ -30,12 +37,28 @@ function LoginRedirect() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const user = useAuthStore((state) => state.user);
+  const isLoading = useAuthStore((state) => state.isLoading);
 
   useEffect(() => {
-    if (!user) return;
-    const redirectUrl = searchParams.get('redirect') ?? '/timer';
-    router.replace(redirectUrl);
-  }, [user, router, searchParams]);
+    // Only redirect if we have a user AND we're not in a loading state
+    // This prevents redirecting with stale user data during failed login attempts
+    if (!user || isLoading) return;
+
+    // Verify the session is actually valid before redirecting
+    const checkSessionAndRedirect = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (data.session?.user) {
+          const redirectUrl = searchParams.get('redirect') ?? '/timer';
+          router.replace(redirectUrl);
+        }
+      } catch (error) {
+        console.error('Session check failed:', error);
+      }
+    };
+
+    checkSessionAndRedirect();
+  }, [user, isLoading, router, searchParams]);
 
   return null;
 }
@@ -43,10 +66,14 @@ function LoginRedirect() {
 export default function LoginPage() {
   const { t } = useI18n();
   const user = useAuthStore((state) => state.user);
+  const setUser = useAuthStore((state) => state.setUser);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailLoading, setEmailLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
   const isBusy = emailLoading || googleLoading;
 
   const [mounted, setMounted] = useState(false);
@@ -80,6 +107,8 @@ export default function LoginPage() {
         password,
       });
       if (error) {
+        // Clear any stale user data to prevent unwanted redirects
+        setUser(null);
         toast.error(error.message || t('login.errors.loginFailed'));
         setEmailLoading(false);
       } else {
@@ -88,8 +117,39 @@ export default function LoginPage() {
       }
     } catch (error) {
       console.error(error);
+      // Clear any stale user data to prevent unwanted redirects
+      setUser(null);
       toast.error(t('login.errors.loginError'));
       setEmailLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const client = getSupabaseClient();
+    if (!client) return;
+    const emailToUse = forgotEmail.trim() || email.trim();
+    if (!emailToUse) {
+      toast.error(t('login.forgot.emailRequired'));
+      return;
+    }
+    setForgotLoading(true);
+    try {
+      const { error } = await client.auth.resetPasswordForEmail(emailToUse, {
+        redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
+      });
+      if (error) {
+        toast.error(error.message || t('login.forgot.error'));
+      } else {
+        toast.success(t('login.forgot.success'));
+        setForgotPasswordOpen(false);
+        setForgotEmail('');
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(t('login.forgot.error'));
+    } finally {
+      setForgotLoading(false);
     }
   };
 
@@ -156,6 +216,10 @@ export default function LoginPage() {
                 <button
                   type="button"
                   className="text-xs text-muted-foreground hover:text-foreground"
+                  onClick={() => {
+                    setForgotEmail(email);
+                    setForgotPasswordOpen(true);
+                  }}
                 >
                   {t('login.form.forgotPassword')}
                 </button>
@@ -236,6 +300,48 @@ export default function LoginPage() {
             )}
           </Button>
         </CardContent>
+
+        <Dialog open={forgotPasswordOpen} onOpenChange={setForgotPasswordOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>{t('login.forgot.title')}</DialogTitle>
+              <DialogDescription>{t('login.forgot.description')}</DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleForgotPassword} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="forgot-email">{t('login.form.email')}</Label>
+                <Input
+                  id="forgot-email"
+                  type="email"
+                  placeholder={t('login.form.emailPlaceholder')}
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  disabled={forgotLoading}
+                />
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setForgotPasswordOpen(false)}
+                  disabled={forgotLoading}
+                >
+                  {t('common.cancel')}
+                </Button>
+                <Button type="submit" disabled={forgotLoading}>
+                  {forgotLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {t('login.forgot.sending')}
+                    </>
+                  ) : (
+                    t('login.forgot.sendLink')
+                  )}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
 
         <CardFooter className="flex flex-col gap-3 text-sm text-muted-foreground">
           <p className="text-center">

@@ -7,6 +7,7 @@ import {
   TaskPriority,
   TaskStatus,
 } from '@/stores/task-store';
+import { useAuthStore } from '@/stores/auth-store';
 import { toast } from 'sonner';
 import { startOfDay, endOfDay } from 'date-fns';
 
@@ -206,12 +207,14 @@ async function cloneTask(taskId: string): Promise<Task> {
 
 export function useTasks(filters: any = {}) {
   const queryClient = useQueryClient();
+  const user = useAuthStore((state) => state.user);
 
   const [page, setPage] = useState(1);
   const limit = filters.limit || 10;
 
   const tasksQuery = useQuery({
     queryKey: ['tasks', page, limit, filters],
+    enabled: !!user,
     queryFn: () =>
       fetchTasks({
         page,
@@ -221,8 +224,12 @@ export function useTasks(filters: any = {}) {
           status: filters.statusFilter,
           priority: filters.priorityFilter,
           tag: filters.tagFilter,
-          from: filters.dateRange?.from ? startOfDay(filters.dateRange.from).toISOString() : undefined,
-          to: filters.dateRange?.to ? endOfDay(filters.dateRange.to).toISOString() : undefined,
+          from: filters.dateRange?.from
+            ? startOfDay(filters.dateRange.from).toISOString()
+            : undefined,
+          to: filters.dateRange?.to
+            ? endOfDay(filters.dateRange.to).toISOString()
+            : undefined,
           dateField: filters.dateField || 'created_at',
         },
       }),
