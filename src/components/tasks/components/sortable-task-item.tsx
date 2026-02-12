@@ -6,6 +6,7 @@ import { Task } from '@/stores/task-store'
 import { TaskItem } from './task-item'
 import { GripVertical } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { memo } from 'react'
 
 interface SortableTaskItemProps {
   task: Task
@@ -16,10 +17,11 @@ interface SortableTaskItemProps {
   onDelete: (id: string) => void
   onClone?: (id: string) => void
   onSaveAsTemplate?: (id: string) => void
-  togglingTaskIds?: Set<string>
+  onToggleActive?: (task: Task) => void
+  isToggling?: boolean
 }
 
-export function SortableTaskItem({
+export const SortableTaskItem = memo(function SortableTaskItem({
   task,
   isActive,
   isDragging,
@@ -28,7 +30,8 @@ export function SortableTaskItem({
   onDelete,
   onClone,
   onSaveAsTemplate,
-  togglingTaskIds,
+  onToggleActive,
+  isToggling,
 }: SortableTaskItemProps) {
   const {
     attributes,
@@ -77,9 +80,10 @@ export function SortableTaskItem({
           onDelete={onDelete}
           onClone={onClone}
           onSaveAsTemplate={onSaveAsTemplate}
-          togglingTaskIds={togglingTaskIds}
+          onToggleActive={onToggleActive}
+          isToggling={isToggling}
         />
       </div>
     </div>
   )
-}
+})
