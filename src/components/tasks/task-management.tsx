@@ -1,6 +1,7 @@
 "use client"
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { EmptyState } from '@/components/ui/empty-state'
 import { useAuth } from '@/hooks/use-auth'
 
 import { useMemo, useState } from 'react'
@@ -307,9 +308,15 @@ export function TaskManagement() {
 
   if (!isAuthenticated) {
     return (
-      <div className="flex flex-col items-center justify-center flex-1 min-h-[60vh] space-y-4">
-        <h2 className="text-xl font-semibold text-center">{t('auth.signInToManageTasks')}</h2>
-        <Button onClick={() => router.push('/login?redirect=/tasks')}>{t('auth.signInButton')}</Button>
+      <div className="flex flex-col items-center justify-center flex-1 min-h-[60vh]">
+        <EmptyState
+          title={t('auth.signInToManageTasks')}
+          action={
+            <Button onClick={() => router.push('/login?redirect=/tasks')}>
+              {t('auth.signInButton')}
+            </Button>
+          }
+        />
       </div>
     )
   }

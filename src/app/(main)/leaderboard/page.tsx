@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { EmptyState } from "@/components/ui/empty-state"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/contexts/i18n-context"
 
@@ -96,9 +97,10 @@ export default function LeaderboardPage() {
             <ScrollArea className="h-full pr-4">
               <div className="space-y-3">
                 {entries.length === 0 ? (
-                  <div className="text-center py-12 text-muted-foreground">
-                    {t('leaderboard.empty')}
-                  </div>
+                  <EmptyState
+                    title={t('leaderboard.empty')}
+                    className="min-h-[280px] py-8"
+                  />
                 ) : (
                   entries.map((entry, index) => {
                     const isCurrentUser = entry.user_id === user?.id

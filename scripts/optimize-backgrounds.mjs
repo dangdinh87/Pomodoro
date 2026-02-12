@@ -13,7 +13,7 @@
  * Usage: node scripts/optimize-backgrounds.mjs
  */
 
-import { existsSync, mkdirSync, statSync, readdirSync, copyFileSync } from 'node:fs';
+import { existsSync, mkdirSync, statSync, readdirSync, copyFileSync, renameSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import { join, basename, extname } from 'node:path';
 import sharp from 'sharp';
@@ -27,6 +27,8 @@ const SOURCE_DIR = join(ROOT, 'backgrounds-source');
 const OUTPUT_DIR = join(ROOT, 'public', 'backgrounds');
 const FULL_DIR = join(OUTPUT_DIR, 'full');
 const THUMB_DIR = join(OUTPUT_DIR, 'thumb');
+const MASCOT_DIR = join(ROOT, 'public', 'mascot');
+const MASCOT_MAX_WIDTH = 512;
 
 // Packs to process (directories under backgrounds-source/)
 const PACKS = ['cyberpunk', 'anime-cozy', 'fantasy', 'space', 'working'];
@@ -107,6 +109,59 @@ async function optimizeImage(sourcePath, id, pack) {
     thumbSize,
     width: Math.min(metadata.width || FULL_WIDTH, FULL_WIDTH),
   };
+}
+
+async function optimizeMascots() {
+  if (!existsSync(MASCOT_DIR)) return [];
+
+  const results = [];
+  const files = readdirSync(MASCOT_DIR).filter(
+    (f) => extname(f).toLowerCase() === '.png'
+  );
+
+  for (const file of files) {
+    const id = basename(file, extname(file));
+    const sourcePath = join(MASCOT_DIR, file);
+    const sourceMtime = statSync(sourcePath).mtimeMs;
+    const sourceSize = statSync(sourcePath).size;
+
+    // Output optimized WebP (supports transparency, best compression)
+    const webpPath = join(MASCOT_DIR, `${id}.webp`);
+    const skipWebp = isNewer(webpPath, sourceMtime);
+
+    if (!skipWebp) {
+      const source = sharp(sourcePath);
+      const meta = await source.metadata();
+      const w = Math.min(meta.width || MASCOT_MAX_WIDTH, MASCOT_MAX_WIDTH);
+
+      const pipeline = source
+        .clone()
+        .resize({ width: w, withoutEnlargement: true });
+
+      await pipeline.clone().webp({ quality: 85, alphaQuality: 90 }).toFile(webpPath);
+
+      // Compress PNG: write to temp then replace (sharp disallows same-file output)
+      if (extname(file).toLowerCase() === '.png') {
+        const tmpPath = join(MASCOT_DIR, `${id}.png.tmp`);
+        await pipeline.clone().png({ compressionLevel: 9 }).toFile(tmpPath);
+        renameSync(tmpPath, sourcePath);
+      }
+    }
+
+    const webpSize = existsSync(webpPath) ? statSync(webpPath).size : 0;
+    const pngSize = extname(file).toLowerCase() === '.png'
+      ? statSync(sourcePath).size
+      : null;
+    results.push({
+      id,
+      sourceSize,
+      webpSize,
+      pngSize,
+      skipped: skipWebp,
+    });
+  }
+
+  return results;
 }
 
 function copyVideos() {
@@ -209,6 +264,20 @@ async function main() {
         errorCount++;
         console.error(`  ✗ ${id} (${pack}): ${err.message}`);
       }
+    }
+  }
+
+  // Optimize mascot images (empty state illustrations)
+  const mascotResults = await optimizeMascots();
+  if (mascotResults.length > 0) {
+    console.log('\n🦊 Mascot optimization:');
+    for (const m of mascotResults) {
+      const srcKB = Math.round((m.sourceSize || 0) / 1024);
+      const webpKB = Math.round((m.webpSize || 0) / 1024);
+      const pngKB = m.pngSize ? Math.round(m.pngSize / 1024) : null;
+      const parts = [`${srcKB}KB → WebP ${webpKB}KB`];
+      if (pngKB != null) parts.push(`PNG ${pngKB}KB`);
+      console.log(`  ✓ ${m.id}: ${parts.join(', ')}`);
     }
   }
 

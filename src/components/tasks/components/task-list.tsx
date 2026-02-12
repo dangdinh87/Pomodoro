@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { Task } from '@/stores/task-store'
 import { TaskItem } from './task-item'
 import { AnimatedListItem } from '@/components/ui/animated-list'
+import { EmptyState } from '@/components/ui/empty-state'
 import { Skeleton } from '@/components/ui/skeleton'
 import { LayoutList, FilterX } from 'lucide-react'
 import { useI18n } from '@/contexts/i18n-context'
@@ -85,23 +86,12 @@ export function TaskList({
   }
 
   if (tasks.length === 0) {
-    const isFiltered = true // We can pass this from parent or check filters here
-
     return (
-      <div className="flex flex-col items-center justify-center py-20 px-4 bg-muted/10 border border-dashed border-muted/50 rounded-2xl space-y-4">
-        <div className="h-16 w-16 rounded-full bg-muted/30 flex items-center justify-center animate-pulse">
-          <LayoutList className="h-8 w-8 text-muted-foreground/60" />
-        </div>
-        <div className="text-center space-y-1">
-          <h3 className="text-lg font-semibold tracking-tight">{t('tasks.noTasks')}</h3>
-          <p className="text-sm text-muted-foreground max-w-[280px] mx-auto leading-relaxed">
-            {t('tasks.noTasksDescription')}
-          </p>
-        </div>
-        <div className="pt-2">
-           {/* We could add a clear filters button here if we know it's filtered */}
-        </div>
-      </div>
+      <EmptyState
+        title={t('tasks.noTasks')}
+        description={t('tasks.noTasksDescription')}
+        className="py-20 px-4 bg-muted/10 border border-dashed border-muted/50 rounded-2xl"
+      />
     )
   }
 

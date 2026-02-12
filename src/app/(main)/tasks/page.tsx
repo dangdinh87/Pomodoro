@@ -1,6 +1,7 @@
 "use client"
 
 import { TaskManagement } from '@/components/tasks/task-management'
+import { EmptyState } from '@/components/ui/empty-state'
 import { useAuth } from "@/hooks/use-auth"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -15,7 +16,7 @@ export default function TasksPage() {
   if (isLoading) {
     return (
       <main
-        className="container mx-auto px-4 py-12 min-h-screen flex flex-col w-full items-center justify-center"
+        className="container mx-auto px-4 py-12 min-h-full flex flex-col w-full items-center justify-center"
         aria-label="Tasks management page"
       >
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -26,11 +27,17 @@ export default function TasksPage() {
   if (!isAuthenticated) {
     return (
       <main
-        className="container mx-auto px-4 py-12 min-h-screen flex flex-col items-center justify-center space-y-4"
+        className="container mx-auto px-4 py-12 min-h-full flex flex-col items-center justify-center"
         aria-label="Tasks management page"
       >
-        <h2 className="text-xl font-semibold text-center">{t('auth.signInToManageTasks')}</h2>
-        <Button onClick={() => router.push('/login?redirect=/tasks')}>{t('auth.signInButton')}</Button>
+        <EmptyState
+          title={t('auth.signInToManageTasks')}
+          action={
+            <Button onClick={() => router.push('/login?redirect=/tasks')}>
+              {t('auth.signInButton')}
+            </Button>
+          }
+        />
       </main>
     )
   }

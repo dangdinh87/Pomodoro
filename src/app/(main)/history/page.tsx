@@ -16,6 +16,7 @@ import { useStats } from "@/hooks/use-stats"
 import { useHistory } from "@/hooks/use-history"
 import { StatsLoading } from "./components/stats-loading"
 import { StatsEmpty } from "./components/stats-empty"
+import { EmptyState } from "@/components/ui/empty-state"
 
 export default function HistoryPage() {
     const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
@@ -34,7 +35,7 @@ export default function HistoryPage() {
 
     if (isAuthLoading) {
         return <main
-            className="container mx-auto px-4 py-8 md:py-12 min-h-screen"
+            className="container mx-auto px-4 py-8 md:py-12 min-h-full"
             aria-label="History and statistics page"
         >
             <StatsLoading />
@@ -44,11 +45,17 @@ export default function HistoryPage() {
     if (!isAuthenticated) {
         return (
             <main
-                className="container mx-auto px-4 py-8 md:py-12 min-h-screen flex flex-col items-center justify-center space-y-4"
+                className="container mx-auto px-4 py-8 md:py-12 min-h-full flex flex-col items-center justify-center"
                 aria-label="History and statistics page"
             >
-                <h2 className="text-xl font-semibold text-center">{t('auth.signInToViewStats')}</h2>
-                <Button onClick={() => router.push('/login?redirect=/history')}>{t('auth.signInButton')}</Button>
+                <EmptyState
+                    title={t('auth.signInToViewStats')}
+                    action={
+                        <Button onClick={() => router.push('/login?redirect=/history')}>
+                            {t('auth.signInButton')}
+                        </Button>
+                    }
+                />
             </main>
         )
     }

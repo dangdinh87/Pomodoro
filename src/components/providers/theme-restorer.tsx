@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import { themePresets, type ThemeVars } from '@/config/themes';
 
 const STYLE_TAG_ID = 'app-theme-vars';
@@ -108,7 +108,7 @@ ${optionalDark}
  * Must be rendered inside AppProviders so it runs on every page load.
  */
 export function ThemeRestorer() {
-  useEffect(() => {
+  useLayoutEffect(() => {
     const savedKey = localStorage.getItem(STORAGE_KEY);
     if (!savedKey || savedKey === 'default') return;
 
@@ -122,7 +122,7 @@ export function ThemeRestorer() {
   }, []);
 
   // Also restore font and font size
-  useEffect(() => {
+  useLayoutEffect(() => {
     const savedFont = localStorage.getItem('ui-font');
     if (savedFont) {
       if (savedFont === 'Inter') {
