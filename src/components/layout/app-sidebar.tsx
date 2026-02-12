@@ -39,9 +39,6 @@ import {
   BookOpen,
   MessageSquare,
   Globe,
-  Moon,
-  Sun,
-  Monitor,
   ChevronsUpDown,
 } from 'lucide-react';
 import { BotMessageSquare } from '@/components/animate-ui/icons/bot-message-square';
@@ -56,9 +53,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Image from 'next/image';
 import { AnimateIcon } from '../animate-ui/icons/icon';
 import { useI18n, LANGS, Lang } from '@/contexts/i18n-context';
-import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
 
 // Navigation item component - using default shadcn styling
 function NavItem({
@@ -92,13 +87,7 @@ export function AppSidebar() {
   const user = useAuthStore((state) => state.user);
   const { t, lang, setLang } = useI18n();
   const { state } = useSidebar();
-  const { theme, resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
   const isCollapsed = state === 'collapsed';
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleSignOut = async () => {
     if (!supabase) {
@@ -414,63 +403,6 @@ export function AppSidebar() {
                             {l.label}
                           </DropdownMenuRadioItem>
                         ))}
-                      </DropdownMenuRadioGroup>
-                    </DropdownMenuSubContent>
-                  </DropdownMenuPortal>
-                </DropdownMenuSub>
-
-                {/* Theme Submenu */}
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger className="gap-3 cursor-pointer">
-                    {mounted && resolvedTheme === 'dark' ? (
-                      <Moon className="size-4 text-muted-foreground" />
-                    ) : (
-                      <Sun className="size-4 text-muted-foreground" />
-                    )}
-                    <span suppressHydrationWarning>{t('settings.general.theme.title')}</span>
-                    <span className="ml-auto text-xs text-muted-foreground">
-                      {mounted && (
-                        theme === 'system'
-                          ? t('settings.general.theme.system')
-                          : resolvedTheme === 'dark'
-                            ? t('settings.general.theme.dark')
-                            : t('settings.general.theme.light')
-                      )}
-                    </span>
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuPortal>
-                    <DropdownMenuSubContent
-                      className={cn(
-                        'rounded-lg',
-                        'bg-popover/95 backdrop-blur-xl',
-                        'dark:bg-popover/90 dark:backdrop-blur-2xl'
-                      )}
-                    >
-                      <DropdownMenuRadioGroup
-                        value={theme || 'system'}
-                        onValueChange={(value) => setTheme(value)}
-                      >
-                        <DropdownMenuRadioItem
-                          value="light"
-                          className="cursor-pointer gap-2"
-                        >
-                          <Sun className="size-4" />
-                          <span suppressHydrationWarning>{t('settings.general.theme.light')}</span>
-                        </DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem
-                          value="dark"
-                          className="cursor-pointer gap-2"
-                        >
-                          <Moon className="size-4" />
-                          <span suppressHydrationWarning>{t('settings.general.theme.dark')}</span>
-                        </DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem
-                          value="system"
-                          className="cursor-pointer gap-2"
-                        >
-                          <Monitor className="size-4" />
-                          <span suppressHydrationWarning>{t('settings.general.theme.system')}</span>
-                        </DropdownMenuRadioItem>
                       </DropdownMenuRadioGroup>
                     </DropdownMenuSubContent>
                   </DropdownMenuPortal>

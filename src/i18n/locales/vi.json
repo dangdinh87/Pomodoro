@@ -14,6 +14,8 @@
     "edit": "Chỉnh sửa",
     "add": "Thêm",
     "close": "Đóng",
+    "play": "Phát",
+    "pause": "Tạm dừng",
     "confirm": "Xác nhận",
     "retry": "Thử lại",
     "back": "Quay lại",
@@ -426,6 +428,8 @@
       "brightness": "Độ sáng",
       "selectImage": "Chọn hình nền",
       "description": "Chọn ảnh tĩnh, video, hoặc màu đơn sắc hệ thống. Thanh trượt chỉ áp dụng cho ảnh và video.",
+      "preview": "Xem trước",
+      "showSettings": "Hiện cài đặt",
       "reset": "Đặt lại",
       "saveChanges": "Lưu thay đổi",
       "systemAuto": "Hệ thống",
@@ -440,43 +444,39 @@
       "packDescriptions": {
         "system": "Dùng một màu đơn sắc từ theme hiện tại. Phù hợp giao diện tối giản và tiết kiệm pin.",
         "lofiVideo": "Video lo-fi lặp. Chọn một; có thể chỉnh độ trong suốt và độ sáng.",
-        "travelling": "Ảnh tĩnh du lịch và phong cảnh.",
-        "classic": "Ảnh tĩnh cổ điển: phong cảnh, phòng ấm, bàn học.",
         "cyberpunk": "Ảnh tĩnh cyberpunk và thành phố tương lai.",
-        "animeCozy": "Ảnh tĩnh nội thất anime ấm cúng.",
-        "fantasy": "Ảnh tĩnh phiêu lưu giả tưởng."
+        "room": "Phòng ấm cúng, góc học và không gian làm việc.",
+        "fantasy": "Ảnh tĩnh phiêu lưu giả tưởng.",
+        "space": "Ảnh tĩnh không gian, mặt trăng và thành phố sci-fi."
       },
       "presets": {
         "systemSolidColor": "Đơn sắc theo theme",
         "lofiDay": "Lo-fi ban ngày",
         "lofiNight": "Lo-fi ban đêm",
-        "travelling1": "Du lịch 1",
-        "travelling2": "Du lịch 2",
-        "travelling3": "Du lịch 3",
-        "travelling4": "Du lịch 4",
-        "travelling5": "Du lịch 5",
-        "travelling6": "Du lịch 6",
-        "travelling7": "Du lịch 7",
-        "travelling8": "Du lịch 8",
-        "travelling9": "Du lịch 9",
-        "background1": "Phong cảnh hoạt hình",
-        "chillShiba": "Shiba thư giãn",
-        "studyDesk1": "Bàn học",
         "nightLight": "Ánh đèn đêm",
-        "cozyAnimeStudy": "Góc Học Ánh Nắng – Sunlit Study Room ☀️📚",
+        "sunlitStudyRoom": "Góc học ánh nắng ☀️📚",
         "enchantedForest": "Khu rừng bí ẩn",
         "abstractFuturisticCity": "Thành phố tương lai",
-        "animeCozyHome": "Nhà Nhỏ Chiều Vàng – Golden Hour Home 🌤️",
-        "animeCozyHome1": "Không Gian Sống Dịu Êm – Cozy Living Space 🛋️🌿",
+        "goldenHourHome": "Nhà chiều vàng 🌤️",
+        "cozyLivingSpace": "Không gian sống ấm cúng 🛋️🌿",
         "cyberCity": "Thành phố cyber",
-        "cozyAnimeInterior": "Phòng Ngủ Đêm Yên Tĩnh – Quiet Night Bedroom 🌙🛏️",
-        "cozyRoomSunset": "Góc Làm Việc Hoàng Hôn – Sunset Workspace 🌇💻",
+        "quietNightBedroom": "Phòng ngủ đêm yên tĩnh 🌙🛏️",
+        "sunsetWorkspace": "Góc làm việc hoàng hôn 🌇💻",
         "fantasyAdventurers": "Phiêu lưu giả tưởng 1",
         "fantasyAdventurers1": "Phiêu lưu giả tưởng 2",
         "fantasyAdventurers2": "Phiêu lưu giả tưởng 3",
         "fantasyAdventurers3": "Phiêu lưu giả tưởng 4",
         "fantasyAdventurers4": "Phiêu lưu giả tưởng 5",
-        "futuristicCityNight": "Thành phố tương lai đêm"
+        "futuristicCityNight": "Thành phố tương lai đêm",
+        "beautifulOfficeSpace": "Văn phòng đẹp",
+        "studyTogether": "Cùng học",
+        "teamWorkspace": "Không gian làm việc nhóm",
+        "cityscapeAnimeUrban": "Thành phố 1",
+        "cityscapeAnimeUrban1": "Thành phố 2",
+        "fantasyHouseMoon": "Nhà giả tưởng trên mặt trăng 1",
+        "fantasyHouseMoon1": "Nhà giả tưởng trên mặt trăng 2",
+        "fantasyHouseMoon2": "Nhà giả tưởng trên mặt trăng 3",
+        "fantasyHouseMoon3": "Nhà giả tưởng trên mặt trăng 4"
       },
       "toasts": {
         "saved": "Đã lưu hình nền",
@@ -485,11 +485,10 @@
       "packs": {
         "system": "Hệ thống",
         "lofiVideo": "Video",
-        "travelling": "Du lịch",
-        "classic": "Cổ điển",
         "cyberpunk": "Cyberpunk",
-        "animeCozy": "Anime",
-        "fantasy": "Giả tưởng"
+        "room": "Phòng",
+        "fantasy": "Giả tưởng",
+        "space": "Không gian"
       },
       "topTabs": {
         "static": "Ảnh tĩnh",
@@ -521,14 +520,130 @@
         "replaceNotice": "Tải ảnh mới sẽ thay thế ảnh hiện tại.",
         "limit2MB": "Tối đa 2MB (JPEG, PNG, WebP)"
       }
+    }
+  },
+  "audio": {
+    "selectAudio": "Chọn Audio",
+    "title": "Cài đặt Âm thanh",
+    "volume": "Âm lượng",
+    "backgroundMusic": "Nhạc nền",
+    "natureSounds": "Âm thanh thiên nhiên",
+    "connectSpotify": "Kết nối Spotify",
+    "connectYouTube": "Kết nối YouTube",
+    "tabs": {
+      "ambient": "Môi trường",
+      "youtube": "YouTube"
     },
-    "audio": {
-      "title": "Cài đặt Âm thanh",
-      "volume": "Âm lượng",
-      "backgroundMusic": "Nhạc nền",
-      "natureSounds": "Âm thanh thiên nhiên",
-      "connectSpotify": "Kết nối Spotify",
-      "connectYouTube": "Kết nối YouTube"
+    "ambient": {
+      "title": "Tất cả âm thanh",
+      "playing": "đang phát",
+      "stopAll": "Dừng tất cả",
+      "active": "đang bật",
+      "pausedAlert": {
+        "title": "YouTube đang phát",
+        "description": "Âm thanh môi trường tạm dừng khi bạn phát YouTube để tránh chồng chéo âm thanh."
+      }
+    },
+    "presets": {
+      "library": "Thư viện",
+      "saveMix": "Lưu Preset",
+      "savePresetTitle": "Lưu Preset",
+      "savePresetDescription": "Tạo preset mới từ bản mix hiện tại của bạn ({{count}} âm thanh).",
+      "icon": "Biểu tượng",
+      "iconPlaceholder": "🎵 hoặc chữ",
+      "name": "Tên Preset",
+      "namePlaceholder": "Preset của tôi",
+      "save": "Lưu",
+      "cancel": "Hủy",
+      "renameTitle": "Đổi tên Preset",
+      "newName": "Tên mới",
+      "newNamePlaceholder": "Tên Preset mới",
+      "rename": "Đổi tên",
+      "delete": "Xóa",
+      "builtIn": {
+        "cafe": "Quán Cafe",
+        "rain": "Mưa",
+        "forest": "Rừng",
+        "ocean": "Đại Dương",
+        "train-ride": "Tàu Hỏa",
+        "night": "Đêm",
+        "library": "Thư Viện",
+        "cozy": "Ấm Cúng",
+        "deep-focus": "Tập Trung Sâu"
+      }
+    },
+    "categories": {
+      "nature": "Thiên nhiên",
+      "rain": "Mưa",
+      "noise": "Tiếng ồn",
+      "study": "Học tập",
+      "cozy": "Ấm cúng",
+      "transport": "Phương tiện",
+      "city": "Thành phố",
+      "machine": "Máy móc"
+    },
+    "youtube": {
+      "library": "Thư viện",
+      "random": "Ngẫu nhiên",
+      "close": "Đóng / Thay đổi link",
+      "channelLink": "Link kênh",
+      "playBackground": "Phát nền",
+      "placeholder": "Nhập link YouTube của bạn...",
+      "invalidLink": "Không tìm thấy video hợp lệ.",
+      "nowPlaying": "Đang Phát",
+      "soundSettings": "Cài Đặt Âm Thanh",
+      "status": {
+        "playing": "Đang phát",
+        "paused": "Tạm dừng"
+      },
+      "categories": {
+        "Lofi": "Lofi Hip Hop",
+        "Chill VN": "Nhạc Chill Việt",
+        "Cafe": "Quán Cà Phê",
+        "Piano": "Piano & Cổ điển",
+        "Ambient": "Không Gian",
+        "Nature": "Thiên Nhiên",
+        "Coding": "Lập Trình",
+        "Pomodoro": "Pomodoro",
+        "Brainwaves": "Sóng Não"
+      }
+    },
+    "sounds": {
+      "campfire": "Lửa trại",
+      "droplets": "Giọt nước",
+      "river": "Dòng sông",
+      "waves": "Sóng biển",
+      "wind-in-trees": "Gió rừng",
+      "wind": "Tiếng gió",
+      "birds": "Chim hót",
+      "night-crickets": "Dế đêm",
+      "fireplace": "Lò sưởi",
+      "heavy-rain": "Mưa rào",
+      "light-rain": "Mưa nhỏ",
+      "rain-on-leaves": "Mưa trên lá",
+      "rain-on-window": "Mưa bên cửa sổ",
+      "thunder": "Sấm sét",
+      "white-noise": "Tiếng ồn trắng",
+      "brown-noise": "Tiếng ồn nâu",
+      "pink-noise": "Tiếng ồn hồng",
+      "library": "Thư viện",
+      "coffee-shop": "Quán cà phê",
+      "coworking": "Văn phòng",
+      "clock": "Đồng hồ",
+      "singing-bowl": "Chuông xoay",
+      "vinyl-effect": "Đĩa than",
+      "wind-chimes": "Chuông gió",
+      "cat-purring": "Mèo kêu",
+      "airplane": "Máy bay",
+      "inside-a-train": "Trong tàu hỏa",
+      "submarine": "Tàu ngầm",
+      "train": "Đường sắt",
+      "busy-street": "Phố xá",
+      "crowd": "Đám đông",
+      "traffic": "Xe cộ",
+      "ceiling-fan": "Quạt trần",
+      "keyboard": "Gõ phím",
+      "typewriter": "Máy đánh chữ"
     }
   },
   "guide": {
@@ -939,7 +1054,7 @@
   },
   "login": {
     "title": "Đăng nhập với Study Bro",
-    "description": "Đăng nhập để giữ nhịp học và đồng bộ mọi phiên Pomodoro.",
+    "description": "Chào mừng trở lại! Tiếp tục hành trình nâng cao sự tập trung.",
     "form": {
       "email": "Email",
       "emailPlaceholder": "email@example.com",
@@ -965,11 +1080,38 @@
     "success": {
       "loginSuccess": "Đăng nhập thành công!",
       "redirectingToGoogle": "Đang chuyển hướng đến Google…"
+    },
+    "forgot": {
+      "title": "Đặt lại mật khẩu",
+      "description": "Nhập email của bạn, chúng tôi sẽ gửi link đặt lại mật khẩu.",
+      "emailRequired": "Vui lòng nhập địa chỉ email.",
+      "sendLink": "Gửi link đặt lại",
+      "sending": "Đang gửi...",
+      "success": "Kiểm tra email để nhận link đặt lại mật khẩu.",
+      "error": "Không thể gửi email đặt lại. Vui lòng thử lại."
+    }
+  },
+  "resetPassword": {
+    "title": "Đặt mật khẩu mới",
+    "description": "Nhập mật khẩu mới của bạn bên dưới.",
+    "newPassword": "Mật khẩu mới",
+    "newPasswordPlaceholder": "Tối thiểu 6 ký tự",
+    "confirmPassword": "Xác nhận mật khẩu",
+    "confirmPasswordPlaceholder": "Nhập lại mật khẩu",
+    "submit": "Cập nhật mật khẩu",
+    "updating": "Đang cập nhật...",
+    "success": "Đã cập nhật mật khẩu! Bạn có thể đăng nhập ngay.",
+    "invalidTitle": "Link không hợp lệ hoặc đã hết hạn",
+    "invalidDescription": "Link đặt lại này không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu link mới từ trang đăng nhập.",
+    "errors": {
+      "passwordTooShort": "Mật khẩu phải có ít nhất 6 ký tự.",
+      "passwordMismatch": "Mật khẩu không trùng khớp.",
+      "updateFailed": "Không thể cập nhật mật khẩu. Vui lòng thử lại."
     }
   },
   "signup": {
     "title": "Đăng ký với Study Bro",
-    "description": "Đăng ký miễn phí để lưu preset, lịch sử tập trung và đồng bộ nhiệm vụ giữa các thiết bị.",
+    "description": "Bắt đầu hành trình nâng cao sự tập trung và năng suất.",
     "form": {
       "email": "Email",
       "emailPlaceholder": "email@example.com",

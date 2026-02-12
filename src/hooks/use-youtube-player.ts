@@ -26,6 +26,7 @@ export interface ParsedYouTubeUrl {
 const GLOBAL_YT_PLAYER_KEY = '__globalYTPlayer';
 const GLOBAL_YT_SOURCE_KEY = '__globalYTSource';
 const GLOBAL_YT_CONTAINER_ID = 'youtube-global-container';
+const GLOBAL_YT_TIMEOUT_KEY = '__globalYTTimeout';
 
 // YouTube player state mapping
 const YT_STATE_MAP: Record<number, YouTubePlayerState['status']> = {
@@ -41,6 +42,7 @@ declare global {
   interface Window {
     [GLOBAL_YT_PLAYER_KEY]?: any;
     [GLOBAL_YT_SOURCE_KEY]?: YouTubeSource | null;
+    [GLOBAL_YT_TIMEOUT_KEY]?: number;
     onYouTubeIframeAPIReady?: () => void;
     YT?: any;
   }
@@ -76,6 +78,23 @@ const setGlobalYTSource = (source: YouTubeSource | null): void => {
 };
 
 const getGlobalYTSource = (): YouTubeSource | null => window[GLOBAL_YT_SOURCE_KEY] || null;
+
+const setGlobalYTTimeout = (timeoutId: number | undefined): void => {
+  // Clear existing timeout first
+  const existing = window[GLOBAL_YT_TIMEOUT_KEY];
+  if (existing) {
+    window.clearTimeout(existing);
+  }
+  window[GLOBAL_YT_TIMEOUT_KEY] = timeoutId;
+};
+
+const clearGlobalYTTimeout = (): void => {
+  const existing = window[GLOBAL_YT_TIMEOUT_KEY];
+  if (existing) {
+    window.clearTimeout(existing);
+    window[GLOBAL_YT_TIMEOUT_KEY] = undefined;
+  }
+};
 
 // YouTube URL parsing utility
 export const parseYouTubeUrl = (url: string): ParsedYouTubeUrl => {
@@ -247,6 +266,26 @@ export const useYouTubePlayer = () => {
         ? { listId: videoIdOrListId }
         : { videoId: videoIdOrListId };
 
+      // Playback timeout - stop and notify if not playing within 5s
+      const startPlaybackTimeout = () => {
+        const timeoutId = window.setTimeout(() => {
+          const yt = getGlobalYT();
+          const state = yt?.getPlayerState?.();
+          // If still not playing after 5s (state 1 = playing)
+          if (state !== 1) {
+            try { yt?.stopVideo?.(); } catch { /* ignore */ }
+            setPlayerState({ status: 'stopped', currentSource: null });
+            setGlobalYTSource(null);
+            clearCurrentlyPlaying();
+            toast.error('Không thể phát video này. Vui lòng kiểm tra lại link.');
+          }
+          // Clear the timeout reference after it fires
+          clearGlobalYTTimeout();
+        }, 5000);
+        setGlobalYTTimeout(timeoutId);
+        return timeoutId;
+      };
+
       if (existingPlayer) {
         if (autoPlay) {
           try { existingPlayer.unMute?.(); } catch { /* ignore */ }
@@ -261,7 +300,9 @@ export const useYouTubePlayer = () => {
 
         if (autoPlay) existingPlayer.playVideo?.();
         setGlobalYTSource(source);
+        setPlayerState(prev => ({ ...prev, status: 'buffering', currentSource: source }));
         updateAudioStoreForYouTube(source, autoPlay, setCurrentlyPlaying);
+        if (autoPlay) startPlaybackTimeout();
         return;
       }
 
@@ -280,7 +321,7 @@ export const useYouTubePlayer = () => {
             if (autoPlay) {
               try { player.unMute?.(); } catch { /* ignore */ }
               try { player.playVideo?.(); } catch { /* ignore */ }
-              toast.success('Đang phát nền • Nhạc sẽ tiếp tục khi đóng cửa sổ 🎧');
+              startPlaybackTimeout();
             }
           },
           onStateChange: (e: any) => {
@@ -293,6 +334,7 @@ export const useYouTubePlayer = () => {
 
       setGlobalYT(player);
       setGlobalYTSource(source);
+      setPlayerState(prev => ({ ...prev, status: 'buffering', currentSource: source }));
       updateAudioStoreForYouTube(source, autoPlay, setCurrentlyPlaying);
     } catch (error) {
       console.error('Failed to create or update YouTube player:', error);
@@ -327,18 +369,27 @@ export const useYouTubePlayer = () => {
       // Same source - toggle play/pause
       const state = yt.getPlayerState?.();
       if (state === 1) {
+        // Set to buffering first for smooth transition
+        setPlayerState(prev => ({ ...prev, status: 'buffering' }));
         yt.pauseVideo();
+        // Let the polling mechanism update to paused
       } else {
+        // Set to buffering first for smooth transition
+        setPlayerState(prev => ({ ...prev, status: 'buffering' }));
         yt.playVideo();
+        // Let the polling mechanism update to playing
       }
     } catch (error) {
       console.error('Failed to toggle playback:', error);
       toast.error('Không thể điều khiển trình phát. Vui lòng thử lại.');
     }
-  }, [createOrUpdatePlayer]);
+  }, [createOrUpdatePlayer, updatePlayingStatus]);
 
   // Stop playback
   const stopPlayback = useCallback(() => {
+    // Clear any pending timeout to prevent error toast
+    clearGlobalYTTimeout();
+
     try {
       getGlobalYT()?.stopVideo();
     } catch {
@@ -359,7 +410,7 @@ export const useYouTubePlayer = () => {
   useEffect(() => {
     const player = getGlobalYT();
     if (player && typeof player.setVolume === 'function') {
-      player.setVolume(audioSettings.volume);
+      player.setVolume(audioSettings.masterVolume);
     }
     if (player && typeof player.mute === 'function' && typeof player.unMute === 'function') {
       if (audioSettings.isMuted) {
@@ -368,7 +419,7 @@ export const useYouTubePlayer = () => {
         player.unMute();
       }
     }
-  }, [audioSettings.volume, audioSettings.isMuted]);
+  }, [audioSettings.masterVolume, audioSettings.isMuted]);
 
   return {
     playerState,

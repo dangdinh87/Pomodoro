@@ -14,6 +14,8 @@
     "edit": "Edit",
     "add": "Add",
     "close": "Close",
+    "play": "Play",
+    "pause": "Pause",
     "confirm": "Confirm",
     "retry": "Retry",
     "back": "Back",
@@ -426,6 +428,8 @@
       "brightness": "Brightness",
       "selectImage": "Select background",
       "description": "Choose a static image, a video, or use the system solid color. Sliders apply only to images and videos.",
+      "preview": "Preview",
+      "showSettings": "Show settings",
       "reset": "Reset",
       "saveChanges": "Save Changes",
       "systemAuto": "System",
@@ -440,43 +444,39 @@
       "packDescriptions": {
         "system": "Use a single solid color from your current theme. Best for minimal look and battery saving.",
         "lofiVideo": "Lo-fi animated loops. Pick one video; opacity and brightness can be adjusted.",
-        "travelling": "Travel and scenery static images.",
-        "classic": "Classic static scenes: landscapes, cozy rooms, study setups.",
         "cyberpunk": "Cyberpunk and futuristic city static images.",
-        "animeCozy": "Cozy anime-style interior static images.",
-        "fantasy": "Fantasy adventurer and quest-style static images."
+        "room": "Cozy rooms, study spaces, and workspace interiors.",
+        "fantasy": "Fantasy adventurer and quest-style static images.",
+        "space": "Space, moon, and sci-fi cityscape static images."
       },
       "presets": {
         "systemSolidColor": "Solid color from theme",
         "lofiDay": "Lo-fi Day",
         "lofiNight": "Lo-fi Night",
-        "travelling1": "Travelling 1",
-        "travelling2": "Travelling 2",
-        "travelling3": "Travelling 3",
-        "travelling4": "Travelling 4",
-        "travelling5": "Travelling 5",
-        "travelling6": "Travelling 6",
-        "travelling7": "Travelling 7",
-        "travelling8": "Travelling 8",
-        "travelling9": "Travelling 9",
-        "background1": "Landscape cartoon",
-        "chillShiba": "Chill Shiba",
-        "studyDesk1": "Study desk",
         "nightLight": "Night light",
-        "cozyAnimeStudy": "Sunlit Study Room ☀️📚",
+        "sunlitStudyRoom": "Sunlit Study Room ☀️📚",
         "enchantedForest": "Enchanted forest",
         "abstractFuturisticCity": "Abstract futuristic city",
-        "animeCozyHome": "Golden Hour Home 🌤️",
-        "animeCozyHome1": "Cozy Living Space 🛋️🌿",
+        "goldenHourHome": "Golden Hour Home 🌤️",
+        "cozyLivingSpace": "Cozy Living Space 🛋️🌿",
         "cyberCity": "Cyber city",
-        "cozyAnimeInterior": "Quiet Night Bedroom 🌙🛏️",
-        "cozyRoomSunset": "Sunset Workspace 🌇💻",
+        "quietNightBedroom": "Quiet Night Bedroom 🌙🛏️",
+        "sunsetWorkspace": "Sunset Workspace 🌇💻",
         "fantasyAdventurers": "Fantasy adventurers 1",
         "fantasyAdventurers1": "Fantasy adventurers 2",
         "fantasyAdventurers2": "Fantasy adventurers 3",
         "fantasyAdventurers3": "Fantasy adventurers 4",
         "fantasyAdventurers4": "Fantasy adventurers 5",
-        "futuristicCityNight": "Futuristic city night"
+        "futuristicCityNight": "Futuristic city night",
+        "beautifulOfficeSpace": "Beautiful office space",
+        "studyTogether": "Study together",
+        "teamWorkspace": "Team workspace",
+        "cityscapeAnimeUrban": "Cityscape urban",
+        "cityscapeAnimeUrban1": "Cityscape urban 2",
+        "fantasyHouseMoon": "Fantasy house on moon",
+        "fantasyHouseMoon1": "Fantasy house on moon 2",
+        "fantasyHouseMoon2": "Fantasy house on moon 3",
+        "fantasyHouseMoon3": "Fantasy house on moon 4"
       },
       "toasts": {
         "saved": "Background saved",
@@ -485,11 +485,10 @@
       "packs": {
         "system": "System",
         "lofiVideo": "Video",
-        "travelling": "Travel",
-        "classic": "Classic",
         "cyberpunk": "Cyberpunk",
-        "animeCozy": "Anime",
-        "fantasy": "Fantasy"
+        "room": "Room",
+        "fantasy": "Fantasy",
+        "space": "Space"
       },
       "topTabs": {
         "static": "Static",
@@ -521,14 +520,130 @@
         "replaceNotice": "Uploading a new image will replace this one.",
         "limit2MB": "Max 2MB (JPEG, PNG, WebP)"
       }
+    }
+  },
+  "audio": {
+    "selectAudio": "Select Audio",
+    "title": "Audio Settings",
+    "volume": "Volume",
+    "backgroundMusic": "Background Music",
+    "natureSounds": "Nature Sounds",
+    "connectSpotify": "Connect Spotify",
+    "connectYouTube": "Connect YouTube",
+    "tabs": {
+      "ambient": "Ambient",
+      "youtube": "YouTube"
     },
-    "audio": {
-      "title": "Audio Settings",
-      "volume": "Volume",
-      "backgroundMusic": "Background Music",
-      "natureSounds": "Nature Sounds",
-      "connectSpotify": "Connect Spotify",
-      "connectYouTube": "Connect YouTube"
+    "ambient": {
+      "title": "All sounds",
+      "playing": "playing",
+      "stopAll": "Stop All",
+      "active": "active",
+      "pausedAlert": {
+        "title": "YouTube is active",
+        "description": "Ambient sounds are paused while YouTube is playing to prevent sound overlap."
+      }
+    },
+    "presets": {
+      "library": "Library",
+      "saveMix": "Save Mix",
+      "savePresetTitle": "Save Preset",
+      "savePresetDescription": "Create a new preset from your current ambient mix ({{count}} sound{{plural}}).",
+      "icon": "Icon",
+      "iconPlaceholder": "🎵 or text",
+      "name": "Preset Name",
+      "namePlaceholder": "My Preset",
+      "save": "Save",
+      "cancel": "Cancel",
+      "renameTitle": "Rename Preset",
+      "newName": "New Name",
+      "newNamePlaceholder": "New Preset Name",
+      "rename": "Rename",
+      "delete": "Delete",
+      "builtIn": {
+        "cafe": "Cafe",
+        "rain": "Rain",
+        "forest": "Forest",
+        "ocean": "Ocean",
+        "train-ride": "Train Ride",
+        "night": "Night",
+        "library": "Library",
+        "cozy": "Cozy",
+        "deep-focus": "Deep Focus"
+      }
+    },
+    "categories": {
+      "nature": "Nature",
+      "rain": "Rain",
+      "noise": "Noise",
+      "study": "Study",
+      "cozy": "Cozy",
+      "transport": "Transport",
+      "city": "City",
+      "machine": "Machine"
+    },
+    "youtube": {
+      "library": "Library",
+      "random": "Random",
+      "close": "Close / Change Link",
+      "channelLink": "Channel link",
+      "playBackground": "Play in background",
+      "placeholder": "Paste YouTube link here...",
+      "invalidLink": "Invalid video link found.",
+      "nowPlaying": "Now Playing",
+      "soundSettings": "Sound Settings",
+      "status": {
+        "playing": "Playing",
+        "paused": "Paused"
+      },
+      "categories": {
+        "Lofi": "Lofi Hip Hop",
+        "Chill VN": "Chill VN",
+        "Cafe": "Cafe Ambience",
+        "Piano": "Piano & Classical",
+        "Ambient": "Ambient & Flow",
+        "Nature": "Nature Sounds",
+        "Coding": "Deep Work",
+        "Pomodoro": "Pomodoro Sessions",
+        "Brainwaves": "Brain Waves"
+      }
+    },
+    "sounds": {
+      "campfire": "Campfire",
+      "droplets": "Droplets",
+      "river": "River",
+      "waves": "Waves",
+      "wind-in-trees": "Wind in Trees",
+      "wind": "Wind",
+      "birds": "Birds",
+      "night-crickets": "Night Crickets",
+      "fireplace": "Fireplace",
+      "heavy-rain": "Heavy Rain",
+      "light-rain": "Light Rain",
+      "rain-on-leaves": "Rain on Leaves",
+      "rain-on-window": "Rain on Window",
+      "thunder": "Thunder",
+      "white-noise": "White Noise",
+      "brown-noise": "Brown Noise",
+      "pink-noise": "Pink Noise",
+      "library": "Library",
+      "coffee-shop": "Coffee Shop",
+      "coworking": "Coworking",
+      "clock": "Clock",
+      "singing-bowl": "Singing Bowl",
+      "vinyl-effect": "Vinyl",
+      "wind-chimes": "Wind Chimes",
+      "cat-purring": "Cat Purring",
+      "airplane": "Airplane",
+      "inside-a-train": "Inside Train",
+      "submarine": "Submarine",
+      "train": "Train",
+      "busy-street": "Busy Street",
+      "crowd": "Crowd",
+      "traffic": "Traffic",
+      "ceiling-fan": "Ceiling Fan",
+      "keyboard": "Keyboard",
+      "typewriter": "Typewriter"
     }
   },
   "guide": {
@@ -939,7 +1054,7 @@
   },
   "login": {
     "title": "Sign in to Study Bro",
-    "description": "Sign in to keep your study rhythm and sync all Pomodoro sessions.",
+    "description": "Welcome back! Continue your journey to better focus.",
     "form": {
       "email": "Email",
       "emailPlaceholder": "your@email.com",
@@ -965,11 +1080,38 @@
     "success": {
       "loginSuccess": "Successfully signed in!",
       "redirectingToGoogle": "Redirecting to Google..."
+    },
+    "forgot": {
+      "title": "Reset password",
+      "description": "Enter your email and we'll send you a link to reset your password.",
+      "emailRequired": "Please enter your email address.",
+      "sendLink": "Send reset link",
+      "sending": "Sending...",
+      "success": "Check your email for the reset link.",
+      "error": "Unable to send reset email. Please try again."
+    }
+  },
+  "resetPassword": {
+    "title": "Set new password",
+    "description": "Enter your new password below.",
+    "newPassword": "New password",
+    "newPasswordPlaceholder": "Minimum 6 characters",
+    "confirmPassword": "Confirm password",
+    "confirmPasswordPlaceholder": "Re-enter your password",
+    "submit": "Update password",
+    "updating": "Updating...",
+    "success": "Password updated! You can now sign in.",
+    "invalidTitle": "Invalid or expired link",
+    "invalidDescription": "This reset link is invalid or has expired. Please request a new one from the login page.",
+    "errors": {
+      "passwordTooShort": "Password must be at least 6 characters.",
+      "passwordMismatch": "Passwords do not match.",
+      "updateFailed": "Unable to update password. Please try again."
     }
   },
   "signup": {
     "title": "Sign up for Study Bro",
-    "description": "Sign up for free to save presets, focus history and sync tasks across devices.",
+    "description": "Start your journey to better focus and productivity.",
     "form": {
       "email": "Email",
       "emailPlaceholder": "your@email.com",

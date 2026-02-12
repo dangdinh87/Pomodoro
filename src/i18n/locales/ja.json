@@ -14,6 +14,8 @@
     "edit": "編集",
     "add": "追加",
     "close": "閉じる",
+    "play": "再生",
+    "pause": "一時停止",
     "confirm": "確認",
     "retry": "再試行",
     "back": "戻る",
@@ -427,6 +429,8 @@
       "brightness": "明るさ",
       "selectImage": "背景を選択",
       "description": "静止画、動画、またはシステム単色を選択。スライダーは画像と動画にのみ適用されます。",
+      "preview": "プレビュー",
+      "showSettings": "設定を表示",
       "reset": "リセット",
       "saveChanges": "変更を保存",
       "systemAuto": "システム",
@@ -441,43 +445,39 @@
       "packDescriptions": {
         "system": "現在のテーマの単色を使用。ミニマル表示と省電力に最適。",
         "lofiVideo": "Lo-fiループ動画。1本選択。透明度・明るさを調整可能。",
-        "travelling": "旅行・風景の静止画。",
-        "classic": "クラシックな静止画：風景、コージーな部屋、勉強机。",
         "cyberpunk": "サイバーパンク・未来的都市の静止画。",
-        "animeCozy": "アニメ風コージー室内の静止画。",
-        "fantasy": "ファンタジー冒険風の静止画。"
+        "room": "コージーな部屋、勉強スペース、ワークスペース。",
+        "fantasy": "ファンタジー冒険風の静止画。",
+        "space": "宇宙・月・SF都市の静止画。"
       },
       "presets": {
         "systemSolidColor": "テーマの単色",
         "lofiDay": "Lo-fi デイ",
         "lofiNight": "Lo-fi ナイト",
-        "travelling1": "旅行 1",
-        "travelling2": "旅行 2",
-        "travelling3": "旅行 3",
-        "travelling4": "旅行 4",
-        "travelling5": "旅行 5",
-        "travelling6": "旅行 6",
-        "travelling7": "旅行 7",
-        "travelling8": "旅行 8",
-        "travelling9": "旅行 9",
-        "background1": "風景カートゥーン",
-        "chillShiba": "まったり柴犬",
-        "studyDesk1": "勉強机",
         "nightLight": "夜の灯り",
-        "cozyAnimeStudy": "日差しの勉強部屋 ☀️📚",
+        "sunlitStudyRoom": "日差しの勉強部屋 ☀️📚",
         "enchantedForest": "魔法の森",
         "abstractFuturisticCity": "未来都市アブストラクト",
-        "animeCozyHome": "ゴールデンアワーの家 🌤️",
-        "animeCozyHome1": "コージーなリビング 🛋️🌿",
+        "goldenHourHome": "ゴールデンアワーの部屋 🌤️",
+        "cozyLivingSpace": "コージーなリビング 🛋️🌿",
         "cyberCity": "サイバーシティ",
-        "cozyAnimeInterior": "静かな夜の寝室 🌙🛏️",
-        "cozyRoomSunset": "夕焼けのワークスペース 🌇💻",
+        "quietNightBedroom": "静かな夜の寝室 🌙🛏️",
+        "sunsetWorkspace": "夕焼けのワークスペース 🌇💻",
         "fantasyAdventurers": "冒険者 1",
         "fantasyAdventurers1": "冒険者 2",
         "fantasyAdventurers2": "冒険者 3",
         "fantasyAdventurers3": "冒険者 4",
         "fantasyAdventurers4": "冒険者 5",
-        "futuristicCityNight": "未来都市の夜"
+        "futuristicCityNight": "未来都市の夜",
+        "beautifulOfficeSpace": "美しいオフィス",
+        "studyTogether": "一緒に勉強",
+        "teamWorkspace": "チームワークスペース",
+        "cityscapeAnimeUrban": "都市 1",
+        "cityscapeAnimeUrban1": "都市 2",
+        "fantasyHouseMoon": "月のファンタジーハウス 1",
+        "fantasyHouseMoon1": "月のファンタジーハウス 2",
+        "fantasyHouseMoon2": "月のファンタジーハウス 3",
+        "fantasyHouseMoon3": "月のファンタジーハウス 4"
       },
       "toasts": {
         "saved": "背景を保存しました",
@@ -486,11 +486,10 @@
       "packs": {
         "system": "システム",
         "lofiVideo": "動画",
-        "travelling": "旅行",
-        "classic": "クラシック",
         "cyberpunk": "サイバーパンク",
-        "animeCozy": "アニメ",
-        "fantasy": "ファンタジー"
+        "room": "部屋",
+        "fantasy": "ファンタジー",
+        "space": "宇宙"
       },
       "topTabs": {
         "static": "静止画",
@@ -522,14 +521,130 @@
         "replaceNotice": "新しい画像をアップロードするとこれが置き換わります。",
         "limit2MB": "最大2MB（JPEG、PNG、WebP）"
       }
+    }
+  },
+  "audio": {
+    "selectAudio": "オーディオを選択",
+    "title": "オーディオ設定",
+    "volume": "音量",
+    "backgroundMusic": "バックグラウンドミュージック",
+    "natureSounds": "自然音",
+    "connectSpotify": "Spotifyに接続",
+    "connectYouTube": "YouTubeに接続",
+    "tabs": {
+      "ambient": "環境音",
+      "youtube": "YouTube"
     },
-    "audio": {
-      "title": "オーディオ設定",
-      "volume": "音量",
-      "backgroundMusic": "バックグラウンドミュージック",
-      "natureSounds": "自然音",
-      "connectSpotify": "Spotifyに接続",
-      "connectYouTube": "YouTubeに接続"
+    "ambient": {
+      "title": "すべてのサウンド",
+      "playing": "再生中",
+      "stopAll": "すべて停止",
+      "active": "有効",
+      "pausedAlert": {
+        "title": "YouTubeが有効です",
+        "description": "YouTube再生中は、音の重なりを防ぐため環境音が一時停止されます。"
+      }
+    },
+    "presets": {
+      "library": "ライブラリ",
+      "saveMix": "ミックスを保存",
+      "savePresetTitle": "プリセットを保存",
+      "savePresetDescription": "現在のアンビエントミックスから新しいプリセットを作成します（{{count}}サウンド）。",
+      "icon": "アイコン",
+      "iconPlaceholder": "🎵 またはテキスト",
+      "name": "プリセット名",
+      "namePlaceholder": "マイプリセット",
+      "save": "保存",
+      "cancel": "キャンセル",
+      "renameTitle": "プリセットの名前変更",
+      "newName": "新しい名前",
+      "newNamePlaceholder": "新しいプリセット名",
+      "rename": "名前変更",
+      "delete": "削除",
+      "builtIn": {
+        "cafe": "カフェ",
+        "rain": "雨",
+        "forest": "森",
+        "ocean": "海",
+        "train-ride": "電車",
+        "night": "夜",
+        "library": "図書館",
+        "cozy": "居心地",
+        "deep-focus": "集中"
+      }
+    },
+    "categories": {
+      "nature": "自然",
+      "rain": "雨",
+      "noise": "ノイズ",
+      "study": "学習",
+      "cozy": "心地よい",
+      "transport": "交通",
+      "city": "街",
+      "machine": "機械"
+    },
+    "youtube": {
+      "library": "ライブラリ",
+      "random": "ランダム",
+      "close": "閉じる / リンク変更",
+      "channelLink": "チャンネルリンク",
+      "playBackground": "バックグラウンド再生",
+      "placeholder": "YouTubeリンクを貼り付け...",
+      "invalidLink": "無効なビデオリンクです。",
+      "nowPlaying": "再生中",
+      "soundSettings": "サウンド設定",
+      "status": {
+        "playing": "再生中",
+        "paused": "一時停止"
+      },
+      "categories": {
+        "Lofi": "Lofi Hip Hop",
+        "Chill VN": "ベトナム・チル",
+        "Cafe": "カフェ",
+        "Piano": "ピアノ＆クラシック",
+        "Ambient": "環境音＆フロー",
+        "Nature": "自然音",
+        "Coding": "集中作業",
+        "Pomodoro": "ポモドーロセッション",
+        "Brainwaves": "脳波"
+      }
+    },
+    "sounds": {
+      "campfire": "焚き火",
+      "droplets": "水滴",
+      "river": "川のせせらぎ",
+      "waves": "波の音",
+      "wind-in-trees": "梢を渡る風",
+      "wind": "風の音",
+      "birds": "鳥のさえずり",
+      "night-crickets": "夜の虫",
+      "fireplace": "暖炉",
+      "heavy-rain": "豪雨",
+      "light-rain": "小雨",
+      "rain-on-leaves": "葉に降る雨",
+      "rain-on-window": "窓に降る雨",
+      "thunder": "雷",
+      "white-noise": "ホワイトノイズ",
+      "brown-noise": "ブラウンノイズ",
+      "pink-noise": "ピンクノイズ",
+      "library": "図書館",
+      "coffee-shop": "カフェ",
+      "coworking": "コワーキング",
+      "clock": "時計",
+      "singing-bowl": "シンギングボウル",
+      "vinyl-effect": "ヴァイナル",
+      "wind-chimes": "風鈴",
+      "cat-purring": "猫のゴロゴロ",
+      "airplane": "飛行機",
+      "inside-a-train": "電車内",
+      "submarine": "潜水艦",
+      "train": "電車",
+      "busy-street": "にぎやかな通り",
+      "crowd": "雑踏",
+      "traffic": "交通",
+      "ceiling-fan": "シーリングファン",
+      "keyboard": "キーボード",
+      "typewriter": "タイプライター"
     }
   },
   "guide": {
@@ -666,11 +781,7 @@
           "title": "フィードバック",
           "subtitle": "改善にご協力ください",
           "description": "ご意見をお聞かせください：",
-          "points": [
-            "バグを報告",
-            "機能を提案",
-            "体験を評価"
-          ],
+          "points": ["バグを報告", "機能を提案", "体験を評価"],
           "cta": "フィードバックを送信"
         },
         "settings": {
@@ -944,7 +1055,7 @@
   },
   "login": {
     "title": "Study Broにログイン",
-    "description": "ログインして勉強のリズムを保ち、すべてのポモドーロセッションを同期しましょう。",
+    "description": "おかえりなさい！集中力を高める旅を続けましょう。",
     "form": {
       "email": "メールアドレス",
       "emailPlaceholder": "your@email.com",
@@ -970,11 +1081,38 @@
     "success": {
       "loginSuccess": "ログインしました！",
       "redirectingToGoogle": "Googleにリダイレクト中..."
+    },
+    "forgot": {
+      "title": "パスワードをリセット",
+      "description": "メールアドレスを入力してください。リセット用のリンクをお送りします。",
+      "emailRequired": "メールアドレスを入力してください。",
+      "sendLink": "リセットリンクを送信",
+      "sending": "送信中...",
+      "success": "メールでリセットリンクをご確認ください。",
+      "error": "リセットメールを送信できません。もう一度お試しください。"
+    }
+  },
+  "resetPassword": {
+    "title": "新しいパスワードを設定",
+    "description": "下に新しいパスワードを入力してください。",
+    "newPassword": "新しいパスワード",
+    "newPasswordPlaceholder": "6文字以上",
+    "confirmPassword": "パスワードを確認",
+    "confirmPasswordPlaceholder": "パスワードを再入力",
+    "submit": "パスワードを更新",
+    "updating": "更新中...",
+    "success": "パスワードを更新しました！ログインできます。",
+    "invalidTitle": "無効または期限切れのリンク",
+    "invalidDescription": "このリセットリンクは無効か期限切れです。ログインページから新しいリンクをリクエストしてください。",
+    "errors": {
+      "passwordTooShort": "パスワードは6文字以上必要です。",
+      "passwordMismatch": "パスワードが一致しません。",
+      "updateFailed": "パスワードを更新できません。もう一度お試しください。"
     }
   },
   "signup": {
     "title": "Study Broに登録",
-    "description": "無料で登録してプリセット、集中履歴を保存し、デバイス間でタスクを同期しましょう。",
+    "description": "集中力と生産性を高める旅を始めましょう。",
     "form": {
       "email": "メールアドレス",
       "emailPlaceholder": "your@email.com",

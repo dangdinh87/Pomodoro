@@ -1,48 +1,23 @@
 "use client"
 
-
 import { cn } from "@/lib/utils"
 
 interface BorderBeamProps {
-  /**
-   * The size of the border beam.
-   */
+  /** Controls the beam arc width. Higher = wider beam trail. */
   size?: number
-  /**
-   * The duration of the border beam.
-   */
+  /** Animation duration in seconds. */
   duration?: number
-  /**
-   * The delay of the border beam.
-   */
+  /** Animation delay in seconds (stagger multiple beams). */
   delay?: number
-  /**
-   * The color of the border beam from.
-   */
   colorFrom?: string
-  /**
-   * The color of the border beam to.
-   */
   colorTo?: string
-  /**
-   */
   className?: string
-  /**
-   * Whether to reverse the animation direction.
-   */
+  /** Reverse the animation direction. */
   reverse?: boolean
-  /**
-   * The initial offset position (0-100).
-   */
+  /** Initial offset position (0-100), staggers the start point. */
   initialOffset?: number
-  /**
-   * The border width of the beam.
-   */
+  /** The border width of the beam. */
   borderWidth?: number
-  /**
-   * The corner radius of the beam path. Should match the container's border radius.
-   */
-  radius?: number
 }
 
 export const BorderBeam = ({
@@ -55,35 +30,41 @@ export const BorderBeam = ({
   reverse = false,
   initialOffset = 0,
   borderWidth = 2,
-  radius = 8,
 }: BorderBeamProps) => {
+  // Map size to gradient arc percentage (capped 8-30%)
+  const arcSize = Math.max(8, Math.min(size / 4, 30))
+  // Convert initialOffset (0-100) to negative delay for stagger
+  const startDelay = delay + (initialOffset / 100) * duration
+
   return (
     <div
-      className="pointer-events-none absolute inset-0 rounded-[inherit] border-[length:var(--border-beam-width)] border-transparent [mask-image:linear-gradient(transparent,transparent),linear-gradient(#000,#000)] [mask-composite:intersect] [mask-clip:padding-box,border-box]"
+      className="pointer-events-none absolute inset-0 rounded-[inherit]"
       style={
         {
-          "--border-beam-width": `${borderWidth}px`,
+          borderWidth,
+          borderStyle: "solid",
+          borderColor: "transparent",
+          maskImage:
+            "linear-gradient(transparent,transparent),linear-gradient(#000,#000)",
+          maskComposite: "intersect",
+          maskClip: "padding-box,border-box",
+          WebkitMaskImage:
+            "linear-gradient(transparent,transparent),linear-gradient(#000,#000)",
+          WebkitMaskComposite: "source-in",
+          WebkitMaskClip: "padding-box,border-box",
         } as React.CSSProperties
       }
     >
       <div
-        className={cn(
-          "absolute aspect-square",
-          "bg-gradient-to-l from-[var(--color-from)] via-[var(--color-to)] to-transparent",
-          "animate-border-beam",
-          className
-        )}
+        className={cn("animate-border-beam", className)}
         style={
           {
-            width: size,
-            offsetPath: `inset(0 round ${radius}px)`,
-            "--color-from": colorFrom,
-            "--color-to": colorTo,
+            position: "absolute",
+            inset: "-50%",
+            background: `conic-gradient(from 0deg, transparent 0%, ${colorFrom} ${arcSize * 0.4}%, ${colorTo} ${arcSize * 0.8}%, transparent ${arcSize}%, transparent 100%)`,
             "--duration": `${duration}s`,
-            "--delay": `${-delay}s`,
-            "--initial-offset": `${initialOffset}%`,
+            "--delay": `${-startDelay}s`,
             "--direction": reverse ? "reverse" : "normal",
-            willChange: "offset-distance",
           } as React.CSSProperties
         }
       />

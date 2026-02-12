@@ -2,14 +2,13 @@
 
 /**
  * Client-side interactive parts of Navbar
- * Theme toggle, mobile menu, scroll effects
+ * Mobile menu, scroll effects
  */
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Menu, X, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { AnimatedThemeToggler } from '@/components/ui/animated-theme-toggler';
 import { LanguageSwitcher } from '@/components/layout/language-switcher';
 import { useTranslation } from '@/contexts/i18n-context';
 
@@ -20,22 +19,9 @@ interface NavbarClientProps {
 export function NavbarClient({ navLinks }: NavbarClientProps) {
   const { t } = useTranslation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Prevent hydration mismatch
-  if (!mounted) {
-    return <div className="w-9 h-9" />; // Placeholder for theme toggle
-  }
 
   return (
     <>
-      {/* Theme toggle for desktop */}
-      <AnimatedThemeToggler />
-
       {/* Mobile menu button - rendered in parent but controlled here */}
       <button
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -101,7 +87,7 @@ export function NavbarClient({ navLinks }: NavbarClientProps) {
                       {t('auth.login')}
                     </Button>
                   </Link>
-                  <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link href="/timer" onClick={() => setIsMobileMenuOpen(false)}>
                     <Button className="w-full bg-gradient-to-r from-blue-500 to-violet-600 hover:from-blue-600 hover:to-violet-700 text-white cursor-pointer">
                       {t('landing.hero.getStarted')}
                       <ArrowRight className="ml-2 h-4 w-4" />

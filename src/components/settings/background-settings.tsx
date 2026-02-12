@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useMemo, ChangeEvent } from 'react';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Check, X, Upload, Link, FolderHeart } from 'lucide-react';
+import { Check, X, Upload, Link, FolderHeart, Loader2 } from 'lucide-react';
 import { useBackground } from '@/contexts/background-context';
 import { toast } from 'sonner';
 import { useI18n } from '@/contexts/i18n-context';
@@ -22,7 +22,6 @@ import Image from 'next/image';
 
 interface BackgroundSettingsProps {
   onClose?: () => void;
-  /** Whether the slider panel is in preview mode (dialog transparent) */
   isPreview?: boolean;
   onPreviewChange?: (preview: boolean) => void;
 }
@@ -67,7 +66,7 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
   );
   const [blur, setBlur] = useState<number>(background.blur ?? 0);
 
-  // End preview mode on global pointer release
+  // Khi kéo slider: bật preview (ẩn modal) để xem nền; thả chuột thì tắt
   useEffect(() => {
     if (!isPreview) return;
     const endPreview = () => onPreviewChange?.(false);
@@ -78,6 +77,9 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
   const startPreview = () => {
     if (!styleValue.startsWith('system:')) onPreviewChange?.(true);
   };
+
+  // Loading state for background image preload
+  const [loadingValue, setLoadingValue] = useState<string | null>(null);
 
   // Custom images
   const { images: customImages, addImage, addImageByUrl, canAddMore } = useCustomBackgrounds();
@@ -179,10 +181,11 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
     onClose?.();
   };
 
-  /** Select an image and show preview */
+  /** Select an image and show preview with loading indicator */
   const selectImage = (value: string) => {
     setStyleValue(value);
     if (value.startsWith('system:')) {
+      setLoadingValue(null);
       setBackgroundTemp({
         ...background,
         type: 'solid',
@@ -192,7 +195,14 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
         brightness: 100,
       });
     } else {
+      setLoadingValue(value);
       const img = findImageById(value);
+      // Preload full-res image to track loading
+      const fullSrc = img?.sources ? getBestImageUrl(img.sources) : value;
+      const preloader = new window.Image();
+      preloader.onload = () => setLoadingValue((prev) => prev === value ? null : prev);
+      preloader.onerror = () => setLoadingValue((prev) => prev === value ? null : prev);
+      preloader.src = fullSrc;
       setBackgroundTemp({
         ...background,
         type: 'image',
@@ -223,8 +233,8 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
 
   return (
     <div className="flex flex-col h-full">
-      {/* Fixed Header — hidden during slider preview */}
-      <div className={`flex items-center justify-between px-6 py-4 border-b shrink-0 transition-opacity duration-150 ${isPreview ? 'opacity-0' : ''}`}>
+      {/* Fixed Header — ẩn khi đang kéo slider để xem nền */}
+      <div className={`flex items-center justify-between px-6 py-4 border-b shrink-0 transition-opacity duration-150 ${isPreview ? 'opacity-0 pointer-events-none' : ''}`}>
         <div>
           <h2 className="text-lg font-semibold leading-none tracking-tight">{t('settings.background.selectImage')}</h2>
         </div>
@@ -240,8 +250,8 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
         </div>
       </div>
 
-      {/* Top: 3 main tabs — hidden during slider preview */}
-      <div className={`shrink-0 border-b px-6 transition-opacity duration-150 ${isPreview ? 'opacity-0' : ''}`}>
+      {/* Top: 3 main tabs — ẩn khi đang kéo slider */}
+      <div className={`shrink-0 border-b px-6 transition-opacity duration-150 ${isPreview ? 'opacity-0 pointer-events-none' : ''}`}>
         <div className="flex gap-0" role="tablist" aria-label={t('settings.background.selectImage')}>
           {(['static', 'video', 'personal'] as const).map((tab) => (
             <button
@@ -267,7 +277,7 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
         {/* Left: Vertical category list — only for Ảnh tĩnh (static packs) or Ảnh động (lofi only); Ảnh của tôi has no categories */}
         {showLeftNav && (
           <nav
-            className={`shrink-0 w-36 border-r flex flex-col py-3 gap-0.5 transition-opacity duration-150 ${isPreview ? 'opacity-0' : ''}`}
+            className={`shrink-0 w-36 border-r flex flex-col py-3 gap-0.5 transition-opacity duration-150 ${isPreview ? 'opacity-0 pointer-events-none' : ''}`}
             aria-label={t('settings.background.selectImage')}
           >
             {leftNavPacks.map((pack) => (
@@ -288,8 +298,8 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
           </nav>
         )}
 
-        {/* Center: hidden during slider preview */}
-        <div className={`flex-1 overflow-y-auto p-6 min-w-0 transition-opacity duration-150 ${isPreview ? 'opacity-0' : ''}`}>
+        {/* Center — ẩn khi đang kéo slider */}
+        <div className={`flex-1 overflow-y-auto p-6 min-w-0 transition-opacity duration-150 ${isPreview ? 'opacity-0 pointer-events-none' : ''}`}>
           {activeTab === 'personal' ? (
             <>
               <PersonalTab
@@ -338,6 +348,7 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
                     <PackGrid
                       pack={pack}
                       styleValue={styleValue}
+                      loadingValue={loadingValue}
                       onSelect={selectImage}
                       t={t}
                     />
@@ -348,11 +359,9 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
           )}
         </div>
 
-        {/* Right: Sliders — stays visible during preview with solid bg */}
+        {/* Right: Sliders — giữ hiện khi kéo để user vẫn thấy và kéo được */}
         <div className={`shrink-0 w-56 p-4 flex flex-col gap-4 overflow-y-auto relative transition-all duration-150 ${
-          isPreview
-            ? 'bg-background/95 backdrop-blur-sm rounded-lg shadow-2xl border'
-            : 'border-l bg-muted/10'
+          isPreview ? 'bg-background/95 backdrop-blur-sm rounded-lg shadow-2xl border' : 'border-l bg-muted/10'
         }`}>
           {styleValue.startsWith('system:') && (
             <div className="absolute inset-0 z-10 bg-background/60 backdrop-blur-[1px] flex items-center justify-center p-6">
@@ -454,11 +463,13 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
 function PackGrid({
   pack,
   styleValue,
+  loadingValue,
   onSelect,
   t,
 }: {
   pack: BackgroundPack;
   styleValue: string;
+  loadingValue: string | null;
   onSelect: (v: string) => void;
   t: (key: string) => string;
 }) {
@@ -467,6 +478,7 @@ function PackGrid({
       {pack.items.map((item) => {
         const value = itemToStyleValue(item);
         const selected = styleValue === value || styleValue === item.id;
+        const isLoading = loadingValue === value || loadingValue === item.id;
 
         return (
           <PackThumbnail
@@ -474,6 +486,7 @@ function PackGrid({
             item={item}
             value={value}
             selected={selected}
+            isLoading={isLoading}
             onSelect={onSelect}
             t={t}
           />
@@ -487,12 +500,14 @@ function PackThumbnail({
   item,
   value,
   selected,
+  isLoading,
   onSelect,
   t,
 }: {
   item: BackgroundImage;
   value: string;
   selected: boolean;
+  isLoading?: boolean;
   onSelect: (v: string) => void;
   t: (key: string) => string;
 }) {
@@ -508,9 +523,14 @@ function PackThumbnail({
       title={label}
     >
       <ThumbnailContent item={item} label={label} />
-      {selected && (
+      {selected && !isLoading && (
         <div className="absolute top-2 right-2 bg-primary text-primary-foreground rounded-full p-0.5 shadow-sm">
           <Check className="h-3 w-3" />
+        </div>
+      )}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
+          <Loader2 className="h-5 w-5 text-white animate-spin" />
         </div>
       )}
       <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-[1px] text-white text-xs py-1.5 text-center font-medium">
@@ -726,7 +746,6 @@ function SliderControl({
         <Label htmlFor={id} className="text-sm">{label}</Label>
         <span className="text-xs font-mono text-muted-foreground">{value}{suffix}</span>
       </div>
-      {/* onPointerDown triggers preview mode; global pointerup ends it */}
       <div onPointerDown={disabled ? undefined : onDragStart}>
         <Slider
           id={id}

@@ -29,7 +29,7 @@ const FULL_DIR = join(OUTPUT_DIR, 'full');
 const THUMB_DIR = join(OUTPUT_DIR, 'thumb');
 
 // Packs to process (directories under backgrounds-source/)
-const PACKS = ['travelling', 'classic', 'cyberpunk', 'anime-cozy', 'fantasy'];
+const PACKS = ['cyberpunk', 'anime-cozy', 'fantasy', 'space', 'working'];
 const VIDEO_PACK = 'lofi-video';
 const IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp']);
 

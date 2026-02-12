@@ -10,15 +10,8 @@ export type PlayOptions = {
   onEnd?: () => void
 };
 
-export type AudioSourceType = 'ambient' | 'youtube' | 'spotify' | 'custom'
+export type AudioSourceType = 'ambient' | 'youtube' | 'custom'
 export type AudioStatus = 'stopped' | 'playing' | 'paused' | 'loading' | 'error'
-
-export interface SpotifyPlaybackOptions {
-  containerId?: string
-  theme?: 'light' | 'dark'
-  view?: 'list' | 'coverart'
-  autoplay?: boolean
-}
 
 export interface AudioSource {
   id: string
@@ -41,10 +34,6 @@ interface AudioPlayer {
   getDuration(): number
 }
 
-type SpotifyPlayerMetadata = SpotifyPlaybackOptions & {
-  embedHeight?: number
-}
-
 class HTMLAudioPlayer implements AudioPlayer {
   private audio: HTMLAudioElement | null = null
   private source: AudioSource
@@ -61,6 +50,7 @@ class HTMLAudioPlayer implements AudioPlayer {
     }
 
     this.audio = new Audio()
+    this.audio.setAttribute('data-managed', 'true')  // mark as managed
     this.audio.src = this.source.url!
     this.audio.loop = this.source.loop
     this.audio.volume = this.source.volume / 100
@@ -213,236 +203,12 @@ class YouTubePlayer implements AudioPlayer {
   }
 }
 
-class SpotifyPlayer implements AudioPlayer {
-  private controller: any = null
-  private source: AudioSource
-  private containerId = 'spotify-global-container'
-  private isReady = false
-  private status: AudioStatus = 'stopped'
-
-  constructor(source: AudioSource) {
-    this.source = source
-  }
-
-  private get metadata(): SpotifyPlayerMetadata {
-    return (this.source.metadata || {}) as SpotifyPlayerMetadata
-  }
-
-  private getOrCreateContainer(): HTMLDivElement {
-    const customId = this.metadata.containerId
-    if (customId) {
-      const customEl = document.getElementById(customId) as HTMLDivElement | null
-      if (!customEl) {
-        throw new Error(`Spotify embed container "${customId}" not found`)
-      }
-      customEl.innerHTML = ''
-      return customEl
-    }
-
-    let el = document.getElementById(this.containerId) as HTMLDivElement | null
-    if (!el) {
-      el = document.createElement('div')
-      el.id = this.containerId
-      el.style.position = 'fixed'
-      el.style.width = '0px'
-      el.style.height = '0px'
-      el.style.left = '-9999px'
-      el.style.top = '0'
-      el.style.display = 'none'
-      document.body.appendChild(el)
-    } else {
-      el.innerHTML = ''
-    }
-    return el
-  }
-
-  private clearContainer(): void {
-    const targetId = this.metadata.containerId || this.containerId
-    const el = document.getElementById(targetId) as HTMLDivElement | null
-    if (el) {
-      el.innerHTML = ''
-    }
-  }
-
-  private async ensureSpotifyAPI(): Promise<any> {
-    const SPOTIFY_IFRAME_API_SRC = 'https://open.spotify.com/embed/iframe-api/v1'
-    const SPOTIFY_IFRAME_API_SCRIPT_ID = 'spotify-iframe-api'
-
-    return new Promise((resolve, reject) => {
-      const win = window as any
-      if (win.Spotify) {
-        resolve(win.Spotify)
-        return
-      }
-
-      const prev = document.getElementById(SPOTIFY_IFRAME_API_SCRIPT_ID) as HTMLScriptElement | null
-      if (!prev) {
-        const tag = document.createElement('script')
-        tag.id = SPOTIFY_IFRAME_API_SCRIPT_ID
-        tag.src = SPOTIFY_IFRAME_API_SRC
-        tag.async = true
-        tag.onerror = () => reject(new Error('Failed to load Spotify iframe API'))
-        document.body.appendChild(tag)
-      }
-
-      win.onSpotifyIframeApiReady = (IFrameAPI: any) => {
-        resolve(IFrameAPI)
-      }
-    })
-  }
-
-  private extractPlaylistId(uri: string): string | null {
-    if (!uri) return null
-
-    // Handle different URI formats
-    if (uri.startsWith('spotify:playlist:')) {
-      return uri.split(':')[2]
-    }
-
-    // Handle URLs
-    try {
-      const url = new URL(uri)
-      if (url.hostname.includes('spotify.com')) {
-        const segments = url.pathname.split('/').filter(Boolean)
-        const playlistIndex = segments.findIndex(
-          (segment) => segment === 'playlist'
-        )
-        if (playlistIndex !== -1 && segments[playlistIndex + 1]) {
-          return segments[playlistIndex + 1].split('?')[0]
-        }
-      }
-    } catch {
-      // Not a URL, continue
-    }
-
-    // Handle direct playlist IDs
-    if (/^[a-zA-Z0-9]{22}$/.test(uri)) {
-      return uri
-    }
-
-    return null
-  }
-
-  async play(): Promise<void> {
-    try {
-      this.status = 'loading'
-      const IFrameAPI = await this.ensureSpotifyAPI()
-      const container = this.getOrCreateContainer()
-
-      const playlistId = this.extractPlaylistId(this.source.url || this.source.id)
-      if (!playlistId) {
-        throw new Error('Invalid Spotify playlist URI')
-      }
-
-      const metadata = this.metadata
-
-      if (!this.controller) {
-        this.controller = await new Promise<any>((resolve, reject) => {
-          IFrameAPI.createController(
-            container,
-            {
-              uri: `spotify:playlist:${playlistId}`,
-              width: '100%',
-              height: `${metadata.embedHeight ?? (metadata.view === 'coverart' ? 352 : 600)}`,
-              ...(metadata.theme ? { theme: metadata.theme } : {}),
-              ...(metadata.view ? { view: metadata.view } : {}),
-              ...(metadata.autoplay !== undefined ? { autoplay: metadata.autoplay } : {}),
-            },
-            (controller: any) => {
-              this.isReady = true
-              this.setupEventListeners(controller)
-              resolve(controller)
-            }
-          )
-        })
-      }
-
-      this.controller.play()
-      this.status = 'playing'
-    } catch (error) {
-      console.error('Spotify player error:', error)
-      this.status = 'error'
-      throw error
-    }
-  }
-
-  private setupEventListeners(controller: any): void {
-    if (!controller?.addListener) return
-
-    const handlePlaybackUpdate = (event: any) => {
-      if (event?.data?.isPaused) {
-        this.status = 'paused'
-      } else {
-        this.status = 'playing'
-      }
-    }
-
-    const handlePlaybackStarted = () => {
-      this.status = 'playing'
-    }
-
-    const handlePlaybackPaused = () => {
-      this.status = 'paused'
-    }
-
-    const handlePlaybackStopped = () => {
-      this.status = 'stopped'
-    }
-
-    controller.addListener('playback_update', handlePlaybackUpdate)
-    controller.addListener('playback_started', handlePlaybackStarted)
-    controller.addListener('playback_paused', handlePlaybackPaused)
-    controller.addListener('playback_stopped', handlePlaybackStopped)
-  }
-
-  async pause(): Promise<void> {
-    if (this.controller) {
-      this.controller.pause()
-      this.status = 'paused'
-    }
-  }
-
-  async stop(): Promise<void> {
-    if (this.controller) {
-      this.controller.pause()
-      this.controller = null
-      this.isReady = false
-    }
-    this.clearContainer()
-    this.status = 'stopped'
-  }
-
-  setVolume(volume: number): void {
-    if (this.controller) {
-      // Spotify volume is 0-1, our volume is 0-100
-      this.controller.setVolume(volume / 100)
-    }
-    // Update source volume as well
-    this.source.volume = volume
-  }
-
-  getStatus(): AudioStatus {
-    if (!this.controller) return 'stopped'
-    if (!this.isReady && this.status !== 'error') return 'loading'
-    return this.status
-  }
-
-  getCurrentTime(): number {
-    // Spotify iframe API doesn't expose current time through the controller
-    return 0
-  }
-
-  getDuration(): number {
-    // Spotify iframe API doesn't expose duration through the controller
-    return 0
-  }
-}
-
 export class AudioManager {
   private currentPlayer: AudioPlayer | null = null
   private currentSource: AudioSource | null = null
   private ambientPlayers: Map<string, HTMLAudioPlayer> = new Map()
-  private volume = 50
+  private ambientVolumes: Map<string, number> = new Map() // per-sound volumes (0-100)
+  private masterVolume = 50
   private isMuted = false
   private fadeInMs = 300
   private fadeOutMs = 300
@@ -485,8 +251,8 @@ export class AudioManager {
 
   async play(source: AudioSource): Promise<boolean> {
     try {
-      // If playing YouTube or Spotify, stop current main player but KEEP ambients
-      if (source.type === 'youtube' || source.type === 'spotify') {
+      // If playing YouTube, stop current main player but KEEP ambients
+      if (source.type === 'youtube') {
         await this.stop()
       } else if (source.type === 'ambient') {
         // For ambient sounds, use the mix system
@@ -506,20 +272,19 @@ export class AudioManager {
         }
         source.metadata = ytData
         this.currentPlayer = new YouTubePlayer(source)
-      } else if (source.type === 'spotify') {
-        this.currentPlayer = new SpotifyPlayer(source)
       } else {
         this.currentPlayer = new HTMLAudioPlayer(source)
       }
 
-      // Apply current settings
-      this.currentPlayer.setVolume(this.isMuted ? 0 : this.volume)
+      // Start playback first (required before any volume manipulation)
+      this.currentPlayer.setVolume(this.isMuted ? 0 : 0) // start silent for fade
+      await this.currentPlayer.play()
 
-      // Play with fade in if enabled
-      if (this.fadeInMs > 0) {
-        await this.fadeIn(this.currentPlayer, this.volume)
+      // Apply fade or set final volume
+      if (this.fadeInMs > 0 && !this.isMuted) {
+        await this.fadeIn(this.currentPlayer, this.masterVolume)
       } else {
-        await this.currentPlayer.play()
+        this.currentPlayer.setVolume(this.isMuted ? 0 : this.masterVolume)
       }
 
       return true
@@ -594,29 +359,48 @@ export class AudioManager {
   }
 
   setVolume(volume: number): void {
-    this.volume = Math.max(0, Math.min(100, volume))
-    const vol = this.isMuted ? 0 : this.volume
+    this.masterVolume = Math.max(0, Math.min(100, volume))
 
     if (this.currentPlayer) {
-      this.currentPlayer.setVolume(vol)
+      this.currentPlayer.setVolume(this.isMuted ? 0 : this.masterVolume)
     }
-    // Apply to all ambient players
-    this.ambientPlayers.forEach(player => {
-      player.setVolume(vol)
+
+    // Recalculate effective volumes for all ambient players
+    this.ambientPlayers.forEach((player, id) => {
+      const soundVol = this.ambientVolumes.get(id) ?? 50
+      const effective = this.isMuted ? 0 : (soundVol / 100) * (this.masterVolume / 100) * 100
+      player.setVolume(effective)
     })
   }
 
   setMute(muted: boolean): void {
     this.isMuted = muted
-    const vol = muted ? 0 : this.volume
 
     if (this.currentPlayer) {
-      this.currentPlayer.setVolume(vol)
+      this.currentPlayer.setVolume(muted ? 0 : this.masterVolume)
     }
-    // Apply to all ambient players
-    this.ambientPlayers.forEach(player => {
-      player.setVolume(vol)
+
+    // Recalculate for all ambient players
+    this.ambientPlayers.forEach((player, id) => {
+      if (muted) {
+        player.setVolume(0)
+      } else {
+        const soundVol = this.ambientVolumes.get(id) ?? 50
+        const effective = (soundVol / 100) * (this.masterVolume / 100) * 100
+        player.setVolume(effective)
+      }
     })
+  }
+
+  // Set per-sound volume for a specific ambient sound
+  setAmbientVolume(soundId: string, soundVolume: number): void {
+    const clamped = Math.max(0, Math.min(100, soundVolume))
+    this.ambientVolumes.set(soundId, clamped)
+    const player = this.ambientPlayers.get(soundId)
+    if (player) {
+      const effective = this.isMuted ? 0 : (soundVolume / 100) * (this.masterVolume / 100) * 100
+      player.setVolume(effective)
+    }
   }
 
   setFadeSettings(fadeInMs: number, fadeOutMs: number): void {
@@ -643,11 +427,16 @@ export class AudioManager {
         return true
       }
 
-      // Create new HTML audio player for this ambient sound
-      const player = new HTMLAudioPlayer(source)
+      // Store per-sound volume (clamped)
+      const soundVolume = Math.max(0, Math.min(100, source.volume))
+      this.ambientVolumes.set(soundId, soundVolume)
 
-      // Set volume
-      player.setVolume(this.isMuted ? 0 : this.volume)
+      // Calculate effective volume
+      const effectiveVolume = this.isMuted ? 0 : (soundVolume / 100) * (this.masterVolume / 100) * 100
+
+      // Create player with effective volume
+      const effectiveSource = { ...source, volume: effectiveVolume }
+      const player = new HTMLAudioPlayer(effectiveSource)
 
       // Play the sound
       await player.play()
@@ -671,6 +460,7 @@ export class AudioManager {
         console.error('Error stopping ambient sound:', error)
       }
       this.ambientPlayers.delete(soundId)
+      this.ambientVolumes.delete(soundId)
     }
   }
 
@@ -688,6 +478,7 @@ export class AudioManager {
     const promises = Array.from(this.ambientPlayers.keys()).map(id => this.stopAmbient(id))
     await Promise.all(promises)
     this.ambientPlayers.clear()
+    this.ambientVolumes.clear()
   }
 
   getActiveAmbientIds(): string[] {
@@ -702,30 +493,62 @@ export class AudioManager {
     return this.ambientPlayers.size
   }
 
-  private async fadeIn(player: AudioPlayer, targetVolume: number): Promise<void> {
-    const steps = Math.max(1, Math.round(this.fadeInMs / 40))
-    const stepVolume = (targetVolume / 100) / steps
+  // Global cleanup: Stop ALL audio elements in the entire document (including orphaned ones)
+  globalAudioCleanup(): void {
+    // Stop all <audio> elements
+    const audioElements = document.querySelectorAll('audio')
+    audioElements.forEach(audio => {
+      audio.pause()
+      audio.src = ''
+      audio.remove()
+    })
 
-    for (let i = 0; i < steps; i++) {
-      const volume = Math.min((i + 1) * stepVolume, targetVolume / 100)
-      player.setVolume(volume)
-      await this.delay(40)
-    }
+    // Stop all YouTube iframes
+    const ytIframes = document.querySelectorAll('iframe[src*="youtube.com"]')
+    ytIframes.forEach(iframe => iframe.remove())
+
+    // Clear AudioManager's internal state
+    this.ambientPlayers.clear()
+    this.ambientVolumes.clear()
+    this.currentPlayer = null
+    this.currentSource = null
   }
 
-  private async fadeOut(player: AudioPlayer, durationMs: number): Promise<void> {
-    const steps = Math.max(1, Math.round(durationMs / 40))
-    const stepVolume = (this.volume / 100) / steps
+  private fadeIn(player: AudioPlayer, targetVolume: number): Promise<void> {
+    return new Promise(resolve => {
+      const startTime = performance.now()
 
-    for (let i = 0; i < steps; i++) {
-      const volume = Math.max((this.volume / 100) - ((i + 1) * stepVolume), 0)
-      player.setVolume(volume)
-      await this.delay(40)
-    }
+      const fade = (currentTime: number) => {
+        const elapsed = currentTime - startTime
+        const progress = Math.min(elapsed / this.fadeInMs, 1)
+        player.setVolume(targetVolume * progress)  // pass 0-100 scale, setVolume handles normalization
+        if (progress < 1) {
+          requestAnimationFrame(fade)
+        } else {
+          resolve()
+        }
+      }
+      requestAnimationFrame(fade)
+    })
   }
 
-  private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms))
+  private fadeOut(player: AudioPlayer, durationMs: number): Promise<void> {
+    return new Promise(resolve => {
+      const startVolume = this.masterVolume  // keep in 0-100 scale
+      const startTime = performance.now()
+
+      const fade = (currentTime: number) => {
+        const elapsed = currentTime - startTime
+        const progress = Math.min(elapsed / durationMs, 1)
+        player.setVolume(startVolume * (1 - progress))  // pass 0-100 scale
+        if (progress < 1) {
+          requestAnimationFrame(fade)
+        } else {
+          resolve()
+        }
+      }
+      requestAnimationFrame(fade)
+    })
   }
 }
 
@@ -745,7 +568,7 @@ export const playAmbientSound = async (soundId: string, volume = 50): Promise<bo
     vn: sound.vn,
     url: sound.url,
     volume,
-    loop: sound.loopRecommended
+    loop: true
   }
 
   return await audioManager.play(source)
@@ -759,30 +582,6 @@ export const playYouTube = async (url: string, volume = 50): Promise<boolean> =>
     url,
     volume,
     loop: false
-  }
-
-  return await audioManager.play(source)
-}
-
-export const playSpotify = async (
-  playlistId: string,
-  name: string,
-  volume = 50,
-  options?: SpotifyPlaybackOptions,
-): Promise<boolean> => {
-  const metadata: SpotifyPlayerMetadata = {
-    embedHeight: options?.view === 'coverart' ? 352 : 600,
-    ...(options || {}),
-  }
-
-  const source: AudioSource = {
-    id: playlistId,
-    type: 'spotify',
-    name,
-    url: `spotify:playlist:${playlistId}`,
-    volume,
-    loop: false,
-    metadata,
   }
 
   return await audioManager.play(source)

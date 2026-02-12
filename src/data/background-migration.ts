@@ -3,6 +3,22 @@
  * Used once per user on first load after the refactor.
  */
 
+/** IDs no longer in any pack (Classic + Travel removed). Stored value is migrated to system. */
+export const REMOVED_BACKGROUND_IDS = new Set([
+  'landscape-cartoon',
+  'chill-shiba',
+  'study-desk',
+  'travelling-1',
+  'travelling-2',
+  'travelling-3',
+  'travelling-4',
+  'travelling-5',
+  'travelling-6',
+  'travelling-7',
+  'travelling-8',
+  'travelling-9',
+]);
+
 export const PATH_TO_ID_MAP: Record<string, string> = {
   // System
   'system:auto-color': 'system-auto-color',

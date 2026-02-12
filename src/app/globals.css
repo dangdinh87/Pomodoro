@@ -334,9 +334,18 @@ html.dark ::-webkit-scrollbar-thumb:hover {
   animation: spin-slow 3s linear infinite;
 }
 
-/* Custom macOS-style scrollbar for audio modal */
+/* Hide scrollbar while keeping scroll functionality */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Custom macOS-style scrollbar for audio modal - visible & scrollable */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
@@ -344,13 +353,13 @@ html.dark ::-webkit-scrollbar-thumb:hover {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.25);
   border-radius: 10px;
   transition: background-color 0.2s ease;
 }
 
 html.dark .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.35);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
@@ -364,20 +373,20 @@ html.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
 /* Firefox scrollbar */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
 }
 
 html.dark .custom-scrollbar {
-  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
 }
 
-/* Border Beam Animation */
+/* Border Beam Animation - GPU-composited via transform */
 @keyframes border-beam {
-  0% {
-    offset-distance: var(--initial-offset, 0%);
+  from {
+    transform: rotate(0deg);
   }
-  100% {
-    offset-distance: calc(var(--initial-offset, 0%) + 100%);
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -418,6 +427,31 @@ html.dark .custom-scrollbar {
 
 .pulse-primary {
   animation: pulse-primary 2s infinite;
+}
+
+/* YouTube equalizer animation */
+@keyframes equalizer {
+  0%, 100% { height: 30%; }
+  50% { height: 100%; }
+}
+
+/* Equalizer bar animation for now-playing card */
+@keyframes eq-bar {
+  0%, 100% { height: 20%; }
+  25% { height: 80%; }
+  50% { height: 45%; }
+  75% { height: 100%; }
+}
+
+.animate-eq-bar {
+  animation: eq-bar 1.2s ease-in-out infinite;
+}
+
+/* Shimmer bar animation */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(0%); }
+  100% { transform: translateX(100%); }
 }
 
 /* Safe area utilities for notched devices (iOS, Android) */

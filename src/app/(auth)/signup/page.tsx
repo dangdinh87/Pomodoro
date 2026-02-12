@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -23,23 +23,31 @@ import { useAuthStore } from '@/stores/auth-store';
 import { useI18n } from '@/contexts/i18n-context';
 
 import { BorderBeam } from '@/components/ui/border-beam';
+import Image from 'next/image';
 
-export default function SignupPage() {
-  const { t } = useI18n();
+// Component that handles redirect logic with useSearchParams
+function SignupRedirect() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const user = useAuthStore((state) => state.user);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [signupLoading, setSignupLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
-  const isBusy = signupLoading || googleLoading;
 
   useEffect(() => {
     if (!user) return;
     const redirectUrl = searchParams.get('redirect') ?? '/timer';
     router.replace(redirectUrl);
   }, [user, router, searchParams]);
+
+  return null;
+}
+
+export default function SignupPage() {
+  const { t } = useI18n();
+  const user = useAuthStore((state) => state.user);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [signupLoading, setSignupLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const isBusy = signupLoading || googleLoading;
 
   const getSupabaseClient = () => {
     if (!supabase) {
@@ -107,11 +115,15 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-8">
-      <Card className="relative w-full max-w-md overflow-hidden border-white/10 bg-background/80 shadow-2xl backdrop-blur">
-        <BorderBeam size={250} duration={12} delay={0} />
+    <>
+      <Suspense fallback={null}>
+        <SignupRedirect />
+      </Suspense>
+        <Card className="relative w-full max-w-md overflow-hidden border-white/10 bg-background/80 shadow-2xl backdrop-blur">
+          <BorderBeam size={250} duration={12} delay={0} />
         <CardHeader className="space-y-2 text-center">
-          <CardTitle className="text-2xl font-semibold">
+          <CardTitle className="text-2xl font-semibold flex flex-col items-center gap-2">
+            <Image src="/images/logo.svg" alt={t('brand.title')} width={52} height={52} />
             {t('signup.title')}
           </CardTitle>
           <CardDescription className="text-sm text-muted-foreground">
@@ -223,6 +235,6 @@ export default function SignupPage() {
           </Button>
         </CardFooter>
       </Card>
-    </div>
+    </>
   );
 }

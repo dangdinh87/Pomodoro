@@ -137,16 +137,16 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
         <div className="flex flex-col h-full">
             {/* Fixed Header */}
             {onClose && (
-                <div className="flex items-center justify-between px-6 py-4 border-b shrink-0">
+                <div className="flex items-center justify-between px-6 py-4 border-b shrink-0 bg-background/95 backdrop-blur-sm">
                     <h2 className="text-lg font-semibold">{t('timerSettings.title')}</h2>
                     <div className="flex items-center gap-2">
-                        <Button variant="outline" onClick={resetToDefaults} size="sm">{t('timerSettings.actions.resetDefaults')}</Button>
-                        <Button onClick={saveSettings} size="sm">{t('timerSettings.actions.save')}</Button>
+                        <Button variant="outline" onClick={resetToDefaults} size="sm" className="h-9">{t('timerSettings.actions.resetDefaults')}</Button>
+                        <Button onClick={saveSettings} size="sm" className="h-9 bg-primary hover:bg-primary/90 text-primary-foreground">{t('timerSettings.actions.save')}</Button>
                         <Button
                             variant="ghost"
                             size="icon"
                             onClick={onClose}
-                            className="h-8 w-8 rounded-full"
+                            className="h-8 w-8 rounded-full hover:bg-muted"
                         >
                             <X className="h-4 w-4" />
                             <span className="sr-only">{t('common.close')}</span>
@@ -165,80 +165,96 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                             <Separator />
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="work-duration">{t('timerSettings.labels.workDuration')}</Label>
-                                    <Input
-                                        id="work-duration"
-                                        type="number"
-                                        min={1}
-                                        max={60}
-                                        value={workStr}
-                                        onChange={(e) => {
-                                            const v = e.target.value
-                                            if (v === '' || /^[0-9]{0,2}$/.test(v)) setWorkStr(v)
-                                        }}
-                                        onBlur={() => {
-                                            const n = clamp(toInt(workStr, localSettings.workDuration), 1, 60)
-                                            setWorkStr(String(n))
-                                            setLocalSettings({ ...localSettings, workDuration: n })
-                                        }}
-                                    />
+                                    <Label htmlFor="work-duration" className="text-sm font-medium">{t('timerSettings.labels.workDuration')}</Label>
+                                    <div className="relative">
+                                        <Input
+                                            id="work-duration"
+                                            type="number"
+                                            min={1}
+                                            max={60}
+                                            value={workStr}
+                                            onChange={(e) => {
+                                                const v = e.target.value
+                                                if (v === '' || /^[0-9]{0,2}$/.test(v)) setWorkStr(v)
+                                            }}
+                                            onBlur={() => {
+                                                const n = clamp(toInt(workStr, localSettings.workDuration), 1, 60)
+                                                setWorkStr(String(n))
+                                                setLocalSettings({ ...localSettings, workDuration: n })
+                                            }}
+                                            className="pr-12"
+                                        />
+                                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">min</span>
+                                    </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="short-break-duration">{t('timerSettings.labels.shortBreakDuration')}</Label>
-                                    <Input
-                                        id="short-break-duration"
-                                        type="number"
-                                        min={1}
-                                        max={30}
-                                        value={shortStr}
-                                        onChange={(e) => {
-                                            const v = e.target.value
-                                            if (v === '' || /^[0-9]{0,2}$/.test(v)) setShortStr(v)
-                                        }}
-                                        onBlur={() => {
-                                            const n = clamp(toInt(shortStr, localSettings.shortBreakDuration), 1, 30)
-                                            setShortStr(String(n))
-                                            setLocalSettings({ ...localSettings, shortBreakDuration: n })
-                                        }}
-                                    />
+                                    <Label htmlFor="short-break-duration" className="text-sm font-medium">{t('timerSettings.labels.shortBreakDuration')}</Label>
+                                    <div className="relative">
+                                        <Input
+                                            id="short-break-duration"
+                                            type="number"
+                                            min={1}
+                                            max={30}
+                                            value={shortStr}
+                                            onChange={(e) => {
+                                                const v = e.target.value
+                                                if (v === '' || /^[0-9]{0,2}$/.test(v)) setShortStr(v)
+                                            }}
+                                            onBlur={() => {
+                                                const n = clamp(toInt(shortStr, localSettings.shortBreakDuration), 1, 30)
+                                                setShortStr(String(n))
+                                                setLocalSettings({ ...localSettings, shortBreakDuration: n })
+                                            }}
+                                            className="pr-12"
+                                        />
+                                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">min</span>
+                                    </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="long-break-duration">{t('timerSettings.labels.longBreakDuration')}</Label>
-                                    <Input
-                                        id="long-break-duration"
-                                        type="number"
-                                        min={1}
-                                        max={60}
-                                        value={longStr}
-                                        onChange={(e) => {
-                                            const v = e.target.value
-                                            if (v === '' || /^[0-9]{0,2}$/.test(v)) setLongStr(v)
-                                        }}
-                                        onBlur={() => {
-                                            const n = clamp(toInt(longStr, localSettings.longBreakDuration), 1, 60)
-                                            setLongStr(String(n))
-                                            setLocalSettings({ ...localSettings, longBreakDuration: n })
-                                        }}
-                                    />
+                                    <Label htmlFor="long-break-duration" className="text-sm font-medium">{t('timerSettings.labels.longBreakDuration')}</Label>
+                                    <div className="relative">
+                                        <Input
+                                            id="long-break-duration"
+                                            type="number"
+                                            min={1}
+                                            max={60}
+                                            value={longStr}
+                                            onChange={(e) => {
+                                                const v = e.target.value
+                                                if (v === '' || /^[0-9]{0,2}$/.test(v)) setLongStr(v)
+                                            }}
+                                            onBlur={() => {
+                                                const n = clamp(toInt(longStr, localSettings.longBreakDuration), 1, 60)
+                                                setLongStr(String(n))
+                                                setLocalSettings({ ...localSettings, longBreakDuration: n })
+                                            }}
+                                            className="pr-12"
+                                        />
+                                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">min</span>
+                                    </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="long-break-interval">{t('timerSettings.labels.longBreakInterval')}</Label>
-                                    <Input
-                                        id="long-break-interval"
-                                        type="number"
-                                        min={2}
-                                        max={10}
-                                        value={intervalStr}
-                                        onChange={(e) => {
-                                            const v = e.target.value
-                                            if (v === '' || /^[0-9]{0,2}$/.test(v)) setIntervalStr(v)
-                                        }}
-                                        onBlur={() => {
-                                            const n = clamp(toInt(intervalStr, localSettings.longBreakInterval), 2, 10)
-                                            setIntervalStr(String(n))
-                                            setLocalSettings({ ...localSettings, longBreakInterval: n })
-                                        }}
-                                    />
+                                    <Label htmlFor="long-break-interval" className="text-sm font-medium">{t('timerSettings.labels.longBreakInterval')}</Label>
+                                    <div className="relative">
+                                        <Input
+                                            id="long-break-interval"
+                                            type="number"
+                                            min={2}
+                                            max={10}
+                                            value={intervalStr}
+                                            onChange={(e) => {
+                                                const v = e.target.value
+                                                if (v === '' || /^[0-9]{0,2}$/.test(v)) setIntervalStr(v)
+                                            }}
+                                            onBlur={() => {
+                                                const n = clamp(toInt(intervalStr, localSettings.longBreakInterval), 2, 10)
+                                                setIntervalStr(String(n))
+                                                setLocalSettings({ ...localSettings, longBreakInterval: n })
+                                            }}
+                                            className="pr-16"
+                                        />
+                                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">cycles</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -247,29 +263,31 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                         <div className="space-y-4">
                             <h2 className="text-lg font-semibold">{t('timerSettings.labels.behavior')}</h2>
                             <Separator />
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <Label htmlFor="auto-start-break" className="flex-1">{t('timerSettings.labels.autoStartBreaks')}</Label>
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-muted/50 transition-colors">
+                                    <Label htmlFor="auto-start-break" className="flex-1 cursor-pointer text-sm font-medium">{t('timerSettings.labels.autoStartBreaks')}</Label>
                                     <Switch
                                         id="auto-start-break"
                                         checked={localSettings.autoStartBreak}
                                         onCheckedChange={(checked) =>
                                             setLocalSettings({ ...localSettings, autoStartBreak: checked })
                                         }
+                                        className="data-[state=checked]:bg-primary"
                                     />
                                 </div>
-                                <div className="flex items-center justify-between">
-                                    <Label htmlFor="auto-start-work" className="flex-1">{t('timerSettings.labels.autoStartWork')}</Label>
+                                <div className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-muted/50 transition-colors">
+                                    <Label htmlFor="auto-start-work" className="flex-1 cursor-pointer text-sm font-medium">{t('timerSettings.labels.autoStartWork')}</Label>
                                     <Switch
                                         id="auto-start-work"
                                         checked={localSettings.autoStartWork}
                                         onCheckedChange={(checked) =>
                                             setLocalSettings({ ...localSettings, autoStartWork: checked })
                                         }
+                                        className="data-[state=checked]:bg-primary"
                                     />
                                 </div>
-                                <div className="flex items-center justify-between">
-                                    <Label htmlFor="low-time-warning" className="flex-1">{t('timerSettings.labels.lowTimeWarning')}</Label>
+                                <div className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-muted/50 transition-colors">
+                                    <Label htmlFor="low-time-warning" className="flex-1 cursor-pointer text-sm font-medium">{t('timerSettings.labels.lowTimeWarning')}</Label>
                                     <Switch
                                         id="low-time-warning"
                                         checked={localSettings.lowTimeWarningEnabled}
@@ -279,6 +297,7 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                                                 lowTimeWarningEnabled: checked,
                                             })
                                         }
+                                        className="data-[state=checked]:bg-primary"
                                     />
                                 </div>
                             </div>
@@ -293,14 +312,14 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                             <Separator />
                             <div className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="clock-type">{t('timerSettings.labels.clockStyle')}</Label>
+                                    <Label htmlFor="clock-type" className="text-sm font-medium">{t('timerSettings.labels.clockStyle')}</Label>
                                     <Select
                                         value={localSettings.clockType}
                                         onValueChange={(value: ClockType) =>
                                             setLocalSettings({ ...localSettings, clockType: value })
                                         }
                                     >
-                                        <SelectTrigger>
+                                        <SelectTrigger className="bg-background">
                                             <SelectValue placeholder={t('timerSettings.labels.selectClockType')} />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -328,14 +347,14 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="clock-size">{t('timerSettings.labels.clockSize')}</Label>
+                                    <Label htmlFor="clock-size" className="text-sm font-medium">{t('timerSettings.labels.clockSize')}</Label>
                                     <Select
                                         value={localSettings.clockSize}
                                         onValueChange={(value: 'small' | 'medium' | 'large') =>
                                             setLocalSettings({ ...localSettings, clockSize: value })
                                         }
                                     >
-                                        <SelectTrigger id="clock-size">
+                                        <SelectTrigger id="clock-size" className="bg-background">
                                             <SelectValue placeholder={t('timerSettings.labels.selectSize')} />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -352,7 +371,7 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                         <div className="space-y-4">
                             <h2 className="text-lg font-semibold">{t('timerSettings.labels.preview')}</h2>
                             <Separator />
-                            <div className="rounded-lg border bg-card p-6 flex items-center justify-center min-h-[200px]">
+                            <div className="rounded-lg border bg-muted/30 p-6 flex items-center justify-center min-h-[200px] backdrop-blur-sm">
                                 {(localSettings.clockType === 'digital' || localSettings.clockType === 'progress') && (() => {
                                     const sizeClasses = {
                                         small: 'text-2xl',
@@ -454,8 +473,8 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
 
                     {!onClose && (
                         <div className="flex justify-between pt-4 border-t">
-                            <Button variant="outline" onClick={resetToDefaults}>{t('timerSettings.actions.resetDefaults')}</Button>
-                            <Button onClick={saveSettings}>{t('timerSettings.actions.saveChanges')}</Button>
+                            <Button variant="outline" onClick={resetToDefaults} className="h-10">{t('timerSettings.actions.resetDefaults')}</Button>
+                            <Button onClick={saveSettings} className="h-10 bg-primary hover:bg-primary/90 text-primary-foreground">{t('timerSettings.actions.saveChanges')}</Button>
                         </div>
                     )}
                 </div>
