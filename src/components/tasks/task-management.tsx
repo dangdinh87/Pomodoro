@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { useAuth } from '@/hooks/use-auth'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useCallback } from 'react'
 import { Task, useTasksStore, TaskStatus } from '@/stores/task-store'
 import { TaskFilters } from './components/task-filters'
 import { TaskFormModal } from './components/task-form-modal'
@@ -94,9 +94,10 @@ export function TaskManagement() {
     }
   }
 
-  const handleToggleStatus = async (task: Task) => {
+  const handleToggleStatus = useCallback(async (task: Task) => {
     const isNowDone = task.status !== 'done'
     const newStatus: TaskStatus = isNowDone ? 'done' : 'todo'
+    const { activeTaskId } = useTasksStore.getState()
 
     // Auto-unfocus logic
     if (isNowDone && activeTaskId === task.id) {
@@ -135,10 +136,11 @@ export function TaskManagement() {
         return next
       })
     }
-  }
+  }, [updateTask, queryClient, setActiveTask])
 
-  const handleUpdateStatus = async (taskId: string, newStatus: TaskStatus) => {
+  const handleUpdateStatus = useCallback(async (taskId: string, newStatus: TaskStatus) => {
     const isNowDone = newStatus === 'done'
+    const { activeTaskId } = useTasksStore.getState()
 
     if (isNowDone && activeTaskId === taskId) {
       const { mode, timeLeft, lastSessionTimeLeft, setLastSessionTimeLeft } = useTimerStore.getState()
@@ -174,10 +176,11 @@ export function TaskManagement() {
         return next
       })
     }
-  }
+  }, [updateTask, queryClient, setActiveTask])
 
-  const handleToggleActive = (task: Task) => {
+  const handleToggleActive = useCallback((task: Task) => {
     const { timeLeft, setLastSessionTimeLeft } = useTimerStore.getState()
+    const { activeTaskId } = useTasksStore.getState()
 
     if (activeTaskId === task.id) {
       // Recording when manual unfocus too for accuracy
@@ -232,7 +235,7 @@ export function TaskManagement() {
         updateTask({ id: task.id, input: { status: 'doing' } })
       }
     }
-  }
+  }, [setActiveTask, updateTask, queryClient])
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -243,9 +246,9 @@ export function TaskManagement() {
     }
   }
 
-  const handleDeleteRequest = (id: string) => {
+  const handleDeleteRequest = useCallback((id: string) => {
     setDeleteConfirmId(id)
-  }
+  }, [])
 
   const confirmDelete = async () => {
     if (!deleteConfirmId) return
@@ -268,25 +271,25 @@ export function TaskManagement() {
     }
   }
 
-  const handleEdit = (task: Task) => {
+  const handleEdit = useCallback((task: Task) => {
     setEditingId(task.id)
-  }
+  }, [setEditingId])
 
-  const handleClone = async (taskId: string) => {
+  const handleClone = useCallback(async (taskId: string) => {
     try {
       await cloneTask(taskId)
     } catch (error) {
       // Error handled by hook
     }
-  }
+  }, [cloneTask])
 
-  const handleSaveAsTemplate = async (taskId: string) => {
+  const handleSaveAsTemplate = useCallback(async (taskId: string) => {
     try {
       await saveAsTemplate(taskId)
     } catch (error) {
       // Error handled by hook
     }
-  }
+  }, [saveAsTemplate])
 
   const uniqueTags = useMemo(() => {
     const tags = new Set<string>()
