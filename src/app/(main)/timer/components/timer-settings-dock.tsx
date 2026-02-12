@@ -1,6 +1,7 @@
 'use client';
 
 import { memo, useState } from 'react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Music, Wallpaper, Clock, Maximize2, Minimize2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -28,8 +29,9 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
     const { setOpen: setSidebarOpen } = useSidebar();
     const currentlyPlaying = useAudioStore((state) => state.currentlyPlaying);
     const activeAmbientSounds = useAudioStore((state) => state.activeAmbientSounds);
-    const isAudioPlaying = (currentlyPlaying?.isPlaying ?? false) || activeAmbientSounds.length > 0;
-    const hasActiveAudio = !!currentlyPlaying || activeAmbientSounds.length > 0;
+    const activeAmbientWithVolume = activeAmbientSounds.filter(s => s.volume > 0);
+    const isAudioPlaying = (currentlyPlaying?.isPlaying ?? false) || activeAmbientWithVolume.length > 0;
+    const hasActiveAudio = !!currentlyPlaying || activeAmbientWithVolume.length > 0;
 
     // Local Modal States
     const [timerSettingsOpen, setTimerSettingsOpen] = useState(false);
@@ -72,18 +74,49 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                             "h-10 w-10 rounded-full backdrop-blur-sm border transition-all relative overflow-visible",
                                             hasActiveAudio
                                                 ? currentlyPlaying?.type === 'youtube'
-                                                    ? "bg-red-500/90 border-red-500/50 text-white hover:bg-red-500 shadow-lg shadow-red-500/25 pulse-red"
+                                                    ? isAudioPlaying
+                                                        ? "bg-red-500/90 border-red-500/50 text-white hover:bg-red-500 shadow-lg shadow-red-500/25 pulse-red"
+                                                        : "bg-red-500/60 border-red-500/40 text-white hover:bg-red-500/80 shadow-md shadow-red-500/20"
                                                     : "bg-gradient-to-br from-primary/80 to-primary border-primary/50 text-primary-foreground hover:from-primary hover:to-primary/90 shadow-lg shadow-primary/25"
                                                 : "bg-background/20 hover:bg-background/40 border-white/10 text-foreground"
                                         )}
                                         onClick={() => setAudioSettingsOpen(true)}
                                     >
                                         {hasActiveAudio ? (
-                                            <div className="flex items-center justify-center">
+                                            <div className="flex items-center justify-center relative w-full h-full">
                                                 {currentlyPlaying?.type === 'youtube' ? (
-                                                    <svg className="h-5 w-5 text-white fill-current" viewBox="0 0 24 24">
-                                                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                                                    </svg>
+                                                    <>
+                                                        {/* Ripple/Glow Effect - Only when playing */}
+                                                        {isAudioPlaying && (
+                                                            <motion.div
+                                                                className="absolute inset-0 rounded-full border-2 border-white/80"
+                                                                animate={{
+                                                                    scale: [1, 1.3, 1],
+                                                                    opacity: [0.8, 0, 0.8],
+                                                                }}
+                                                                transition={{
+                                                                    duration: 1.2,
+                                                                    repeat: Infinity,
+                                                                    ease: "easeInOut",
+                                                                }}
+                                                            />
+                                                        )}
+                                                        {/* Icon - Animated only when playing */}
+                                                        <motion.svg
+                                                            className="h-5 w-5 text-white fill-current relative z-10"
+                                                            viewBox="0 0 24 24"
+                                                            animate={isAudioPlaying ? {
+                                                                scale: [1, 1.2, 1],
+                                                            } : undefined}
+                                                            transition={isAudioPlaying ? {
+                                                                duration: 1.2,
+                                                                repeat: Infinity,
+                                                                ease: "easeInOut",
+                                                            } : undefined}
+                                                        >
+                                                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                                                        </motion.svg>
+                                                    </>
                                                 ) : (
                                                     <AudioLines size={20} animate={isAudioPlaying} className="text-background" />
                                                 )}
@@ -105,20 +138,20 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                             )}
                                             <div className="flex flex-col min-w-0">
                                                 <span className="max-w-[180px] truncate">{currentlyPlaying.name}</span>
-                                                {activeAmbientSounds.length > 0 && currentlyPlaying.type !== 'ambient' && (
+                                                {activeAmbientWithVolume.length > 0 && currentlyPlaying.type !== 'ambient' && (
                                                     <span className="text-[10px] text-muted-foreground font-medium">
-                                                        + {activeAmbientSounds.length} ambient sound{activeAmbientSounds.length > 1 ? 's' : ''}
+                                                        + {activeAmbientWithVolume.length} ambient sound{activeAmbientWithVolume.length > 1 ? 's' : ''}
                                                     </span>
                                                 )}
                                             </div>
                                         </div>
-                                    ) : activeAmbientSounds.length > 0 ? (
+                                    ) : activeAmbientWithVolume.length > 0 ? (
                                         <div className="flex items-center gap-2">
                                             <AudioLines size={16} className="shrink-0" animate={true} />
                                             <span className="max-w-[180px] truncate">
-                                                {activeAmbientSounds.length === 1
+                                                {activeAmbientWithVolume.length === 1
                                                     ? "Ambient Sound Playing"
-                                                    : `Mixed Ambient (${activeAmbientSounds.length} sounds)`}
+                                                    : `Mixed Ambient (${activeAmbientWithVolume.length} sounds)`}
                                             </span>
                                         </div>
                                     ) : (

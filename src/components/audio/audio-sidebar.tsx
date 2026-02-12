@@ -1,19 +1,20 @@
 'use client'
 
+import { useEffect } from 'react'
 import {
   Sheet,
   SheetContent,
-  SheetHeader,
-  SheetTitle,
 } from '@/components/ui/sheet'
 import { Volume2, VolumeX } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger } from '@/components/animate-ui/components/animate/tabs'
 import { useAudioStore } from '@/stores/audio-store'
+
 import { AmbientMixer } from './ambient-mixer'
 import YouTubePane from './youtube/youtube-pane'
 import { cn } from '@/lib/utils'
+import { useTranslation } from '@/contexts/i18n-context'
 
 interface AudioSidebarProps {
   open: boolean
@@ -33,12 +34,23 @@ const YouTubeIcon = ({ className }: { className?: string }) => (
 )
 
 export function AudioSidebar({ open, onOpenChange }: AudioSidebarProps) {
+  const { t } = useTranslation()
   const audioSettings = useAudioStore((s) => s.audioSettings)
+  const currentlyPlaying = useAudioStore((s) => s.currentlyPlaying)
   const updateVolume = useAudioStore((s) => s.updateVolume)
   const toggleMute = useAudioStore((s) => s.toggleMute)
   const setActiveSource = useAudioStore((s) => s.setActiveSource)
 
-  // Controlled by activeSource from store
+  // Auto-switch tab to match what's playing when sidebar opens
+  useEffect(() => {
+    if (open) {
+      if (currentlyPlaying?.type === 'youtube') {
+        setActiveSource('youtube')
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
+
   const currentTab = audioSettings.activeSource === 'youtube' ? 'youtube' : 'ambient'
 
   return (
@@ -50,37 +62,55 @@ export function AudioSidebar({ open, onOpenChange }: AudioSidebarProps) {
           'bg-background/95 backdrop-blur-md'
         )}
       >
-        {/* Header */}
-        <SheetHeader className="px-4 pt-4 pb-2 shrink-0">
-          <SheetTitle className="text-base font-semibold">Audio</SheetTitle>
-        </SheetHeader>
-
-        {/* Tabs */}
+        {/* Tabs with header in one row */}
         <Tabs
           value={currentTab}
           onValueChange={(v) => setActiveSource(v as 'ambient' | 'youtube')}
           className="flex-1 flex flex-col overflow-hidden"
         >
-          <div className="px-4 pb-2 shrink-0">
-            <TabsList className="grid w-full grid-cols-2 h-9">
-              <TabsTrigger value="ambient" className="text-xs">
-                Ambient
+          {/* Header with label and TabsList */}
+          <div className="px-4 pt-3 pb-2 shrink-0 flex items-center gap-3">
+            <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide shrink-0">
+              {t('audio.selectAudio')}
+            </h2>
+            <TabsList className="w-fit h-9">
+              <TabsTrigger value="ambient" className="text-sm px-3 py-1.5">
+                {t('audio.tabs.ambient')}
               </TabsTrigger>
-              <TabsTrigger value="youtube" className="text-xs flex items-center gap-1.5">
-                <YouTubeIcon className="h-3.5 w-3.5" />
-                YouTube
+              <TabsTrigger value="youtube" className="text-sm px-3 py-1.5 flex items-center gap-2">
+                <YouTubeIcon className={cn(
+                  "h-4 w-4 transition-colors",
+                  currentTab === 'youtube' ? "text-red-500" : "text-muted-foreground"
+                )} />
+                {t('audio.tabs.youtube')}
               </TabsTrigger>
             </TabsList>
           </div>
 
-          {/* Scrollable content */}
-          <div className="flex-1 overflow-y-auto px-4 custom-scrollbar">
-            <TabsContent value="ambient" className="mt-0">
+          {/* Content area - NO scroll; only inner list scrolls. Use conditional render to avoid animate-ui height cycle (0) */}
+          <div className="flex-1 min-h-0 overflow-hidden flex flex-col relative">
+            <div
+              className={cn(
+                "h-full min-h-0 flex flex-col transition-opacity duration-200 px-4 pb-2 pt-2",
+                currentTab === 'ambient'
+                  ? "relative z-10 opacity-100"
+                  : "absolute inset-0 z-0 opacity-0 pointer-events-none"
+              )}
+            >
               <AmbientMixer />
-            </TabsContent>
-            <TabsContent value="youtube" className="mt-0">
-              <YouTubePane />
-            </TabsContent>
+            </div>
+            <div
+              className={cn(
+                "h-full min-h-0 flex flex-col transition-opacity duration-200 px-4 pb-2 pt-2",
+                currentTab === 'youtube'
+                  ? "relative z-10 opacity-100"
+                  : "absolute inset-0 z-0 opacity-0 pointer-events-none h-full w-full"
+              )}
+            >
+              <div className="h-full w-full flex flex-col pointer-events-auto">
+                <YouTubePane />
+              </div>
+            </div>
           </div>
         </Tabs>
 

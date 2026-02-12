@@ -1,8 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useTheme } from "next-themes"
-import { Check, Moon, Sun, Laptop, Type } from "lucide-react"
+import { Type } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
@@ -20,7 +19,6 @@ const FONTS = [
 ]
 
 export function GeneralSettings() {
-    const { theme, setTheme } = useTheme()
     const { lang, setLang, t } = useI18n()
     const [selectedThemeKey, setSelectedThemeKey] = useState<string>('default')
     const [selectedFont, setSelectedFont] = useState<string>('Nunito')
@@ -224,41 +222,6 @@ ${optionalDark}
                 <Separator />
 
                 <div className="grid gap-6">
-                    {/* Dark Mode */}
-                    <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                            <Label>{t('settings.general.theme.mode')}</Label>
-                            <p className="text-sm text-muted-foreground">
-                                {t('settings.general.theme.modeDescription')}
-                            </p>
-                        </div>
-                        <Select value={theme} onValueChange={(value) => setTheme(value)}>
-                            <SelectTrigger className="w-[200px]">
-                                <SelectValue placeholder={t('settings.general.theme.selectModePlaceholder')} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="light">
-                                    <div className="flex items-center gap-2">
-                                        <Sun className="h-4 w-4" />
-                                        <span>{t('settings.general.theme.light')}</span>
-                                    </div>
-                                </SelectItem>
-                                <SelectItem value="dark">
-                                    <div className="flex items-center gap-2">
-                                        <Moon className="h-4 w-4" />
-                                        <span>{t('settings.general.theme.dark')}</span>
-                                    </div>
-                                </SelectItem>
-                                <SelectItem value="system">
-                                    <div className="flex items-center gap-2">
-                                        <Laptop className="h-4 w-4" />
-                                        <span>{t('settings.general.theme.system')}</span>
-                                    </div>
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
                     {/* Color Theme */}
                     <div className="flex items-center justify-between">
                         <div className="space-y-1">

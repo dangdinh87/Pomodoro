@@ -50,6 +50,7 @@ class HTMLAudioPlayer implements AudioPlayer {
     }
 
     this.audio = new Audio()
+    this.audio.setAttribute('data-managed', 'true')  // mark as managed
     this.audio.src = this.source.url!
     this.audio.loop = this.source.loop
     this.audio.volume = this.source.volume / 100
@@ -275,14 +276,15 @@ export class AudioManager {
         this.currentPlayer = new HTMLAudioPlayer(source)
       }
 
-      // Apply current settings
-      this.currentPlayer.setVolume(this.isMuted ? 0 : this.masterVolume)
+      // Start playback first (required before any volume manipulation)
+      this.currentPlayer.setVolume(this.isMuted ? 0 : 0) // start silent for fade
+      await this.currentPlayer.play()
 
-      // Play with fade in if enabled
-      if (this.fadeInMs > 0) {
+      // Apply fade or set final volume
+      if (this.fadeInMs > 0 && !this.isMuted) {
         await this.fadeIn(this.currentPlayer, this.masterVolume)
       } else {
-        await this.currentPlayer.play()
+        this.currentPlayer.setVolume(this.isMuted ? 0 : this.masterVolume)
       }
 
       return true
@@ -491,15 +493,35 @@ export class AudioManager {
     return this.ambientPlayers.size
   }
 
+  // Global cleanup: Stop ALL audio elements in the entire document (including orphaned ones)
+  globalAudioCleanup(): void {
+    // Stop all <audio> elements
+    const audioElements = document.querySelectorAll('audio')
+    audioElements.forEach(audio => {
+      audio.pause()
+      audio.src = ''
+      audio.remove()
+    })
+
+    // Stop all YouTube iframes
+    const ytIframes = document.querySelectorAll('iframe[src*="youtube.com"]')
+    ytIframes.forEach(iframe => iframe.remove())
+
+    // Clear AudioManager's internal state
+    this.ambientPlayers.clear()
+    this.ambientVolumes.clear()
+    this.currentPlayer = null
+    this.currentSource = null
+  }
+
   private fadeIn(player: AudioPlayer, targetVolume: number): Promise<void> {
     return new Promise(resolve => {
-      const targetVolumeNormalized = targetVolume / 100
       const startTime = performance.now()
 
       const fade = (currentTime: number) => {
         const elapsed = currentTime - startTime
         const progress = Math.min(elapsed / this.fadeInMs, 1)
-        player.setVolume(targetVolumeNormalized * progress)
+        player.setVolume(targetVolume * progress)  // pass 0-100 scale, setVolume handles normalization
         if (progress < 1) {
           requestAnimationFrame(fade)
         } else {
@@ -512,13 +534,13 @@ export class AudioManager {
 
   private fadeOut(player: AudioPlayer, durationMs: number): Promise<void> {
     return new Promise(resolve => {
-      const startVolume = this.masterVolume / 100
+      const startVolume = this.masterVolume  // keep in 0-100 scale
       const startTime = performance.now()
 
       const fade = (currentTime: number) => {
         const elapsed = currentTime - startTime
         const progress = Math.min(elapsed / durationMs, 1)
-        player.setVolume(startVolume * (1 - progress))
+        player.setVolume(startVolume * (1 - progress))  // pass 0-100 scale
         if (progress < 1) {
           requestAnimationFrame(fade)
         } else {

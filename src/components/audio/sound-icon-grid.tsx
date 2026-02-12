@@ -42,12 +42,12 @@ export const SoundIconGrid = memo(function SoundIconGrid({
             !isOpen && '-rotate-90'
           )}
         />
-        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+        <span className="text-sm font-medium text-foreground uppercase tracking-wider">
           {categoryLabel}
         </span>
-        <span className="text-[10px] text-muted-foreground/60">({sounds.length})</span>
+        <span className="text-xs text-foreground/80">({sounds.length})</span>
         {activeCount > 0 && (
-          <span className="ml-auto text-[10px] font-medium text-primary">
+          <span className="ml-auto text-xs font-medium text-primary">
             {activeCount} active
           </span>
         )}
@@ -73,9 +73,9 @@ export const SoundIconGrid = memo(function SoundIconGrid({
                     {sound.icon}
                   </button>
                 </TooltipTrigger>
-                <TooltipContent side="bottom" className="text-xs">
+                <TooltipContent side="bottom" className="text-sm">
                   {sound.label}
-                  {sound.vn && <span className="text-muted-foreground ml-1">({sound.vn})</span>}
+                  {sound.vn && <span className="text-foreground/90 ml-1">({sound.vn})</span>}
                 </TooltipContent>
               </Tooltip>
             )

@@ -6,6 +6,7 @@
 import type { Metadata } from 'next';
 import { Be_Vietnam_Pro, Space_Grotesk, Nunito } from 'next/font/google';
 import Script from 'next/script';
+import { AuthCodeHandler } from '@/components/auth/auth-code-handler';
 import './globals.css';
 
 const beVietnamPro = Be_Vietnam_Pro({
@@ -128,6 +129,7 @@ export default function RootLayout({
             `}</Script>
           </>
         ) : null}
+        <AuthCodeHandler />
         {children}
       </body>
     </html>

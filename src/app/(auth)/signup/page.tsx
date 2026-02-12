@@ -23,6 +23,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import { useI18n } from '@/contexts/i18n-context';
 
 import { BorderBeam } from '@/components/ui/border-beam';
+import Image from 'next/image';
 
 // Component that handles redirect logic with useSearchParams
 function SignupRedirect() {
@@ -121,7 +122,8 @@ export default function SignupPage() {
         <Card className="relative w-full max-w-md overflow-hidden border-white/10 bg-background/80 shadow-2xl backdrop-blur">
           <BorderBeam size={250} duration={12} delay={0} />
         <CardHeader className="space-y-2 text-center">
-          <CardTitle className="text-2xl font-semibold">
+          <CardTitle className="text-2xl font-semibold flex flex-col items-center gap-2">
+            <Image src="/images/logo.svg" alt={t('brand.title')} width={52} height={52} />
             {t('signup.title')}
           </CardTitle>
           <CardDescription className="text-sm text-muted-foreground">
