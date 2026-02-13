@@ -81,6 +81,7 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                                 : "bg-background/20 hover:bg-background/40 border-white/10 text-foreground"
                                         )}
                                         onClick={() => setAudioSettingsOpen(true)}
+                                        aria-label={t('timerComponents.enhancedTimer.soundSettings')}
                                     >
                                         {hasActiveAudio ? (
                                             <div className="flex items-center justify-center relative w-full h-full">
@@ -168,6 +169,7 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                         size="icon"
                                         className="h-10 w-10 rounded-full bg-background/20 backdrop-blur-sm hover:bg-background/40 border border-white/10 text-foreground"
                                         onClick={() => setBackgroundSettingsOpen(true)}
+                                        aria-label={t('timerComponents.enhancedTimer.backgroundSettings')}
                                     >
                                         <Wallpaper className="h-5 w-5" />
                                     </Button>
@@ -185,6 +187,7 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                         size="icon"
                                         className="h-10 w-10 rounded-full bg-background/20 backdrop-blur-sm hover:bg-background/40 border border-white/10 text-foreground"
                                         onClick={() => setTimerSettingsOpen(true)}
+                                        aria-label={t('timerComponents.enhancedTimer.timerSettings')}
                                     >
                                         <Clock className="h-5 w-5" />
                                     </Button>
@@ -204,6 +207,7 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                 size="icon"
                                 className="h-10 w-10 rounded-full bg-background/20 backdrop-blur-sm hover:bg-background/40 border border-white/10 text-foreground"
                                 onClick={toggleFullscreen}
+                                aria-label={isFullscreen ? t('timerComponents.enhancedTimer.exitFocus') : t('timerComponents.enhancedTimer.enterFocus')}
                             >
                                 {isFullscreen ? (
                                     <Minimize2 className="h-5 w-5" />
