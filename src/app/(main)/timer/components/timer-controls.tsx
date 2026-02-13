@@ -252,11 +252,12 @@ export const TimerControls = memo(function TimerControls() {
                     disabled={isProcessing}
                     variant="ghost"
                     size="icon"
+                    aria-label={t('timer.controls.skip_hint')}
                     title={t('timer.controls.skip_hint')}
                     className="h-10 w-10 rounded-full opacity-70 hover:opacity-100 transition-all"
                     style={{ color: clockState.color }}
                 >
-                    <SkipForwardIcon size={16} />
+                    <SkipForwardIcon size={16} aria-hidden="true" />
                 </Button>
             </div>
 
