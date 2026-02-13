@@ -29,7 +29,10 @@ function convertMessages(messages: any[]) {
 
 // Generate a conversation title using MegaLLM API
 async function generateTitle(userMessage: string): Promise<string> {
-	const fallbackTitle = userMessage.trim().substring(0, 50) || "New Chat";
+	// Truncate user message to prevent token exhaustion and DoS
+	const truncatedMessage = userMessage.slice(0, 500);
+	const fallbackTitle = truncatedMessage.trim().substring(0, 50) || "New Chat";
+
 	try {
 		const response = await fetch("https://ai.megallm.io/v1/chat/completions", {
 			method: "POST",
@@ -41,8 +44,13 @@ async function generateTitle(userMessage: string): Promise<string> {
 				model: DEFAULT_CHAT_AI_MODEL,
 				messages: [
 					{
+						role: "system",
+						content:
+							"Generate a short, concise title (max 10 words) for a new chatbot conversation in a Pomodoro app with a playful & friendly vibe, with the same language as user language. Return ONLY the title, no quotes, no punctuation at the end.",
+					},
+					{
 						role: "user",
-						content: `Generate a short, concise title (max 10 words) for a new chatbot conversation in a Pomodoro app with a playful & friendly vibe, with the same language as user language. Return ONLY the title, no quotes, no punctuation at the end. User's first message: "${userMessage}"`,
+						content: truncatedMessage,
 					},
 				],
 				max_tokens: 20,
@@ -75,6 +83,11 @@ export async function POST(req: Request) {
 	}
 
 	let { messages, model = DEFAULT_CHAT_AI_MODEL, conversationId } = await req.json();
+
+	// Security: Validate model to prevent unauthorized model usage or injection
+	if (model !== DEFAULT_CHAT_AI_MODEL) {
+		return new Response("Invalid model parameter", { status: 400 });
+	}
 
 	if (!Array.isArray(messages)) {
 		return new Response("Invalid messages format", { status: 400 });
