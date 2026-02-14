@@ -200,7 +200,7 @@ export function TaskTable({
                                     </TableCell>
                                     <TableCell className="py-1 text-right">
                                         <div className="flex items-center justify-end gap-1">
-                                            <span className="text-[10px]">🍅</span>
+                                            <span className="text-[10px]" role="img" aria-label={t('tasks.estimated')}>🍅</span>
                                             <span className="text-[11px] font-bold text-foreground">
                                                 {task.actualPomodoros}/{task.estimatePomodoros}
                                             </span>
