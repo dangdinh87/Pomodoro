@@ -199,9 +199,12 @@ export function TaskTable({
                                         </div>
                                     </TableCell>
                                     <TableCell className="py-1 text-right">
-                                        <div className="flex items-center justify-end gap-1">
-                                            <span className="text-[10px]">🍅</span>
-                                            <span className="text-[11px] font-bold text-foreground">
+                                        <div
+                                            className="flex items-center justify-end gap-1"
+                                            aria-label={`${t('tasks.fields.progress')}: ${task.actualPomodoros} / ${task.estimatePomodoros}`}
+                                        >
+                                            <span className="text-[10px]" aria-hidden="true">🍅</span>
+                                            <span className="text-[11px] font-bold text-foreground" aria-hidden="true">
                                                 {task.actualPomodoros}/{task.estimatePomodoros}
                                             </span>
                                         </div>
