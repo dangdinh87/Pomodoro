@@ -44,7 +44,14 @@ function TaskProgress({ actual, estimated, t }: { actual: number; estimated: num
 
   return (
     <div className="flex items-center gap-2 text-xs">
-      <div className="w-20 h-1.5 bg-muted/50 rounded-full overflow-hidden shrink-0">
+      <div
+        className="w-20 h-1.5 bg-muted/50 rounded-full overflow-hidden shrink-0"
+        role="progressbar"
+        aria-valuenow={percentage}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={t('tasks.fields.progress')}
+      >
         <div
           className="h-full bg-primary/80 transition-all duration-500 rounded-full"
           style={{ width: `${percentage}%` }}
