@@ -43,14 +43,22 @@ function TaskProgress({ actual, estimated, t }: { actual: number; estimated: num
   const percentage = Math.min(100, Math.round((actual / estimated) * 100))
 
   return (
-    <div className="flex items-center gap-2 text-xs">
-      <div className="w-20 h-1.5 bg-muted/50 rounded-full overflow-hidden shrink-0">
+    <div
+      className="flex items-center gap-2 text-xs"
+      role="progressbar"
+      aria-label={t('tasks.fields.progress')}
+      aria-valuenow={percentage}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuetext={`${actual} / ${estimated}`}
+    >
+      <div className="w-20 h-1.5 bg-muted/50 rounded-full overflow-hidden shrink-0" aria-hidden="true">
         <div
           className="h-full bg-primary/80 transition-all duration-500 rounded-full"
           style={{ width: `${percentage}%` }}
         />
       </div>
-      <span className="text-muted-foreground/60 tabular-nums text-[11px] font-medium">
+      <span className="text-muted-foreground/60 tabular-nums text-[11px] font-medium" aria-hidden="true">
         {actual}/{estimated}
       </span>
     </div>
