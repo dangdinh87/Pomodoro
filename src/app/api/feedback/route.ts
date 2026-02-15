@@ -1,8 +1,19 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase-server';
+import { rateLimiter } from '@/lib/rate-limit';
 
 export async function POST(req: Request) {
     try {
+        const ip = (req.headers.get('x-forwarded-for') ?? 'unknown').split(',')[0].trim();
+        const isAllowed = rateLimiter.check(ip, 5, 60 * 60 * 1000); // 5 requests per hour
+
+        if (!isAllowed) {
+            return NextResponse.json(
+                { error: 'Too many requests. Please try again later.' },
+                { status: 429 }
+            );
+        }
+
         const supabase = await createClient();
         const body = await req.json();
         const { name, email, type, message, rating } = body;
