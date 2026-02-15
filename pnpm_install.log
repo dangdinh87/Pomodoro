@@ -1,0 +1,39 @@
+Lockfile is up to date, resolution step is skipped
+Packages: +1019
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+   ╭──────────────────────────────────────────╮
+   │                                          │
+   │   Update available! 10.28.0 → 10.29.3.   │
+   │   Changelog: https://pnpm.io/v/10.29.3   │
+   │     To update, run: pnpm add -g pnpm     │
+   │                                          │
+   ╰──────────────────────────────────────────╯
+
+Progress: resolved 0, reused 0, downloaded 1, added 0
+Progress: resolved 0, reused 0, downloaded 40, added 17
+Progress: resolved 0, reused 0, downloaded 51, added 21
+Progress: resolved 0, reused 0, downloaded 56, added 24
+Progress: resolved 0, reused 0, downloaded 57, added 24
+Progress: resolved 0, reused 0, downloaded 89, added 36
+Progress: resolved 0, reused 0, downloaded 140, added 83
+Progress: resolved 0, reused 0, downloaded 181, added 110
+Progress: resolved 0, reused 0, downloaded 214, added 122
+Progress: resolved 0, reused 0, downloaded 269, added 149
+Progress: resolved 0, reused 0, downloaded 300, added 158
+Progress: resolved 0, reused 0, downloaded 357, added 197
+Progress: resolved 0, reused 0, downloaded 521, added 379
+Progress: resolved 0, reused 0, downloaded 797, added 819
+Progress: resolved 0, reused 0, downloaded 991, added 1019
+Progress: resolved 0, reused 0, downloaded 991, added 1019, done
+node_modules/sharp install$ node install/check.js || npm run build
+node_modules/sharp install: Done
+
+╭ Warning ─────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│   Ignored build scripts: @tsparticles/engine@3.9.1.                          │
+│   Run "pnpm approve-builds" to pick which dependencies should be allowed     │
+│   to run scripts.                                                            │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+Done in 17.6s using pnpm v10.28.0
