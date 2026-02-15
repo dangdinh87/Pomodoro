@@ -165,12 +165,12 @@ export function TaskKanbanBoard({
             <TaskItem
               task={activeTask}
               isActive={activeTaskId === activeTask.id}
+              isToggling={togglingTaskIds?.has(activeTask.id)}
               onToggleStatus={onToggleStatus}
               onEdit={onEdit}
               onDelete={onDelete}
               onClone={onClone}
               onSaveAsTemplate={onSaveAsTemplate}
-              togglingTaskIds={togglingTaskIds}
             />
           </div>
         ) : null}

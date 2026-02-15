@@ -25,12 +25,12 @@ import { MoreHorizontal } from 'lucide-react'
 interface TaskItemProps {
   task: Task
   isActive: boolean
+  isToggling?: boolean
   onToggleStatus: (task: Task) => void
   onEdit: (task: Task) => void
   onDelete: (id: string) => void
   onClone?: (id: string) => void
   onSaveAsTemplate?: (id: string) => void
-  togglingTaskIds?: Set<string>
 }
 
 function formatMinutes(ms?: number): string {
@@ -69,12 +69,12 @@ function getDueDateInfo(dueDate: string | null | undefined) {
 export function TaskItem({
   task,
   isActive,
+  isToggling,
   onToggleStatus,
   onEdit,
   onDelete,
   onClone,
   onSaveAsTemplate,
-  togglingTaskIds,
 }: TaskItemProps) {
   const { t } = useI18n()
   const isDone = task.status === 'done'
@@ -109,12 +109,12 @@ export function TaskItem({
                 onCheckedChange={() => onToggleStatus(task)}
                 className={cn(
                   "h-5 w-5 rounded-full transition-all hover:scale-110 active:scale-90 data-[state=checked]:bg-primary data-[state=checked]:border-primary",
-                  togglingTaskIds?.has(task.id) && "opacity-50"
+                  isToggling && "opacity-50"
                 )}
-                disabled={togglingTaskIds?.has(task.id)}
+                disabled={isToggling}
                 aria-label={`${isDone ? t('tasks.actions.markIncomplete') : t('tasks.actions.markComplete')} - ${task.title}`}
               />
-              {togglingTaskIds?.has(task.id) && (
+              {isToggling && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <Loader2 className={cn(
                     "h-3 w-3 animate-spin",

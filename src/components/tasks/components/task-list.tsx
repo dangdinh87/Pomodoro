@@ -115,8 +115,8 @@ export function TaskList({
                   task={task}
                   isActive={activeTaskId === task.id}
                   isDragging={dndProps.activeId === task.id}
+                  isToggling={false}
                   onToggleStatus={onToggleStatus}
-                  onToggleActive={onToggleActive}
                   onEdit={onEdit}
                   onDelete={onDelete}
                   onClone={onClone}
@@ -134,8 +134,8 @@ export function TaskList({
             <TaskItem
               task={activeTask}
               isActive={activeTaskId === activeTask.id}
+              isToggling={false}
               onToggleStatus={onToggleStatus}
-              onToggleActive={onToggleActive}
               onEdit={onEdit}
               onDelete={onDelete}
               onClone={onClone}

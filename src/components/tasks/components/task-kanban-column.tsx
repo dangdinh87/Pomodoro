@@ -91,6 +91,7 @@ export function TaskKanbanColumn({
                   task={task}
                   isActive={activeTaskId === task.id}
                   isDragging={draggingTaskId === task.id}
+                  isToggling={togglingTaskIds?.has(task.id)}
                   onToggleStatus={onToggleStatus}
                   onEdit={onEdit}
                   onDelete={onDelete}

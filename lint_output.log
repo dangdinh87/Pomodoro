@@ -1,0 +1,68 @@
+
+> pomodoro-focus-app@0.1.0 lint /app
+> next lint
+
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+
+./src/app/(main)/timer/hooks/use-timer-engine.ts
+263:6  Warning: React Hook useEffect has a missing dependency: 'handleLoopComplete'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/components/animate-ui/icons/icon.tsx
+123:1  Error: Definition for rule '@typescript-eslint/no-explicit-any' was not found.  @typescript-eslint/no-explicit-any
+
+./src/components/animate-ui/primitives/animate/slot.tsx
+19:3  Error: Definition for rule '@typescript-eslint/no-explicit-any' was not found.  @typescript-eslint/no-explicit-any
+
+./src/components/animate-ui/primitives/effects/highlight.tsx
+46:3  Error: Definition for rule '@typescript-eslint/no-explicit-any' was not found.  @typescript-eslint/no-explicit-any
+
+./src/components/audio/youtube/youtube-pane.tsx
+344:31  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/entertainment/brick-breaker-game.tsx
+353:6  Warning: React Hook useEffect has a missing dependency: 'lives'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/components/entertainment/space-shooter-game.tsx
+285:6  Warning: React Hook useCallback has a missing dependency: 'Star'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+324:6  Warning: React Hook useCallback has a missing dependency: 'Enemy'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+418:6  Warning: React Hook useCallback has a missing dependency: 'Particle'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+425:6  Warning: React Hook useCallback has a missing dependency: 'Projectile'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+452:6  Warning: React Hook useCallback has a missing dependency: 'Player'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/components/entertainment/wordle-game.tsx
+136:6  Warning: React Hook useCallback has an unnecessary dependency: 'targetWord'. Either exclude it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/components/focus/focus-mode.tsx
+232:19  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+232:34  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+
+./src/components/settings/background-settings.tsx
+692:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/ui/animated-tabs.tsx
+36:8  Warning: React Hook React.useEffect has a missing dependency: 'currentValue'. Either include it or remove the dependency array. You can also replace multiple useState variables with useReducer if 'setPreviousValue' needs the current value of 'currentValue'.  react-hooks/exhaustive-deps
+
+./src/components/ui/animated-testimonials.tsx
+40:6  Warning: React Hook useEffect has a missing dependency: 'handleNext'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+82:19  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/ui/text-generate-effect.tsx
+31:6  Warning: React Hook useEffect has missing dependencies: 'animate', 'duration', and 'filter'. Either include them or remove the dependency array. Mutable values like 'scope.current' aren't valid dependencies because mutating them doesn't re-render the component.  react-hooks/exhaustive-deps
+
+./src/contexts/i18n-context.tsx
+113:5  Warning: React Hook useMemo has a missing dependency: 'dict'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/hooks/use-custom-backgrounds.ts
+108:9  Warning: React Hook useCallback has an unnecessary dependency: 'images'. Either exclude it or remove the dependency array.  react-hooks/exhaustive-deps
+144:9  Warning: React Hook useCallback has an unnecessary dependency: 'images'. Either exclude it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/hooks/use-youtube-player.ts
+343:6  Warning: React Hook useCallback has a missing dependency: 'clearCurrentlyPlaying'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+386:6  Warning: React Hook useCallback has an unnecessary dependency: 'updatePlayingStatus'. Either exclude it or remove the dependency array.  react-hooks/exhaustive-deps
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+ ELIFECYCLE  Command failed with exit code 1.
