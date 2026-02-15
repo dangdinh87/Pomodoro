@@ -250,6 +250,7 @@ export const TimerControls = memo(function TimerControls() {
                 <Button
                     onClick={handleSkipClick}
                     disabled={isProcessing}
+                    aria-label={t('timer.controls.skip_hint')}
                     variant="ghost"
                     size="icon"
                     title={t('timer.controls.skip_hint')}
