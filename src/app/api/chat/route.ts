@@ -1,4 +1,5 @@
 import { createUIMessageStream, createUIMessageStreamResponse } from "ai";
+import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
 import { BRO_AI_SYSTEM_PROMPT } from "@/lib/prompts/bro-ai-system";
 import { DEFAULT_CHAT_AI_MODEL } from "@/config/constants";
@@ -29,7 +30,9 @@ function convertMessages(messages: any[]) {
 
 // Generate a conversation title using MegaLLM API
 async function generateTitle(userMessage: string): Promise<string> {
-	const fallbackTitle = userMessage.trim().substring(0, 50) || "New Chat";
+	// Limit input length for title generation to prevent token exhaustion
+	const truncatedMessage = userMessage.slice(0, 500);
+	const fallbackTitle = truncatedMessage.trim().substring(0, 50) || "New Chat";
 	try {
 		const response = await fetch("https://ai.megallm.io/v1/chat/completions", {
 			method: "POST",
@@ -41,8 +44,12 @@ async function generateTitle(userMessage: string): Promise<string> {
 				model: DEFAULT_CHAT_AI_MODEL,
 				messages: [
 					{
+						role: "system",
+						content: `Generate a short, concise title (max 10 words) for a new chatbot conversation in a Pomodoro app with a playful & friendly vibe, with the same language as user language. Return ONLY the title, no quotes, no punctuation at the end.`,
+					},
+					{
 						role: "user",
-						content: `Generate a short, concise title (max 10 words) for a new chatbot conversation in a Pomodoro app with a playful & friendly vibe, with the same language as user language. Return ONLY the title, no quotes, no punctuation at the end. User's first message: "${userMessage}"`,
+						content: truncatedMessage,
 					},
 				],
 				max_tokens: 20,
@@ -78,6 +85,15 @@ export async function POST(req: Request) {
 
 	if (!Array.isArray(messages)) {
 		return new Response("Invalid messages format", { status: 400 });
+	}
+
+	// Input Validation
+	if (messages.length > 50) {
+		return NextResponse.json({ error: "Too many messages" }, { status: 400 });
+	}
+
+	if (typeof model !== "string" || model.length > 100 || !/^[a-zA-Z0-9-./:]+$/.test(model)) {
+		return NextResponse.json({ error: "Invalid model name" }, { status: 400 });
 	}
 
 	console.log("[Chat API] Received:", {

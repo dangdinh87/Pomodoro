@@ -60,4 +60,74 @@ describe('Chat API Route Security', () => {
     const res = await POST(req);
     expect(res.status).toBe(400);
   });
+
+  it('should return 400 if model name is too long', async () => {
+    (createClient as jest.Mock).mockResolvedValue({
+      auth: {
+        getUser: jest.fn().mockResolvedValue({
+          data: { user: { id: 'test-user' } },
+          error: null,
+        }),
+      },
+    });
+
+    const req = new Request('http://localhost:3000/api/chat', {
+      method: 'POST',
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: 'hello' }],
+        model: 'a'.repeat(101),
+      }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toBe('Invalid model name');
+  });
+
+  it('should return 400 if model name contains invalid characters', async () => {
+    (createClient as jest.Mock).mockResolvedValue({
+      auth: {
+        getUser: jest.fn().mockResolvedValue({
+          data: { user: { id: 'test-user' } },
+          error: null,
+        }),
+      },
+    });
+
+    const req = new Request('http://localhost:3000/api/chat', {
+      method: 'POST',
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: 'hello' }],
+        model: 'model; rm -rf /',
+      }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toBe('Invalid model name');
+  });
+
+  it('should return 400 if messages array is too long', async () => {
+    (createClient as jest.Mock).mockResolvedValue({
+      auth: {
+        getUser: jest.fn().mockResolvedValue({
+          data: { user: { id: 'test-user' } },
+          error: null,
+        }),
+      },
+    });
+
+    const messages = Array(51).fill({ role: 'user', content: 'hello' });
+    const req = new Request('http://localhost:3000/api/chat', {
+      method: 'POST',
+      body: JSON.stringify({ messages }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toBe('Too many messages');
+  });
 });
