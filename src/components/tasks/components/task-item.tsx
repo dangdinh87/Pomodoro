@@ -2,6 +2,7 @@ import { Task } from '@/stores/task-store'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Progress } from '@/components/ui/progress'
 import { cn } from '@/lib/utils'
 import { AnimatedTrash, AnimatedEdit, AnimatedTarget, AnimatedSquare } from '@/components/ui/animated-icons'
 import { BorderBeam } from '@/components/ui/border-beam'
@@ -44,11 +45,8 @@ function TaskProgress({ actual, estimated, t }: { actual: number; estimated: num
 
   return (
     <div className="flex items-center gap-2 text-xs">
-      <div className="w-20 h-1.5 bg-muted/50 rounded-full overflow-hidden shrink-0">
-        <div
-          className="h-full bg-primary/80 transition-all duration-500 rounded-full"
-          style={{ width: `${percentage}%` }}
-        />
+      <div className="w-20 shrink-0">
+        <Progress value={percentage} className="h-1.5" aria-label={t('tasks.fields.progress')} />
       </div>
       <span className="text-muted-foreground/60 tabular-nums text-[11px] font-medium">
         {actual}/{estimated}
