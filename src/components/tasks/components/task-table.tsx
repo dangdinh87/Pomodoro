@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { AnimatedEdit, AnimatedTrash, AnimatedTarget } from '@/components/ui/animated-icons'
-import { Copy, Bookmark, Loader2, MoreHorizontal } from 'lucide-react'
+import { Copy, Bookmark, Loader2, MoreHorizontal, Plus } from 'lucide-react'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/tooltip'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useMemo } from 'react'
+import { EmptyState } from '@/components/ui/empty-state'
 
 interface TaskTableProps {
     tasks: Task[]
@@ -44,6 +45,7 @@ interface TaskTableProps {
     onDelete: (id: string) => void
     onClone?: (id: string) => void
     onSaveAsTemplate?: (id: string) => void
+    onCreate?: () => void
     togglingTaskIds?: Set<string>
 }
 
@@ -68,6 +70,7 @@ export function TaskTable({
     onDelete,
     onClone,
     onSaveAsTemplate,
+    onCreate,
     togglingTaskIds,
 }: TaskTableProps) {
     const { t } = useI18n()
@@ -240,37 +243,44 @@ export function TaskTable({
                                                         {t('tasks.actions.edit')}
                                                     </TooltipContent>
                                                 </Tooltip>
-                                            </TooltipProvider>
 
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
-                                                        aria-label={`${t('common.actions')} - ${task.title}`}
-                                                    >
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-40 text-xs shadow-xl ring-1 ring-black/5">
-                                                    <DropdownMenuItem onClick={() => onClone?.(task.id)} className="cursor-pointer">
-                                                        <Copy className="mr-2 h-3.5 w-3.5" />
-                                                        {t('tasks.actions.clone')}
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => onSaveAsTemplate?.(task.id)} className="cursor-pointer">
-                                                        <Bookmark className="mr-2 h-3.5 w-3.5" />
-                                                        {t('tasks.actions.saveAsTemplate')}
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem
-                                                        className="text-destructive focus:text-destructive cursor-pointer"
-                                                        onClick={() => onDelete(task.id)}
-                                                    >
-                                                        <AnimatedTrash className="mr-2 h-3.5 w-3.5" />
-                                                        {t('tasks.actions.deletePermanent')}
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                                <DropdownMenu>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                                                                    aria-label={`${t('common.actions')} - ${task.title}`}
+                                                                >
+                                                                    <MoreHorizontal className="h-4 w-4" />
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent side="top" className="text-[10px] py-1 px-2 text-center">
+                                                            {t('common.actions')}
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                    <DropdownMenuContent align="end" className="w-40 text-xs shadow-xl ring-1 ring-black/5">
+                                                        <DropdownMenuItem onClick={() => onClone?.(task.id)} className="cursor-pointer">
+                                                            <Copy className="mr-2 h-3.5 w-3.5" />
+                                                            {t('tasks.actions.clone')}
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => onSaveAsTemplate?.(task.id)} className="cursor-pointer">
+                                                            <Bookmark className="mr-2 h-3.5 w-3.5" />
+                                                            {t('tasks.actions.saveAsTemplate')}
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem
+                                                            className="text-destructive focus:text-destructive cursor-pointer"
+                                                            onClick={() => onDelete(task.id)}
+                                                        >
+                                                            <AnimatedTrash className="mr-2 h-3.5 w-3.5" />
+                                                            {t('tasks.actions.deletePermanent')}
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </TooltipProvider>
                                         </div>
                                     </TableCell>
                                 </TableRow>
@@ -279,9 +289,17 @@ export function TaskTable({
                     </TableBody>
                 </Table>
                 {tasks.length === 0 && (
-                    <div className="text-center py-20 text-muted-foreground bg-muted/5 border-t border-border">
-                        {t('tasks.noTasks')}
-                    </div>
+                    <EmptyState
+                        title={t('tasks.noTasks')}
+                        description={t('tasks.noTasksDescription')}
+                        action={onCreate && (
+                            <Button onClick={onCreate} className="mt-4">
+                                <Plus className="mr-2 h-4 w-4" />
+                                {t('tasks.addTask')}
+                            </Button>
+                        )}
+                        className="py-10"
+                    />
                 )}
             </div>
             <div className="flex items-center justify-between px-4 py-1.5 bg-background border-t border-border mt-auto h-10">

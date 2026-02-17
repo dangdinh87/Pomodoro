@@ -210,16 +210,23 @@ export function TaskItem({
         )}>
 
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 rounded-sm hover:bg-muted"
-                aria-label={`${t('common.actions')} - ${task.title}`}
-              >
-                <MoreHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
-              </Button>
-            </DropdownMenuTrigger>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 rounded-sm hover:bg-muted"
+                    aria-label={`${t('common.actions')} - ${task.title}`}
+                  >
+                    <MoreHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Button>
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="text-[10px] py-1 px-2 text-center">
+                {t('common.actions')}
+              </TooltipContent>
+            </Tooltip>
             <DropdownMenuContent align="end" className="w-40">
               <DropdownMenuItem onClick={() => onEdit(task)} className="text-xs gap-2 cursor-pointer">
                 <AnimatedEdit className="h-3.5 w-3.5 text-muted-foreground" />
