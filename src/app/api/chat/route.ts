@@ -1,29 +1,36 @@
 import { createUIMessageStream, createUIMessageStreamResponse } from "ai";
 import { createClient } from "@/lib/supabase-server";
 import { BRO_AI_SYSTEM_PROMPT } from "@/lib/prompts/bro-ai-system";
-import { DEFAULT_CHAT_AI_MODEL } from "@/config/constants";
+import { DEFAULT_CHAT_AI_MODEL, ALLOWED_CHAT_MODELS, MAX_CHAT_MESSAGE_LENGTH } from "@/config/constants";
 
 export const maxDuration = 60;
 
 // Convert assistant-ui message format to OpenAI format
 function convertMessages(messages: any[]) {
 	return messages.map((msg) => {
+		let content = "";
 		// If already has content string, return as-is
 		if (typeof msg.content === "string") {
-			return { role: msg.role, content: msg.content };
+			content = msg.content;
 		}
-
 		// If has parts array (assistant-ui format), extract text
-		if (Array.isArray(msg.parts)) {
-			const textParts = msg.parts
+		else if (Array.isArray(msg.parts)) {
+			content = msg.parts
 				.filter((p: any) => p.type === "text")
 				.map((p: any) => p.text)
 				.join("\n");
-			return { role: msg.role, content: textParts };
+		}
+		// Fallback
+		else {
+			content = msg.content || "";
 		}
 
-		// Fallback
-		return { role: msg.role, content: msg.content || "" };
+		// Truncate user messages to prevent token exhaustion/DoS
+		if (msg.role === "user" && content.length > MAX_CHAT_MESSAGE_LENGTH) {
+			content = content.substring(0, MAX_CHAT_MESSAGE_LENGTH);
+		}
+
+		return { role: msg.role, content };
 	});
 }
 
@@ -76,6 +83,11 @@ export async function POST(req: Request) {
 
 	let { messages, model = DEFAULT_CHAT_AI_MODEL, conversationId } = await req.json();
 
+	// Validate model against whitelist to prevent unauthorized model usage
+	if (!ALLOWED_CHAT_MODELS.includes(model)) {
+		model = DEFAULT_CHAT_AI_MODEL;
+	}
+
 	if (!Array.isArray(messages)) {
 		return new Response("Invalid messages format", { status: 400 });
 	}
@@ -107,7 +119,7 @@ export async function POST(req: Request) {
 		}
 
 		// Generate title using MegaLLM API
-		conversationTitle = await generateTitle(titleContent);
+		conversationTitle = await generateTitle(titleContent.substring(0, MAX_CHAT_MESSAGE_LENGTH));
 
 		const { data: newConv, error: createError } = await supabase
 			.from("conversations")
