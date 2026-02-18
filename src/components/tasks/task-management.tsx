@@ -437,6 +437,7 @@ export function TaskManagement() {
             onReorder={reorderTasks}
             onUpdateStatus={handleUpdateStatus}
             onSaveAsTemplate={handleSaveAsTemplate}
+            onCreate={() => setIsCreateModalOpen(true)}
             togglingTaskIds={togglingTaskIds}
           />
         ) : (
@@ -452,6 +453,7 @@ export function TaskManagement() {
             onDelete={handleDeleteRequest}
             onClone={handleClone}
             onSaveAsTemplate={handleSaveAsTemplate}
+            onCreate={() => setIsCreateModalOpen(true)}
             togglingTaskIds={togglingTaskIds}
           />
         )}

@@ -15,6 +15,10 @@ import { TaskKanbanColumn } from './task-kanban-column'
 import { TaskItem } from './task-item'
 import { useTaskDnd } from '@/hooks/use-task-dnd'
 import { Skeleton } from '@/components/ui/skeleton'
+import { EmptyState } from '@/components/ui/empty-state'
+import { Button } from '@/components/ui/button'
+import { Plus } from 'lucide-react'
+import { useI18n } from '@/contexts/i18n-context'
 
 interface TaskKanbanBoardProps {
   tasks: Task[]
@@ -27,6 +31,7 @@ interface TaskKanbanBoardProps {
   onReorder?: (taskOrders: { id: string; displayOrder: number }[]) => Promise<void>
   onUpdateStatus?: (taskId: string, newStatus: TaskStatus) => Promise<void>
   onSaveAsTemplate?: (id: string) => void
+  onCreate?: () => void
   togglingTaskIds?: Set<string>
 }
 
@@ -71,8 +76,10 @@ export function TaskKanbanBoard({
   onReorder,
   onUpdateStatus,
   onSaveAsTemplate,
+  onCreate,
   togglingTaskIds,
 }: TaskKanbanBoardProps) {
+  const { t } = useI18n()
   const dndProps = useTaskDnd({
     tasks,
     onReorder: onReorder || (async () => { }),
@@ -112,6 +119,22 @@ export function TaskKanbanBoard({
   }
 
   const activeTask = tasks.find((task) => task.id === dndProps.activeId)
+
+  if (!isLoading && tasks.length === 0) {
+    return (
+      <EmptyState
+        title={t('tasks.noTasks')}
+        description={t('tasks.noTasksDescription')}
+        action={onCreate && (
+          <Button onClick={onCreate} className="gap-2">
+            <Plus className="h-4 w-4" />
+            {t('tasks.addTask')}
+          </Button>
+        )}
+        className="min-h-[400px] bg-muted/5 rounded-xl border-2 border-dashed border-muted"
+      />
+    )
+  }
 
   return (
     <DndContext
