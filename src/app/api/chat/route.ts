@@ -1,7 +1,7 @@
 import { createUIMessageStream, createUIMessageStreamResponse } from "ai";
 import { createClient } from "@/lib/supabase-server";
 import { BRO_AI_SYSTEM_PROMPT } from "@/lib/prompts/bro-ai-system";
-import { DEFAULT_CHAT_AI_MODEL } from "@/config/constants";
+import { DEFAULT_CHAT_AI_MODEL, ALLOWED_CHAT_MODELS } from "@/config/constants";
 
 export const maxDuration = 60;
 
@@ -75,6 +75,12 @@ export async function POST(req: Request) {
 	}
 
 	let { messages, model = DEFAULT_CHAT_AI_MODEL, conversationId } = await req.json();
+
+	// Validate model against whitelist
+	if (!ALLOWED_CHAT_MODELS.includes(model)) {
+		console.warn(`[Chat API] Invalid model requested: ${model}. Defaulting to ${DEFAULT_CHAT_AI_MODEL}`);
+		model = DEFAULT_CHAT_AI_MODEL;
+	}
 
 	if (!Array.isArray(messages)) {
 		return new Response("Invalid messages format", { status: 400 });
