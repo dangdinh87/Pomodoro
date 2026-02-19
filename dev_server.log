@@ -1,0 +1,43 @@
+
+> pomodoro-focus-app@0.1.0 dev /app
+> next dev
+
+ ⚠ Port 3000 is in use, trying 3001 instead.
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3001
+  - Environments:  ○ Compiling /src/middleware ...
+ ✓ Compiled / ○ Compiling /src/middleware ...
+ ✓ Compiled /src/middleware in 1787ms (201 modules)
+ ○ Compiling /tasks ...
+
+warn - The class `duration-[3000ms]` is ambiguous and matches multiple utilities.
+warn - If this is content and not a class, replace it with `duration-&lsqb;3000ms&rsqb;` to silence this warning.
+ ✓ Compiled /tasks in 38s (6628 modules)
+ GET /tasks 200 in 40385ms
+ ✓ Compiled in 3.3s (3414 modules)
+ GET /tasks 200 in 257ms
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (126kiB) impacts deserializ ✓ Compiled in 2.6s (3414 modules)
+ ✓ Compiled in 2.6s (3414 modules)
+ ✓ Compiled in 1238ms (3414 modules)
+ ✓ Compiled in 2.5s (3414 modules)
+ ✓ Compiled in 4.1s (3414 modules)
+ ✓ Compiled in 1216ms (3414 modules)
+s 401 in 1805ms
+ GET /api/tags 401 in 1806ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/app/.next/cache/webpack/client-development/1.pack.gz_' -> '/app/.next/cache/webpack/client-development/1.pack.gz'
+ GET /tasks 200 in 782ms
+ GET /api/tags 401 in 41ms
+ GET /api/tags 401 in 40ms
+ GET /tasks 200 in 145ms
+ GET /api/tags 401 in 42ms
+ GET /api/tags 401 in 41ms
+ ✓ Compiled in 5.3s (6707 modules)
+ ✓ Compiled in 1643ms (6707 modules)
+ GET /tasks 200 in 1052ms
+ ○ Compiling /api/conversations ...
+ GET /api/tags 200 in 693ms
+ GET /api/tags 200 in 690ms
+ ✓ Compiled /api/conversations in 700ms (3296 modules)
+ ✓ Compiled in 3.6s (6710 modules)
+ ✓ Compiled in 7.1s (6710 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/app/.next/cache/webpack/client-development/0.pack.gz_' -> '/app/.next/cache/webpack/client-development/0.pack.gz'

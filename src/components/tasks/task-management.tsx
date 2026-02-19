@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { useAuth } from '@/hooks/use-auth'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useCallback } from 'react'
 import { Task, useTasksStore, TaskStatus } from '@/stores/task-store'
 import { TaskFilters } from './components/task-filters'
 import { TaskFormModal } from './components/task-form-modal'
@@ -94,7 +94,8 @@ export function TaskManagement() {
     }
   }
 
-  const handleToggleStatus = async (task: Task) => {
+  const handleToggleStatus = useCallback(async (task: Task) => {
+    const { activeTaskId, setActiveTask } = useTasksStore.getState()
     const isNowDone = task.status !== 'done'
     const newStatus: TaskStatus = isNowDone ? 'done' : 'todo'
 
@@ -135,9 +136,10 @@ export function TaskManagement() {
         return next
       })
     }
-  }
+  }, [updateTask, queryClient])
 
-  const handleUpdateStatus = async (taskId: string, newStatus: TaskStatus) => {
+  const handleUpdateStatus = useCallback(async (taskId: string, newStatus: TaskStatus) => {
+    const { activeTaskId, setActiveTask } = useTasksStore.getState()
     const isNowDone = newStatus === 'done'
 
     if (isNowDone && activeTaskId === taskId) {
@@ -174,9 +176,10 @@ export function TaskManagement() {
         return next
       })
     }
-  }
+  }, [updateTask, queryClient])
 
-  const handleToggleActive = (task: Task) => {
+  const handleToggleActive = useCallback((task: Task) => {
+    const { activeTaskId, setActiveTask } = useTasksStore.getState()
     const { timeLeft, setLastSessionTimeLeft } = useTimerStore.getState()
 
     if (activeTaskId === task.id) {
@@ -232,7 +235,7 @@ export function TaskManagement() {
         updateTask({ id: task.id, input: { status: 'doing' } })
       }
     }
-  }
+  }, [updateTask, queryClient])
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -243,9 +246,9 @@ export function TaskManagement() {
     }
   }
 
-  const handleDeleteRequest = (id: string) => {
+  const handleDeleteRequest = useCallback((id: string) => {
     setDeleteConfirmId(id)
-  }
+  }, [])
 
   const confirmDelete = async () => {
     if (!deleteConfirmId) return
@@ -268,25 +271,25 @@ export function TaskManagement() {
     }
   }
 
-  const handleEdit = (task: Task) => {
+  const handleEdit = useCallback((task: Task) => {
     setEditingId(task.id)
-  }
+  }, [setEditingId])
 
-  const handleClone = async (taskId: string) => {
+  const handleClone = useCallback(async (taskId: string) => {
     try {
       await cloneTask(taskId)
     } catch (error) {
       // Error handled by hook
     }
-  }
+  }, [cloneTask])
 
-  const handleSaveAsTemplate = async (taskId: string) => {
+  const handleSaveAsTemplate = useCallback(async (taskId: string) => {
     try {
       await saveAsTemplate(taskId)
     } catch (error) {
       // Error handled by hook
     }
-  }
+  }, [saveAsTemplate])
 
   const uniqueTags = useMemo(() => {
     const tags = new Set<string>()
