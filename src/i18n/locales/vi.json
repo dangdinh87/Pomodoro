@@ -995,6 +995,13 @@
     "backToList": "Quay lại danh sách",
     "closeGame": "Đóng game",
     "controls": "Điều khiển",
+    "gameControls": {
+      "up": "Di chuyển lên",
+      "down": "Di chuyển xuống",
+      "left": "Di chuyển trái",
+      "right": "Di chuyển phải",
+      "restart": "Chơi lại"
+    },
     "instructions": "Di chuyển chuột hoặc chạm tay để điều khiển phi thuyền. Bắn hạ kẻ thù và tránh va chạm!",
     "loading": "Đang tải game...",
     "highScore": "Điểm cao nhất",
