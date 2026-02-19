@@ -413,8 +413,9 @@ export const Game2048 = memo(function Game2048({
               size="icon"
               onClick={initGame}
               className="bg-gray-800/80 hover:bg-gray-700 text-white rounded-lg w-9 h-9"
+              aria-label={t('entertainment.gameControls.restart')}
             >
-              <RotateCcw className="h-4 w-4" />
+              <RotateCcw className="h-4 w-4" aria-hidden="true" />
             </Button>
           </div>
 
@@ -480,8 +481,9 @@ export const Game2048 = memo(function Game2048({
               size="icon"
               className="w-11 h-11 bg-white/10 hover:bg-white/20 text-white rounded-xl"
               onClick={() => move('up')}
+              aria-label={t('entertainment.gameControls.up')}
             >
-              <ArrowUp className="h-5 w-5" />
+              <ArrowUp className="h-5 w-5" aria-hidden="true" />
             </Button>
             <div className="flex gap-2">
               <Button
@@ -489,24 +491,27 @@ export const Game2048 = memo(function Game2048({
                 size="icon"
                 className="w-11 h-11 bg-white/10 hover:bg-white/20 text-white rounded-xl"
                 onClick={() => move('left')}
+                aria-label={t('entertainment.gameControls.left')}
               >
-                <ArrowLeft className="h-5 w-5" />
+                <ArrowLeft className="h-5 w-5" aria-hidden="true" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 className="w-11 h-11 bg-white/10 hover:bg-white/20 text-white rounded-xl"
                 onClick={() => move('down')}
+                aria-label={t('entertainment.gameControls.down')}
               >
-                <ArrowDown className="h-5 w-5" />
+                <ArrowDown className="h-5 w-5" aria-hidden="true" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 className="w-11 h-11 bg-white/10 hover:bg-white/20 text-white rounded-xl"
                 onClick={() => move('right')}
+                aria-label={t('entertainment.gameControls.right')}
               >
-                <ArrowRight className="h-5 w-5" />
+                <ArrowRight className="h-5 w-5" aria-hidden="true" />
               </Button>
             </div>
           </div>

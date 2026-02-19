@@ -996,6 +996,13 @@
     "backToList": "ゲーム一覧に戻る",
     "closeGame": "ゲームを閉じる",
     "controls": "操作方法",
+    "gameControls": {
+      "up": "上へ移動",
+      "down": "下へ移動",
+      "left": "左へ移動",
+      "right": "右へ移動",
+      "restart": "リスタート"
+    },
     "instructions": "マウスまたはタッチで宇宙船を操作。敵を撃ち落とし、衝突を避けよう！",
     "loading": "ゲームを読み込み中...",
     "highScore": "ハイスコア",

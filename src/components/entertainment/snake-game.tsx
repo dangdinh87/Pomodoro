@@ -471,8 +471,9 @@ export const SnakeGame = memo(function SnakeGame({
             size="icon"
             className="w-12 h-12 bg-white/10 hover:bg-white/20 text-white rounded-xl active:scale-95"
             onClick={() => handleDirectionButton('UP')}
+            aria-label={t('entertainment.gameControls.up')}
           >
-            <ArrowUp className="h-6 w-6" />
+            <ArrowUp className="h-6 w-6" aria-hidden="true" />
           </Button>
           <div className="flex gap-2">
             <Button
@@ -480,24 +481,27 @@ export const SnakeGame = memo(function SnakeGame({
               size="icon"
               className="w-12 h-12 bg-white/10 hover:bg-white/20 text-white rounded-xl active:scale-95"
               onClick={() => handleDirectionButton('LEFT')}
+              aria-label={t('entertainment.gameControls.left')}
             >
-              <ArrowLeft className="h-6 w-6" />
+              <ArrowLeft className="h-6 w-6" aria-hidden="true" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
               className="w-12 h-12 bg-white/10 hover:bg-white/20 text-white rounded-xl active:scale-95"
               onClick={() => handleDirectionButton('DOWN')}
+              aria-label={t('entertainment.gameControls.down')}
             >
-              <ArrowDown className="h-6 w-6" />
+              <ArrowDown className="h-6 w-6" aria-hidden="true" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
               className="w-12 h-12 bg-white/10 hover:bg-white/20 text-white rounded-xl active:scale-95"
               onClick={() => handleDirectionButton('RIGHT')}
+              aria-label={t('entertainment.gameControls.right')}
             >
-              <ArrowRight className="h-6 w-6" />
+              <ArrowRight className="h-6 w-6" aria-hidden="true" />
             </Button>
           </div>
         </div>
