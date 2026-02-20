@@ -81,6 +81,7 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                                 : "bg-background/20 hover:bg-background/40 border-white/10 text-foreground"
                                         )}
                                         onClick={() => setAudioSettingsOpen(true)}
+                                        aria-label={t('timerComponents.enhancedTimer.soundSettings')}
                                     >
                                         {hasActiveAudio ? (
                                             <div className="flex items-center justify-center relative w-full h-full">
@@ -113,16 +114,17 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                                                 repeat: Infinity,
                                                                 ease: "easeInOut",
                                                             } : undefined}
+                                                            aria-hidden="true"
                                                         >
                                                             <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
                                                         </motion.svg>
                                                     </>
                                                 ) : (
-                                                    <AudioLines size={20} animate={isAudioPlaying} className="text-background" />
+                                                    <AudioLines size={20} animate={isAudioPlaying} className="text-background" aria-hidden="true" />
                                                 )}
                                             </div>
                                         ) : (
-                                            <Music className="h-5 w-5" />
+                                            <Music className="h-5 w-5" aria-hidden="true" />
                                         )}
                                     </Button>
                                 </TooltipTrigger>
@@ -166,10 +168,11 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
+                                        aria-label={t('timerComponents.enhancedTimer.backgroundSettings')}
                                         className="h-10 w-10 rounded-full bg-background/20 backdrop-blur-sm hover:bg-background/40 border border-white/10 text-foreground"
                                         onClick={() => setBackgroundSettingsOpen(true)}
                                     >
-                                        <Wallpaper className="h-5 w-5" />
+                                        <Wallpaper className="h-5 w-5" aria-hidden="true" />
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -183,10 +186,11 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
+                                        aria-label={t('timerComponents.enhancedTimer.timerSettings')}
                                         className="h-10 w-10 rounded-full bg-background/20 backdrop-blur-sm hover:bg-background/40 border border-white/10 text-foreground"
                                         onClick={() => setTimerSettingsOpen(true)}
                                     >
-                                        <Clock className="h-5 w-5" />
+                                        <Clock className="h-5 w-5" aria-hidden="true" />
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -202,13 +206,14 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                             <Button
                                 variant="ghost"
                                 size="icon"
+                                aria-label={isFullscreen ? t('timerComponents.enhancedTimer.exitFocus') : t('timerComponents.enhancedTimer.enterFocus')}
                                 className="h-10 w-10 rounded-full bg-background/20 backdrop-blur-sm hover:bg-background/40 border border-white/10 text-foreground"
                                 onClick={toggleFullscreen}
                             >
                                 {isFullscreen ? (
-                                    <Minimize2 className="h-5 w-5" />
+                                    <Minimize2 className="h-5 w-5" aria-hidden="true" />
                                 ) : (
-                                    <Maximize2 className="h-5 w-5" />
+                                    <Maximize2 className="h-5 w-5" aria-hidden="true" />
                                 )}
                             </Button>
                         </TooltipTrigger>
