@@ -70,6 +70,7 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
+                                        aria-label={t('timerComponents.enhancedTimer.soundSettings')}
                                         className={cn(
                                             "h-10 w-10 rounded-full backdrop-blur-sm border transition-all relative overflow-visible",
                                             hasActiveAudio
@@ -83,7 +84,7 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                         onClick={() => setAudioSettingsOpen(true)}
                                     >
                                         {hasActiveAudio ? (
-                                            <div className="flex items-center justify-center relative w-full h-full">
+                                            <div className="flex items-center justify-center relative w-full h-full" aria-hidden="true">
                                                 {currentlyPlaying?.type === 'youtube' ? (
                                                     <>
                                                         {/* Ripple/Glow Effect - Only when playing */}
@@ -122,7 +123,7 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                                 )}
                                             </div>
                                         ) : (
-                                            <Music className="h-5 w-5" />
+                                            <Music className="h-5 w-5" aria-hidden="true" />
                                         )}
                                     </Button>
                                 </TooltipTrigger>
@@ -166,10 +167,11 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
+                                        aria-label={t('timerComponents.enhancedTimer.backgroundSettings')}
                                         className="h-10 w-10 rounded-full bg-background/20 backdrop-blur-sm hover:bg-background/40 border border-white/10 text-foreground"
                                         onClick={() => setBackgroundSettingsOpen(true)}
                                     >
-                                        <Wallpaper className="h-5 w-5" />
+                                        <Wallpaper className="h-5 w-5" aria-hidden="true" />
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -183,10 +185,11 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
+                                        aria-label={t('timerComponents.enhancedTimer.timerSettings')}
                                         className="h-10 w-10 rounded-full bg-background/20 backdrop-blur-sm hover:bg-background/40 border border-white/10 text-foreground"
                                         onClick={() => setTimerSettingsOpen(true)}
                                     >
-                                        <Clock className="h-5 w-5" />
+                                        <Clock className="h-5 w-5" aria-hidden="true" />
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -202,13 +205,14 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                             <Button
                                 variant="ghost"
                                 size="icon"
+                                aria-label={isFullscreen ? t('timerComponents.enhancedTimer.exitFocus') : t('timerComponents.enhancedTimer.enterFocus')}
                                 className="h-10 w-10 rounded-full bg-background/20 backdrop-blur-sm hover:bg-background/40 border border-white/10 text-foreground"
                                 onClick={toggleFullscreen}
                             >
                                 {isFullscreen ? (
-                                    <Minimize2 className="h-5 w-5" />
+                                    <Minimize2 className="h-5 w-5" aria-hidden="true" />
                                 ) : (
-                                    <Maximize2 className="h-5 w-5" />
+                                    <Maximize2 className="h-5 w-5" aria-hidden="true" />
                                 )}
                             </Button>
                         </TooltipTrigger>
