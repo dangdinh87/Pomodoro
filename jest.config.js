@@ -12,6 +12,12 @@ const customJestConfig = {
     '^@/components/(.*)$': '<rootDir>/src/components/$1',
     '^@/pages/(.*)$': '<rootDir>/src/pages/$1',
     '^@/lib/(.*)$': '<rootDir>/src/lib/$1',
+    '^@/contexts/(.*)$': '<rootDir>/src/contexts/$1',
+    '^@/stores/(.*)$': '<rootDir>/src/stores/$1',
+    '^@/hooks/(.*)$': '<rootDir>/src/hooks/$1',
+    '^@/data/(.*)$': '<rootDir>/src/data/$1',
+    '^@/utils/(.*)$': '<rootDir>/src/utils/$1',
+    '^@/(.*)$': '<rootDir>/src/$1', // Catch-all for other aliases
   },
   testEnvironment: 'jest-environment-jsdom',
 }

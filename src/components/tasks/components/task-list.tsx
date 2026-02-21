@@ -116,11 +116,11 @@ export function TaskList({
                   isActive={activeTaskId === task.id}
                   isDragging={dndProps.activeId === task.id}
                   onToggleStatus={onToggleStatus}
-                  onToggleActive={onToggleActive}
                   onEdit={onEdit}
                   onDelete={onDelete}
                   onClone={onClone}
                   onSaveAsTemplate={onSaveAsTemplate}
+                  isToggling={false}
                 />
               </AnimatedListItem>
             ))}
@@ -135,11 +135,11 @@ export function TaskList({
               task={activeTask}
               isActive={activeTaskId === activeTask.id}
               onToggleStatus={onToggleStatus}
-              onToggleActive={onToggleActive}
               onEdit={onEdit}
               onDelete={onDelete}
               onClone={onClone}
               onSaveAsTemplate={onSaveAsTemplate}
+              isToggling={false}
             />
           </div>
         ) : null}
