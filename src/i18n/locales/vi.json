@@ -78,7 +78,8 @@
       "aria": {
         "start": "Bắt đầu hẹn giờ",
         "pause": "Tạm dừng hẹn giờ",
-        "reset": "Đặt lại hẹn giờ"
+        "reset": "Đặt lại hẹn giờ",
+        "skip": "Bỏ qua phiên"
       }
     },
     "toasts": {

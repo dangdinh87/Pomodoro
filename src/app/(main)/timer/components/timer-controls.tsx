@@ -223,7 +223,7 @@ export const TimerControls = memo(function TimerControls() {
                     className="h-10 w-10 rounded-full opacity-70 hover:opacity-100 transition-all"
                     style={{ color: clockState.color }}
                 >
-                    <RotateCcw size={16} />
+                    <RotateCcw size={16} aria-hidden="true" />
                 </Button>
 
                 <Button
@@ -238,11 +238,11 @@ export const TimerControls = memo(function TimerControls() {
                 >
                     {isRunning ? (
                         <span className="inline-flex items-center gap-1.5">
-                            <Pause size={16} fill="currentColor" /> {t('timer.controls.pause')}
+                            <Pause size={16} fill="currentColor" aria-hidden="true" /> {t('timer.controls.pause')}
                         </span>
                     ) : (
                         <span className="inline-flex items-center gap-1.5">
-                            <Play size={16} fill="currentColor" /> {t('timer.controls.start').toUpperCase()}
+                            <Play size={16} fill="currentColor" aria-hidden="true" /> {t('timer.controls.start').toUpperCase()}
                         </span>
                     )}
                 </Button>
@@ -250,13 +250,14 @@ export const TimerControls = memo(function TimerControls() {
                 <Button
                     onClick={handleSkipClick}
                     disabled={isProcessing}
+                    aria-label={t('timer.controls.aria.skip')}
                     variant="ghost"
                     size="icon"
                     title={t('timer.controls.skip_hint')}
                     className="h-10 w-10 rounded-full opacity-70 hover:opacity-100 transition-all"
                     style={{ color: clockState.color }}
                 >
-                    <SkipForwardIcon size={16} />
+                    <SkipForwardIcon size={16} aria-hidden="true" />
                 </Button>
             </div>
 
