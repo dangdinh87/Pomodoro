@@ -78,7 +78,8 @@
       "aria": {
         "start": "Start timer",
         "pause": "Pause timer",
-        "reset": "Reset timer"
+        "reset": "Reset timer",
+        "skip": "Skip session"
       }
     },
     "toasts": {
