@@ -11,7 +11,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useTimerStore } from '@/stores/timer-store';
-import { useAnalogClockState } from './clocks/use-analog-clock-state';
+import { getClockState } from './clocks/clock-state-utils';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -38,8 +38,15 @@ export const TimerControls = memo(function TimerControls() {
     // ATOMIC SUBSCRIPTION
     const isRunning = useTimerStore((state) => state.isRunning);
     const mode = useTimerStore((state) => state.mode);
-    const timeLeft = useTimerStore((state) => state.timeLeft);
+    // OPTIMIZATION: Removed direct subscription to timeLeft to prevent re-rendering every second
+    // const timeLeft = useTimerStore((state) => state.timeLeft);
     const settings = useTimerStore((state) => state.settings);
+
+    // Subscribe only to the color derived from state (changes rarely)
+    const clockColor = useTimerStore((state) => getClockState(state.timeLeft, state.isRunning).color);
+
+    // Subscribe to completion status for the dialog effect
+    const isFinished = useTimerStore((state) => state.timeLeft <= 0);
 
     // Actions
     const setIsRunning = useTimerStore((state) => state.setIsRunning);
@@ -53,10 +60,6 @@ export const TimerControls = memo(function TimerControls() {
     const setMode = useTimerStore((state) => state.setMode);
     const setTimeLeft = useTimerStore((state) => state.setTimeLeft);
     const setDeadlineAt = useTimerStore((state) => state.setDeadlineAt);
-    const sessionCount = useTimerStore((state) => state.sessionCount);
-
-    // Clock state for color sync
-    const clockState = useAnalogClockState({ timeLeft, isRunning });
 
     // Local state
     const [skipConfirmOpen, setSkipConfirmOpen] = useState(false);
@@ -73,6 +76,7 @@ export const TimerControls = memo(function TimerControls() {
 
     const getCompletionPercent = () => {
         const total = getTotalTimeForMode();
+        const timeLeft = useTimerStore.getState().timeLeft;
         // BUG-06 FIX: Clamp to 0-100 range to handle edge cases
         if (total <= 0) return 0;
         const completed = Math.max(0, total - timeLeft);
@@ -81,10 +85,10 @@ export const TimerControls = memo(function TimerControls() {
 
     // BUG-04 FIX: Close skip dialog when timer completes (timeLeft reaches 0)
     useEffect(() => {
-        if (timeLeft <= 0 && skipConfirmOpen) {
+        if (isFinished && skipConfirmOpen) {
             setSkipConfirmOpen(false);
         }
-    }, [timeLeft, skipConfirmOpen]);
+    }, [isFinished, skipConfirmOpen]);
 
     const playNotificationSound = () => {
         // NOTE: We might want to move this to a shared sound utility or store later
@@ -105,6 +109,7 @@ export const TimerControls = memo(function TimerControls() {
         // Clear deadline before mode transition to prevent stale deadline reuse
         setDeadlineAt(null);
 
+        const timeLeft = useTimerStore.getState().timeLeft;
         const totalTime = getTotalTimeForMode();
         const completedDuration = totalTime - timeLeft;
         const completionPercent = (completedDuration / totalTime) * 100;
@@ -204,6 +209,7 @@ export const TimerControls = memo(function TimerControls() {
     const toggleTimer = () => {
         if (isProcessing) return;
         if (!isRunning) {
+            const timeLeft = useTimerStore.getState().timeLeft;
             if (timeLeft > 0) resumeTimer();
         } else {
             pauseTimer();
@@ -221,7 +227,7 @@ export const TimerControls = memo(function TimerControls() {
                     variant="ghost"
                     size="icon"
                     className="h-10 w-10 rounded-full opacity-70 hover:opacity-100 transition-all"
-                    style={{ color: clockState.color }}
+                    style={{ color: clockColor }}
                 >
                     <RotateCcw size={16} />
                 </Button>
@@ -254,7 +260,7 @@ export const TimerControls = memo(function TimerControls() {
                     size="icon"
                     title={t('timer.controls.skip_hint')}
                     className="h-10 w-10 rounded-full opacity-70 hover:opacity-100 transition-all"
-                    style={{ color: clockState.color }}
+                    style={{ color: clockColor }}
                 >
                     <SkipForwardIcon size={16} />
                 </Button>
