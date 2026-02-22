@@ -1014,6 +1014,15 @@
       "keyboard": "Bàn phím",
       "mouse": "Chuột",
       "touch": "Cảm ứng"
+    },
+    "gameControls": {
+      "up": "Lên",
+      "down": "Xuống",
+      "left": "Trái",
+      "right": "Phải",
+      "restart": "Chơi lại",
+      "delete": "Xóa",
+      "enter": "Nhập"
     }
   },
   "tooltips": {

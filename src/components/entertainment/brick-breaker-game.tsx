@@ -482,16 +482,18 @@ export function BrickBreakerGame({ onGameEnd, fullscreen }: BrickBreakerGameProp
             size="lg"
             className="w-20 h-14 border-cyan-500/50 text-cyan-400"
             onTouchStart={() => movePaddle('left')}
+            aria-label={t('entertainment.gameControls.left')}
           >
-            <ChevronLeft className="w-8 h-8" />
+            <ChevronLeft className="w-8 h-8" aria-hidden="true" />
           </Button>
           <Button
             variant="outline"
             size="lg"
             className="w-20 h-14 border-cyan-500/50 text-cyan-400"
             onTouchStart={() => movePaddle('right')}
+            aria-label={t('entertainment.gameControls.right')}
           >
-            <ChevronRight className="w-8 h-8" />
+            <ChevronRight className="w-8 h-8" aria-hidden="true" />
           </Button>
         </div>
       )}
