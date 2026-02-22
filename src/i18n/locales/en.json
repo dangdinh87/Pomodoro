@@ -995,6 +995,15 @@
     "backToList": "Back to Games",
     "closeGame": "Close Game",
     "controls": "Controls",
+    "gameControls": {
+      "up": "Up",
+      "down": "Down",
+      "left": "Left",
+      "right": "Right",
+      "restart": "Restart Game",
+      "delete": "Delete",
+      "enter": "Enter"
+    },
     "instructions": "Move mouse or touch to control the spaceship. Shoot down enemies and avoid collisions!",
     "loading": "Loading game...",
     "highScore": "High Score",
