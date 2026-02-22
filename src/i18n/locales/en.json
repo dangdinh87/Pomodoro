@@ -1014,6 +1014,15 @@
       "keyboard": "Keyboard",
       "mouse": "Mouse",
       "touch": "Touch"
+    },
+    "gameControls": {
+      "up": "Up",
+      "down": "Down",
+      "left": "Left",
+      "right": "Right",
+      "restart": "Restart Game",
+      "delete": "Delete",
+      "enter": "Enter"
     }
   },
   "tooltips": {
