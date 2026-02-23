@@ -453,6 +453,7 @@ export function TaskManagement() {
             onClone={handleClone}
             onSaveAsTemplate={handleSaveAsTemplate}
             togglingTaskIds={togglingTaskIds}
+            onCreate={() => setIsCreateModalOpen(true)}
           />
         )}
       </section>
