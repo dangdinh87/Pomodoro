@@ -1,6 +1,7 @@
 /**
  * @jest-environment node
  */
+/// <reference types="jest" />
 import { POST } from './route';
 import { createClient } from '@/lib/supabase-server';
 
@@ -55,6 +56,26 @@ describe('Chat API Route Security', () => {
     const req = new Request('http://localhost:3000/api/chat', {
       method: 'POST',
       body: JSON.stringify({ messages: 'invalid' }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+  });
+
+  it('should return 400 if model is invalid', async () => {
+    // Mock authorized user
+    (createClient as jest.Mock).mockResolvedValue({
+      auth: {
+        getUser: jest.fn().mockResolvedValue({
+          data: { user: { id: 'test-user' } },
+          error: null,
+        }),
+      },
+    });
+
+    const req = new Request('http://localhost:3000/api/chat', {
+      method: 'POST',
+      body: JSON.stringify({ messages: [], model: 'invalid-model' }),
     });
 
     const res = await POST(req);
