@@ -13,7 +13,6 @@ interface SubtaskListProps {
   subtasks: Task[]
   activeTaskId: string | null
   onToggleStatus: (task: Task) => void
-  onToggleActive: (task: Task) => void
   onEdit: (task: Task) => void
   onDelete: (id: string) => void
   onClone?: (id: string) => void
@@ -31,7 +30,6 @@ export function SubtaskList({
   subtasks,
   activeTaskId,
   onToggleStatus,
-  onToggleActive,
   onEdit,
   onDelete,
   onClone,
@@ -67,7 +65,6 @@ export function SubtaskList({
                     task={subtask}
                     isActive={activeTaskId === subtask.id}
                     onToggleStatus={onToggleStatus}
-                    onToggleActive={onToggleActive}
                     onEdit={onEdit}
                     onDelete={onDelete}
                     onClone={onClone}
