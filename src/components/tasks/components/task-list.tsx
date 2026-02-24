@@ -21,12 +21,12 @@ interface TaskListProps {
   activeTaskId: string | null
   hasTasks: boolean
   onToggleStatus: (task: Task) => void
-  onToggleActive: (task: Task) => void
   onEdit: (task: Task) => void
   onDelete: (id: string) => void
   onClone?: (id: string) => void
   onReorder?: (taskOrders: { id: string; displayOrder: number }[]) => Promise<void>
   onSaveAsTemplate?: (id: string) => void
+  togglingTaskIds?: Set<string>
 }
 
 // Group tasks into parent tasks and their subtasks
@@ -61,12 +61,12 @@ export function TaskList({
   activeTaskId,
   hasTasks,
   onToggleStatus,
-  onToggleActive,
   onEdit,
   onDelete,
   onClone,
   onReorder,
   onSaveAsTemplate,
+  togglingTaskIds,
 }: TaskListProps) {
   const { t } = useI18n()
 
@@ -116,11 +116,11 @@ export function TaskList({
                   isActive={activeTaskId === task.id}
                   isDragging={dndProps.activeId === task.id}
                   onToggleStatus={onToggleStatus}
-                  onToggleActive={onToggleActive}
                   onEdit={onEdit}
                   onDelete={onDelete}
                   onClone={onClone}
                   onSaveAsTemplate={onSaveAsTemplate}
+                  isToggling={togglingTaskIds?.has(task.id)}
                 />
               </AnimatedListItem>
             ))}
@@ -135,11 +135,11 @@ export function TaskList({
               task={activeTask}
               isActive={activeTaskId === activeTask.id}
               onToggleStatus={onToggleStatus}
-              onToggleActive={onToggleActive}
               onEdit={onEdit}
               onDelete={onDelete}
               onClone={onClone}
               onSaveAsTemplate={onSaveAsTemplate}
+              isToggling={togglingTaskIds?.has(activeTask.id)}
             />
           </div>
         ) : null}
