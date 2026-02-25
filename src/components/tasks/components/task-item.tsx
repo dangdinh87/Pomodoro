@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Task } from '@/stores/task-store'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -30,7 +31,7 @@ interface TaskItemProps {
   onDelete: (id: string) => void
   onClone?: (id: string) => void
   onSaveAsTemplate?: (id: string) => void
-  togglingTaskIds?: Set<string>
+  isToggling?: boolean
 }
 
 function formatMinutes(ms?: number): string {
@@ -66,7 +67,7 @@ function getDueDateInfo(dueDate: string | null | undefined) {
   return { date, overdue, today, tomorrow }
 }
 
-export function TaskItem({
+export const TaskItem = memo(function TaskItem({
   task,
   isActive,
   onToggleStatus,
@@ -74,7 +75,7 @@ export function TaskItem({
   onDelete,
   onClone,
   onSaveAsTemplate,
-  togglingTaskIds,
+  isToggling,
 }: TaskItemProps) {
   const { t } = useI18n()
   const isDone = task.status === 'done'
@@ -109,12 +110,12 @@ export function TaskItem({
                 onCheckedChange={() => onToggleStatus(task)}
                 className={cn(
                   "h-5 w-5 rounded-full transition-all hover:scale-110 active:scale-90 data-[state=checked]:bg-primary data-[state=checked]:border-primary",
-                  togglingTaskIds?.has(task.id) && "opacity-50"
+                  isToggling && "opacity-50"
                 )}
-                disabled={togglingTaskIds?.has(task.id)}
+                disabled={isToggling}
                 aria-label={`${isDone ? t('tasks.actions.markIncomplete') : t('tasks.actions.markComplete')} - ${task.title}`}
               />
-              {togglingTaskIds?.has(task.id) && (
+              {isToggling && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <Loader2 className={cn(
                     "h-3 w-3 animate-spin",
@@ -248,4 +249,4 @@ export function TaskItem({
       </article>
     </TooltipProvider>
   )
-}
+})
