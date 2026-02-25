@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase-server";
 import { NextResponse } from "next/server";
-import { DEFAULT_CHAT_AI_MODEL } from "@/config/constants";
+import { DEFAULT_CHAT_AI_MODEL, ALLOWED_CHAT_MODELS } from "@/config/constants";
 
 export async function GET() {
 	const supabase = await createClient();
@@ -91,6 +91,11 @@ export async function POST(req: Request) {
 		const body = await req.json();
 		const { title, model } = body;
 
+		const modelToUse = model || DEFAULT_CHAT_AI_MODEL;
+		if (!ALLOWED_CHAT_MODELS.includes(modelToUse)) {
+			return NextResponse.json({ error: "Invalid model" }, { status: 400 });
+		}
+
 		// Generate a random productivity-themed title if none is provided
 		const finalTitle = title || generateRandomTitle();
 
@@ -99,7 +104,7 @@ export async function POST(req: Request) {
 			.insert({
 				user_id: user.id,
 				title: finalTitle,
-				model: model || DEFAULT_CHAT_AI_MODEL,
+				model: modelToUse,
 			})
 			.select()
 			.single();
