@@ -1,5 +1,6 @@
 "use client"
 
+import { memo } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { Task } from '@/stores/task-store'
@@ -16,10 +17,10 @@ interface SortableTaskItemProps {
   onDelete: (id: string) => void
   onClone?: (id: string) => void
   onSaveAsTemplate?: (id: string) => void
-  togglingTaskIds?: Set<string>
+  isToggling?: boolean
 }
 
-export function SortableTaskItem({
+export const SortableTaskItem = memo(function SortableTaskItem({
   task,
   isActive,
   isDragging,
@@ -28,7 +29,7 @@ export function SortableTaskItem({
   onDelete,
   onClone,
   onSaveAsTemplate,
-  togglingTaskIds,
+  isToggling,
 }: SortableTaskItemProps) {
   const {
     attributes,
@@ -77,9 +78,9 @@ export function SortableTaskItem({
           onDelete={onDelete}
           onClone={onClone}
           onSaveAsTemplate={onSaveAsTemplate}
-          togglingTaskIds={togglingTaskIds}
+          isToggling={isToggling}
         />
       </div>
     </div>
   )
-}
+})
