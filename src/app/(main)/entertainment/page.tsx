@@ -357,7 +357,7 @@ function GameInstructionPopup({ game, highScore, onStart, onClose }: GameInstruc
           {/* Controls */}
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-muted-foreground uppercase tracking-wide" suppressHydrationWarning>
-              {t('entertainment.controls')}:
+              {t('entertainment.controls.title')}:
             </span>
             {game.controls.map(control => {
               const ControlIcon = controlIcons[control].icon;

@@ -350,7 +350,7 @@ export function BrickBreakerGame({ onGameEnd, fullscreen }: BrickBreakerGameProp
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [gameState, level, score, combo, onGameEnd, resetBall]);
+  }, [gameState, level, score, combo, onGameEnd, resetBall, lives]);
 
   // Keyboard handlers
   useEffect(() => {
@@ -482,6 +482,7 @@ export function BrickBreakerGame({ onGameEnd, fullscreen }: BrickBreakerGameProp
             size="lg"
             className="w-20 h-14 border-cyan-500/50 text-cyan-400"
             onTouchStart={() => movePaddle('left')}
+            aria-label={t('entertainment.controls.left')}
           >
             <ChevronLeft className="w-8 h-8" />
           </Button>
@@ -490,6 +491,7 @@ export function BrickBreakerGame({ onGameEnd, fullscreen }: BrickBreakerGameProp
             size="lg"
             className="w-20 h-14 border-cyan-500/50 text-cyan-400"
             onTouchStart={() => movePaddle('right')}
+            aria-label={t('entertainment.controls.right')}
           >
             <ChevronRight className="w-8 h-8" />
           </Button>
