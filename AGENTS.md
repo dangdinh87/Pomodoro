@@ -99,3 +99,25 @@ When working on this project, you can run commands to:
 - Verify implementation against design (`check-implementation`)
 - Writing tests (`writing-test`)
 - Perform structured code reviews (`code-review`)
+
+## Cursor Cloud specific instructions
+
+### Application overview
+Study Bro is a single Next.js 14 application (Pomodoro timer + productivity suite). It uses pnpm as the package manager and Supabase as the hosted backend (auth + PostgreSQL). There are no Docker containers, microservices, or local databases to run.
+
+### Running the dev server
+- `pnpm dev` starts the Next.js dev server on port 3000.
+- The landing page (`/`) loads without Supabase credentials; the timer page (`/timer`) also renders but auth-dependent features (task linking, history sync) require valid Supabase credentials.
+- The middleware matcher only applies to auth-related routes (`/login`, `/signup`, `/timer/*`, `/tasks/*`, etc.), so public routes are unaffected by missing Supabase config.
+
+### Key commands
+See `package.json` scripts. Summary: `pnpm dev`, `pnpm build`, `pnpm lint`, `pnpm test`, `pnpm type-check`.
+
+### Environment variables
+A `.env.local` file is needed with at minimum `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`. See `.env.example` for all available variables. The AI chat feature requires `MEGALLM_API_KEY`.
+
+### Gotchas
+- `next.config.js` sets `ignoreBuildErrors: true` for both TypeScript and ESLint, so `pnpm build` succeeds even with pre-existing lint/type errors.
+- There are 2 pre-existing ESLint errors in `src/components/focus/focus-mode.tsx` (unescaped entities) that cause `pnpm lint` to exit with code 1.
+- `pnpm install` may show a warning about ignored build scripts for `@tsparticles/engine`; this is expected due to `pnpm.onlyBuiltDependencies` only allowing `sharp`.
+- The `prebuild` script runs `node scripts/optimize-backgrounds.mjs` which requires `sharp`; this runs automatically before `pnpm build`.
