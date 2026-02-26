@@ -96,6 +96,7 @@ export function TaskKanbanColumn({
                   onDelete={onDelete}
                   onClone={onClone}
                   onSaveAsTemplate={onSaveAsTemplate}
+                  isToggling={!!togglingTaskIds?.has(task.id)}
                 />
               </AnimatedListItem>
             ))}

@@ -170,7 +170,7 @@ export function TaskKanbanBoard({
               onDelete={onDelete}
               onClone={onClone}
               onSaveAsTemplate={onSaveAsTemplate}
-              togglingTaskIds={togglingTaskIds}
+              isToggling={!!togglingTaskIds?.has(activeTask.id)}
             />
           </div>
         ) : null}
