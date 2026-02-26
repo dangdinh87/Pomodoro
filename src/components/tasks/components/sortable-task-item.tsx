@@ -16,7 +16,8 @@ interface SortableTaskItemProps {
   onDelete: (id: string) => void
   onClone?: (id: string) => void
   onSaveAsTemplate?: (id: string) => void
-  togglingTaskIds?: Set<string>
+  onToggleActive?: (task: Task) => void
+  isToggling?: boolean
 }
 
 export function SortableTaskItem({
@@ -28,7 +29,8 @@ export function SortableTaskItem({
   onDelete,
   onClone,
   onSaveAsTemplate,
-  togglingTaskIds,
+  onToggleActive,
+  isToggling,
 }: SortableTaskItemProps) {
   const {
     attributes,
@@ -77,7 +79,8 @@ export function SortableTaskItem({
           onDelete={onDelete}
           onClone={onClone}
           onSaveAsTemplate={onSaveAsTemplate}
-          togglingTaskIds={togglingTaskIds}
+          onToggleActive={onToggleActive}
+          isToggling={isToggling}
         />
       </div>
     </div>
