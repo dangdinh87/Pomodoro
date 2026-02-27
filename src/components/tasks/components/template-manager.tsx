@@ -119,6 +119,7 @@ export function TemplateManager({ trigger }: TemplateManagerProps) {
                       className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive self-start"
                       onClick={() => handleRemove(template.id)}
                       disabled={removingId === template.id}
+                      aria-label={t('common.delete')}
                     >
                       {removingId === template.id ? (
                         <Loader2 className="h-4 w-4 animate-spin" />

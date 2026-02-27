@@ -93,6 +93,7 @@ export function TagManager({ tags, isLoading: isInitialLoading, onAddTag, onRemo
                             onClick={handleAddTag}
                             size="icon"
                             disabled={!newTag.trim() || tags.length >= 10 || isAdding}
+                            aria-label={t('common.add')}
                         >
                             {isAdding ? (
                                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -130,6 +131,7 @@ export function TagManager({ tags, isLoading: isInitialLoading, onAddTag, onRemo
                                             onClick={() => handleRemoveTag(tag)}
                                             disabled={removingTag === tag}
                                             className="p-1 hover:bg-destructive/20 rounded-full transition-colors disabled:opacity-50"
+                                            aria-label={`${t('common.delete')} ${tag}`}
                                         >
                                             {removingTag === tag ? (
                                                 <Loader2 className="h-3 w-3 animate-spin" />
