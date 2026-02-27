@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase-server";
 
 // Type for MegaLLM model response (based on official API docs)
 export type MegaLLMModel = {
@@ -115,6 +116,17 @@ function isTextModel(modelId: string): boolean {
 }
 
 export async function GET() {
+    const supabase = await createClient();
+
+    const {
+        data: { user },
+        error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     try {
         const apiKey = process.env.MEGALLM_API_KEY;
 
