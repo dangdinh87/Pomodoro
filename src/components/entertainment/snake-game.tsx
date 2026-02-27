@@ -46,13 +46,19 @@ export const SnakeGame = memo(function SnakeGame({
   const directionRef = useRef<Direction>('RIGHT');
   const nextDirectionRef = useRef<Direction>('RIGHT');
 
+  // Game state refs for performance (avoids re-renders on every tick)
+  const snakeRef = useRef<Point[]>([{ x: 5, y: 7 }]);
+  const foodRef = useRef<Point>({ x: 10, y: 7 });
+  const obstaclesRef = useRef<Point[]>([]);
+  const scoreRef = useRef(0);
+  const levelRef = useRef(1);
+
+  // UI state
   const [isRunning, setIsRunning] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
   const [score, setScore] = useState(0);
   const [level, setLevel] = useState(1);
-  const [snake, setSnake] = useState<Point[]>([{ x: 5, y: 7 }]);
-  const [food, setFood] = useState<Point>({ x: 10, y: 7 });
-  const [obstacles, setObstacles] = useState<Point[]>([]);
+  const [obstacleCount, setObstacleCount] = useState(0);
   const [showInstructions, setShowInstructions] = useState(true);
 
   const { t } = useI18n();
@@ -118,6 +124,11 @@ export const SnakeGame = memo(function SnakeGame({
 
     const width = GRID_COLS * CELL_SIZE;
     const height = GRID_ROWS * CELL_SIZE;
+
+    // Use refs directly for drawing
+    const snake = snakeRef.current;
+    const food = foodRef.current;
+    const obstacles = obstaclesRef.current;
 
     // Clear canvas
     ctx.fillStyle = '#0f172a';
@@ -251,82 +262,77 @@ export const SnakeGame = memo(function SnakeGame({
     ctx.moveTo(foodX, foodY - foodRadius + 2);
     ctx.lineTo(foodX + 3, foodY - foodRadius - 4);
     ctx.stroke();
-  }, [snake, food, obstacles]);
+  }, []);
 
   const gameLoop = useCallback(() => {
-    setSnake(prevSnake => {
-      directionRef.current = nextDirectionRef.current;
-      const head = { ...prevSnake[0] };
+    const prevSnake = snakeRef.current;
+    const obstacles = obstaclesRef.current;
+    const food = foodRef.current;
 
-      switch (directionRef.current) {
-        case 'UP': head.y -= 1; break;
-        case 'DOWN': head.y += 1; break;
-        case 'LEFT': head.x -= 1; break;
-        case 'RIGHT': head.x += 1; break;
+    directionRef.current = nextDirectionRef.current;
+    const head = { ...prevSnake[0] };
+
+    switch (directionRef.current) {
+      case 'UP': head.y -= 1; break;
+      case 'DOWN': head.y += 1; break;
+      case 'LEFT': head.x -= 1; break;
+      case 'RIGHT': head.x += 1; break;
+    }
+
+    // Check collisions
+    if (head.x < 0 || head.x >= GRID_COLS || head.y < 0 || head.y >= GRID_ROWS ||
+        prevSnake.some(seg => seg.x === head.x && seg.y === head.y) ||
+        obstacles.some(obs => obs.x === head.x && obs.y === head.y)) {
+
+      setIsGameOver(true);
+      setIsRunning(false);
+      if (gameLoopRef.current) clearInterval(gameLoopRef.current);
+      onGameEnd?.(scoreRef.current);
+      return;
+    }
+
+    const newSnake = [head, ...prevSnake];
+
+    // Check food
+    if (head.x === food.x && head.y === food.y) {
+      // Score update
+      const newScore = scoreRef.current + 10;
+      scoreRef.current = newScore;
+      setScore(newScore); // Update UI state
+
+      const newLevel = Math.min(LEVEL_CONFIG.length, Math.floor(newScore / POINTS_PER_LEVEL) + 1);
+
+      if (newLevel > levelRef.current) {
+        levelRef.current = newLevel;
+        setLevel(newLevel); // Update UI state
+
+        const levelConfig = LEVEL_CONFIG[newLevel - 1];
+        const newObstacles = generateObstacles(levelConfig.obstacles, newSnake, food);
+        obstaclesRef.current = newObstacles;
+        setObstacleCount(newObstacles.length); // Update UI state
       }
 
-      // Check wall collision
-      if (head.x < 0 || head.x >= GRID_COLS || head.y < 0 || head.y >= GRID_ROWS) {
-        setIsGameOver(true);
-        setIsRunning(false);
-        if (gameLoopRef.current) clearInterval(gameLoopRef.current);
-        onGameEnd?.(score);
-        return prevSnake;
-      }
+      foodRef.current = generateFood(newSnake, obstaclesRef.current);
+    } else {
+      newSnake.pop();
+    }
 
-      // Check self collision
-      if (prevSnake.some(seg => seg.x === head.x && seg.y === head.y)) {
-        setIsGameOver(true);
-        setIsRunning(false);
-        if (gameLoopRef.current) clearInterval(gameLoopRef.current);
-        onGameEnd?.(score);
-        return prevSnake;
-      }
-
-      // Check obstacle collision
-      if (obstacles.some(obs => obs.x === head.x && obs.y === head.y)) {
-        setIsGameOver(true);
-        setIsRunning(false);
-        if (gameLoopRef.current) clearInterval(gameLoopRef.current);
-        onGameEnd?.(score);
-        return prevSnake;
-      }
-
-      const newSnake = [head, ...prevSnake];
-
-      // Check food collision
-      if (head.x === food.x && head.y === food.y) {
-        setScore(prev => {
-          const newScore = prev + 10;
-          // Check level up
-          const newLevel = Math.min(LEVEL_CONFIG.length, Math.floor(newScore / POINTS_PER_LEVEL) + 1);
-          if (newLevel > level) {
-            setLevel(newLevel);
-            // Add obstacles for new level
-            const levelConfig = LEVEL_CONFIG[newLevel - 1];
-            const newObstacles = generateObstacles(levelConfig.obstacles, newSnake, food);
-            setObstacles(newObstacles);
-          }
-          return newScore;
-        });
-        setFood(generateFood(newSnake, obstacles));
-      } else {
-        newSnake.pop();
-      }
-
-      return newSnake;
-    });
-  }, [food, obstacles, generateFood, generateObstacles, level, onGameEnd, score]);
+    snakeRef.current = newSnake;
+  }, [generateFood, generateObstacles, onGameEnd]);
 
   const startGame = useCallback(() => {
     const initialSnake = [{ x: 3, y: Math.floor(GRID_ROWS / 2) }];
     const initialFood = generateFood(initialSnake, []);
 
-    setSnake(initialSnake);
-    setFood(initialFood);
-    setObstacles([]);
+    snakeRef.current = initialSnake;
+    foodRef.current = initialFood;
+    obstaclesRef.current = [];
+    scoreRef.current = 0;
+    levelRef.current = 1;
+
     setScore(0);
     setLevel(1);
+    setObstacleCount(0);
     setIsGameOver(false);
     setIsRunning(true);
     setShowInstructions(false);
@@ -391,11 +397,6 @@ export const SnakeGame = memo(function SnakeGame({
     };
   }, [isRunning, gameLoop, level]);
 
-  // Draw effect
-  useEffect(() => {
-    drawGame();
-  }, [drawGame]);
-
   // Continuous draw for animations
   useEffect(() => {
     let animationId: number;
@@ -416,7 +417,6 @@ export const SnakeGame = memo(function SnakeGame({
     };
   }, [handleKeyDown]);
 
-  const levelConfig = LEVEL_CONFIG[Math.min(level - 1, LEVEL_CONFIG.length - 1)];
   const canvasWidth = GRID_COLS * CELL_SIZE;
   const canvasHeight = GRID_ROWS * CELL_SIZE;
 
@@ -444,10 +444,10 @@ export const SnakeGame = memo(function SnakeGame({
               <div className="text-yellow-400 font-bold text-lg">{level}</div>
             </div>
           </div>
-          {obstacles.length > 0 && (
+          {obstacleCount > 0 && (
             <div className="flex items-center gap-1 text-gray-400 text-sm">
               <Skull className="h-4 w-4" />
-              <span>{obstacles.length}</span>
+              <span>{obstacleCount}</span>
             </div>
           )}
         </div>
@@ -571,7 +571,7 @@ export const SnakeGame = memo(function SnakeGame({
             </div>
             <div className="flex justify-center gap-6 text-gray-300 text-sm">
               <span>Level: <strong className="text-yellow-400">{level}</strong></span>
-              <span>Độ dài: <strong className="text-green-400">{snake.length}</strong></span>
+              <span>Độ dài: <strong className="text-green-400">{snakeRef.current.length}</strong></span>
             </div>
           </div>
 
