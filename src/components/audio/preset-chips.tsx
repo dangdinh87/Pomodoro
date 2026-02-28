@@ -160,13 +160,13 @@ export const PresetChips = memo(function PresetChips() {
         <div className="relative">
           {builtInScroll.canScrollLeft && (
             <Button variant="ghost" size="icon" onClick={builtInScroll.scrollLeft}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-background/80 hover:bg-background shadow-sm">
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-background/80 hover:bg-background shadow-sm" aria-label={t('audio.presets.scrollLeft') || "Scroll left"}>
               <ChevronLeft className="h-4 w-4" />
             </Button>
           )}
           {builtInScroll.canScrollRight && (
             <Button variant="ghost" size="icon" onClick={builtInScroll.scrollRight}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-background/80 hover:bg-background shadow-sm">
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-background/80 hover:bg-background shadow-sm" aria-label={t('audio.presets.scrollRight') || "Scroll right"}>
               <ChevronRight className="h-4 w-4" />
             </Button>
           )}
@@ -208,6 +208,7 @@ export const PresetChips = memo(function PresetChips() {
                           variant="ghost"
                           size="icon"
                           className="h-6 w-6 shrink-0 text-muted-foreground hover:text-foreground"
+                          aria-label={`${t('audio.presets.moreOptions')} for ${displayName}`}
                         >
                           <MoreVertical className="h-3.5 w-3.5" />
                         </Button>
