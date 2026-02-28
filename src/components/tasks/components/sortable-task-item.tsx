@@ -1,5 +1,8 @@
 "use client"
 
+import React from 'react'
+
+
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { Task } from '@/stores/task-store'
@@ -19,7 +22,7 @@ interface SortableTaskItemProps {
   togglingTaskIds?: Set<string>
 }
 
-export function SortableTaskItem({
+export const SortableTaskItem = React.memo(function SortableTaskItem({
   task,
   isActive,
   isDragging,
@@ -82,4 +85,4 @@ export function SortableTaskItem({
       </div>
     </div>
   )
-}
+})
