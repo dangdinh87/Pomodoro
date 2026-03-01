@@ -98,6 +98,8 @@ export function Navigation() {
               size="icon"
               onClick={toggleNav}
               className="transition-all duration-200"
+              aria-label={t('nav.menu')}
+              aria-expanded={!isNavCollapsed}
             >
               <Menu
                 className={`h-4 w-4 transition-transform duration-300 ${isNavCollapsed ? 'rotate-180' : ''
@@ -147,6 +149,9 @@ export function Navigation() {
                 size="icon"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="transition-all duration-200"
+                aria-label={t('nav.menu')}
+                aria-expanded={isMobileMenuOpen}
+                aria-controls="mobile-menu"
               >
                 {isMobileMenuOpen ? (
                   <X className="h-4 w-4" />
@@ -161,7 +166,10 @@ export function Navigation() {
 
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div className="md:hidden fixed top-16 left-0 right-0 z-40 bg-transparent border-b border-white/10 animate-in slide-in-from-top duration-200">
+        <div
+          id="mobile-menu"
+          className="md:hidden fixed top-16 left-0 right-0 z-40 bg-transparent border-b border-white/10 animate-in slide-in-from-top duration-200"
+        >
           <div className="container mx-auto px-4 py-4">
             <div className="space-y-2">
               {navigationItems.map((item) => (
