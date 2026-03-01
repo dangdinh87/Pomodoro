@@ -12,7 +12,7 @@ function unauthorizedResponse() {
 }
 
 function isAuthorized(request: Request) {
-  if (!API_ROUTE_TOKEN) return true
+  if (!API_ROUTE_TOKEN) return false
   const header = request.headers.get('authorization') || ''
   if (!header.startsWith('Bearer ')) return false
   return header.slice(7) === API_ROUTE_TOKEN
