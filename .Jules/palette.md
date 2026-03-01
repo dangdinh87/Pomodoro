@@ -1,3 +1,7 @@
-## 2024-05-22 - Icon-Only Buttons Accessibility
-**Learning:** The app frequently uses icon-only buttons (e.g., Edit, Delete, More Actions) without `aria-label` attributes. This makes the app difficult to navigate for screen reader users.
-**Action:** Always add descriptive `aria-label` props to icon-only `Button` components, especially in list views where multiple similar buttons exist. Use dynamic labels (e.g., "Edit task [Task Name]") for context.
+## 2025-03-01 - Add aria-label to Icon-Only Buttons
+**Learning:** Icon-only buttons without an explicit aria-label are inaccessible to screen readers as they rely purely on visual context (icons) to communicate their function.
+**Action:** When adding or modifying `<Button size="icon">` elements, always include a descriptive `aria-label` attribute to describe the action they perform.
+
+## 2025-03-01 - Add aria-label to Icon-Only Buttons
+**Learning:** Icon-only buttons without an explicit aria-label are inaccessible to screen readers as they rely purely on visual context (icons) to communicate their function.
+**Action:** When adding or modifying `<Button size="icon">` elements, always include a descriptive `aria-label` attribute to describe the action they perform.
