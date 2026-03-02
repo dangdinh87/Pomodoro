@@ -98,6 +98,7 @@ export function Navigation() {
               size="icon"
               onClick={toggleNav}
               className="transition-all duration-200"
+              aria-label="Toggle navigation"
             >
               <Menu
                 className={`h-4 w-4 transition-transform duration-300 ${isNavCollapsed ? 'rotate-180' : ''
@@ -147,6 +148,7 @@ export function Navigation() {
                 size="icon"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="transition-all duration-200"
+                aria-label="Toggle menu"
               >
                 {isMobileMenuOpen ? (
                   <X className="h-4 w-4" />
