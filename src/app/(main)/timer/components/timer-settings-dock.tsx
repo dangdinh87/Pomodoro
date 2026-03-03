@@ -70,6 +70,7 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
+                                        aria-label={t('timerComponents.enhancedTimer.soundSettings')}
                                         className={cn(
                                             "h-10 w-10 rounded-full backdrop-blur-sm border transition-all relative overflow-visible",
                                             hasActiveAudio
@@ -166,6 +167,7 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
+                                        aria-label={t('timerComponents.enhancedTimer.backgroundSettings')}
                                         className="h-10 w-10 rounded-full bg-background/20 backdrop-blur-sm hover:bg-background/40 border border-white/10 text-foreground"
                                         onClick={() => setBackgroundSettingsOpen(true)}
                                     >
@@ -183,6 +185,7 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
+                                        aria-label={t('timerComponents.enhancedTimer.timerSettings')}
                                         className="h-10 w-10 rounded-full bg-background/20 backdrop-blur-sm hover:bg-background/40 border border-white/10 text-foreground"
                                         onClick={() => setTimerSettingsOpen(true)}
                                     >
@@ -202,6 +205,7 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                             <Button
                                 variant="ghost"
                                 size="icon"
+                                aria-label={isFullscreen ? t('timerComponents.enhancedTimer.exitFocus') : t('timerComponents.enhancedTimer.enterFocus')}
                                 className="h-10 w-10 rounded-full bg-background/20 backdrop-blur-sm hover:bg-background/40 border border-white/10 text-foreground"
                                 onClick={toggleFullscreen}
                             >
