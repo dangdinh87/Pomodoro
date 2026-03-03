@@ -1,3 +1,4 @@
+import React from 'react'
 import { Task } from '@/stores/task-store'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -66,7 +67,7 @@ function getDueDateInfo(dueDate: string | null | undefined) {
   return { date, overdue, today, tomorrow }
 }
 
-export function TaskItem({
+export const TaskItem = React.memo(function TaskItem({
   task,
   isActive,
   onToggleStatus,
@@ -248,4 +249,4 @@ export function TaskItem({
       </article>
     </TooltipProvider>
   )
-}
+})
