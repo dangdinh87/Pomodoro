@@ -85,6 +85,74 @@ describe('Chat API Route Security', () => {
     expect(res.status).toBe(400);
   });
 
+  describe('IDOR Protection', () => {
+    it('should return 403 if user tries to append to another users conversation', async () => {
+      // Mock authorized user
+      (createClient as jest.Mock).mockResolvedValue({
+        auth: {
+          getUser: jest.fn().mockResolvedValue({
+            data: { user: { id: 'test-user' } },
+            error: null,
+          }),
+        },
+        from: jest.fn(() => ({
+          select: jest.fn(() => ({
+            eq: jest.fn(() => ({
+              single: jest.fn().mockResolvedValue({
+                data: { user_id: 'other-user-id' },
+                error: null,
+              }),
+            })),
+          })),
+        })),
+      });
+
+      const req = new Request('http://localhost:3000/api/chat', {
+        method: 'POST',
+        body: JSON.stringify({
+            messages: [{ role: 'user', content: 'hello' }],
+            conversationId: 'some-other-conv-id'
+        }),
+      });
+
+      const res = await POST(req);
+      expect(res.status).toBe(403);
+    });
+
+    it('should return 404 if conversation ID does not exist', async () => {
+      // Mock authorized user
+      (createClient as jest.Mock).mockResolvedValue({
+        auth: {
+          getUser: jest.fn().mockResolvedValue({
+            data: { user: { id: 'test-user' } },
+            error: null,
+          }),
+        },
+        from: jest.fn(() => ({
+          select: jest.fn(() => ({
+            eq: jest.fn(() => ({
+              single: jest.fn().mockResolvedValue({
+                data: null,
+                error: new Error('Not found'),
+              }),
+            })),
+          })),
+        })),
+      });
+
+      const req = new Request('http://localhost:3000/api/chat', {
+        method: 'POST',
+        body: JSON.stringify({
+            messages: [{ role: 'user', content: 'hello' }],
+            conversationId: 'non-existent-conv-id'
+        }),
+      });
+
+      const res = await POST(req);
+      expect(res.status).toBe(404);
+    });
+  });
+
   describe('Model Validation', () => {
     beforeEach(() => {
         // Mock authorized user for model tests

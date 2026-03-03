@@ -90,6 +90,25 @@ export async function POST(req: Request) {
 		return new Response("Invalid messages format", { status: 400 });
 	}
 
+	// IDOR Protection: Verify the conversation belongs to the authenticated user
+	if (conversationId) {
+		const { data: existingConv, error: convError } = await supabase
+			.from("conversations")
+			.select("user_id")
+			.eq("id", conversationId)
+			.single();
+
+		if (convError || !existingConv) {
+			console.error("[Chat API] Conversation not found or error:", convError);
+			return new Response("Conversation not found", { status: 404 });
+		}
+
+		if (existingConv.user_id !== user.id) {
+			console.warn(`[Chat API] User ${user.id} attempted to access conversation ${conversationId} belonging to ${existingConv.user_id}`);
+			return new Response("Forbidden", { status: 403 });
+		}
+	}
+
 	console.log("[Chat API] Received:", {
 		model,
 		messagesCount: messages?.length,
