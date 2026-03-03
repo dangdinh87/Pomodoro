@@ -41,8 +41,12 @@ async function generateTitle(userMessage: string): Promise<string> {
 				model: DEFAULT_CHAT_AI_MODEL,
 				messages: [
 					{
+						role: "system",
+						content: "Generate a short, concise title (max 10 words) for a new chatbot conversation in a Pomodoro app with a playful & friendly vibe, with the same language as user language. Return ONLY the title, no quotes, no punctuation at the end.",
+					},
+					{
 						role: "user",
-						content: `Generate a short, concise title (max 10 words) for a new chatbot conversation in a Pomodoro app with a playful & friendly vibe, with the same language as user language. Return ONLY the title, no quotes, no punctuation at the end. User's first message: "${userMessage}"`,
+						content: userMessage,
 					},
 				],
 				max_tokens: 20,
