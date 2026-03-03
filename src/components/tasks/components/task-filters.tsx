@@ -10,12 +10,11 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
-import { Search, FilterX } from 'lucide-react'
+import { Search, FilterX, X } from 'lucide-react'
 import { DateRange } from 'react-day-picker'
 import { useI18n } from '@/contexts/i18n-context'
 import { TaskStatus, TaskPriority } from '@/stores/task-store'
 import { DateRangePicker } from '@/app/(main)/history/components/date-range-picker'
-import { isToday } from 'date-fns'
 import { cn } from '@/lib/utils'
 
 interface TaskFiltersProps {
@@ -60,9 +59,18 @@ export function TaskFilters({
           placeholder={t('tasks.filters.searchPlaceholder')}
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
-          className="pl-9 h-9 text-sm"
+          className="pl-9 pr-8 h-9 text-sm"
           aria-label={t('tasks.filters.searchPlaceholder')}
         />
+        {query && (
+          <button
+            onClick={() => onQueryChange('')}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Clear search"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        )}
       </div>
 
       <div className="flex items-center gap-1.5">
