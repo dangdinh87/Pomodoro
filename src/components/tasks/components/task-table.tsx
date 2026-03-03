@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/tooltip'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useMemo } from 'react'
+import { EmptyState } from '@/components/ui/empty-state'
 
 interface TaskTableProps {
     tasks: Task[]
@@ -44,6 +45,7 @@ interface TaskTableProps {
     onDelete: (id: string) => void
     onClone?: (id: string) => void
     onSaveAsTemplate?: (id: string) => void
+    onCreate?: () => void
     togglingTaskIds?: Set<string>
 }
 
@@ -68,6 +70,7 @@ export function TaskTable({
     onDelete,
     onClone,
     onSaveAsTemplate,
+    onCreate,
     togglingTaskIds,
 }: TaskTableProps) {
     const { t } = useI18n()
@@ -279,9 +282,16 @@ export function TaskTable({
                     </TableBody>
                 </Table>
                 {tasks.length === 0 && (
-                    <div className="text-center py-20 text-muted-foreground bg-muted/5 border-t border-border">
-                        {t('tasks.noTasks')}
-                    </div>
+                    <EmptyState
+                        title={t('tasks.noTasks')}
+                        description={t('tasks.noTasksDescription') || "You don't have any tasks yet. Create one to get started with your focus session."}
+                        action={onCreate && (
+                            <Button onClick={onCreate} className="mt-2">
+                                {t('tasks.addTask')}
+                            </Button>
+                        )}
+                        className="py-12 border-t border-border bg-muted/5"
+                    />
                 )}
             </div>
             <div className="flex items-center justify-between px-4 py-1.5 bg-background border-t border-border mt-auto h-10">
