@@ -107,6 +107,7 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                                         <motion.svg
                                                             className="h-5 w-5 text-white fill-current relative z-10"
                                                             viewBox="0 0 24 24"
+                                                            aria-hidden="true"
                                                             animate={isAudioPlaying ? {
                                                                 scale: [1, 1.2, 1],
                                                             } : undefined}
