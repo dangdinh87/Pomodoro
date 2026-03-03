@@ -243,7 +243,7 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
             {t('settings.background.saveChanges')}
           </Button>
           {onClose && (
-            <Button variant="ghost" size="icon" className="ml-2" onClick={cancel}>
+            <Button variant="ghost" size="icon" className="ml-2" onClick={cancel} aria-label={t("common.cancel")} title={t("common.cancel")}>
               <X className="h-4 w-4" />
             </Button>
           )}
@@ -634,6 +634,8 @@ function PersonalTab({
             variant="outline"
             size="icon"
             disabled={!urlInput.trim()}
+            aria-label={t("common.add")}
+            title={t("common.add")}
             onClick={async () => {
               const result = await addImageByUrl(urlInput.trim());
               if (result.success) {
@@ -645,7 +647,6 @@ function PersonalTab({
                 toast.error(t(errorKey));
               }
             }}
-            title={t('settings.background.customImages.addUrl')}
           >
             <Link className="h-4 w-4" />
           </Button>
