@@ -9,3 +9,8 @@
 **Vulnerability:** The `/api/chat/models` endpoint acted as an unauthenticated proxy to the MegaLLM models API, which could be abused or allow anonymous usage limits/data harvesting.
 **Learning:** Similarly to the chat endpoint, read-only external API proxy endpoints also need robust session validation to prevent unauthorized usage and possible abuse.
 **Prevention:** Always wrap external API calls behind a valid authenticated user session using `supabase.auth.getUser()` and explicitly returning `401` when no valid user is present.
+
+## 2026-03-03 - Insecure Direct Object Reference (IDOR) in Chat Appends
+**Vulnerability:** The `/api/chat` endpoint accepted a `conversationId` to append messages to, but it did not verify that the ID actually belonged to the authenticated user, allowing any user to append messages to another user's conversation.
+**Learning:** Checking for an authenticated session does not automatically validate that the session is authorized to modify specific resources via their ID.
+**Prevention:** Always verify resource ownership by querying the database using the resource ID and comparing the owner's `user_id` to the currently authenticated `user.id` before allowing modifications.
