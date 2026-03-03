@@ -4,3 +4,7 @@
 ## 2026-02-26 - Timer Accessibility
 **Learning:** The timer page's icon-only buttons (Skip, Sound, Background, etc.) lacked `aria-label` attributes, making them inaccessible to screen readers.
 **Action:** Always add descriptive `aria-label` to icon-only buttons, reusing localized tooltip text or hint keys where available.
+
+## 2025-03-03 - Aria labels on icon buttons
+**Learning:** Found multiple instances of `<Button size="icon">` lacking accessible text alternative (`aria-label`) and `title` which hurts screen readers and users who rely on tooltips for small icons.
+**Action:** Consistently add `aria-label` and `title` via existing localized strings (e.g., `t("common.close")`, `t("common.add")`) to all `<Button size="icon">` components to improve both a11y and standard UX.
