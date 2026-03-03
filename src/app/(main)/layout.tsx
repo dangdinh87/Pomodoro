@@ -52,6 +52,7 @@ export default function MainLayout({
                             : 'hover:text-primary'
                         }
                         title="Toggle Chat"
+                        aria-label="Toggle Chat"
                       >
                         <BotMessageSquare
                           loop={isChatPanelOpen}
