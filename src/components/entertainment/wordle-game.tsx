@@ -378,6 +378,7 @@ export const WordleGame = memo(function WordleGame({
                 size="icon"
                 onClick={() => setIsStarted(false)}
                 className="h-8 w-8 text-gray-400 hover:text-white hover:bg-white/10"
+                aria-label={t('entertainment.controls.back')}
               >
                 <RotateCcw className="h-4 w-4" />
               </Button>
@@ -456,6 +457,11 @@ export const WordleGame = memo(function WordleGame({
                         : "w-8 md:w-9 text-sm",
                       getKeyStyle(key)
                     )}
+                    aria-label={
+                      key === 'DELETE' ? t('entertainment.controls.delete') :
+                      key === 'ENTER' ? t('entertainment.controls.enter') :
+                      key
+                    }
                   >
                     {key === 'DELETE' ? <Delete className="h-4 w-4" /> :
                      key === 'ENTER' ? <CornerDownLeft className="h-4 w-4" /> : key}

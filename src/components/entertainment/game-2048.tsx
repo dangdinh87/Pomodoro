@@ -413,6 +413,7 @@ export const Game2048 = memo(function Game2048({
               size="icon"
               onClick={initGame}
               className="bg-gray-800/80 hover:bg-gray-700 text-white rounded-lg w-9 h-9"
+              aria-label={t('entertainment.controls.restart')}
             >
               <RotateCcw className="h-4 w-4" />
             </Button>
@@ -480,6 +481,7 @@ export const Game2048 = memo(function Game2048({
               size="icon"
               className="w-11 h-11 bg-white/10 hover:bg-white/20 text-white rounded-xl"
               onClick={() => move('up')}
+              aria-label={t('entertainment.controls.up')}
             >
               <ArrowUp className="h-5 w-5" />
             </Button>
@@ -489,6 +491,7 @@ export const Game2048 = memo(function Game2048({
                 size="icon"
                 className="w-11 h-11 bg-white/10 hover:bg-white/20 text-white rounded-xl"
                 onClick={() => move('left')}
+                aria-label={t('entertainment.controls.left')}
               >
                 <ArrowLeft className="h-5 w-5" />
               </Button>
@@ -497,6 +500,7 @@ export const Game2048 = memo(function Game2048({
                 size="icon"
                 className="w-11 h-11 bg-white/10 hover:bg-white/20 text-white rounded-xl"
                 onClick={() => move('down')}
+                aria-label={t('entertainment.controls.down')}
               >
                 <ArrowDown className="h-5 w-5" />
               </Button>
@@ -505,6 +509,7 @@ export const Game2048 = memo(function Game2048({
                 size="icon"
                 className="w-11 h-11 bg-white/10 hover:bg-white/20 text-white rounded-xl"
                 onClick={() => move('right')}
+                aria-label={t('entertainment.controls.right')}
               >
                 <ArrowRight className="h-5 w-5" />
               </Button>
