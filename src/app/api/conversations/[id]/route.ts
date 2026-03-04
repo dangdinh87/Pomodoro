@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase-server";
 import { NextResponse } from "next/server";
+import { ALLOWED_CHAT_MODELS } from "@/config/constants";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -64,7 +65,13 @@ export async function PATCH(req: Request, { params }: Params) {
 
         const updates: Record<string, string> = {};
         if (title !== undefined) updates.title = title;
-        if (model !== undefined) updates.model = model;
+        if (model !== undefined) {
+            if (ALLOWED_CHAT_MODELS.includes(model)) {
+                updates.model = model;
+            } else {
+                console.warn(`[Conversation API] Invalid model update requested: ${model}. Ignoring.`);
+            }
+        }
 
         const { data: conversation, error } = await supabase
             .from("conversations")
