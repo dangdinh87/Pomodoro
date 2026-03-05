@@ -259,9 +259,10 @@ const YouTubePane = memo(() => {
                 variant="ghost"
                 size="icon"
                 onClick={scrollLeft}
+                aria-label={t('common.scrollLeft', 'Scroll left')}
                 className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-background/80 hover:bg-background shadow-sm"
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-4 w-4" aria-hidden="true" />
               </Button>
             )}
             {canScrollRight && (
@@ -269,9 +270,10 @@ const YouTubePane = memo(() => {
                 variant="ghost"
                 size="icon"
                 onClick={scrollRight}
+                aria-label={t('common.scrollRight', 'Scroll right')}
                 className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-background/80 hover:bg-background shadow-sm"
               >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-4 w-4" aria-hidden="true" />
               </Button>
             )}
             <div
