@@ -160,14 +160,16 @@ export const PresetChips = memo(function PresetChips() {
         <div className="relative">
           {builtInScroll.canScrollLeft && (
             <Button variant="ghost" size="icon" onClick={builtInScroll.scrollLeft}
+              aria-label={t('common.scrollLeft', 'Scroll left')}
               className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-background/80 hover:bg-background shadow-sm">
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
             </Button>
           )}
           {builtInScroll.canScrollRight && (
             <Button variant="ghost" size="icon" onClick={builtInScroll.scrollRight}
+              aria-label={t('common.scrollRight', 'Scroll right')}
               className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-background/80 hover:bg-background shadow-sm">
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-4 w-4" aria-hidden="true" />
             </Button>
           )}
           <div ref={builtInScroll.scrollRef} className="flex gap-2 overflow-x-auto p-1.5 scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}>
@@ -207,9 +209,10 @@ export const PresetChips = memo(function PresetChips() {
                         <Button
                           variant="ghost"
                           size="icon"
+                          aria-label={`${t('common.options', 'Options')} - ${displayName}`}
                           className="h-6 w-6 shrink-0 text-muted-foreground hover:text-foreground"
                         >
-                          <MoreVertical className="h-3.5 w-3.5" />
+                          <MoreVertical className="h-3.5 w-3.5" aria-hidden="true" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
