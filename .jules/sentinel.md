@@ -9,3 +9,8 @@
 **Vulnerability:** The `/api/chat/models` endpoint acted as an unauthenticated proxy to the MegaLLM models API, which could be abused or allow anonymous usage limits/data harvesting.
 **Learning:** Similarly to the chat endpoint, read-only external API proxy endpoints also need robust session validation to prevent unauthorized usage and possible abuse.
 **Prevention:** Always wrap external API calls behind a valid authenticated user session using `supabase.auth.getUser()` and explicitly returning `401` when no valid user is present.
+
+## $(date +%Y-%m-%d) - Unauthenticated API Access to Leaderboard
+**Vulnerability:** The `/api/leaderboard` endpoint fetched data but did not enforce authentication, potentially allowing anonymous users to scrape user data and total focus time.
+**Learning:** Checking for user existence (`supabase.auth.getUser()`) is not enough; explicit control flow (early return) is required to stop execution.
+**Prevention:** Always add `if (authError || !user) { return NextResponse.json({ error: 'Unauthorized' }, { status: 401 }); }` immediately after authentication checks in API routes.

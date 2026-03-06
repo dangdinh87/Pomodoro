@@ -6,6 +6,13 @@ import { startOfWeek, startOfMonth, startOfYear } from 'date-fns';
 
 export async function GET(request: Request) {
   const supabase = await createClient();
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const { searchParams } = new URL(request.url);
   const sortBy = searchParams.get('sortBy') || 'time'; // 'time' | 'tasks'
   const limit = parseInt(searchParams.get('limit') || '100');
