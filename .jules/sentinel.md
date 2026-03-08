@@ -9,3 +9,8 @@
 **Vulnerability:** The `/api/chat/models` endpoint acted as an unauthenticated proxy to the MegaLLM models API, which could be abused or allow anonymous usage limits/data harvesting.
 **Learning:** Similarly to the chat endpoint, read-only external API proxy endpoints also need robust session validation to prevent unauthorized usage and possible abuse.
 **Prevention:** Always wrap external API calls behind a valid authenticated user session using `supabase.auth.getUser()` and explicitly returning `401` when no valid user is present.
+
+## 2026-03-05 - AI Prompt Injection via Role Spoofing
+**Vulnerability:** The `/api/chat` endpoint accepted incoming messages and mapped their roles directly (`role: msg.role`) without sanitizing whether a user was attempting to inject a `system` prompt. This allowed users to bypass the application's intended restrictions by overriding `BRO_AI_SYSTEM_PROMPT` using injected system instructions.
+**Learning:** We cannot trust the `role` attribute from client requests when constructing messages for a Large Language Model. Attackers can manipulate payload values to elevate privileges in the prompt.
+**Prevention:** Always restrict incoming message roles to `user` or `assistant` and explicitly fallback to `user` if an invalid or restricted role is provided. System prompts must strictly originate from the server.
