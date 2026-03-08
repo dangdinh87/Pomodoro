@@ -5,3 +5,7 @@
 ## 2025-02-28 - [React.memo in Large Lists]
 **Learning:** Components rendered within large lists (like `TaskItem` and `SortableTaskItem` inside `TaskList`) are highly susceptible to unnecessary re-renders when the parent component's state changes (e.g. `togglingTaskIds`). Wrapping them in `React.memo` effectively isolates them, reducing performance bottlenecks during list updates.
 **Action:** When working with list items that receive stable props (or localized state like `togglingTaskIds`), wrap the individual item components in `React.memo` to prevent re-rendering the entire list when only one item changes.
+
+## 2024-03-24 - [Optimize Task Stats Calculation]
+**Learning:** The O(kN) `.filter().length` calculations for task statistics can cause performance issues when scaling list rendering. Single-pass iteration reduces memory allocation and computes O(N).
+**Action:** Use single-pass `for` loops for summary statistics computation instead of multiple `.filter()` maps.
