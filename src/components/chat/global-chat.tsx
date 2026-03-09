@@ -225,8 +225,8 @@ export function GlobalChat() {
 					/>
 				</div>
 				<div className="flex items-center gap-1">
-					<Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setChatPanelOpen(false)}>
-						<X className="h-4 w-4" />
+					<Button variant="ghost" size="icon" className="h-7 w-7" aria-label={t("common.close")} onClick={() => setChatPanelOpen(false)}>
+						<X className="h-4 w-4" aria-hidden="true" />
 					</Button>
 				</div>
 			</div>

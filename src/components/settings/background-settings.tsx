@@ -243,8 +243,8 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
             {t('settings.background.saveChanges')}
           </Button>
           {onClose && (
-            <Button variant="ghost" size="icon" className="ml-2" onClick={cancel}>
-              <X className="h-4 w-4" />
+            <Button variant="ghost" size="icon" className="ml-2" aria-label={t('common.close')} onClick={cancel}>
+              <X className="h-4 w-4" aria-hidden="true" />
             </Button>
           )}
         </div>
