@@ -30,7 +30,9 @@
     "language": "Language",
     "total": "Total",
     "item": "item",
-    "items": "items"
+    "items": "items",
+    "scrollLeft": "Scroll Left",
+    "scrollRight": "Scroll Right"
   },
   "nav": {
     "navigation": "Navigation",
