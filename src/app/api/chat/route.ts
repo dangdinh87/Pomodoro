@@ -8,9 +8,12 @@ export const maxDuration = 60;
 // Convert assistant-ui message format to OpenAI format
 function convertMessages(messages: any[]) {
 	return messages.map((msg) => {
+		// Sanitize role to prevent system prompt injection
+		const safeRole = (msg.role === "user" || msg.role === "assistant") ? msg.role : "user";
+
 		// If already has content string, return as-is
 		if (typeof msg.content === "string") {
-			return { role: msg.role, content: msg.content };
+			return { role: safeRole, content: msg.content };
 		}
 
 		// If has parts array (assistant-ui format), extract text
@@ -19,11 +22,11 @@ function convertMessages(messages: any[]) {
 				.filter((p: any) => p.type === "text")
 				.map((p: any) => p.text)
 				.join("\n");
-			return { role: msg.role, content: textParts };
+			return { role: safeRole, content: textParts };
 		}
 
 		// Fallback
-		return { role: msg.role, content: msg.content || "" };
+		return { role: safeRole, content: msg.content || "" };
 	});
 }
 
