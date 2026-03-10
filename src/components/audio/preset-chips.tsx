@@ -159,15 +159,15 @@ export const PresetChips = memo(function PresetChips() {
         {/* Scrollable chips with arrows */}
         <div className="relative">
           {builtInScroll.canScrollLeft && (
-            <Button variant="ghost" size="icon" onClick={builtInScroll.scrollLeft}
+            <Button variant="ghost" size="icon" onClick={builtInScroll.scrollLeft} aria-label={t('common.scrollLeft')}
               className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-background/80 hover:bg-background shadow-sm">
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
             </Button>
           )}
           {builtInScroll.canScrollRight && (
-            <Button variant="ghost" size="icon" onClick={builtInScroll.scrollRight}
+            <Button variant="ghost" size="icon" onClick={builtInScroll.scrollRight} aria-label={t('common.scrollRight')}
               className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-background/80 hover:bg-background shadow-sm">
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-4 w-4" aria-hidden="true" />
             </Button>
           )}
           <div ref={builtInScroll.scrollRef} className="flex gap-2 overflow-x-auto p-1.5 scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}>
