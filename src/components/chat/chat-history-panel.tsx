@@ -169,6 +169,7 @@ export function ChatHistoryPanel({
                             size="icon"
                             className="h-7 w-7 min-w-[28px] shrink-0 text-muted-foreground hover:text-foreground"
                             onClick={(e) => e.stopPropagation()}
+                            aria-label={t('common.actions')}
                         >
                             <MoreHorizontal className="h-4 w-4" />
                         </Button>
