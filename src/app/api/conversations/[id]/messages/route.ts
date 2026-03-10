@@ -90,6 +90,13 @@ export async function POST(req: Request, { params }: Params) {
             );
         }
 
+        if (role !== "user" && role !== "assistant") {
+            return NextResponse.json(
+                { error: "Invalid role. Only 'user' or 'assistant' are allowed." },
+                { status: 400 }
+            );
+        }
+
         const { data: message, error } = await supabase
             .from("messages")
             .insert({
