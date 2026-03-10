@@ -126,6 +126,7 @@ export function ConversationSelector({
 						variant="ghost"
 						size="icon"
 						className="h-6 w-6 ml-auto opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100 data-[state=open]:opacity-100"
+						aria-label={t('common.actions')}
 					>
 						<MoreHorizontal className="h-3 w-3" />
 					</Button>
