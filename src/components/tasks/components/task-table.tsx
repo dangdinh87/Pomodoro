@@ -30,7 +30,7 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { EmptyState } from '@/components/ui/empty-state'
 
 interface TaskTableProps {
@@ -57,6 +57,234 @@ function getDueDateInfo(dueDate: string | null | undefined) {
     const tomorrow = isTomorrow(date)
     return { date, overdue, today, tomorrow }
 }
+
+
+const TaskTableRow = React.memo(function TaskTableRow({
+    task,
+    index,
+    activeTaskId,
+    togglingTaskIds,
+    onToggleStatus,
+    onToggleActive,
+    onEdit,
+    onDelete,
+    onClone,
+    onSaveAsTemplate,
+    t
+}: {
+    task: Task;
+    index: number;
+    activeTaskId: string | null;
+    togglingTaskIds?: Set<string>;
+    onToggleStatus: (task: Task) => void;
+    onToggleActive: (task: Task) => void;
+    onEdit: (task: Task) => void;
+    onDelete: (id: string) => void;
+    onClone?: (id: string) => void;
+    onSaveAsTemplate?: (id: string) => void;
+    t: any;
+}) {
+    const isDone = task.status === 'done';
+    const dueDateInfo = getDueDateInfo(task.dueDate);
+    const isActive = activeTaskId === task.id;
+
+    return (
+        <TableRow
+            key={task.id}
+            className={cn(
+                "group border-border hover:bg-muted/30 transition-colors relative h-8",
+                isActive && "bg-primary/10 dark:bg-primary/20 border-l-4 border-l-primary shadow-sm"
+            )}
+        >
+            <TableCell className="py-1 w-[45px]">
+                <div className="relative flex items-center justify-center h-4 w-4 mx-auto">
+                    <Checkbox
+                        checked={isDone}
+                        onCheckedChange={() => onToggleStatus(task)}
+                        className={cn(
+                            "rounded-full h-4 w-4 border-muted-foreground/30 transition-opacity",
+                            togglingTaskIds?.has(task.id) && "opacity-50"
+                        )}
+                        disabled={togglingTaskIds?.has(task.id)}
+                        aria-label={`${isDone ? t('tasks.actions.markIncomplete') : t('tasks.actions.markComplete')} - ${task.title}`}
+                    />
+                    {togglingTaskIds?.has(task.id) && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <Loader2 className={cn(
+                                "h-2.5 w-2.5 animate-spin",
+                                isDone ? "text-primary-foreground" : "text-primary"
+                            )} strokeWidth={3} />
+                        </div>
+                    )}
+                </div>
+            </TableCell>
+            <TableCell className="py-1">
+                <span className="text-[10px] text-muted-foreground/50 font-bold tabular-nums">
+                    {(index + 1).toString().padStart(2, '0')}
+                </span>
+            </TableCell>
+            <TableCell className="py-1">
+                <div className="flex flex-col gap-1 w-full max-w-[200px]">
+                    <span className={cn(
+                        "font-bold text-xs truncate transition-all",
+                        isDone && "line-through text-muted-foreground opacity-70",
+                        isActive && "text-primary"
+                    )}>
+                        {task.title}
+                    </span>
+                    {task.isTemplate && (
+                        <div className="flex items-center gap-1 mt-1">
+                            <Badge variant="outline" className="text-[10px] h-4.5 px-2 rounded-md font-bold border-amber-500/30 text-amber-600 bg-amber-500/10 dark:text-amber-400 dark:border-amber-400/20">
+                                <Bookmark className="h-2.5 w-2.5 mr-1 fill-current" />
+                                {t('tasks.templateBadge')}
+                            </Badge>
+                        </div>
+                    )}
+                </div>
+            </TableCell>
+            <TableCell className="py-1 w-[110px]">
+                <Badge
+                    variant="outline"
+                    className={cn(
+                        "capitalize font-bold border-none px-2 py-0 h-5 rounded-full text-[10px]",
+                        task.priority === 'high' && "bg-red-500/10 text-red-600 dark:text-red-400",
+                        task.priority === 'medium' && "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+                        task.priority === 'low' && "bg-muted text-muted-foreground"
+                    )}
+                >
+                    {t(`tasks.priorityLevels.${task.priority}`)}
+                </Badge>
+            </TableCell>
+            <TableCell className="py-1 w-[120px]">
+                {dueDateInfo ? (
+                    <div className={cn(
+                        "text-[10px] font-bold",
+                        dueDateInfo.overdue && !isDone && "text-destructive",
+                        !dueDateInfo.overdue && "text-muted-foreground"
+                    )}>
+                        {format(dueDateInfo.date, 'MMM d, yyyy')}
+                    </div>
+                ) : (
+                    <span className="text-[10px] text-muted-foreground/40">-</span>
+                )}
+            </TableCell>
+            <TableCell className="hidden md:table-cell py-1 max-w-[150px]">
+                <div className="flex flex-wrap gap-1">
+                    {task.tags.map((tag) => (
+                        <Badge
+                            key={tag}
+                            variant="secondary"
+                            className="bg-muted/50 text-muted-foreground text-[9px] h-4 px-1.5 font-bold border-border/50 rounded flex-shrink-0"
+                        >
+                            {tag}
+                        </Badge>
+                    ))}
+                    {task.tags.length === 0 && <span className="text-muted-foreground/40 text-[10px]">-</span>}
+                </div>
+            </TableCell>
+            <TableCell className="py-1 w-[90px] text-right">
+                <div className="flex flex-col items-end gap-1">
+                    <div className="flex items-center gap-1">
+                        <span className="text-[9px]">🍅</span>
+                        <span className="text-[10px] font-bold text-foreground">
+                            {task.actualPomodoros}/{task.estimatePomodoros}
+                        </span>
+                    </div>
+                    {task.estimatePomodoros > 0 && (
+                        <div className="w-12 h-1 bg-muted rounded-full overflow-hidden">
+                            <div
+                                className="h-full bg-primary/70 transition-all"
+                                style={{ width: `${Math.min(100, (task.actualPomodoros / task.estimatePomodoros) * 100)}%` }}
+                            />
+                        </div>
+                    )}
+                </div>
+            </TableCell>
+            <TableCell className="py-1 w-[110px] text-right">
+                <div className={cn(
+                    "flex items-center justify-end gap-1 transition-opacity duration-200",
+                    isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                )}>
+                    {isActive ? (
+                        <Badge className="bg-primary/10 text-primary border-primary/20 text-[9px] h-5 px-1.5 animate-pulse flex items-center gap-1 hover:bg-primary/20 cursor-pointer" onClick={(e) => { e.stopPropagation(); onToggleActive(task); }}>
+                            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-ping" />
+                            {t('tasks.focusing') || 'Focusing'}
+                        </Badge>
+                    ) : (
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={(e) => { e.stopPropagation(); onToggleActive(task); }}
+                                        className="h-6 w-6 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                                        aria-label={`${t('tasks.actions.start')} - ${task.title}`}
+                                    >
+                                        <AnimatedTarget className="h-3 w-3" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="text-[10px] py-1 px-2">
+                                    {t('tasks.actions.start')}
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    )}
+
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={(e) => { e.stopPropagation(); onEdit(task); }}
+                                    className="h-6 w-6 text-muted-foreground hover:text-blue-500 hover:bg-blue-500/10"
+                                    aria-label={`${t('tasks.actions.edit')} - ${task.title}`}
+                                >
+                                    <AnimatedEdit className="h-3 w-3" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="text-[10px] py-1 px-2">
+                                {t('tasks.actions.edit')}
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 text-muted-foreground hover:text-foreground hover:bg-muted"
+                                aria-label={`${t('common.actions')} - ${task.title}`}
+                            >
+                                <MoreHorizontal className="h-3 w-3" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-40 text-[10px] font-bold shadow-xl ring-1 ring-black/5">
+                            <DropdownMenuItem onClick={() => onClone?.(task.id)} className="cursor-pointer py-1.5">
+                                <Copy className="mr-2 h-3 w-3" />
+                                {t('tasks.actions.clone')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onSaveAsTemplate?.(task.id)} className="cursor-pointer py-1.5">
+                                <Bookmark className="mr-2 h-3 w-3" />
+                                {t('tasks.actions.saveAsTemplate')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                className="text-destructive focus:text-destructive cursor-pointer py-1.5"
+                                onClick={() => onDelete(task.id)}
+                            >
+                                <AnimatedTrash className="mr-2 h-3 w-3" />
+                                {t('tasks.actions.deletePermanent')}
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+            </TableCell>
+        </TableRow>
+    );
+});
+
 
 export function TaskTable({
     tasks,
@@ -105,180 +333,22 @@ export function TaskTable({
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {tasks.map((task, index) => {
-                            const isDone = task.status === 'done'
-                            const dueDateInfo = getDueDateInfo(task.dueDate)
-                            const isActive = activeTaskId === task.id
-
-                            return (
-                                <TableRow
-                                    key={task.id}
-                                    className={cn(
-                                        "group border-border hover:bg-muted/30 transition-colors relative h-8",
-                                        isActive && "bg-primary/10 dark:bg-primary/20 border-l-4 border-l-primary shadow-sm"
-                                    )}
-                                >
-                                    <TableCell className="py-1 w-[45px]">
-                                        <div className="relative flex items-center justify-center h-4 w-4 mx-auto">
-                                            <Checkbox
-                                                checked={isDone}
-                                                onCheckedChange={() => onToggleStatus(task)}
-                                                className={cn(
-                                                    "rounded-full h-4 w-4 border-muted-foreground/30 transition-opacity",
-                                                    togglingTaskIds?.has(task.id) && "opacity-50"
-                                                )}
-                                                disabled={togglingTaskIds?.has(task.id)}
-                                                aria-label={`${isDone ? t('tasks.actions.markIncomplete') : t('tasks.actions.markComplete')} - ${task.title}`}
-                                            />
-                                            {togglingTaskIds?.has(task.id) && (
-                                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                                    <Loader2 className={cn(
-                                                        "h-2.5 w-2.5 animate-spin",
-                                                        isDone ? "text-primary-foreground" : "text-primary"
-                                                    )} strokeWidth={3} />
-                                                </div>
-                                            )}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="py-1 text-[11px] font-medium text-muted-foreground/50 w-[40px] px-2 text-center">
-                                        {(page - 1) * limit + index + 1}
-                                    </TableCell>
-                                    <TableCell className="py-0.5 pl-4">
-                                        <div className="flex flex-col gap-1">
-                                            <span className={cn(
-                                                "text-sm font-semibold text-slate-900 dark:text-slate-100 line-clamp-2 leading-snug tracking-tight",
-                                                isDone && "line-through text-slate-400 dark:text-slate-500 font-normal"
-                                            )}>
-                                                {task.title}
-                                            </span>
-                                            {task.isTemplate && (
-                                                <div className="flex items-center gap-1 mt-1">
-                                                    <Badge variant="outline" className="text-[10px] h-4.5 px-2 rounded-md font-bold border-amber-500/30 text-amber-600 bg-amber-500/10 dark:text-amber-400 dark:border-amber-400/20">
-                                                        <Bookmark className="h-2.5 w-2.5 mr-1 fill-current" />
-                                                        {t('tasks.templateBadge')}
-                                                    </Badge>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="py-2">
-                                        <Badge
-                                            variant="outline"
-                                            className={cn(
-                                                "capitalize font-bold border-none px-2 py-0 h-5 rounded-full text-[10px]",
-                                                task.priority === 'high' && "bg-red-500/10 text-red-600 dark:text-red-400",
-                                                task.priority === 'medium' && "bg-blue-500/10 text-blue-600 dark:text-blue-400",
-                                                task.priority === 'low' && "bg-muted text-muted-foreground"
-                                            )}
-                                        >
-                                            {t(`tasks.priorityLevels.${task.priority}`)}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell className="py-2">
-                                        {dueDateInfo ? (
-                                            <div className={cn(
-                                                "text-xs font-medium",
-                                                dueDateInfo.overdue && !isDone && "text-destructive",
-                                                !dueDateInfo.overdue && "text-muted-foreground"
-                                            )}>
-                                                {format(dueDateInfo.date, 'MMM d, yyyy')}
-                                            </div>
-                                        ) : (
-                                            <span className="text-sm text-slate-400">-</span>
-                                        )}
-                                    </TableCell>
-                                    <TableCell className="hidden md:table-cell py-1.5 min-w-[120px]">
-                                        <div className="flex flex-wrap gap-1.5 max-w-[200px]">
-                                            {task.tags.map((tag) => (
-                                                <Badge
-                                                    key={tag}
-                                                    variant="secondary"
-                                                    className="bg-muted/50 text-muted-foreground text-[10px] h-5 px-2 font-medium border-border/50 rounded flex-shrink-0"
-                                                >
-                                                    {tag}
-                                                </Badge>
-                                            ))}
-                                            {task.tags.length === 0 && <span className="text-muted-foreground/40 text-xs">-</span>}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="py-1 text-right">
-                                        <div className="flex items-center justify-end gap-1">
-                                            <span className="text-[10px]">🍅</span>
-                                            <span className="text-[11px] font-bold text-foreground">
-                                                {task.actualPomodoros}/{task.estimatePomodoros}
-                                            </span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="py-2 text-right">
-                                        <div className={cn(
-                                            "flex items-center justify-end gap-1.5 transition-opacity duration-200",
-                                            isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                                        )}>
-                                            {isActive && (
-                                                <Badge
-                                                    className="bg-primary/10 text-primary border-primary/20 text-[9px] h-5 px-2 animate-pulse flex items-center gap-1"
-                                                >
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-primary animate-ping" />
-                                                    {t('tasks.focusing') || 'Focusing'}
-                                                </Badge>
-                                            )}
-
-                                            <TooltipProvider>
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation()
-                                                                onEdit(task)
-                                                            }}
-                                                            className="h-7 w-7 text-muted-foreground hover:text-blue-500 hover:bg-blue-500/10 transition-colors"
-                                                            aria-label={`${t('tasks.actions.edit')} - ${task.title}`}
-                                                        >
-                                                            <AnimatedEdit className="h-3.5 w-3.5" />
-                                                        </Button>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent side="top" className="text-[10px] py-1 px-2 text-center">
-                                                        {t('tasks.actions.edit')}
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
-                                                        aria-label={`${t('common.actions')} - ${task.title}`}
-                                                    >
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-40 text-xs shadow-xl ring-1 ring-black/5">
-                                                    <DropdownMenuItem onClick={() => onClone?.(task.id)} className="cursor-pointer">
-                                                        <Copy className="mr-2 h-3.5 w-3.5" />
-                                                        {t('tasks.actions.clone')}
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => onSaveAsTemplate?.(task.id)} className="cursor-pointer">
-                                                        <Bookmark className="mr-2 h-3.5 w-3.5" />
-                                                        {t('tasks.actions.saveAsTemplate')}
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem
-                                                        className="text-destructive focus:text-destructive cursor-pointer"
-                                                        onClick={() => onDelete(task.id)}
-                                                    >
-                                                        <AnimatedTrash className="mr-2 h-3.5 w-3.5" />
-                                                        {t('tasks.actions.deletePermanent')}
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            )
-                        })}
+                        {tasks.map((task, index) => (
+                            <TaskTableRow
+                                key={task.id}
+                                task={task}
+                                index={index}
+                                activeTaskId={activeTaskId}
+                                togglingTaskIds={togglingTaskIds}
+                                onToggleStatus={onToggleStatus}
+                                onToggleActive={onToggleActive}
+                                onEdit={onEdit}
+                                onDelete={onDelete}
+                                onClone={onClone}
+                                onSaveAsTemplate={onSaveAsTemplate}
+                                t={t}
+                            />
+                        ))}
                     </TableBody>
                 </Table>
                 {tasks.length === 0 && (
