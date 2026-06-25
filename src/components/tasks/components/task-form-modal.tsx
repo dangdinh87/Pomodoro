@@ -289,8 +289,9 @@ export function TaskFormModal({
                       type="button"
                       onClick={() => removeTag(tag)}
                       className="p-0.5 hover:bg-primary/20 rounded-full transition-colors"
+                      aria-label={`${t('common.delete')} ${tag}`}
                     >
-                      <X className="h-2.5 w-2.5" />
+                      <X className="h-2.5 w-2.5" aria-hidden="true" />
                     </button>
                   </Badge>
                 ))}
@@ -315,8 +316,9 @@ export function TaskFormModal({
                 size="sm"
                 onClick={() => handleAddTag(tagInput)}
                 className="shrink-0 h-9 px-2 sm:px-3"
+                aria-label={t('common.add')}
               >
-                <Plus className="h-4 w-4 sm:mr-1" />
+                <Plus className="h-4 w-4 sm:mr-1" aria-hidden="true" />
                 <span className="hidden sm:inline">{t('common.add')}</span>
               </Button>
             </div>
