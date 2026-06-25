@@ -10,6 +10,7 @@ import {
 import { useAuthStore } from '@/stores/auth-store';
 import { toast } from 'sonner';
 import { startOfDay, endOfDay } from 'date-fns';
+import { useDebounce } from 'use-debounce';
 
 // Helper functions to map API data
 function mapPriorityToApi(priority: TaskPriority | undefined) {
@@ -212,15 +213,17 @@ export function useTasks(filters: any = {}) {
   const [page, setPage] = useState(1);
   const limit = filters.limit || 10;
 
+  const [debouncedQuery] = useDebounce(filters.query, 500);
+
   const tasksQuery = useQuery({
-    queryKey: ['tasks', page, limit, filters],
+    queryKey: ['tasks', page, limit, { ...filters, query: debouncedQuery }],
     enabled: !!user,
     queryFn: () =>
       fetchTasks({
         page,
         limit,
         filters: {
-          q: filters.query,
+          q: debouncedQuery,
           status: filters.statusFilter,
           priority: filters.priorityFilter,
           tag: filters.tagFilter,
