@@ -296,9 +296,18 @@ export function TaskManagement() {
 
   // Task statistics - use filteredTasks to match displayed content
   const taskStats = useMemo(() => {
-    const todo = tasks.filter(t => t.status === 'todo').length
-    const doing = tasks.filter(t => t.status === 'doing').length
-    const done = tasks.filter(t => t.status === 'done').length
+    let todo = 0
+    let doing = 0
+    let done = 0
+
+    // ⚡ Bolt: Single pass O(n) instead of O(3n) with 3 intermediate array allocations
+    for (let i = 0; i < tasks.length; i++) {
+      const status = tasks[i].status
+      if (status === 'todo') todo++
+      else if (status === 'doing') doing++
+      else if (status === 'done') done++
+    }
+
     return { todo, doing, done, total: tasks.length }
   }, [tasks])
 
