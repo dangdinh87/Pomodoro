@@ -69,7 +69,6 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        aria-label={t('timerComponents.enhancedTimer.soundSettings')}
                                         className={cn(
                                             "h-10 w-10 rounded-full backdrop-blur-sm border transition-all relative overflow-visible",
                                             hasActiveAudio
