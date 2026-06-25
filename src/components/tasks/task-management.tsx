@@ -43,6 +43,8 @@ import {
 export function TaskManagement() {
   const taskFilters = useTaskFilters()
   const userTags = useTags()
+  const { debouncedQuery, ...restFilters } = taskFilters
+
   const {
     tasks,
     total,
@@ -58,7 +60,11 @@ export function TaskManagement() {
     isUpdating,
     isHardDeleting,
     isCloning,
-  } = useTasks(taskFilters)
+  } = useTasks({
+    ...restFilters,
+    // Pass the debounced query to useTasks to prevent frequent API calls while typing
+    query: debouncedQuery
+  })
 
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
   const router = useRouter()

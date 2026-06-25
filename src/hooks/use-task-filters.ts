@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useDebounce } from 'use-debounce';
 import { Task, TaskPriority, TaskStatus } from '@/stores/task-store';
 import { DateRange } from 'react-day-picker';
 import { subDays, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
@@ -13,6 +14,11 @@ export interface TaskFilters {
 
 export function useTaskFilters() {
   const [query, setQuery] = useState('');
+
+  // ⚡ Bolt Optimization: Debounce search input to reduce API calls
+  // Expected Impact: Prevents rapid-fire API requests on every keystroke, reducing network load and React Query refetches.
+  const [debouncedQuery] = useDebounce(query, 300);
+
   const [statusFilter, setStatusFilter] = useState<'all' | TaskStatus>('all');
   const [priorityFilter, setPriorityFilter] = useState<'all' | TaskPriority>(
     'all',
@@ -46,6 +52,7 @@ export function useTaskFilters() {
 
   return {
     query,
+    debouncedQuery,
     statusFilter,
     priorityFilter,
     tagFilter,
