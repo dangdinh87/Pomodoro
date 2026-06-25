@@ -295,10 +295,19 @@ export function TaskManagement() {
   }, [tasks])
 
   // Task statistics - use filteredTasks to match displayed content
+  // ⚡ Bolt: Replaced multiple .filter() calls with a single-pass loop to reduce
+  // time complexity from O(3N) to O(N) and avoid unnecessary array allocations.
   const taskStats = useMemo(() => {
-    const todo = tasks.filter(t => t.status === 'todo').length
-    const doing = tasks.filter(t => t.status === 'doing').length
-    const done = tasks.filter(t => t.status === 'done').length
+    let todo = 0
+    let doing = 0
+    let done = 0
+
+    for (const t of tasks) {
+      if (t.status === 'todo') todo++
+      else if (t.status === 'doing') doing++
+      else if (t.status === 'done') done++
+    }
+
     return { todo, doing, done, total: tasks.length }
   }, [tasks])
 
