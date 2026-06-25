@@ -260,8 +260,9 @@ const YouTubePane = memo(() => {
                 size="icon"
                 onClick={scrollLeft}
                 className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-background/80 hover:bg-background shadow-sm"
+                aria-label={t('common.previous')}
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-4 w-4" aria-hidden="true" />
               </Button>
             )}
             {canScrollRight && (
@@ -270,8 +271,9 @@ const YouTubePane = memo(() => {
                 size="icon"
                 onClick={scrollRight}
                 className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-background/80 hover:bg-background shadow-sm"
+                aria-label={t('common.next')}
               >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-4 w-4" aria-hidden="true" />
               </Button>
             )}
             <div
@@ -323,11 +325,13 @@ const YouTubePane = memo(() => {
                       const thumbnailUrl = parsed.videoId ? getYouTubeThumbnailUrl(parsed.videoId) : null;
 
                       return (
-                        <div
+                        <button
                           key={item.url}
+                          type="button"
                           onClick={() => handlePlaySuggestion(item)}
                           className={cn(
-                            "flex items-center gap-2 p-2 rounded-lg border cursor-pointer group relative overflow-hidden",
+                            "w-full text-left flex items-center gap-2 p-2 rounded-lg border cursor-pointer group relative overflow-hidden",
+                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:ring-offset-background",
                             "transition-colors duration-150",
                             isMatch
                               ? "bg-primary/10 border-primary/30 shadow-md"
@@ -392,14 +396,14 @@ const YouTubePane = memo(() => {
                             )}
                           >
                             {isBuffering ? (
-                              <Loader2 className="h-3 w-3 animate-spin" />
+                              <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />
                             ) : isPlaying ? (
-                              <Pause className="h-3 w-3 fill-current" />
+                              <Pause className="h-3 w-3 fill-current" aria-hidden="true" />
                             ) : (
-                              <Play className="h-3 w-3 fill-current" />
+                              <Play className="h-3 w-3 fill-current" aria-hidden="true" />
                             )}
                           </div>
-                        </div>
+                        </button>
                       );
                     })}
                   </div>
