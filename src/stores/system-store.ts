@@ -37,7 +37,7 @@ interface SystemState {
 
 const defaultBackgroundSettings: BackgroundSettings = {
   backgroundType: 'solid',
-  backgroundStyle: 'hsl(var(--background))',
+  backgroundStyle: 'var(--surface-page)',
   backgroundOpacity: 100,
 }
 

@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Globe } from 'lucide-react';
+import { Globe } from '@phosphor-icons/react/dist/ssr';
 
 import { cn } from '@/lib/utils';
 
@@ -18,7 +18,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
   return (
     <Select value={lang} onValueChange={(value) => setLang(value as Lang)}>
       <SelectTrigger className={cn("w-[140px]", className)}>
-        <Globe className="mr-2 h-4 w-4" />
+        <Globe size={16} className="mr-2" />
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

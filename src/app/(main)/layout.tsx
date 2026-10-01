@@ -1,83 +1,48 @@
 'use client';
 
-/**
- * Main App Layout - Client Component
- * Wraps authenticated app sections with providers
- */
 import { Suspense } from 'react';
-import { AppSidebar } from '@/components/layout/app-sidebar';
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from '@/components/ui/sidebar';
-import GATracker from '@/components/trackings/ga';
-import { useSystemStore } from '@/stores/system-store';
-import { GlobalChat } from '@/components/chat/global-chat';
-import { BotMessageSquare } from '@/components/animate-ui/icons/bot-message-square';
-import { Button } from '@/components/ui/button';
 import { usePathname } from 'next/navigation';
+import GATracker from '@/components/trackings/ga';
 import { AppProviders } from '@/components/providers/app-providers';
-import { useAuth } from '@/hooks/use-auth';
+import { AppTopBar } from '@/components/layout/app-top-bar';
+import { MobileTabBar } from '@/components/layout/mobile-tab-bar';
+import { useI18n } from '@/contexts/i18n-context';
 
-export default function MainLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const { isFocusMode, isChatPanelOpen, setChatPanelOpen } = useSystemStore();
-  const { isAuthenticated } = useAuth();
+function SkipLink() {
+  const { t } = useI18n();
+  return (
+    <a
+      href="#main-content"
+      className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-3 focus:z-50 focus:rounded-md focus:bg-surface focus:px-3 focus:py-2 focus:text-sm focus:font-semibold focus:text-ink focus:ring-2 focus:ring-brand"
+    >
+      {t('skipLink.label')}
+    </a>
+  );
+}
+
+export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const showChatToggle = false; // Hidden for UI rework
+  const isTimer = pathname === '/timer';
 
   return (
     <AppProviders>
-      <SidebarProvider>
-        <AppSidebar />
-        <SidebarInset className="h-screen overflow-hidden flex flex-col">
-          <div className="flex-1 flex overflow-hidden">
-            <div className="flex-1 flex flex-col overflow-hidden">
-              {!isFocusMode && (
-                <header className="flex h-14 items-center justify-between px-4 lg:h-[60px] shrink-0 gap-2">
-                  <SidebarTrigger />
-                  <div className="flex items-center gap-2">
-                    {showChatToggle && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setChatPanelOpen(!isChatPanelOpen)}
-                        className={
-                          isChatPanelOpen
-                            ? 'text-primary bg-primary/10'
-                            : 'hover:text-primary'
-                        }
-                        title="Toggle Chat"
-                        aria-label="Toggle Chat"
-                      >
-                        <BotMessageSquare
-                          loop={isChatPanelOpen}
-                          animate={isChatPanelOpen}
-                          initial={isChatPanelOpen ? 'open' : 'close'}
-                          className="h-5 w-5"
-                        />
-                      </Button>
-                    )}
-                  </div>
-                </header>
-              )}
-              {process.env.NEXT_PUBLIC_GA_ID ? (
-                <Suspense fallback={null}>
-                  <GATracker />
-                </Suspense>
-              ) : null}
-              <div className="flex-1 overflow-y-auto overflow-x-hidden px-0">
-                {children}
-              </div>
-            </div>
-            {/* GlobalChat hidden for UI rework */}
-          </div>
-        </SidebarInset>
-      </SidebarProvider>
+      <SkipLink />
+      <div className="flex min-h-dvh flex-col">
+        <AppTopBar overlay={isTimer} />
+        {process.env.NEXT_PUBLIC_GA_ID ? (
+          <Suspense fallback={null}>
+            <GATracker />
+          </Suspense>
+        ) : null}
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="flex flex-1 flex-col pb-[calc(64px+env(safe-area-inset-bottom))] focus:outline-none md:pb-0"
+        >
+          {children}
+        </main>
+        <MobileTabBar />
+      </div>
     </AppProviders>
   );
 }

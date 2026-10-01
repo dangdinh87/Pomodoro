@@ -16,7 +16,7 @@ import { FloatingPlayerBar } from '@/components/audio/youtube/floating-player-ba
 import { useYouTubePlayer } from '@/hooks/use-youtube-player';
 import { useAudioStore } from '@/stores/audio-store';
 import { getYouTubeThumbnailUrl } from '@/data/youtube-suggestions';
-import { Toaster } from 'sonner';
+import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NextTopLoader from 'nextjs-toploader';
 
@@ -69,14 +69,14 @@ function YouTubeFloatingPlayer() {
 export function AppProviders({ children }: AppProvidersProps) {
   return (
     <ThemeProvider
-      attribute="class"
+      attribute="data-theme"
       defaultTheme="dark"
       forcedTheme="dark"
       enableSystem={false}
       disableTransitionOnChange
     >
       <NextTopLoader
-        color="hsl(var(--primary))"
+        color="var(--accent-solid)"
         showSpinner={false}
         height={3}
         crawlSpeed={200}
