@@ -15,7 +15,8 @@ export const SessionCycle = memo(function SessionCycle() {
     if (usePlan || interval < 1) return null;
 
     const isWork = mode === 'work';
-    if (!isWork && sessionCount === 0) return null;
+    // Same height as the label row, so switching modes doesn't shift the clock.
+    if (!isWork && sessionCount === 0) return <div className="h-5" aria-hidden="true" />;
     const done = isWork || sessionCount % interval !== 0 ? sessionCount % interval : interval;
     const current = isWork ? done + 1 : null;
 

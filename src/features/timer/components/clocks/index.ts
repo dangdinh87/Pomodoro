@@ -7,13 +7,15 @@ export {
     type AnalogClockProps,
 } from './analog-clock';
 export {
-    ProgressBarClock,
-    type ProgressBarClockProps,
-} from './progress-bar-clock';
-export {
     FlipClock,
     type FlipClockProps,
 } from './flip-clock';
+export { ThreeClock, type ThreeClockProps } from './three-clock';
 export {
-    AnimatedCountdown,
-} from './animated-countdown';
+    CLOCK_STYLES,
+    getClockStyle,
+    isThreeDClock,
+    resolveClockType,
+    type ClockStyleMeta,
+    type SelectableClockType,
+} from './clock-registry';

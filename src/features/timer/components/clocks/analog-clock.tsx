@@ -3,6 +3,7 @@
 import { memo } from 'react';
 import NumberFlow from '@number-flow/react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useAnalogClockState } from './use-analog-clock-state';
 
 export type AnalogClockProps = {
@@ -11,6 +12,7 @@ export type AnalogClockProps = {
   timeLeft: number;
   clockSize?: 'small' | 'medium' | 'large';
   isRunning: boolean;
+  warn?: boolean;
 };
 
 const RADIUS = 90;
@@ -34,8 +36,10 @@ export const AnalogClock = memo(
     timeLeft,
     clockSize = 'medium',
     isRunning,
+    warn = true,
   }: AnalogClockProps) => {
-    const animConfig = useAnalogClockState({ timeLeft, isRunning });
+    const { t } = useTranslation();
+    const animConfig = useAnalogClockState({ timeLeft, isRunning, warn });
 
     const total = totalTimeForMode || 1;
     const elapsed = (total - timeLeft) / total; // 0→1 as time passes
@@ -59,22 +63,25 @@ export const AnalogClock = memo(
 
     const svgClassName = cn(
       'w-full h-full',
-      (animConfig.state === 'urgent' || animConfig.state === 'critical') && 'animate-clock-pulse',
+      animConfig.pulse && 'animate-clock-pulse',
       'clock-color-transition',
     );
 
     return (
       <div className="text-center">
         <div
-          className={cn('relative mx-auto mb-4', size.container)}
-          style={{ color: animConfig.color }}
+          className={cn('relative mx-auto', size.container)}
+          style={{ color: animConfig.accent }}
+          role="timer"
+          aria-live="off"
+          aria-label={t('timer.aria.timeRemaining').replace('{time}', `${minutes}:${String(seconds).padStart(2, '0')}`)}
         >
           {/* Rotation wrapper separated from SVG so animate-clock-pulse scale doesn't override -rotate-90 */}
           <div className="w-full h-full transform -rotate-90">
           <svg
             className={svgClassName}
             viewBox="0 0 200 200"
-            aria-label="Analog countdown"
+            aria-hidden="true"
           >
             {/* Background ring */}
             <circle
@@ -100,16 +107,21 @@ export const AnalogClock = memo(
               className="transition-[stroke-dasharray] duration-1000"
             />
 
-            {/* Inner accent ring */}
-            <circle
-              cx="100"
-              cy="100"
-              r="82"
-              strokeWidth="1"
-              stroke="currentColor"
-              fill="none"
-              opacity="0.2"
-            />
+            {/* 12 quiet ticks, one per twelfth of the phase */}
+            {Array.from({ length: 12 }, (_, i) => (
+              <line
+                key={i}
+                x1="100"
+                y1="22"
+                x2="100"
+                y2={i % 3 === 0 ? '30' : '27'}
+                stroke="currentColor"
+                strokeWidth={i % 3 === 0 ? 2 : 1.25}
+                strokeLinecap="round"
+                opacity={i % 3 === 0 ? 0.35 : 0.2}
+                transform={`rotate(${i * 30} 100 100)`}
+              />
+            ))}
 
             {/* Head dot with pulse aura (visible only when progress > 1%) */}
             {elapsed > 0.01 && (
@@ -146,6 +158,7 @@ export const AnalogClock = memo(
                 'clock-color-transition',
               )}
               style={{ color: animConfig.color }}
+              aria-hidden="true"
             >
               <div className="flex items-center">
                 <NumberFlow
@@ -157,7 +170,7 @@ export const AnalogClock = memo(
                   spinTiming={numberFlowTiming.spin}
                   opacityTiming={numberFlowTiming.opacity}
                 />
-                <span className="mx-0.5">:</span>
+                <span className="mx-[0.03em] inline-block -translate-y-[0.06em] opacity-60">:</span>
                 <NumberFlow
                   value={seconds}
                   format={{ minimumIntegerDigits: 2 }}

@@ -2,7 +2,16 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export type TimerMode = 'work' | 'shortBreak' | 'longBreak';
-export type ClockType = 'digital' | 'analog' | 'progress' | 'flip' | 'animated';
+export type ClockType =
+  | 'digital'
+  | 'analog'
+  | 'progress'
+  | 'flip'
+  | 'animated'
+  | 'flip3d'
+  | 'tomato'
+  | 'orbit'
+  | 'solid';
 
 export interface TimerSettings {
   workDuration: number; // in minutes

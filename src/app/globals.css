@@ -478,6 +478,11 @@ html[data-chrome-idle='true'] body {
  * progress line and primary button all read the current mode. The stage is always dark,
  * so only dark-mode steps are needed. Specificity (0,2,0) beats colour presets.
  */
+/* Re-resolved on the stage: a custom property inherits the value computed at :root,
+   which would pin the clock to the focus colour. */
+[data-timer] {
+  --timer-foreground: var(--accent);
+}
 [data-timer][data-mode='shortBreak'] {
   --accent: #2DD4BF;
   --accent-hover: #5EEAD4;

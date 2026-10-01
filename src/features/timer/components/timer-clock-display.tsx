@@ -9,6 +9,8 @@ import {
     AnalogClock,
     DigitalClock,
     FlipClock,
+    ThreeClock,
+    resolveClockType,
 } from './clocks';
 
 export const TimerClockDisplay = memo(function TimerClockDisplay() {
@@ -46,9 +48,11 @@ export const TimerClockDisplay = memo(function TimerClockDisplay() {
 
     const formattedTime = formatTime(timeLeft);
     const clockSize = settings.clockSize || 'medium';
+    const warn = settings.lowTimeWarningEnabled ?? true;
+    const clockType = resolveClockType(settings.clockType);
 
     let clockContent = null;
-    switch (settings.clockType) {
+    switch (clockType) {
         case 'analog':
             clockContent = (
                 <AnalogClock
@@ -57,6 +61,7 @@ export const TimerClockDisplay = memo(function TimerClockDisplay() {
                     timeLeft={timeLeft}
                     clockSize={clockSize}
                     isRunning={isRunning}
+                    warn={warn}
                 />
             );
             break;
@@ -67,11 +72,25 @@ export const TimerClockDisplay = memo(function TimerClockDisplay() {
                     timeLeft={timeLeft}
                     isRunning={isRunning}
                     clockSize={clockSize}
+                    warn={warn}
                 />
             );
             break;
-        case 'progress':
-            // Progress clock type removed from UI; fallback to digital
+        case 'flip3d':
+        case 'tomato':
+        case 'orbit':
+        case 'solid':
+            clockContent = (
+                <ThreeClock
+                    scene={clockType}
+                    timeLeft={timeLeft}
+                    totalTimeForMode={totalTimeForMode}
+                    isRunning={isRunning}
+                    clockSize={clockSize}
+                    warn={warn}
+                />
+            );
+            break;
         case 'digital':
         default:
             clockContent = (
@@ -81,12 +100,14 @@ export const TimerClockDisplay = memo(function TimerClockDisplay() {
                     timeLeft={timeLeft}
                     totalTimeForMode={totalTimeForMode}
                     clockSize={clockSize}
+                    warn={warn}
                 />
             );
             break;
     }
 
-    const showProgressLine = settings.clockType !== 'analog';
+    // Analog, tomato and orbit already draw the progress themselves.
+    const showProgressLine = clockType !== 'analog' && clockType !== 'tomato' && clockType !== 'orbit';
 
     return (
         <div className="flex w-full flex-col items-center gap-4">

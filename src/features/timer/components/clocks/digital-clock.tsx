@@ -12,6 +12,7 @@ export type DigitalClockProps = {
   timeLeft: number;
   totalTimeForMode: number;
   clockSize?: 'small' | 'medium' | 'large';
+  warn?: boolean;
 };
 
 const sizeClasses = {
@@ -31,9 +32,10 @@ export const DigitalClock = memo(
     isRunning,
     timeLeft,
     clockSize = 'medium',
+    warn = true,
   }: DigitalClockProps) => {
     const { t } = useTranslation();
-    const animConfig = useAnalogClockState({ timeLeft, isRunning });
+    const animConfig = useAnalogClockState({ timeLeft, isRunning, warn });
 
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
@@ -43,9 +45,9 @@ export const DigitalClock = memo(
         <div
           className={cn(
             sizeClasses[clockSize],
-            'font-heading font-bold leading-none tabular-nums',
+            'font-heading font-bold leading-none tabular-nums tracking-[-0.02em]',
             'clock-color-transition',
-            (animConfig.state === 'urgent' || animConfig.state === 'critical') && 'animate-clock-pulse',
+            animConfig.pulse && 'animate-clock-pulse',
           )}
           style={{ color: animConfig.color }}
           // role="timer" is not announced on every tick; TimerLiveAnnouncer
@@ -64,7 +66,7 @@ export const DigitalClock = memo(
               spinTiming={numberFlowTiming.spin}
               opacityTiming={numberFlowTiming.opacity}
             />
-            <span className="mx-0.5">:</span>
+            <span className="mx-[0.03em] inline-block -translate-y-[0.06em] opacity-60" aria-hidden>:</span>
             <NumberFlow
               value={seconds}
               format={{ minimumIntegerDigits: 2 }}

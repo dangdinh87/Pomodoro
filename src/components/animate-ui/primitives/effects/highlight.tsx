@@ -252,10 +252,14 @@ function Highlight<T extends React.ElementType = 'div'>({
     return () => container.removeEventListener('scroll', onScroll);
   }, [mode, activeValue]);
 
+  // Narrowed: with react-three-fiber's JSX elements in scope, inference over the
+  // generic `as` element collapses to `never`.
+  const ParentContainer = Component as React.ComponentType<Record<string, unknown>>;
+
   const render = (children: React.ReactNode) => {
     if (mode === 'parent') {
       return (
-        <Component
+        <ParentContainer
           ref={localRef}
           data-slot="motion-highlight-container"
           style={{ position: 'relative', zIndex: 1 }}
@@ -293,7 +297,7 @@ function Highlight<T extends React.ElementType = 'div'>({
             )}
           </AnimatePresence>
           {children}
-        </Component>
+        </ParentContainer>
       );
     }
 

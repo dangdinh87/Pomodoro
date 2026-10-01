@@ -3,6 +3,7 @@
 import { memo, useState, useEffect } from 'react';
 import { useReducedMotion } from 'motion/react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useAnalogClockState } from './use-analog-clock-state';
 
 export type FlipClockProps = {
@@ -10,6 +11,7 @@ export type FlipClockProps = {
   timeLeft: number;
   isRunning: boolean;
   clockSize?: 'small' | 'medium' | 'large';
+  warn?: boolean;
 };
 
 const sizeClasses = {
@@ -43,12 +45,12 @@ const FlipDigit = memo(({ value, color }: { value: string; color: string }) => {
 
   return (
     <div 
-      className="relative inline-flex flex-col w-[0.82em] h-[1.3em] font-heading font-bold tabular-nums select-none text-center" 
+      className="relative inline-flex flex-col w-[0.82em] h-[1.3em] font-heading font-bold tabular-nums select-none text-center rounded-lg shadow-[0_0.06em_0.12em_rgb(0_0_0/0.35)]" 
       style={{ perspective: '400px', transformStyle: 'preserve-3d' }}
     >
       {/* STATIC TOP HALF (displays current new value) */}
       <div 
-        className="absolute top-0 left-0 right-0 h-1/2 overflow-hidden bg-surface rounded-t-md border-t border-x border-border"
+        className="absolute top-0 left-0 right-0 h-1/2 overflow-hidden bg-surface rounded-t-lg border-t border-x border-border"
         style={{ backfaceVisibility: 'hidden' }}
       >
         <span 
@@ -66,7 +68,7 @@ const FlipDigit = memo(({ value, color }: { value: string; color: string }) => {
 
       {/* STATIC BOTTOM HALF (displays new value normally, old value only during active flip) */}
       <div 
-        className="absolute bottom-0 left-0 right-0 h-1/2 overflow-hidden bg-surface rounded-b-md border-b border-x border-border"
+        className="absolute bottom-0 left-0 right-0 h-1/2 overflow-hidden bg-surface rounded-b-lg border-b border-x border-border"
         style={{ backfaceVisibility: 'hidden' }}
       >
         <span 
@@ -86,7 +88,7 @@ const FlipDigit = memo(({ value, color }: { value: string; color: string }) => {
       {isFlipping && (
         <div 
           key={`top-${flipId}`}
-          className="absolute top-0 left-0 right-0 h-1/2 overflow-hidden bg-surface rounded-t-md border-t border-x border-border flip-panel-top-anim"
+          className="absolute top-0 left-0 right-0 h-1/2 overflow-hidden bg-surface rounded-t-lg border-t border-x border-border flip-panel-top-anim"
           style={{ 
             transformOrigin: 'bottom',
             backfaceVisibility: 'hidden',
@@ -112,7 +114,7 @@ const FlipDigit = memo(({ value, color }: { value: string; color: string }) => {
       {isFlipping && (
         <div 
           key={`bottom-${flipId}`}
-          className="absolute bottom-0 left-0 right-0 h-1/2 overflow-hidden bg-surface rounded-b-md border-b border-x border-border flip-panel-bottom-anim"
+          className="absolute bottom-0 left-0 right-0 h-1/2 overflow-hidden bg-surface rounded-b-lg border-b border-x border-border flip-panel-bottom-anim"
           style={{ 
             transformOrigin: 'top',
             backfaceVisibility: 'hidden',
@@ -145,18 +147,23 @@ const FlipDigit = memo(({ value, color }: { value: string; color: string }) => {
 FlipDigit.displayName = 'FlipDigit';
 
 export const FlipClock = memo(
-  ({ timeLeft, isRunning, clockSize = 'medium' }: FlipClockProps) => {
-    const animConfig = useAnalogClockState({ timeLeft, isRunning });
+  ({ timeLeft, isRunning, clockSize = 'medium', warn = true }: FlipClockProps) => {
+    const { t } = useTranslation();
+    const animConfig = useAnalogClockState({ timeLeft, isRunning, warn });
     const mins = Math.floor(timeLeft / 60);
     const secs = timeLeft % 60;
     const size = sizeClasses[clockSize];
-    const isUrgentOrCritical = animConfig.state === 'urgent' || animConfig.state === 'critical';
 
     const minsDigits = String(mins).padStart(2, '0').split('');
     const secsDigits = String(secs).padStart(2, '0').split('');
 
     return (
-      <div className="text-center">
+      <div
+        className="text-center"
+        role="timer"
+        aria-live="off"
+        aria-label={t('timer.aria.timeRemaining').replace('{time}', `${mins}:${String(secs).padStart(2, '0')}`)}
+      >
         {/* Style block for animations */}
         <style dangerouslySetInnerHTML={{ __html: `
           @keyframes flip-top {
@@ -190,11 +197,12 @@ export const FlipClock = memo(
         ` }} />
 
         <div
+          aria-hidden="true"
           className={cn(
             'flex justify-center items-center clock-color-transition',
             size.gap,
             size.digit,
-            isUrgentOrCritical && 'animate-clock-pulse',
+            animConfig.pulse && 'animate-clock-pulse',
           )}
         >
           {/* Minutes Digits */}
@@ -204,12 +212,10 @@ export const FlipClock = memo(
             ))}
           </div>
 
-          {/* Separator */}
-          <div 
-            className={cn(size.separator, 'font-heading font-bold flex items-center justify-center h-[1.3em] select-none')}
-            style={{ color: animConfig.color }}
-          >
-            :
+          {/* Separator: two dots, stacked on the hinge line */}
+          <div className={cn(size.separator, 'flex h-[1.3em] flex-col items-center justify-center gap-[0.16em] px-[0.04em]')} aria-hidden="true">
+            <span className="block size-[0.1em] rounded-full opacity-70" style={{ backgroundColor: animConfig.color }} />
+            <span className="block size-[0.1em] rounded-full opacity-70" style={{ backgroundColor: animConfig.color }} />
           </div>
 
           {/* Seconds Digits */}
