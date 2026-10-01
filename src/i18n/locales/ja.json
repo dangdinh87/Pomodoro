@@ -1747,5 +1747,38 @@
       "ambientPlaying": "環境音を再生中",
       "ambientMix": "環境音ミックス（{count}件）"
     }
+  },
+  "shell": {
+    "dock": "パネル",
+    "openTimer": "タイマーを開く",
+    "streak": "{count}日連続",
+    "panels": {
+      "tasks": "タスク",
+      "sound": "サウンド",
+      "scene": "シーン",
+      "timer": "タイマー",
+      "stats": "統計",
+      "arcade": "ゲーム",
+      "settings": "設定",
+      "feedback": "フィードバック",
+      "login": "ログイン"
+    },
+    "palette": {
+      "open": "コマンドを検索",
+      "short": "検索",
+      "placeholder": "コマンドを入力または検索…",
+      "empty": "一致するコマンドはありません。",
+      "groups": {
+        "timer": "タイマー",
+        "panels": "開く",
+        "language": "言語",
+        "account": "アカウント"
+      },
+      "pause": "一時停止",
+      "start": "開始",
+      "reset": "タイマーをリセット",
+      "switchTo": "{mode}に切り替え",
+      "guide": "ポモドーロガイド"
+    }
   }
 }

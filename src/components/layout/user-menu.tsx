@@ -20,6 +20,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/hooks/use-auth';
 import { useI18n, LANGS, type Lang } from '@/contexts/i18n-context';
+import { openPanel } from '@/features/app-shell/panel-store';
 
 export function UserMenu() {
   const router = useRouter();
@@ -65,7 +66,7 @@ export function UserMenu() {
             {user.name && <p className="truncate text-xs text-ink-muted">{user.email}</p>}
           </DropdownMenuLabel>
         ) : (
-          <DropdownMenuItem className="cursor-pointer gap-3 py-2" onClick={() => router.push('/login')}>
+          <DropdownMenuItem className="cursor-pointer gap-3 py-2" onClick={() => openPanel('login')}>
             <SignIn size={16} className="text-ink-muted" />
             <span className="flex flex-col">
               <span className="font-semibold text-ink">{t('nav.login')}</span>
@@ -76,7 +77,7 @@ export function UserMenu() {
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem className="cursor-pointer gap-3" onClick={() => router.push('/settings')}>
+        <DropdownMenuItem className="cursor-pointer gap-3" onClick={() => openPanel('settings')}>
           <Gear size={16} className="text-ink-muted" />
           {t('nav.settings')}
         </DropdownMenuItem>
@@ -84,7 +85,7 @@ export function UserMenu() {
           <BookOpen size={16} className="text-ink-muted" />
           {t('nav.guide')}
         </DropdownMenuItem>
-        <DropdownMenuItem className="cursor-pointer gap-3" onClick={() => router.push('/feedback')}>
+        <DropdownMenuItem className="cursor-pointer gap-3" onClick={() => openPanel('feedback')}>
           <ChatCircle size={16} className="text-ink-muted" />
           {t('nav.feedback')}
         </DropdownMenuItem>

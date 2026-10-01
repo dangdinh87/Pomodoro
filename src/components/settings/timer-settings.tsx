@@ -11,7 +11,7 @@ import { useTimerStore } from '@/stores/timer-store'
 import { toast } from 'sonner'
 import { SettingsSection, SettingsRow } from '@/components/settings/settings-section'
 import { useI18n } from '@/contexts/i18n-context'
-import { FlipClock } from '@/app/(main)/timer/components/clocks/flip-clock'
+import { FlipClock } from '@/features/timer/components/clocks/flip-clock'
 
 const PREVIEW_DIGITS = { small: 'text-3xl', medium: 'text-5xl', large: 'text-6xl' } as const
 const PREVIEW_ANALOG = {

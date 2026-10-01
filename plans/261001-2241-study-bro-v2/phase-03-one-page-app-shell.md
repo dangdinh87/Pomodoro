@@ -1,7 +1,7 @@
 ---
 phase: 03
 title: "App một trang"
-status: pending
+status: done (phần lớn) — còn bottom sheet kéo trên mobile, light mode cho sân khấu
 estimate: 3 ngày
 depends_on: 01
 ---
@@ -34,3 +34,15 @@ depends_on: 01
 ## Rủi ro
 - Một trang quá tải → giới hạn mỗi lúc một panel, panel tải động (code split).
 - SEO của route cũ → giữ redirect 308 và sitemap mới.
+
+## Kết quả (2026-10-02)
+- `/` là app duy nhất: sân khấu timer (thanh trạng thái + đồng hồ + dock) ở `src/features/app-shell/`; trang cũ thành panel ở `src/features/panels/` (tasks, stats, arcade, settings, feedback) + login dạng dialog. Sound/Scene/Timer dùng lại sheet/modal có sẵn.
+- `panel-store`: một panel mỗi lúc, đồng bộ `?panel=` — mở thì push 1 entry, đổi panel thì replace, Back/Esc đóng; deep link mở thẳng panel.
+- Phím: Space/R (timer), T/S/B/C/H/G (panel), ⌘K/Ctrl K (command palette, cmdk). Phím tắt bị chặn khi đang gõ hoặc có dialog mở; Space nhường cho nút đang focus.
+- Route cũ → 308 `/?panel=…` (/timer, /tasks, /history, /settings, /entertainment, /feedback, /login, /signup…). Chỉ còn trang nội dung: /guide, /privacy, /terms (header + footer chung).
+- Dưới màn đầu `/` (chỉ khách / chưa có tài khoản): Features, How it works, FAQ + JSON-LD — SSR cho SEO.
+- Panel nặng tải động (code split). Test: panel-store (Back/deep link/replace) + dock. Harness 1440 + 390: mọi panel, palette, deep link, redirect.
+
+### Còn lại
+- Mobile: sheet bên trái/phải full-width thay vì bottom sheet có kéo — đủ dùng, làm đẹp ở phase 11.
+- Sân khấu luôn dark (nền scene); panel theo theme người dùng. Light mode cho sân khấu cân nhắc khi làm scene (phase 06).

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,10 +15,10 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useAuth } from '@/hooks/use-auth';
 import { useI18n } from '@/contexts/i18n-context';
+import { openPanel } from '@/features/app-shell/panel-store';
 
 export function AccountSettings() {
   const { t } = useI18n();
-  const router = useRouter();
   const { user, isAuthenticated, isLoading, signOut } = useAuth();
 
   const [exporting, setExporting] = useState(false);
@@ -36,7 +35,7 @@ export function AccountSettings() {
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">{t('settings.account.title')}</h2>
         <p>{t('settings.account.guestPrompt')}</p>
-        <Button onClick={() => router.push('/login?redirect=/settings')}>
+        <Button onClick={() => openPanel('login')}>
           {t('settings.account.guestLogin')}
         </Button>
       </section>

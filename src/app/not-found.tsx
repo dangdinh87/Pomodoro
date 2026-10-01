@@ -20,7 +20,7 @@ export default async function NotFound() {
         </h1>
         <p className="mt-3 text-sm text-ink-muted">{t('notFound.description')}</p>
         <Button asChild size="lg" className="mt-8">
-          <Link href="/timer">{t('notFound.backToTimer')}</Link>
+          <Link href="/">{t('notFound.backToTimer')}</Link>
         </Button>
       </div>
     </main>

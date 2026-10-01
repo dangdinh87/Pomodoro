@@ -1747,5 +1747,38 @@
       "ambientPlaying": "Đang phát âm thanh nền",
       "ambientMix": "Trộn âm thanh nền ({count} âm)"
     }
+  },
+  "shell": {
+    "dock": "Bảng điều khiển",
+    "openTimer": "Mở đồng hồ",
+    "streak": "Chuỗi {count} ngày",
+    "panels": {
+      "tasks": "Việc cần làm",
+      "sound": "Âm thanh",
+      "scene": "Không gian",
+      "timer": "Hẹn giờ",
+      "stats": "Thống kê",
+      "arcade": "Giải trí",
+      "settings": "Cài đặt",
+      "feedback": "Góp ý",
+      "login": "Đăng nhập"
+    },
+    "palette": {
+      "open": "Tìm lệnh",
+      "short": "Tìm",
+      "placeholder": "Gõ lệnh hoặc tìm…",
+      "empty": "Không có lệnh phù hợp.",
+      "groups": {
+        "timer": "Hẹn giờ",
+        "panels": "Mở",
+        "language": "Ngôn ngữ",
+        "account": "Tài khoản"
+      },
+      "pause": "Tạm dừng",
+      "start": "Bắt đầu",
+      "reset": "Đặt lại hẹn giờ",
+      "switchTo": "Chuyển sang {mode}",
+      "guide": "Hướng dẫn Pomodoro"
+    }
   }
 }

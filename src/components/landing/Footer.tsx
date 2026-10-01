@@ -41,11 +41,11 @@ export async function Footer() {
           </div>
 
           <nav className="flex flex-wrap gap-x-8 gap-y-4">
-            <Link href="#features" className="text-sm font-medium text-ink-muted hover:text-ink transition-colors">
+            <Link href="/#features" className="text-sm font-medium text-ink-muted hover:text-ink transition-colors">
               {t('landing.footer.links.features')}
             </Link>
-            <Link href="#pricing" className="text-sm font-medium text-ink-muted hover:text-ink transition-colors">
-              {t('landing.footer.links.pricing')}
+            <Link href="/guide" className="text-sm font-medium text-ink-muted hover:text-ink transition-colors">
+              {t('nav.guide')}
             </Link>
             <Link href="/privacy" className="text-sm font-medium text-ink-muted hover:text-ink transition-colors">
               {t('landing.footer.links.privacy')}

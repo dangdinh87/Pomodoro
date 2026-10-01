@@ -1747,5 +1747,38 @@
       "ambientPlaying": "Ambient sound playing",
       "ambientMix": "Ambient mix ({count} sounds)"
     }
+  },
+  "shell": {
+    "dock": "App panels",
+    "openTimer": "Open the timer",
+    "streak": "{count}-day streak",
+    "panels": {
+      "tasks": "Tasks",
+      "sound": "Sounds",
+      "scene": "Scene",
+      "timer": "Timer",
+      "stats": "Stats",
+      "arcade": "Arcade",
+      "settings": "Settings",
+      "feedback": "Feedback",
+      "login": "Sign in"
+    },
+    "palette": {
+      "open": "Search commands",
+      "short": "Search",
+      "placeholder": "Type a command or search…",
+      "empty": "No matching command.",
+      "groups": {
+        "timer": "Timer",
+        "panels": "Open",
+        "language": "Language",
+        "account": "Account"
+      },
+      "pause": "Pause",
+      "start": "Start",
+      "reset": "Reset timer",
+      "switchTo": "Switch to {mode}",
+      "guide": "Pomodoro guide"
+    }
   }
 }

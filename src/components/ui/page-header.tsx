@@ -19,6 +19,11 @@ export function PageContainer({
   );
 }
 
+/** Padding for page content rendered inside a sheet or dialog panel. */
+export function PanelBody({ className, children }: { className?: string; children: ReactNode }) {
+  return <div className={cn('px-5 pb-10 pt-6 sm:px-8 sm:pt-8', className)}>{children}</div>;
+}
+
 export function PageHeader({
   title,
   description,

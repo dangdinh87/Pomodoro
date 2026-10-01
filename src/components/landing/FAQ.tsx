@@ -4,6 +4,7 @@
  */
 import { getT } from '@/lib/server-translations';
 import { FAQAccordion } from './faq-accordion';
+import { OpenPanelButton } from '@/features/app-shell/open-panel-button';
 
 export async function FAQ() {
   const t = await getT();
@@ -26,9 +27,9 @@ export async function FAQ() {
         <div className="mt-6">
           <p className="text-sm text-ink-secondary">
             {t('landing.faq.stillHaveQuestions')}{' '}
-            <a href="/feedback" className="text-brand hover:underline font-medium">
+            <OpenPanelButton panel="feedback" className="font-medium text-brand hover:underline">
               {t('landing.faq.sendMessage')}
-            </a>
+            </OpenPanelButton>
           </p>
         </div>
       </div>

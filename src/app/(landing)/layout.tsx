@@ -1,8 +1,9 @@
 /**
- * Landing Layout - with client providers for interactive components
- * SSR components use server-side translations
- * Client components (HowItWorks, Pricing, FAQ, etc.) use I18nProvider
+ * Standalone content pages (guide, privacy, terms). Server components use
+ * server-side translations; client parts use I18nProvider.
  */
+import { Footer } from '@/components/landing/Footer';
+import { SiteHeader } from '@/components/landing/site-header';
 import { ThemeProvider } from '@/components/layout/theme-provider';
 import { I18nProvider } from '@/contexts/i18n-context';
 import { getT } from '@/lib/server-translations';
@@ -29,6 +30,7 @@ export default async function LandingLayout({
           >
             {t('skipLink.label')}
           </a>
+          <SiteHeader />
           <main
             id="main-content"
             tabIndex={-1}
@@ -36,6 +38,7 @@ export default async function LandingLayout({
           >
             {children}
           </main>
+          <Footer />
         </div>
       </I18nProvider>
     </ThemeProvider>

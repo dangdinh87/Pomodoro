@@ -1,8 +1,8 @@
 "use client"
 
 import { useMemo, useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { useSessionRecorder } from '@/lib/timer/use-session-recorder'
+import { closePanel } from '@/features/app-shell/panel-store'
 import { isPast, isToday } from 'date-fns'
 import { BookmarkSimple, CircleNotch, DotsThree, Tag } from '@phosphor-icons/react/dist/ssr'
 import { Task, TaskPriority, TaskStatus, useTasksStore } from '@/stores/task-store'
@@ -48,7 +48,6 @@ export function TaskManagement() {
     useTasks(TASK_QUERY)
   const { saveAsTemplate } = useTemplates()
   const { t } = useI18n()
-  const router = useRouter()
   const { record } = useSessionRecorder()
   const { activeTaskId, setActiveTask, viewMode, setViewMode } = useTasksStore()
 
@@ -131,7 +130,7 @@ export function TaskManagement() {
       setActiveTask(task.id)
       if (task.status === 'todo') void updateTask({ id: task.id, input: { status: 'doing' } })
     }
-    router.push('/timer')
+    closePanel()
   }
 
   const handleQuickAdd = async (input: { title: string; priority: TaskPriority; estimatePomodoros: number }) => {

@@ -1,19 +1,16 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, CircleNotch, EnvelopeSimple, SignIn } from '@phosphor-icons/react/dist/ssr';
+import { CircleNotch, EnvelopeSimple, SignIn } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useI18n } from '@/contexts/i18n-context';
 import { useAuth } from '@/hooks/use-auth';
 import { authClient } from '@/lib/auth-client';
-import { toSafeRedirectPath } from '@/lib/safe-redirect';
 
 const CODE_LENGTH = 6;
 
@@ -28,10 +25,9 @@ function GoogleGlyph() {
   );
 }
 
-export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
+/** Email-code and Google sign-in; `onSignedIn` runs once a real account is active. */
+export function LoginForm({ googleEnabled, onSignedIn }: { googleEnabled: boolean; onSignedIn: () => void }) {
   const { t } = useI18n();
-  const router = useRouter();
-  const redirectTo = toSafeRedirectPath(useSearchParams().get('redirect'));
   const { user, isAuthenticated } = useAuth();
 
   const [step, setStep] = useState<'email' | 'code'>('email');
@@ -41,8 +37,8 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isAuthenticated) router.replace(redirectTo);
-  }, [isAuthenticated, redirectTo, router]);
+    if (isAuthenticated) onSignedIn();
+  }, [isAuthenticated, onSignedIn]);
 
   async function sendCode(event?: React.FormEvent) {
     event?.preventDefault();
@@ -71,13 +67,13 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
       setError(t('login.errors.invalidCode'));
       return;
     }
-    router.replace(redirectTo);
+    onSignedIn();
   }
 
   async function signInWithGoogle() {
     setBusy(true);
     setError(null);
-    const { error: googleError } = await authClient.signIn.social({ provider: 'google', callbackURL: redirectTo });
+    const { error: googleError } = await authClient.signIn.social({ provider: 'google', callbackURL: '/' });
     if (googleError) {
       setBusy(false);
       setError(t('login.errors.googleConnectionFailed'));
@@ -172,14 +168,6 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
         {user?.isAnonymous && <p className="text-center text-xs text-ink-muted">{t('login.guestNote')}</p>}
       </CardContent>
 
-      <CardFooter className="justify-center">
-        <Button variant="link" size="sm" asChild>
-          <Link href="/timer">
-            <ArrowLeft size={14} />
-            {t('login.form.backToApp')}
-          </Link>
-        </Button>
-      </CardFooter>
     </Card>
   );
 }

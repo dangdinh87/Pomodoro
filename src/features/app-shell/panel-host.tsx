@@ -1,0 +1,98 @@
+'use client';
+
+import dynamic from 'next/dynamic';
+import type { ReactNode } from 'react';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
+import { AudioSidebar } from '@/components/audio/audio-sidebar';
+import BackgroundSettingsModal from '@/components/settings/background-settings-modal';
+import { TimerSettingsModal } from '@/components/settings/timer-settings-modal';
+import { LoginForm } from '@/components/auth/login-form';
+import { useI18n } from '@/contexts/i18n-context';
+import { cn } from '@/lib/utils';
+import { PANELS } from './panel-registry';
+import { closePanel, usePanelStore, type PanelId } from './panel-store';
+
+// Loaded on first open so the timer page only ships the timer.
+const TasksPanel = dynamic(() => import('@/features/panels/tasks-panel'));
+const StatsPanel = dynamic(() => import('@/features/panels/stats-panel'));
+const ArcadePanel = dynamic(() => import('@/features/panels/arcade-panel'));
+const SettingsPanel = dynamic(() => import('@/features/panels/settings-panel'));
+const FeedbackPanel = dynamic(() => import('@/features/panels/feedback-panel'));
+
+const onOpenChange = (open: boolean) => {
+  if (!open) closePanel();
+};
+
+function PanelTitle({ id, as: Title }: { id: PanelId; as: typeof SheetTitle | typeof DialogTitle }) {
+  const { t } = useI18n();
+  return <Title className="sr-only">{t(PANELS[id].labelKey)}</Title>;
+}
+
+function SheetPanel({ id, side, children }: { id: PanelId; side: 'left' | 'right'; children: ReactNode }) {
+  const open = usePanelStore((s) => s.active === id);
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side={side} className="w-full overflow-y-auto p-0 sm:max-w-[720px]">
+        <PanelTitle id={id} as={SheetTitle} />
+        {open && children}
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function DialogPanel({
+  id,
+  className,
+  children,
+}: {
+  id: PanelId;
+  className?: string;
+  children: ReactNode;
+}) {
+  const open = usePanelStore((s) => s.active === id);
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className={cn('block max-h-[90dvh] max-w-2xl overflow-y-auto p-0', className)}>
+        <PanelTitle id={id} as={DialogTitle} />
+        {open && children}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export function PanelHost({ googleEnabled }: { googleEnabled: boolean }) {
+  const active = usePanelStore((s) => s.active);
+
+  return (
+    <>
+      <AudioSidebar open={active === 'sound'} onOpenChange={onOpenChange} />
+      <BackgroundSettingsModal isOpen={active === 'scene'} onClose={closePanel} />
+      <TimerSettingsModal isOpen={active === 'timer'} onClose={closePanel} />
+
+      <SheetPanel id="tasks" side="left">
+        <TasksPanel />
+      </SheetPanel>
+      <SheetPanel id="stats" side="right">
+        <StatsPanel />
+      </SheetPanel>
+
+      <DialogPanel id="settings">
+        <SettingsPanel />
+      </DialogPanel>
+      <DialogPanel id="feedback">
+        <FeedbackPanel />
+      </DialogPanel>
+      {/* Full viewport and untransformed: games position their overlays with `fixed`. */}
+      <DialogPanel
+        id="arcade"
+        className="inset-0 left-0 top-0 h-dvh max-h-none w-screen max-w-none translate-x-0 translate-y-0 rounded-none border-0 data-[state=closed]:slide-out-to-left-0 data-[state=closed]:slide-out-to-top-0 data-[state=open]:slide-in-from-left-0 data-[state=open]:slide-in-from-top-0 sm:rounded-none"
+      >
+        <ArcadePanel />
+      </DialogPanel>
+      <DialogPanel id="login" className="max-w-md border-0 bg-transparent shadow-none">
+        <LoginForm googleEnabled={googleEnabled} onSignedIn={closePanel} />
+      </DialogPanel>
+    </>
+  );
+}

@@ -64,13 +64,18 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      // Retired pages: /progress was a "coming soon" placeholder and /focus only
-      // showed the streak tracker, which now lives on /history.
-      { source: '/progress', destination: '/history', permanent: true },
-      { source: '/focus', destination: '/history', permanent: true },
-      // Email codes replaced passwords: sign-up and reset are the same sign-in flow now.
-      { source: '/signup', destination: '/login', permanent: true },
-      { source: '/reset-password', destination: '/login', permanent: true },
+      // One-page app: former pages open as panels on `/` (see src/features/app-shell).
+      { source: '/timer', destination: '/', permanent: true },
+      { source: '/tasks', destination: '/?panel=tasks', permanent: true },
+      { source: '/history', destination: '/?panel=stats', permanent: true },
+      { source: '/progress', destination: '/?panel=stats', permanent: true },
+      { source: '/focus', destination: '/?panel=stats', permanent: true },
+      { source: '/settings', destination: '/?panel=settings', permanent: true },
+      { source: '/entertainment', destination: '/?panel=arcade', permanent: true },
+      { source: '/feedback', destination: '/?panel=feedback', permanent: true },
+      { source: '/login', destination: '/?panel=login', permanent: true },
+      { source: '/signup', destination: '/?panel=login', permanent: true },
+      { source: '/reset-password', destination: '/?panel=login', permanent: true },
     ];
   },
 };
