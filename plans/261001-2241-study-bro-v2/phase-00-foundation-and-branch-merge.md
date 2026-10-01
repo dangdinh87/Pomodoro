@@ -1,7 +1,7 @@
 ---
 phase: 00
 title: "Nền móng & hợp nhất nhánh"
-status: pending
+status: done (trừ xoá lịch sử git — chờ xác nhận)
 estimate: 1.5 ngày
 depends_on: — (chủ dự án đã đồng ý commit + merge, làm chung một nhánh)
 ---
@@ -36,3 +36,10 @@ Có một nhánh duy nhất, sạch, chứa cả phần UI (feat/design-system) 
 
 ## Câu hỏi còn lại
 - Xoá 181 MB ảnh gốc khỏi **lịch sử** git cần force-push mọi nhánh → người cộng tác phải clone lại. Chỉ làm khi chủ dự án xác nhận riêng.
+
+## Kết quả (2026-10-01)
+- Commit theo nhóm: `bda270d` design system → `1b76543` các trang, `c5919e1` plan; merge `2f8dbf6` (20 xung đột, giữ UI mới + áp lại logic ghi phiên của nhánh fix).
+- Dọn `767ffb8`: xoá ~35 file chết, 11 dependency thừa, script `.py`, `build.log`; menu lọc theo cờ.
+- `backgrounds-source/`: mới xoá các bộ không dùng (classic, travelling, video anime-cozy). Phần còn lại vẫn là nguồn của `prebuild` → gỡ hẳn ở phase 06.
+- Kiểm tra: tsc 0 lỗi, jest 226/226, build bật gate type/lint, harness `/timer` `/tasks` `/history` `/settings` + khách không lỗi bước.
+- **Còn treo:** xoá 181 MB khỏi lịch sử git (force-push) — chờ chủ dự án xác nhận riêng.
