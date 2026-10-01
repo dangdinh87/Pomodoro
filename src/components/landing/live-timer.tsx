@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ArrowRight, ArrowCounterClockwise, Pause, Play } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '@/components/ui/button';
 import { FilterChip, FilterChipGroup } from '@/components/ui/filter-chip';
-import { t } from '@/lib/server-translations';
+import { useI18n } from '@/contexts/i18n-context';
 import { cn } from '@/lib/utils';
 
 const MODES = [
@@ -23,6 +23,7 @@ function format(totalSeconds: number) {
 }
 
 export function LiveTimer({ className }: { className?: string }) {
+  const { t } = useI18n();
   const [modeKey, setModeKey] = useState<ModeKey>('work');
   const mode = MODES.find((m) => m.key === modeKey)!;
   const total = mode.minutes * 60;

@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { APP_NAV, isNavActive } from '@/config/app-navigation';
+import { getVisibleNav, isNavActive } from '@/config/app-navigation';
 import { useI18n } from '@/contexts/i18n-context';
 import { cn } from '@/lib/utils';
 
 export function MobileTabBar() {
   const pathname = usePathname();
   const { t } = useI18n();
+  const items = getVisibleNav();
 
   return (
     <nav
@@ -16,8 +17,8 @@ export function MobileTabBar() {
       aria-label={t('nav.navigation')}
       className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/90 pb-safe backdrop-blur-md md:hidden"
     >
-      <ul className="grid grid-cols-4">
-        {APP_NAV.map(({ href, labelKey, icon: Icon }) => {
+      <ul className="grid" style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}>
+        {items.map(({ href, labelKey, icon: Icon }) => {
           const active = isNavActive(pathname, href);
           return (
             <li key={href}>

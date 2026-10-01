@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Gear } from '@phosphor-icons/react/dist/ssr';
-import { APP_NAV, isNavActive } from '@/config/app-navigation';
+import { getVisibleNav, isNavActive } from '@/config/app-navigation';
 import { useI18n } from '@/contexts/i18n-context';
 import { cn } from '@/lib/utils';
 import { UserMenu } from './user-menu';
@@ -34,7 +34,7 @@ export function AppTopBar({ overlay = false }: { overlay?: boolean }) {
         </Link>
 
         <nav aria-label={t('nav.navigation')} className="hidden h-full items-stretch gap-1 md:flex">
-          {APP_NAV.map(({ href, labelKey, icon: Icon }) => {
+          {getVisibleNav().map(({ href, labelKey, icon: Icon }) => {
             const active = isNavActive(pathname, href);
             return (
               <Link
