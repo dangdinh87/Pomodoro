@@ -19,7 +19,7 @@ function setup(tables: SupabaseMockOptions['tables'] = {}) {
 }
 
 const patch = (body: unknown) =>
-  PATCH(jsonRequest(URL, body, { method: 'PATCH' }), { params: { id: TASK_A } });
+  PATCH(jsonRequest(URL, body, { method: 'PATCH' }), { params: Promise.resolve({ id: TASK_A }) });
 
 const updates = (mock: ReturnType<typeof setup>) =>
   mock.callsFor('tasks').filter((c) => c.method === 'update');
@@ -72,7 +72,7 @@ describe('PATCH /api/tasks/[id]', () => {
 
   it('returns 400 for malformed JSON', async () => {
     setup();
-    const res = await PATCH(jsonRequest(URL, '{bad', { method: 'PATCH' }), { params: { id: TASK_A } });
+    const res = await PATCH(jsonRequest(URL, '{bad', { method: 'PATCH' }), { params: Promise.resolve({ id: TASK_A }) });
     expect(res.status).toBe(400);
   });
 });
@@ -82,14 +82,14 @@ describe('DELETE /api/tasks/[id]', () => {
 
   it('returns 404 when soft-deleting a missing task', async () => {
     setup({ tasks: { data: null, error: { code: 'PGRST116', message: 'no rows' } } });
-    const res = await DELETE(new Request(URL, { method: 'DELETE' }), { params: { id: TASK_A } });
+    const res = await DELETE(new Request(URL, { method: 'DELETE' }), { params: Promise.resolve({ id: TASK_A }) });
     expect(res.status).toBe(404);
   });
 
   it('returns 401 without a user', async () => {
     const mock = createSupabaseMock({ user: null });
     (createClient as jest.Mock).mockResolvedValue(mock.client);
-    const res = await DELETE(new Request(URL, { method: 'DELETE' }), { params: { id: TASK_A } });
+    const res = await DELETE(new Request(URL, { method: 'DELETE' }), { params: Promise.resolve({ id: TASK_A }) });
     expect(res.status).toBe(401);
   });
 });

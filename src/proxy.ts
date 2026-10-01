@@ -16,7 +16,6 @@ const AUTH_PATH_PREFIXES = [
     '/timer',
     '/tasks',
     '/history',
-    '/chat',
     '/settings',
     '/entertainment',
 ]
@@ -48,7 +47,7 @@ function withLocaleCookie<T extends NextResponse>(response: T, lang: Lang | null
     return response
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     const localeToSet = ensureLocale(request)
 
     let response = NextResponse.next({

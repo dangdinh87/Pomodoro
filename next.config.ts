@@ -1,3 +1,5 @@
+import type { NextConfig } from 'next';
+
 const isDev = process.env.NODE_ENV === 'development';
 
 /**
@@ -36,8 +38,7 @@ const securityHeaders = [
   // HSTS is already sent by Vercel (max-age=63072000)
 ];
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig: NextConfig = {
   // Type and lint errors fail the build (also enforced in CI).
   poweredByHeader: false,
   // The /dist/ssr barrel re-exports ~1500 icons; without this every page compiles all of them.
@@ -68,20 +69,6 @@ const nextConfig = {
       { source: '/focus', destination: '/history', permanent: true },
     ];
   },
-  webpack: (config, { isServer }) => {
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      fs: false,
-    };
-    if (!isServer && process.env.NODE_ENV === 'development') {
-      config.module.rules.push({
-        test: /\.(tsx|ts|jsx|js)$/,
-        exclude: /node_modules/,
-        use: [{ loader: '@locator/webpack-loader', options: { env: 'development' } }],
-      });
-    }
-    return config;
-  },
 };
 
-module.exports = nextConfig;
+export default nextConfig;

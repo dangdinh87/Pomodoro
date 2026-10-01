@@ -10,8 +10,6 @@ import vi from '@/i18n/locales/vi.json';
 import ja from '@/i18n/locales/ja.json';
 import { LOCALE_COOKIE, normalizeLang, type Lang } from '@/lib/i18n/negotiate-locale';
 
-type TranslationDict = typeof en;
-
 const dictionaries: Record<Lang, Record<string, unknown>> = {
   en: en as unknown as Record<string, unknown>,
   vi: vi as unknown as Record<string, unknown>,
@@ -29,9 +27,9 @@ function lookup(obj: Record<string, unknown>, path: string): string | undefined 
 }
 
 /** Locale of the current request; 'en' outside a request scope. */
-export function getServerLang(): Lang {
+export async function getServerLang(): Promise<Lang> {
   try {
-    return normalizeLang(cookies().get(LOCALE_COOKIE)?.value);
+    return normalizeLang((await cookies()).get(LOCALE_COOKIE)?.value);
   } catch (error) {
     // During static generation Next throws a "dynamic server usage" error to
     // opt the route into dynamic rendering; it must propagate, not be swallowed.
@@ -41,13 +39,8 @@ export function getServerLang(): Lang {
   }
 }
 
-export function getServerTranslation(key: string, lang: Lang = getServerLang()): string {
-  return lookup(dictionaries[lang], key) ?? lookup(dictionaries.en, key) ?? key;
+/** Resolves the request locale once and returns a lookup bound to it. */
+export async function getT(lang?: Lang): Promise<(key: string) => string> {
+  const dict = dictionaries[lang ?? (await getServerLang())];
+  return (key) => lookup(dict, key) ?? lookup(dictionaries.en, key) ?? key;
 }
-
-export function getServerDict(lang: Lang = getServerLang()): TranslationDict {
-  return dictionaries[lang] as unknown as TranslationDict;
-}
-
-// Shorthand for use in components
-export const t = (key: string): string => getServerTranslation(key);

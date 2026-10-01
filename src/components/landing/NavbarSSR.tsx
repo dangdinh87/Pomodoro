@@ -5,10 +5,11 @@
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
-import { t } from '@/lib/server-translations';
+import { getT } from '@/lib/server-translations';
 import { NavbarClient } from './NavbarClient';
 
-export function NavbarSSR() {
+export async function NavbarSSR() {
+  const t = await getT();
   const navLinks = [
     { href: '#features', label: t('landing.nav.features') },
     { href: '#pricing', label: t('landing.nav.pricing') },

@@ -5,13 +5,14 @@
  */
 import { ThemeProvider } from '@/components/layout/theme-provider';
 import { I18nProvider } from '@/contexts/i18n-context';
-import { t } from '@/lib/server-translations';
+import { getT } from '@/lib/server-translations';
 
-export default function LandingLayout({
+export default async function LandingLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const t = await getT();
   return (
     <ThemeProvider
       attribute="data-theme"

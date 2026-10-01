@@ -37,6 +37,7 @@ export default function GlobalError({
               Try again
             </button>
             {/* Plain anchor: the router may be unusable at this level */}
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a
               href="/"
               className="rounded-md border border-white/30 px-4 py-2 text-sm font-medium"

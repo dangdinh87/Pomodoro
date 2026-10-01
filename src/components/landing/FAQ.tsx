@@ -2,10 +2,11 @@
  * SSR FAQ component - text content rendered server-side for SEO
  * Accordion interactivity handled by FAQAccordion client component
  */
-import { t } from '@/lib/server-translations';
+import { getT } from '@/lib/server-translations';
 import { FAQAccordion } from './faq-accordion';
 
-export function FAQ() {
+export async function FAQ() {
+  const t = await getT();
   const faqs = [
     { question: t('landing.faq.items.q1.question'), answer: t('landing.faq.items.q1.answer') },
     { question: t('landing.faq.items.q2.question'), answer: t('landing.faq.items.q2.answer') },

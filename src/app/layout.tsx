@@ -11,7 +11,6 @@ import { Be_Vietnam_Pro, Space_Grotesk, JetBrains_Mono } from 'next/font/google'
 import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/next';
 import { AuthCodeHandler } from '@/components/auth/auth-code-handler';
-import { LocatorSetup } from '@/components/dev/locator-setup';
 import './globals.css';
 
 const spaceGrotesk = Space_Grotesk({
@@ -94,13 +93,15 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function RootLayout(
+  {
+    children,
+  }: {
+    children: React.ReactNode;
+  }
+) {
   // Locale cookie is set by middleware (Accept-Language) or the language switcher
-  const lang = normalizeLang(cookies().get(LOCALE_COOKIE)?.value);
+  const lang = normalizeLang((await cookies()).get(LOCALE_COOKIE)?.value);
 
   return (
     <html
@@ -131,10 +132,9 @@ export default function RootLayout({
               },
               featureList: [
                 'Pomodoro Timer with Task Linking',
-                'AI Study Coach (Bro Chat)',
                 'Mini Games for Breaks',
                 'Focus Mode Analytics',
-                'Daily Streaks & Leaderboard',
+                'Daily Streaks',
                 'Custom Themes & Ambient Sounds',
               ],
             }),
@@ -157,7 +157,6 @@ export default function RootLayout({
         ) : null}
         <AuthCodeHandler />
         <InitialLangProvider lang={lang}>{children}</InitialLangProvider>
-        <LocatorSetup />
         <Analytics />
       </body>
     </html>

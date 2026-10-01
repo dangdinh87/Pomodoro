@@ -1,7 +1,6 @@
 import { isFeatureEnabled } from './feature-flags';
 
 const KEYS = [
-  'NEXT_PUBLIC_FEATURE_CHAT',
   'NEXT_PUBLIC_FEATURE_LEADERBOARD',
   'NEXT_PUBLIC_FEATURE_HISTORY',
 ] as const;
@@ -21,15 +20,12 @@ describe('isFeatureEnabled', () => {
     });
   });
 
-  it('chat and leaderboard default OFF, enabled only by "true"', () => {
-    expect(isFeatureEnabled('chat')).toBe(false);
+  it('leaderboard defaults OFF, enabled only by "true"', () => {
     expect(isFeatureEnabled('leaderboard')).toBe(false);
-    process.env.NEXT_PUBLIC_FEATURE_CHAT = 'true';
     process.env.NEXT_PUBLIC_FEATURE_LEADERBOARD = 'true';
-    expect(isFeatureEnabled('chat')).toBe(true);
     expect(isFeatureEnabled('leaderboard')).toBe(true);
-    process.env.NEXT_PUBLIC_FEATURE_CHAT = '1';
-    expect(isFeatureEnabled('chat')).toBe(false);
+    process.env.NEXT_PUBLIC_FEATURE_LEADERBOARD = '1';
+    expect(isFeatureEnabled('leaderboard')).toBe(false);
   });
 
   it('history defaults ON, disabled only by "false"', () => {

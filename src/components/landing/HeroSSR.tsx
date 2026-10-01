@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { ArrowRight } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '@/components/ui/button';
-import { t } from '@/lib/server-translations';
+import { getT } from '@/lib/server-translations';
 import { LiveTimer } from './live-timer';
 
-export function HeroSSR() {
+export async function HeroSSR() {
+  const t = await getT();
   return (
     <section className="border-b border-border bg-surface-page px-[clamp(16px,4vw,32px)] pb-16 pt-32 lg:pb-24 lg:pt-40">
       <div className="mx-auto grid max-w-[1180px] gap-x-16 gap-y-8 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:items-start">

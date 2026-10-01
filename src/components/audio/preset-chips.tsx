@@ -1,6 +1,6 @@
 'use client'
 
-import { memo, useState, useRef, useCallback, useEffect } from 'react'
+import { memo, useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { Plus, Trash, PencilSimple, DotsThreeVertical, CaretLeft, CaretRight } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '@/components/ui/button'
 import {
@@ -69,7 +69,8 @@ function PresetIcon({ preset }: { preset: SoundPreset }) {
 export const PresetChips = memo(function PresetChips() {
   const { t } = useTranslation()
   const activeAmbientSounds = useAudioStore((s) => s.activeAmbientSounds)
-  const userPresets = useAudioStore((s) => s.presets.filter(p => !p.isBuiltIn))
+  const presets = useAudioStore((s) => s.presets)
+  const userPresets = useMemo(() => presets.filter((p) => !p.isBuiltIn), [presets])
   const loadPreset = useAudioStore((s) => s.loadPreset)
   const savePreset = useAudioStore((s) => s.savePreset)
   const deletePreset = useAudioStore((s) => s.deletePreset)

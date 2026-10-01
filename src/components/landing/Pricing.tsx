@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check, Crown, Lightning, ArrowRight } from '@phosphor-icons/react/dist/ssr';
 import Link from 'next/link';
-import { t } from '@/lib/server-translations';
+import { getT } from '@/lib/server-translations';
 
-export function Pricing() {
+export async function Pricing() {
+  const t = await getT();
   const plans = [
     {
       name: t('landing.pricing.free.name'),
@@ -17,9 +18,7 @@ export function Pricing() {
         t('landing.pricing.free.features.timer'),
         t('landing.pricing.free.features.tasks'),
         t('landing.pricing.free.features.history'),
-        t('landing.pricing.free.features.chatAI'),
         t('landing.pricing.free.features.games'),
-        t('landing.pricing.free.features.leaderboard'),
         t('landing.pricing.free.features.focus'),
         t('landing.pricing.free.features.themes'),
         t('landing.pricing.free.features.sounds'),

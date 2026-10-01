@@ -3,9 +3,10 @@
  */
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { t } from '@/lib/server-translations';
+import { getT } from '@/lib/server-translations';
 
-export default function NotFound() {
+export default async function NotFound() {
+  const t = await getT();
   return (
     <main data-theme="dark" className="flex min-h-screen items-center justify-center bg-surface-page px-4 text-ink">
       <div className="flex max-w-md flex-col items-center text-center">

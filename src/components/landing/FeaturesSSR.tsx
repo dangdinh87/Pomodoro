@@ -1,16 +1,16 @@
-import { Timer, ChartBar, ListChecks, MusicNotes, Chat, GameController } from '@phosphor-icons/react/dist/ssr';
-import { t } from '@/lib/server-translations';
+import { Timer, ChartBar, ListChecks, MusicNotes, GameController } from '@phosphor-icons/react/dist/ssr';
+import { getT } from '@/lib/server-translations';
 
 const FEATURES = [
   { key: 'timer', icon: Timer },
   { key: 'tasks', icon: ListChecks },
   { key: 'analytics', icon: ChartBar },
-  { key: 'chatAI', icon: Chat },
   { key: 'sounds', icon: MusicNotes },
   { key: 'entertainment', icon: GameController },
 ];
 
-export function FeaturesSSR() {
+export async function FeaturesSSR() {
+  const t = await getT();
   return (
     <section id="features" className="scroll-mt-24 px-[clamp(16px,4vw,32px)] py-20 lg:py-24">
       <div className="mx-auto max-w-[1180px]">
@@ -18,7 +18,7 @@ export function FeaturesSSR() {
 
         <div className="grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map(({ key, icon: Icon }) => (
-            <article key={key} className="flex flex-col gap-2 bg-surface p-6">
+            <article key={key} className="flex flex-col gap-2 bg-surface p-6 sm:last:col-span-2">
               <div className="flex items-center gap-2.5">
                 <Icon size={20} className="shrink-0 text-ink-secondary" />
                 <h3 className="font-heading text-[1.0625rem] font-bold text-ink">

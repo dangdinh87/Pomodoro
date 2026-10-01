@@ -11,10 +11,10 @@ import { FAQ } from '@/components/landing/FAQ';
 import { HowItWorks } from '@/components/landing/HowItWorks';
 import { Metadata } from 'next';
 import { buildPageMetadata } from '@/lib/seo/page-metadata';
-import { t } from '@/lib/server-translations';
+import { getT } from '@/lib/server-translations';
 
-// SEO Metadata. Copy only claims features that are always on (chat and
-// leaderboard are behind feature flags, see src/config/feature-flags.ts).
+// SEO Metadata. Copy only claims features that are always on (the
+// leaderboard is behind a feature flag, see src/config/feature-flags.ts).
 export const metadata: Metadata = {
   ...buildPageMetadata({
     path: '/',
@@ -42,7 +42,8 @@ export const metadata: Metadata = {
   ],
 };
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const t = await getT();
   // FAQ structured data for rich snippets
   const faqStructuredData = {
     '@context': 'https://schema.org',

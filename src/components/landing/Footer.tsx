@@ -5,10 +5,11 @@
 import { GithubLogo } from '@phosphor-icons/react/dist/ssr';
 import Link from 'next/link';
 import Image from 'next/image';
-import { t } from '@/lib/server-translations';
+import { getT } from '@/lib/server-translations';
 import { LanguageSwitcher } from '@/components/layout/language-switcher';
 
-export function Footer() {
+export async function Footer() {
+  const t = await getT();
   return (
     <footer className="py-12 px-[clamp(16px,4vw,32px)] bg-surface-page border-t border-border">
       <div className="mx-auto max-w-[1180px]">

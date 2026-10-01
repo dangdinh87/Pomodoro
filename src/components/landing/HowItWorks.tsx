@@ -1,8 +1,9 @@
-import { t } from '@/lib/server-translations';
+import { getT } from '@/lib/server-translations';
 
 const STEPS = ['step1', 'step2', 'step3'];
 
-export function HowItWorks() {
+export async function HowItWorks() {
+  const t = await getT();
   return (
     <section id="how-it-works" className="scroll-mt-24 px-[clamp(16px,4vw,32px)] pb-20 lg:pb-24">
       <div className="mx-auto max-w-[1180px]">
