@@ -17,6 +17,7 @@ import { useHistory } from "@/hooks/use-history"
 import { StatsLoading } from "./components/stats-loading"
 import { StatsEmpty } from "./components/stats-empty"
 import { EmptyState } from "@/components/ui/empty-state"
+import StreakTracker from "@/components/focus/streak-tracker"
 
 export default function HistoryPage() {
     const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
@@ -84,6 +85,8 @@ export default function HistoryPage() {
                         </Button>
                     </div>
                 </div>
+
+                <StreakTracker />
 
                 {isLoading ? (
                     <StatsLoading />

@@ -1,9 +1,10 @@
 /**
- * Not Found Page - uses static text (no i18n provider at root level)
+ * Not Found Page - server-translated (locale from the app.lang cookie)
  */
 import { Button } from '@/components/ui/button';
 import { Home, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { t } from '@/lib/server-translations';
 
 export default function NotFound() {
   return (
@@ -17,10 +18,10 @@ export default function NotFound() {
         {/* Message */}
         <div className="space-y-3 max-w-md">
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-            This page could not be found
+            {t('notFound.title')}
           </h2>
           <p className="text-muted-foreground text-lg">
-            The page you&apos;re looking for doesn&apos;t exist or has been moved.
+            {t('notFound.description')}
           </p>
         </div>
 
@@ -29,13 +30,13 @@ export default function NotFound() {
           <Link href="/">
             <Button className="gap-2 rounded-xl">
               <Home className="w-5 h-5" />
-              Go Home
+              {t('notFound.home')}
             </Button>
           </Link>
           <Link href="/timer">
             <Button variant="ghost" className="gap-2 rounded-xl">
               <ArrowLeft className="w-5 h-5" />
-              Back to Timer
+              {t('notFound.backToTimer')}
             </Button>
           </Link>
         </div>

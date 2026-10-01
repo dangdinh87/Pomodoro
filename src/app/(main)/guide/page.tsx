@@ -17,6 +17,7 @@ import {
     Send,
 } from 'lucide-react';
 import { useI18n } from '@/contexts/i18n-context';
+import { isFeatureEnabled } from '@/config/feature-flags';
 
 export default function GuidePage() {
     const { t, dict } = useI18n();
@@ -232,7 +233,8 @@ export default function GuidePage() {
                     </Card>
 
                     {/* History Feature */}
-                    <Card className="hover:shadow-lg transition-shadow">
+                    {isFeatureEnabled('history') && (
+<Card className="hover:shadow-lg transition-shadow">
                         <CardHeader>
                             <div className="flex items-center gap-3 mb-2">
                                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
@@ -261,6 +263,7 @@ export default function GuidePage() {
                             </Link>
                         </CardContent>
                     </Card>
+)}
 
                     {/* Chat AI Feature hidden for UI rework */}
                     {/* <Card className="hover:shadow-lg transition-shadow">
@@ -325,7 +328,8 @@ export default function GuidePage() {
                     </Card>
 
                     {/* Leaderboard Feature */}
-                    <Card className="hover:shadow-lg transition-shadow">
+                    {isFeatureEnabled('leaderboard') && (
+<Card className="hover:shadow-lg transition-shadow">
                         <CardHeader>
                             <div className="flex items-center gap-3 mb-2">
                                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
@@ -354,6 +358,7 @@ export default function GuidePage() {
                             </Link>
                         </CardContent>
                     </Card>
+)}
 
                     {/* Focus Feature */}
                     <Card className="hover:shadow-lg transition-shadow">
@@ -377,12 +382,14 @@ export default function GuidePage() {
                                     <li key={index}>• {point}</li>
                                 ))}
                             </ul>
-                            <Link
-                                href="/focus"
+                            {isFeatureEnabled('history') && (
+<Link
+                                href="/history"
                                 className="inline-flex items-center text-sm font-medium text-primary hover:underline mt-3"
                             >
                                 {t('guide.howToUse.features.focus.cta')} <ArrowRight className="ml-1 h-4 w-4" />
                             </Link>
+)}
                         </CardContent>
                     </Card>
 

@@ -12,13 +12,18 @@ import { CTA } from '@/components/landing/CTA';
 import { FAQ } from '@/components/landing/FAQ';
 import { HowItWorks } from '@/components/landing/HowItWorks';
 import { Metadata } from 'next';
+import { buildPageMetadata } from '@/lib/seo/page-metadata';
 import { t } from '@/lib/server-translations';
 
-// SEO Metadata
+// SEO Metadata. Copy only claims features that are always on (chat and
+// leaderboard are behind feature flags, see src/config/feature-flags.ts).
 export const metadata: Metadata = {
-  title: 'Study Bro - Free Pomodoro Timer with AI Coach & Task Management',
-  description:
-    'Free online Pomodoro timer with task linking, AI study coach, mini games for breaks, leaderboard, focus mode, and productivity analytics. No signup required.',
+  ...buildPageMetadata({
+    path: '/',
+    title: 'Study Bro - Free Pomodoro Timer with Tasks & Focus Sounds',
+    description:
+      'Free online Pomodoro timer with task tracking, ambient focus sounds, break mini games, focus history and streaks. No signup required.',
+  }),
   keywords: [
     'pomodoro timer',
     'pomodoro timer online',
@@ -27,7 +32,6 @@ export const metadata: Metadata = {
     'pomodoro timer with task list',
     'free pomodoro timer no signup',
     'focus timer online',
-    'AI study coach',
     'productivity timer',
     'Study Bro',
     // Vietnamese
@@ -38,28 +42,6 @@ export const metadata: Metadata = {
     'ポモドーロタイマー',
     'ポモドーロ 無料',
   ],
-  alternates: {
-    canonical: 'https://www.pomodoro-focus.site',
-    languages: {
-      'en': 'https://www.pomodoro-focus.site',
-      'vi': 'https://www.pomodoro-focus.site',
-      'ja': 'https://www.pomodoro-focus.site',
-      'x-default': 'https://www.pomodoro-focus.site',
-    },
-  },
-  openGraph: {
-    title: 'Study Bro - Free Pomodoro Timer with AI Coach',
-    description:
-      'Pomodoro timer, AI coach, mini games, leaderboard, and focus tools. Free to use, no signup required.',
-    type: 'website',
-    url: 'https://www.pomodoro-focus.site',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Study Bro - Free Pomodoro Timer with AI Coach',
-    description:
-      'Pomodoro timer, AI coach, mini games, leaderboard, and focus tools. Free to use.',
-  },
 };
 
 export default function LandingPage() {
@@ -85,7 +67,8 @@ export default function LandingPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqStructuredData) }}
       />
       <NavbarSSR />
-      <main>
+      {/* The (landing) layout already provides the <main> landmark */}
+      <div>
         <HeroSSR />
         <FeaturesSSR />
         <HowItWorks />
@@ -93,7 +76,7 @@ export default function LandingPage() {
         <Pricing />
         <FAQ />
         <CTA />
-      </main>
+      </div>
       <Footer />
     </>
   );

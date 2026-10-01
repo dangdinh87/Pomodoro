@@ -13,12 +13,38 @@ import {
 } from '@/components/ui/sidebar';
 import GATracker from '@/components/trackings/ga';
 import { useSystemStore } from '@/stores/system-store';
-import { GlobalChat } from '@/components/chat/global-chat';
-import { BotMessageSquare } from '@/components/animate-ui/icons/bot-message-square';
+import dynamic from 'next/dynamic';
 import { Button } from '@/components/ui/button';
 import { usePathname } from 'next/navigation';
 import { AppProviders } from '@/components/providers/app-providers';
 import { useAuth } from '@/hooks/use-auth';
+import { useI18n } from '@/contexts/i18n-context';
+import { isFeatureEnabled } from '@/config/feature-flags';
+
+// Loaded lazily so the chat chunks never ship when the chat flag is off.
+const GlobalChat = dynamic(
+  () => import('@/components/chat/global-chat').then((m) => m.GlobalChat),
+  { ssr: false },
+);
+const BotMessageSquare = dynamic(
+  () =>
+    import('@/components/animate-ui/icons/bot-message-square').then(
+      (m) => m.BotMessageSquare,
+    ),
+  { ssr: false },
+);
+
+function SkipLink() {
+  const { t } = useI18n();
+  return (
+    <a
+      href="#main-content"
+      className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-[100] focus:rounded-md focus:bg-background focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:shadow"
+    >
+      {t('skipLink.label')}
+    </a>
+  );
+}
 
 export default function MainLayout({
   children,
@@ -28,10 +54,11 @@ export default function MainLayout({
   const { isFocusMode, isChatPanelOpen, setChatPanelOpen } = useSystemStore();
   const { isAuthenticated } = useAuth();
   const pathname = usePathname();
-  const showChatToggle = false; // Hidden for UI rework
+  const showChatToggle = isFeatureEnabled('chat');
 
   return (
     <AppProviders>
+      <SkipLink />
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset className="h-screen overflow-hidden flex flex-col">
@@ -70,11 +97,15 @@ export default function MainLayout({
                   <GATracker />
                 </Suspense>
               ) : null}
-              <div className="flex-1 overflow-y-auto overflow-x-hidden px-0">
+              <div
+                id="main-content"
+                tabIndex={-1}
+                className="flex-1 overflow-y-auto overflow-x-hidden px-0 focus:outline-none"
+              >
                 {children}
               </div>
             </div>
-            {/* GlobalChat hidden for UI rework */}
+            {showChatToggle && <GlobalChat />}
           </div>
         </SidebarInset>
       </SidebarProvider>

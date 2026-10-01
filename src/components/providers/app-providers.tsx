@@ -19,6 +19,7 @@ import { getYouTubeThumbnailUrl } from '@/data/youtube-suggestions';
 import { Toaster } from 'sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NextTopLoader from 'nextjs-toploader';
+import { MotionConfig } from 'motion/react';
 
 interface AppProvidersProps {
   children: React.ReactNode;
@@ -52,7 +53,7 @@ function YouTubeFloatingPlayer() {
     <FloatingPlayerBar
       isVisible={isVisible}
       title={title}
-      thumbnailUrl={thumbnailUrl}
+      thumbnailUrl={thumbnailUrl ?? undefined}
       isPlaying={isPlaying}
       volume={audioSettings.masterVolume}
       onTogglePlay={() => {
@@ -89,7 +90,7 @@ export function AppProviders({ children }: AppProvidersProps) {
             <ThemeRestorer />
             <AudioCleanupProvider />
             <BackgroundRenderer />
-            {children}
+            <MotionConfig reducedMotion="user">{children}</MotionConfig>
             <Toaster />
             {/* <YouTubeFloatingPlayer /> */}
           </QueryProvider>

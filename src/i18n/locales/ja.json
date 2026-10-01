@@ -32,6 +32,9 @@
     "item": "件",
     "items": "件"
   },
+  "skipLink": {
+    "label": "メインコンテンツへスキップ"
+  },
   "nav": {
     "navigation": "ナビゲーション",
     "system": "システム",
@@ -341,6 +344,52 @@
       "timer": "タイマー",
       "background": "背景",
       "audio": "オーディオ"
+    },
+    "account": {
+      "tab": "アカウント",
+      "title": "アカウント",
+      "subtitle": "パスワードの変更、データのエクスポート、アカウントの削除ができます。",
+      "guestPrompt": "アカウントを管理するにはサインインしてください。",
+      "guestLogin": "サインイン",
+      "password": {
+        "title": "パスワードを変更",
+        "description": "8文字以上の新しいパスワードを設定してください。",
+        "currentLabel": "現在のパスワード",
+        "sameAsCurrent": "新しいパスワードは現在のものと異なる必要があります。",
+        "wrongCurrent": "現在のパスワードが正しくありません。",
+        "weak": "このパスワードは弱すぎます。より強いパスワードを選んでください。",
+        "noEmail": "アカウントにメールアドレスがないため、ここではパスワードを変更できません。",
+        "oauthManaged": "サインインは {provider} で管理されています。パスワードはそちらで変更してください。",
+        "newLabel": "新しいパスワード",
+        "confirmLabel": "新しいパスワード(確認)",
+        "submit": "パスワードを更新",
+        "tooShort": "パスワードは8文字以上にしてください。",
+        "mismatch": "パスワードが一致しません。",
+        "success": "パスワードを更新しました。",
+        "error": "パスワードを更新できませんでした。"
+      },
+      "export": {
+        "title": "データをエクスポート",
+        "description": "プロフィール、タスク、セッション、連続記録、タグ、会話を含む JSON ファイルをダウンロードします。",
+        "button": "データをダウンロード",
+        "success": "エクスポートの準備ができました。",
+        "error": "データをエクスポートできませんでした。",
+        "rateLimited": "エクスポートの回数が多すぎます。しばらくしてからもう一度お試しください。"
+      },
+      "delete": {
+        "title": "アカウントを削除",
+        "description": "アカウントと関連するすべてのデータを完全に削除します。この操作は元に戻せません。",
+        "button": "アカウントを削除",
+        "confirmTitle": "アカウントを削除しますか?",
+        "confirmDescription": "タスク、セッション、連続記録、タグ、会話が完全に削除されます。確認のため、下に {value} を入力してください。",
+        "confirmLabel": "確認のため入力",
+        "cancel": "キャンセル",
+        "confirmButton": "完全に削除",
+        "success": "アカウントを削除しました。",
+        "error": "アカウントを削除できませんでした。",
+        "partial": "アカウントが一部のみ削除された可能性があります。安全に再試行できますので、もう一度お試しください。",
+        "notConfigured": "現在アカウントを削除できません。フィードバックページからサポートにお問い合わせください。"
+      }
     },
     "general": {
       "title": "一般設定",
@@ -846,6 +895,11 @@
     }
   },
   "chat": {
+    "modelSelector": {
+      "searchPlaceholder": "モデルを検索...",
+      "noResults": "モデルが見つかりません",
+      "noResultsHint": "検索条件を変更してみてください"
+    },
     "title": "AIチャット",
     "subtitle": "AIアシスタントとチャット",
     "placeholder": "メッセージを入力...",
@@ -995,7 +1049,18 @@
     "playNow": "今すぐプレイ",
     "backToList": "ゲーム一覧に戻る",
     "closeGame": "ゲームを閉じる",
-    "controls": "操作方法",
+    "controls": {
+      "title": "操作方法",
+      "up": "上",
+      "down": "下",
+      "left": "左",
+      "right": "右",
+      "restart": "ゲームを再開",
+      "close": "ゲームを閉じる",
+      "delete": "削除",
+      "enter": "Enter",
+      "back": "戻る"
+    },
     "instructions": "マウスまたはタッチで宇宙船を操作。敵を撃ち落とし、衝突を避けよう！",
     "loading": "ゲームを読み込み中...",
     "highScore": "ハイスコア",
@@ -1019,6 +1084,7 @@
   },
   "tooltips": {
     "toggleTheme": "テーマを切り替え",
+    "toggleSidebar": "サイドバーを切り替え",
     "timerSettings": "タイマー設定",
     "themeSettings": "テーマ設定",
     "backgroundSetup": "背景設定",
@@ -1033,7 +1099,31 @@
     "network": "ネットワークエラー。接続を確認してください。",
     "notFound": "見つかりません",
     "unauthorized": "認証されていません。ログインしてください。",
-    "forbidden": "このリソースにアクセスする権限がありません"
+    "forbidden": "このリソースにアクセスする権限がありません",
+    "boundary": {
+      "title": "問題が発生しました",
+      "description": "予期しないエラーが発生しました。もう一度お試しいただくか、前のページに戻ってください。",
+      "retry": "もう一度試す",
+      "goHome": "ホームへ",
+      "goTimer": "タイマーへ",
+      "reference": "参照コード: {digest}"
+    }
+  },
+  "timerAnnouncer": {
+    "started": "タイマーを開始しました。{mode}、残り{time}。",
+    "paused": "タイマーを一時停止しました。残り{time}。",
+    "completed": "{mode}が完了しました。次は{next}です。",
+    "remaining": "残り{time}。",
+    "oneMinute": "残り1分です。",
+    "minutes": "{count}分",
+    "minute": "{count}分",
+    "second": "{count}秒",
+    "seconds": "{count}秒",
+    "mode": {
+      "work": "集中",
+      "shortBreak": "短い休憩",
+      "longBreak": "長い休憩"
+    }
   },
   "metadata": {
     "timer": {

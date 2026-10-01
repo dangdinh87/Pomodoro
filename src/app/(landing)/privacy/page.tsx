@@ -1,6 +1,13 @@
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/lib/seo/page-metadata';
 
+export const metadata: Metadata = buildPageMetadata({
+    path: '/privacy',
+    title: 'Privacy Policy • Study Bro',
+    description: 'How Study Bro handles your data: what we store, what stays on your device, and your choices.',
+});
 
-// Since this is a server component, we can probably just use the dictionary directly 
+// Since this is a server component, we can probably just use the dictionary directly
 // or simpler: just client component with useTranslation if we want to be consistent with others.
 // But checking other pages... page.tsx in (landing) might be server or client.
 // Let's use a client component for consistency with the rest of the landing components seen so far

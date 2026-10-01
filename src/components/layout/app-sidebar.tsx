@@ -54,6 +54,7 @@ import Image from 'next/image';
 import { AnimateIcon } from '../animate-ui/icons/icon';
 import { useI18n, LANGS, Lang } from '@/contexts/i18n-context';
 import { cn } from '@/lib/utils';
+import { isFeatureEnabled } from '@/config/feature-flags';
 
 // Navigation item component - using default shadcn styling
 function NavItem({
@@ -109,6 +110,9 @@ export function AppSidebar() {
   };
 
   const currentLang = LANGS.find((l) => l.code === lang);
+  const showHistory = isFeatureEnabled('history');
+  const showLeaderboard = isFeatureEnabled('leaderboard');
+  const showChat = isFeatureEnabled('chat');
 
   return (
     <Sidebar collapsible="offcanvas" className="border-r-0">
@@ -182,55 +186,62 @@ export function AppSidebar() {
 
         <SidebarSeparator className="mx-3 bg-sidebar-border/50 dark:bg-sidebar-border" />
 
-        {/* Analytics & Progress (Hidden) */}
-        {/*
-        <SidebarGroup className="py-3">
-          <SidebarGroupContent>
-            <SidebarMenu className="gap-0.5">
-              <NavItem
-                href="/history"
-                icon={<AnimatedHistory isActive={pathname === '/history'} />}
-                label={t('nav.history')}
-                isActive={pathname === '/history'}
-              />
-              <NavItem
-                href="/leaderboard"
-                icon={
-                  <AnimatedLeaderboard isActive={pathname === '/leaderboard'} />
-                }
-                label={t('nav.leaderboard')}
-                isActive={pathname === '/leaderboard'}
-              />
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {/* Analytics & Progress (feature-flagged) */}
+        {(showHistory || showLeaderboard) && (
+          <>
+            <SidebarGroup className="py-3">
+              <SidebarGroupContent>
+                <SidebarMenu className="gap-0.5">
+                  {showHistory && (
+                    <NavItem
+                      href="/history"
+                      icon={<AnimatedHistory isActive={pathname === '/history'} />}
+                      label={t('nav.history')}
+                      isActive={pathname === '/history'}
+                    />
+                  )}
+                  {showLeaderboard && (
+                    <NavItem
+                      href="/leaderboard"
+                      icon={
+                        <AnimatedLeaderboard isActive={pathname === '/leaderboard'} />
+                      }
+                      label={t('nav.leaderboard')}
+                      isActive={pathname === '/leaderboard'}
+                    />
+                  )}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
 
-        <SidebarSeparator className="mx-3 bg-sidebar-border/50 dark:bg-sidebar-border" />
-        */}
+            <SidebarSeparator className="mx-3 bg-sidebar-border/50 dark:bg-sidebar-border" />
+          </>
+        )}
 
         {/* Tools & Entertainment */}
         <SidebarGroup className="py-3">
           <SidebarGroupContent>
             <SidebarMenu className="gap-0.5">
-              {/* Bro Chat item hidden for UI rework */}
-              {/* <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  isActive={pathname === '/chat'}
-                  tooltip="Bro Chat"
-                >
-                  <Link href="/chat">
-                    <AnimateIcon animateOnHover>
-                      <BotMessageSquare
-                        animate={pathname === '/chat'}
-                        loop={pathname === '/chat'}
-                        className="size-5"
-                      />
-                    </AnimateIcon>
-                    <span suppressHydrationWarning>Bro Chat</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem> */}
+              {showChat && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === '/chat'}
+                    tooltip={t('nav.chatAI')}
+                  >
+                    <Link href="/chat">
+                      <AnimateIcon animateOnHover>
+                        <BotMessageSquare
+                          animate={pathname === '/chat'}
+                          loop={pathname === '/chat'}
+                          className="size-5"
+                        />
+                      </AnimateIcon>
+                      <span suppressHydrationWarning>{t('nav.chatAI')}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
               <NavItem
                 href="/entertainment"
                 icon={

@@ -32,6 +32,9 @@
     "item": "mục",
     "items": "mục"
   },
+  "skipLink": {
+    "label": "Chuyển đến nội dung chính"
+  },
   "nav": {
     "navigation": "Điều hướng",
     "system": "Hệ thống",
@@ -342,6 +345,52 @@
       "background": "Hình nền",
       "audio": "Âm thanh"
     },
+    "account": {
+      "tab": "Tài khoản",
+      "title": "Tài khoản",
+      "subtitle": "Quản lý mật khẩu, xuất dữ liệu hoặc xóa tài khoản của bạn.",
+      "guestPrompt": "Đăng nhập để quản lý tài khoản của bạn.",
+      "guestLogin": "Đăng nhập",
+      "password": {
+        "title": "Đổi mật khẩu",
+        "description": "Chọn mật khẩu mới có ít nhất 8 ký tự.",
+        "currentLabel": "Mật khẩu hiện tại",
+        "sameAsCurrent": "Mật khẩu mới phải khác mật khẩu hiện tại.",
+        "wrongCurrent": "Mật khẩu hiện tại không đúng.",
+        "weak": "Mật khẩu này quá yếu. Hãy chọn mật khẩu mạnh hơn.",
+        "noEmail": "Tài khoản của bạn không có email nên không thể đổi mật khẩu tại đây.",
+        "oauthManaged": "Đăng nhập của bạn được quản lý bởi {provider}. Hãy đổi mật khẩu tại đó.",
+        "newLabel": "Mật khẩu mới",
+        "confirmLabel": "Xác nhận mật khẩu mới",
+        "submit": "Cập nhật mật khẩu",
+        "tooShort": "Mật khẩu phải có ít nhất 8 ký tự.",
+        "mismatch": "Mật khẩu không khớp.",
+        "success": "Đã cập nhật mật khẩu.",
+        "error": "Không thể cập nhật mật khẩu."
+      },
+      "export": {
+        "title": "Xuất dữ liệu của tôi",
+        "description": "Tải về tệp JSON chứa hồ sơ, công việc, phiên tập trung, chuỗi ngày, thẻ và cuộc trò chuyện của bạn.",
+        "button": "Tải dữ liệu của tôi",
+        "success": "Dữ liệu của bạn đã sẵn sàng.",
+        "error": "Không thể xuất dữ liệu của bạn.",
+        "rateLimited": "Bạn xuất dữ liệu quá nhiều lần. Vui lòng thử lại sau."
+      },
+      "delete": {
+        "title": "Xóa tài khoản",
+        "description": "Xóa vĩnh viễn tài khoản và toàn bộ dữ liệu liên quan. Không thể hoàn tác.",
+        "button": "Xóa tài khoản của tôi",
+        "confirmTitle": "Xóa tài khoản của bạn?",
+        "confirmDescription": "Thao tác này xóa vĩnh viễn công việc, phiên tập trung, chuỗi ngày, thẻ và cuộc trò chuyện của bạn. Để xác nhận, hãy nhập {value} bên dưới.",
+        "confirmLabel": "Nhập để xác nhận",
+        "cancel": "Hủy",
+        "confirmButton": "Xóa vĩnh viễn",
+        "success": "Tài khoản của bạn đã được xóa.",
+        "error": "Không thể xóa tài khoản của bạn.",
+        "partial": "Tài khoản của bạn có thể đã bị xóa một phần. Bạn có thể thử lại an toàn, vui lòng thử lại.",
+        "notConfigured": "Hiện chưa thể xóa tài khoản. Vui lòng liên hệ hỗ trợ qua trang góp ý."
+      }
+    },
     "general": {
       "title": "Cài đặt Chung",
       "appearance": "Giao diện",
@@ -352,7 +401,8 @@
         "selectPlaceholder": "Chọn ngôn ngữ",
         "updated": "Đã cập nhật ngôn ngữ",
         "english": "Tiếng Anh",
-        "vietnamese": "Tiếng Việt"
+        "vietnamese": "Tiếng Việt",
+        "japanese": "Tiếng Nhật"
       },
       "theme": {
         "title": "Giao diện",
@@ -845,6 +895,11 @@
     }
   },
   "chat": {
+    "modelSelector": {
+      "searchPlaceholder": "Tìm mô hình...",
+      "noResults": "Không tìm thấy mô hình",
+      "noResultsHint": "Hãy thử thay đổi từ khóa tìm kiếm"
+    },
     "title": "Chat AI",
     "subtitle": "Trò chuyện với trợ lý AI",
     "placeholder": "Nhập tin nhắn của bạn...",
@@ -1029,6 +1084,7 @@
   },
   "tooltips": {
     "toggleTheme": "Chuyển đổi giao diện",
+    "toggleSidebar": "Bật/tắt thanh bên",
     "timerSettings": "Cài đặt hẹn giờ",
     "themeSettings": "Cài đặt giao diện",
     "backgroundSetup": "Thiết lập hình nền",
@@ -1043,7 +1099,31 @@
     "network": "Lỗi mạng. Vui lòng kiểm tra kết nối của bạn.",
     "notFound": "Không tìm thấy",
     "unauthorized": "Chưa được ủy quyền. Vui lòng đăng nhập.",
-    "forbidden": "Bạn không có quyền truy cập tài nguyên này"
+    "forbidden": "Bạn không có quyền truy cập tài nguyên này",
+    "boundary": {
+      "title": "Đã có sự cố xảy ra",
+      "description": "Có lỗi không mong muốn. Bạn có thể thử lại hoặc quay về trang trước.",
+      "retry": "Thử lại",
+      "goHome": "Về trang chủ",
+      "goTimer": "Đến bộ hẹn giờ",
+      "reference": "Mã tham chiếu: {digest}"
+    }
+  },
+  "timerAnnouncer": {
+    "started": "Đã bắt đầu hẹn giờ. {mode}, còn {time}.",
+    "paused": "Đã tạm dừng hẹn giờ. Còn {time}.",
+    "completed": "Đã hoàn thành {mode}. Tiếp theo: {next}.",
+    "remaining": "Còn {time}.",
+    "oneMinute": "Còn một phút.",
+    "minutes": "{count} phút",
+    "minute": "{count} phút",
+    "second": "{count} giây",
+    "seconds": "{count} giây",
+    "mode": {
+      "work": "Tập trung",
+      "shortBreak": "Nghỉ ngắn",
+      "longBreak": "Nghỉ dài"
+    }
   },
   "metadata": {
     "timer": {

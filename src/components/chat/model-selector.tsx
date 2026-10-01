@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useTranslation } from "@/contexts/i18n-context";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -97,6 +98,7 @@ export function ModelSelector<T extends string>({
     selectedModel,
     onModelChange,
 }: ModelSelectorProps<T>) {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [search, setSearch] = useState("");
     const [selectedTier, setSelectedTier] = useState<string>("all");
@@ -106,9 +108,9 @@ export function ModelSelector<T extends string>({
 
     // Convert models object to array for easier manipulation
     const modelsArray = useMemo(() => {
-        return Object.entries(models).map(([id, info]) => ({
-            id: id as T,
+        return (Object.entries(models) as [T, ModelInfo][]).map(([id, info]) => ({
             ...info,
+            id,
         }));
     }, [models]);
 
@@ -192,7 +194,7 @@ export function ModelSelector<T extends string>({
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
-                            placeholder="Search models..."
+                            placeholder={t("chat.modelSelector.searchPlaceholder")}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             className="pl-9 bg-background border-muted-foreground/20 focus-visible:ring-primary/30"
@@ -236,8 +238,8 @@ export function ModelSelector<T extends string>({
                         {filteredModels.length === 0 ? (
                             <div className="text-center py-8 text-muted-foreground">
                                 <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                                <p>No models found</p>
-                                <p className="text-sm">Try adjusting your search</p>
+                                <p>{t("chat.modelSelector.noResults")}</p>
+                                <p className="text-sm">{t("chat.modelSelector.noResultsHint")}</p>
                             </div>
                         ) : selectedTier === "all" ? (
                             // Grouped by tier view

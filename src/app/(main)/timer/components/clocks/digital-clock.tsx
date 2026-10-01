@@ -46,7 +46,9 @@ export const DigitalClock = memo(
             (animConfig.state === 'urgent' || animConfig.state === 'critical') && 'animate-clock-pulse',
           )}
           style={{ color: animConfig.color }}
-          aria-live="polite"
+          // role="timer" is not announced on every tick; TimerLiveAnnouncer
+          // speaks the meaningful changes (start/pause/phase end/milestones).
+          role="timer"
         >
           <div className="flex items-center">
             <NumberFlow

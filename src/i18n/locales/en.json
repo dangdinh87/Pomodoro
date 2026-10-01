@@ -32,6 +32,9 @@
     "item": "item",
     "items": "items"
   },
+  "skipLink": {
+    "label": "Skip to main content"
+  },
   "nav": {
     "navigation": "Navigation",
     "system": "System",
@@ -342,6 +345,52 @@
       "background": "Background",
       "audio": "Audio"
     },
+    "account": {
+      "tab": "Account",
+      "title": "Account",
+      "subtitle": "Manage your password, export your data or delete your account.",
+      "guestPrompt": "Sign in to manage your account.",
+      "guestLogin": "Sign in",
+      "password": {
+        "title": "Change password",
+        "description": "Choose a new password of at least 8 characters.",
+        "currentLabel": "Current password",
+        "sameAsCurrent": "New password must be different from the current one.",
+        "wrongCurrent": "Current password is incorrect.",
+        "weak": "This password is too weak. Choose a stronger one.",
+        "noEmail": "Your account has no email, so the password cannot be changed here.",
+        "oauthManaged": "Your sign-in is managed by {provider}. Change your password there.",
+        "newLabel": "New password",
+        "confirmLabel": "Confirm new password",
+        "submit": "Update password",
+        "tooShort": "Password must be at least 8 characters.",
+        "mismatch": "Passwords do not match.",
+        "success": "Password updated.",
+        "error": "Could not update password."
+      },
+      "export": {
+        "title": "Export my data",
+        "description": "Download a JSON file with your profile, tasks, sessions, streaks, tags and conversations.",
+        "button": "Download my data",
+        "success": "Your data export is ready.",
+        "error": "Could not export your data.",
+        "rateLimited": "Too many exports. Please try again later."
+      },
+      "delete": {
+        "title": "Delete account",
+        "description": "Permanently delete your account and all associated data. This cannot be undone.",
+        "button": "Delete my account",
+        "confirmTitle": "Delete your account?",
+        "confirmDescription": "This permanently removes your tasks, sessions, streaks, tags and conversations. To confirm, type {value} below.",
+        "confirmLabel": "Type to confirm",
+        "cancel": "Cancel",
+        "confirmButton": "Delete permanently",
+        "success": "Your account has been deleted.",
+        "error": "Could not delete your account.",
+        "partial": "Your account may be partly deleted. Retrying is safe, please try again.",
+        "notConfigured": "Account deletion is not available right now. Please contact support via the feedback page."
+      }
+    },
     "general": {
       "title": "General Settings",
       "appearance": "Appearance",
@@ -352,7 +401,8 @@
         "selectPlaceholder": "Select language",
         "updated": "Language updated",
         "english": "English",
-        "vietnamese": "Vietnamese"
+        "vietnamese": "Vietnamese",
+        "japanese": "Japanese"
       },
       "theme": {
         "title": "Theme",
@@ -845,6 +895,11 @@
     }
   },
   "chat": {
+    "modelSelector": {
+      "searchPlaceholder": "Search models...",
+      "noResults": "No models found",
+      "noResultsHint": "Try adjusting your search"
+    },
     "title": "Chat AI",
     "subtitle": "Chat with AI assistant",
     "placeholder": "Type your message...",
@@ -1029,6 +1084,7 @@
   },
   "tooltips": {
     "toggleTheme": "Toggle theme",
+    "toggleSidebar": "Toggle sidebar",
     "timerSettings": "Timer Settings",
     "themeSettings": "Theme settings",
     "backgroundSetup": "Background setup",
@@ -1043,7 +1099,31 @@
     "network": "Network error. Please check your connection.",
     "notFound": "Not found",
     "unauthorized": "Unauthorized. Please sign in.",
-    "forbidden": "You don't have permission to access this resource"
+    "forbidden": "You don't have permission to access this resource",
+    "boundary": {
+      "title": "Something went wrong",
+      "description": "An unexpected error occurred. You can try again or head back.",
+      "retry": "Try again",
+      "goHome": "Go to home",
+      "goTimer": "Go to timer",
+      "reference": "Reference: {digest}"
+    }
+  },
+  "timerAnnouncer": {
+    "started": "Timer started. {mode}, {time} remaining.",
+    "paused": "Timer paused. {time} remaining.",
+    "completed": "{mode} complete. Next: {next}.",
+    "remaining": "{time} remaining.",
+    "oneMinute": "One minute remaining.",
+    "minutes": "{count} minutes",
+    "minute": "{count} minute",
+    "second": "{count} second",
+    "seconds": "{count} seconds",
+    "mode": {
+      "work": "Focus",
+      "shortBreak": "Short break",
+      "longBreak": "Long break"
+    }
   },
   "metadata": {
     "timer": {

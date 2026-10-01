@@ -1,18 +1,24 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import en from '@/i18n/locales/en.json';
 import vi from '@/i18n/locales/vi.json';
 import ja from '@/i18n/locales/ja.json';
+import {
+  DEFAULT_LANG,
+  LOCALE_COOKIE,
+  LOCALE_COOKIE_MAX_AGE,
+  isLang,
+  type Lang,
+} from '@/lib/i18n/negotiate-locale';
 
-export type Lang = 'en' | 'vi' | 'ja';
+export type { Lang };
 
 type Dict = Record<string, any>;
 
 const dictionaries: Record<Lang, Dict> = { en, vi, ja };
 
 const I18N_STORAGE_KEY = 'app.lang';
-const DEFAULT_LANG: Lang = 'en';
 
 function safeGet(obj: any, path: string): any {
   return path.split('.').reduce((acc: any, part: string) => {
@@ -23,31 +29,37 @@ function safeGet(obj: any, path: string): any {
   }, obj);
 }
 
-// Helper to get saved lang from localStorage synchronously during initialization
+// Saved preference from localStorage (back-compat with pre-cookie versions)
 function getSavedLang(): Lang | null {
   if (typeof window === 'undefined') return null;
   try {
-    const saved = window.localStorage.getItem(I18N_STORAGE_KEY) as Lang | null;
-    if (saved === 'en' || saved === 'vi' || saved === 'ja') return saved;
+    const saved = window.localStorage.getItem(I18N_STORAGE_KEY);
+    if (isLang(saved)) return saved;
   } catch { }
   return null;
 }
 
-function detectInitialLang(): Lang {
-  if (typeof window === 'undefined') return DEFAULT_LANG;
-
-  // First priority: saved preference
-  const saved = getSavedLang();
-  if (saved) return saved;
-
-  // Second priority: browser language
+function writeLangCookie(lang: Lang) {
   try {
-    const n = navigator?.language?.toLowerCase?.() || '';
-    if (n.startsWith('vi')) return 'vi';
-    if (n.startsWith('ja')) return 'ja';
+    document.cookie = `${LOCALE_COOKIE}=${lang}; path=/; max-age=${LOCALE_COOKIE_MAX_AGE}; SameSite=Lax`;
   } catch { }
+}
 
-  return DEFAULT_LANG;
+/**
+ * Carries the server-resolved locale (from the `app.lang` cookie) down from the
+ * root layout, so I18nProvider's first render matches the SSR HTML without
+ * threading a prop through app-providers.
+ */
+const InitialLangContext = createContext<Lang>(DEFAULT_LANG);
+
+export function InitialLangProvider({
+  lang,
+  children,
+}: {
+  lang: Lang;
+  children: React.ReactNode;
+}) {
+  return <InitialLangContext.Provider value={lang}>{children}</InitialLangContext.Provider>;
 }
 
 type TranslateVars = Record<string, string | number | boolean>;
@@ -61,26 +73,32 @@ export interface I18nContextValue {
 
 const I18nContext = createContext<I18nContextValue | undefined>(undefined);
 
-export function I18nProvider({ children }: { children: React.ReactNode }) {
-  // Always start with DEFAULT_LANG for the first render to match Server result
-  const [lang, setLangState] = useState<Lang>(DEFAULT_LANG);
+export function I18nProvider({
+  children,
+  initialLang,
+}: {
+  children: React.ReactNode;
+  initialLang?: Lang;
+}) {
+  const ctxLang = useContext(InitialLangContext);
+  const startLang = initialLang ?? ctxLang;
+  // Start from the server-resolved locale so SSR and hydration match
+  const [lang, setLangState] = useState<Lang>(startLang);
 
-  // Apply saved language ONLY after hydration
+  // One-time sync: an explicit localStorage choice wins over the cookie
+  // (the cookie may only come from Accept-Language); mirror it into the cookie.
   useEffect(() => {
     const saved = getSavedLang();
-    if (saved && saved !== DEFAULT_LANG) {
+    if (saved && saved !== startLang) {
       setLangState(saved);
+      writeLangCookie(saved);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     try {
-      window.localStorage.setItem(I18N_STORAGE_KEY, lang);
-    } catch { }
-    try {
-      if (typeof document !== 'undefined') {
-        document.documentElement.setAttribute('lang', lang);
-      }
+      document.documentElement.setAttribute('lang', lang);
     } catch { }
   }, [lang]);
 
@@ -106,11 +124,17 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     };
   }, [dict]);
 
-  const setLang = (l: Lang) => setLangState(l);
+  const setLang = useCallback((l: Lang) => {
+    setLangState(l);
+    try {
+      window.localStorage.setItem(I18N_STORAGE_KEY, l);
+    } catch { }
+    writeLangCookie(l);
+  }, []);
 
   const value = useMemo(
     () => ({ lang, setLang, t, dict }),
-    [lang, t]
+    [lang, setLang, t, dict]
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

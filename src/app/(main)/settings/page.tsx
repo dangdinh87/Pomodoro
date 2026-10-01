@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from "@/compon
 import { GeneralSettings } from "@/components/settings/general-settings"
 import { TimerSettings } from "@/components/settings/timer-settings"
 import { BackgroundSettings } from "@/components/settings/background-settings"
+import { AccountSettings } from "@/components/settings/account-settings"
 import { useI18n } from '@/contexts/i18n-context'
 
 export default function SettingsPage() {
@@ -23,6 +24,7 @@ export default function SettingsPage() {
                     <TabsTrigger value="general" className="flex-1">{t('settings.tabs.general')}</TabsTrigger>
                     <TabsTrigger value="timer" className="flex-1">{t('settings.tabs.timer')}</TabsTrigger>
                     <TabsTrigger value="background" className="flex-1">{t('settings.tabs.background')}</TabsTrigger>
+                    <TabsTrigger value="account" className="flex-1">{t('settings.account.tab')}</TabsTrigger>
                 </TabsList>
                 <TabsContents className="mt-6">
                     <TabsContent value="general" className="px-1">
@@ -33,6 +35,9 @@ export default function SettingsPage() {
                     </TabsContent>
                     <TabsContent value="background" className="px-1">
                         <BackgroundSettings />
+                    </TabsContent>
+                    <TabsContent value="account" className="px-1">
+                        <AccountSettings />
                     </TabsContent>
                 </TabsContents>
             </Tabs >

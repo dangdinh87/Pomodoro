@@ -3,7 +3,10 @@
  * NO client providers here to enable SSR for landing page
  * Providers are added in group-specific layouts ((main), (auth))
  */
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
+import { cookies } from 'next/headers';
+import { InitialLangProvider } from '@/contexts/i18n-context';
+import { LOCALE_COOKIE, normalizeLang } from '@/lib/i18n/negotiate-locale';
 import { Be_Vietnam_Pro, Space_Grotesk, Nunito } from 'next/font/google';
 import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/next';
@@ -35,11 +38,16 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   title: 'Study Bro App',
   description:
-    'Free Pomodoro timer with task management, AI coach, mini games, focus analytics, and leaderboard. No signup required.',
+    'Free Pomodoro timer with task management, focus sounds, break mini games and focus history. No signup required.',
   manifest: '/manifest.json',
   metadataBase: new URL('https://www.pomodoro-focus.site'),
-  alternates: {
-    canonical: 'https://www.pomodoro-focus.site',
+  // No root canonical: each indexable page declares its own (see page metadata)
+  icons: {
+    icon: [
+      { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
   keywords: [
     'pomodoro timer',
@@ -54,14 +62,15 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Study Bro - Free Pomodoro Timer & Focus Tools',
     description:
-      'Free Pomodoro timer with task management, AI coach, mini games, focus analytics, and leaderboard.',
-    url: 'https://www.pomodoro-focus.site',
+      'Free Pomodoro timer with task management, focus sounds, break mini games and focus history.',
+    // No `url` here: child pages would inherit the homepage og:url. Each
+    // indexable page sets its own openGraph.url (see buildPageMetadata).
     siteName: 'Study Bro',
     images: [
       {
         url: 'https://www.pomodoro-focus.site/card.jpg',
-        width: 1200,
-        height: 630,
+        width: 1280,
+        height: 664,
         alt: 'Study Bro - Pomodoro Timer App',
       },
     ],
@@ -72,9 +81,17 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Study Bro - Free Pomodoro Timer & Focus Tools',
     description:
-      'Free Pomodoro timer with task management, AI coach, mini games, and analytics.',
+      'Free Pomodoro timer with task management, focus sounds and break mini games.',
     images: ['https://www.pomodoro-focus.site/card.jpg'],
   },
+};
+
+// Colors from globals.css: light --background (white), dark --background (24 10% 6%)
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#110f0e' },
+  ],
 };
 
 export default function RootLayout({
@@ -82,8 +99,11 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Locale cookie is set by middleware (Accept-Language) or the language switcher
+  const lang = normalizeLang(cookies().get(LOCALE_COOKIE)?.value);
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={lang} suppressHydrationWarning>
       <body className={`${spaceGrotesk.variable} ${beVietnamPro.variable} ${nunito.variable}`}>
         {/* JSON-LD structured data for SEO */}
         <script
@@ -95,7 +115,7 @@ export default function RootLayout({
               name: 'Study Bro',
               alternateName: 'Study Bro Pomodoro Timer',
               description:
-                'Free online Pomodoro timer with AI coach, task management, mini games, leaderboard, and focus analytics.',
+                'Free online Pomodoro timer with task management, focus sounds, break mini games and focus history.',
               url: 'https://www.pomodoro-focus.site',
               applicationCategory: 'ProductivityApplication',
               operatingSystem: 'Web Browser',
@@ -132,7 +152,7 @@ export default function RootLayout({
           </>
         ) : null}
         <AuthCodeHandler />
-        {children}
+        <InitialLangProvider lang={lang}>{children}</InitialLangProvider>
         <LocatorSetup />
         <Analytics />
       </body>
