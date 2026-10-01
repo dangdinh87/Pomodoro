@@ -1,9 +1,14 @@
+import { featureGate } from '@/config/feature-gate';
 import { createClient } from "@/lib/supabase-server";
 import { NextResponse } from "next/server";
+import { validateConversationInput } from "../conversation-schema";
 
 type Params = { params: Promise<{ id: string }> };
 
 export async function GET(req: Request, { params }: Params) {
+  const gated = featureGate('chat');
+  if (gated) return gated;
+
     const supabase = await createClient();
     const { id } = await params;
 
@@ -35,7 +40,7 @@ export async function GET(req: Request, { params }: Params) {
 
         if (msgError) {
             console.error("[Conversation API] Error getting messages:", msgError);
-            return NextResponse.json({ error: msgError.message }, { status: 500 });
+            return NextResponse.json({ error: "Failed to load messages" }, { status: 500 });
         }
 
         return NextResponse.json({ conversation, messages });
@@ -49,6 +54,9 @@ export async function GET(req: Request, { params }: Params) {
 }
 
 export async function PATCH(req: Request, { params }: Params) {
+  const gated = featureGate('chat');
+  if (gated) return gated;
+
     const supabase = await createClient();
     const { id } = await params;
 
@@ -59,12 +67,22 @@ export async function PATCH(req: Request, { params }: Params) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const body = await req.json();
-        const { title, model } = body;
+        let body: unknown;
+        try {
+            body = await req.json();
+        } catch {
+            return NextResponse.json({ error: "Request body must be valid JSON" }, { status: 400 });
+        }
 
-        const updates: Record<string, string> = {};
-        if (title !== undefined) updates.title = title;
-        if (model !== undefined) updates.model = model;
+        const parsed = validateConversationInput(body);
+        if (!parsed.success) {
+            return NextResponse.json({ error: parsed.error }, { status: 400 });
+        }
+
+        const updates = parsed.data;
+        if (!Object.keys(updates).length) {
+            return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
+        }
 
         const { data: conversation, error } = await supabase
             .from("conversations")
@@ -76,7 +94,7 @@ export async function PATCH(req: Request, { params }: Params) {
 
         if (error) {
             console.error("[Conversation API] Error updating:", error);
-            return NextResponse.json({ error: error.message }, { status: 500 });
+            return NextResponse.json({ error: "Failed to update conversation" }, { status: 500 });
         }
 
         return NextResponse.json({ conversation });
@@ -90,6 +108,9 @@ export async function PATCH(req: Request, { params }: Params) {
 }
 
 export async function DELETE(req: Request, { params }: Params) {
+  const gated = featureGate('chat');
+  if (gated) return gated;
+
     const supabase = await createClient();
     const { id } = await params;
 
@@ -108,7 +129,7 @@ export async function DELETE(req: Request, { params }: Params) {
 
         if (error) {
             console.error("[Conversation API] Error deleting:", error);
-            return NextResponse.json({ error: error.message }, { status: 500 });
+            return NextResponse.json({ error: "Failed to delete conversation" }, { status: 500 });
         }
 
         return NextResponse.json({ success: true });

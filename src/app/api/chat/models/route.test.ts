@@ -13,6 +13,14 @@ describe('Chat Models API Route Security', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     process.env.MEGALLM_API_KEY = 'test-key';
+    process.env.NEXT_PUBLIC_FEATURE_CHAT = 'true';
+  });
+
+  it('returns 404 when the chat feature flag is off', async () => {
+    process.env.NEXT_PUBLIC_FEATURE_CHAT = 'false';
+    const res = await GET();
+    expect(res.status).toBe(404);
+    expect(createClient).not.toHaveBeenCalled();
   });
 
   it('should return 401 if user is not authenticated', async () => {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase-server'
 
 const MAX_TAGS = 10
+const MAX_TAG_LENGTH = 50
 
 // GET: Lấy danh sách tags của user
 export async function GET() {
@@ -22,7 +23,8 @@ export async function GET() {
         .single()
 
     if (error && error.code !== 'PGRST116') {
-        return NextResponse.json({ error: error.message }, { status: 500 })
+        console.error('Error fetching tags', error)
+        return NextResponse.json({ error: 'Failed to load tags' }, { status: 500 })
     }
 
     return NextResponse.json({ tags: data?.tags ?? [] })
@@ -40,11 +42,22 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const body = await request.json()
-    const newTag = body.tag?.trim().toLowerCase()
+    let body: unknown
+    try {
+        body = await request.json()
+    } catch {
+        return NextResponse.json({ error: 'Request body must be valid JSON' }, { status: 400 })
+    }
+
+    const rawTag = (body as { tag?: unknown } | null)?.tag
+    const newTag = typeof rawTag === 'string' ? rawTag.trim().toLowerCase() : ''
 
     if (!newTag) {
         return NextResponse.json({ error: 'Tag is required' }, { status: 400 })
+    }
+
+    if (newTag.length > MAX_TAG_LENGTH) {
+        return NextResponse.json({ error: `Tag must be at most ${MAX_TAG_LENGTH} characters` }, { status: 400 })
     }
 
     // Lấy tags hiện tại
@@ -78,7 +91,8 @@ export async function POST(request: NextRequest) {
         }, { onConflict: 'user_id' })
 
     if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
+        console.error('Error saving tags', error)
+        return NextResponse.json({ error: 'Failed to save tags' }, { status: 500 })
     }
 
     return NextResponse.json({ tags: updatedTags })
@@ -122,7 +136,8 @@ export async function DELETE(request: NextRequest) {
         }, { onConflict: 'user_id' })
 
     if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
+        console.error('Error saving tags', error)
+        return NextResponse.json({ error: 'Failed to save tags' }, { status: 500 })
     }
 
     return NextResponse.json({ tags: updatedTags })

@@ -1,5 +1,6 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextRequest, NextResponse } from 'next/server';
+import { toSafeRedirectPath } from '@/lib/safe-redirect';
 
 /**
  * Auth callback - exchanges auth code for session (OAuth, email confirm, password recovery).
@@ -17,14 +18,10 @@ export async function GET(request: NextRequest) {
   }
 
   // Determine redirect destination (only allow same-origin paths)
-  let redirectTo: URL;
-  if (type === 'recovery') {
-    redirectTo = new URL('/reset-password', requestUrl.origin);
-  } else if (next?.startsWith('/') && !next.startsWith('//')) {
-    redirectTo = new URL(next, requestUrl.origin);
-  } else {
-    redirectTo = new URL('/timer', requestUrl.origin);
-  }
+  const redirectTo =
+    type === 'recovery'
+      ? new URL('/reset-password', requestUrl.origin)
+      : new URL(toSafeRedirectPath(next), requestUrl.origin);
 
   // Build response so we can attach session cookies to it
   let response = NextResponse.redirect(redirectTo);

@@ -1,9 +1,14 @@
+import { featureGate } from '@/config/feature-gate';
 import { createClient } from "@/lib/supabase-server";
 import { NextResponse } from "next/server";
+import { STORED_MESSAGE_MAX_LENGTH } from "../../conversation-schema";
 
 type Params = { params: Promise<{ id: string }> };
 
 export async function GET(req: Request, { params }: Params) {
+  const gated = featureGate('chat');
+  if (gated) return gated;
+
     const supabase = await createClient();
     const { id: conversationId } = await params;
 
@@ -34,7 +39,7 @@ export async function GET(req: Request, { params }: Params) {
 
         if (error) {
             console.error("[Messages API] Error fetching:", error);
-            return NextResponse.json({ error: error.message }, { status: 500 });
+            return NextResponse.json({ error: "Failed to load messages" }, { status: 500 });
         }
 
         // Map to UI-compatible format with 'parts' array structure
@@ -58,6 +63,9 @@ export async function GET(req: Request, { params }: Params) {
 
 
 export async function POST(req: Request, { params }: Params) {
+  const gated = featureGate('chat');
+  if (gated) return gated;
+
     const supabase = await createClient();
     const { id: conversationId } = await params;
 
@@ -80,12 +88,24 @@ export async function POST(req: Request, { params }: Params) {
             return NextResponse.json({ error: "Not found" }, { status: 404 });
         }
 
-        const body = await req.json();
-        const { role, content } = body;
+        let body: any;
+        try {
+            body = await req.json();
+        } catch {
+            return NextResponse.json({ error: "Request body must be valid JSON" }, { status: 400 });
+        }
+        const { role, content } = body ?? {};
 
-        if (!role || !content) {
+        if (!role || typeof content !== "string" || !content.trim()) {
             return NextResponse.json(
                 { error: "role and content are required" },
+                { status: 400 }
+            );
+        }
+
+        if (content.length > STORED_MESSAGE_MAX_LENGTH) {
+            return NextResponse.json(
+                { error: `content must be at most ${STORED_MESSAGE_MAX_LENGTH} characters` },
                 { status: 400 }
             );
         }
@@ -109,14 +129,15 @@ export async function POST(req: Request, { params }: Params) {
 
         if (error) {
             console.error("[Messages API] Error creating:", error);
-            return NextResponse.json({ error: error.message }, { status: 500 });
+            return NextResponse.json({ error: "Failed to save message" }, { status: 500 });
         }
 
         // Update conversation's updated_at
         await supabase
             .from("conversations")
             .update({ updated_at: new Date().toISOString() })
-            .eq("id", conversationId);
+            .eq("id", conversationId)
+            .eq("user_id", user.id);
 
         return NextResponse.json({ message }, { status: 201 });
     } catch (error) {
