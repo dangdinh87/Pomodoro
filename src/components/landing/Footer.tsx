@@ -1,64 +1,64 @@
 /**
- * SSR Footer component - links and content rendered server-side for SEO
- * LanguageSwitcher remains client component
+ * Site footer: server-rendered links (SEO) with the language switcher as the only client island.
+ * Used on `/` below the timer and on the standalone content pages.
  */
-import { GithubLogo } from '@phosphor-icons/react/dist/ssr';
-import Link from 'next/link';
 import Image from 'next/image';
+import Link from 'next/link';
+import type { ReactNode } from 'react';
 import { getT } from '@/lib/server-translations';
 import { LanguageSwitcher } from '@/components/layout/language-switcher';
+import { PanelLink } from './panel-link';
+
+const LINK =
+  'rounded text-sm text-ink-muted transition-colors hover:text-ink focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand';
+
+function Column({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <nav aria-label={title}>
+      <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-ink-faint">{title}</h2>
+      <ul className="space-y-2.5">{children}</ul>
+    </nav>
+  );
+}
 
 export async function Footer() {
   const t = await getT();
   return (
-    <footer className="py-12 px-[clamp(16px,4vw,32px)] bg-surface-page border-t border-border">
+    <footer className="border-t border-border bg-surface-page px-[clamp(16px,4vw,32px)]">
       <div className="mx-auto max-w-[1180px]">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
-          <div className="flex flex-col gap-6">
-            <Link href="/" className="flex items-center gap-3 cursor-pointer">
-              <div className="flex h-8 w-8 items-center justify-center">
-                <Image
-                  src="/images/logo.png"
-                  alt="Study Bro"
-                  width={32}
-                  height={32}
-                  
-                />
-              </div>
-              <span className="font-heading text-xl font-bold text-ink">Study Bro</span>
+        <div className="grid gap-10 py-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
+          <div className="max-w-sm">
+            <Link href="/" className="inline-flex items-center gap-2.5 rounded focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand">
+              <Image src="/images/logo.png" alt="" width={28} height={28} className="size-7" />
+              <span className="font-heading text-lg font-bold tracking-[-0.02em] text-ink">{t('brand.title')}</span>
             </Link>
-
-            <div className="flex gap-4">
-              <a
-                href="https://github.com/dangdinh87"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-ink-muted hover:text-ink transition-colors cursor-pointer"
-              >
-                <GithubLogo size={20} aria-label="GitHub" />
-              </a>
-            </div>
+            <p className="mt-3 text-sm leading-relaxed text-ink-muted">{t('site.footer.tagline')}</p>
           </div>
 
-          <nav className="flex flex-wrap gap-x-8 gap-y-4">
-            <Link href="/#features" className="text-sm font-medium text-ink-muted hover:text-ink transition-colors">
-              {t('landing.footer.links.features')}
-            </Link>
-            <Link href="/guide" className="text-sm font-medium text-ink-muted hover:text-ink transition-colors">
-              {t('nav.guide')}
-            </Link>
-            <Link href="/privacy" className="text-sm font-medium text-ink-muted hover:text-ink transition-colors">
-              {t('landing.footer.links.privacy')}
-            </Link>
-            <Link href="/terms" className="text-sm font-medium text-ink-muted hover:text-ink transition-colors">
-              {t('landing.footer.links.terms')}
-            </Link>
-          </nav>
+          <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3">
+            <Column title={t('site.footer.product')}>
+              <li><Link href="/" className={LINK}>{t('site.footer.timer')}</Link></li>
+              <li><PanelLink panel="tasks" className={LINK}>{t('shell.panels.tasks')}</PanelLink></li>
+              <li><PanelLink panel="stats" className={LINK}>{t('shell.panels.stats')}</PanelLink></li>
+              <li><PanelLink panel="scene" className={LINK}>{t('shell.panels.scene')}</PanelLink></li>
+              <li><PanelLink panel="sound" className={LINK}>{t('shell.panels.sound')}</PanelLink></li>
+              <li><PanelLink panel="arcade" className={LINK}>{t('shell.panels.arcade')}</PanelLink></li>
+            </Column>
+            <Column title={t('site.footer.learn')}>
+              <li><Link href="/guide" className={LINK}>{t('site.footer.guide')}</Link></li>
+              <li><Link href="/guide#shortcuts" className={LINK}>{t('site.footer.shortcuts')}</Link></li>
+              <li><PanelLink panel="feedback" className={LINK}>{t('shell.panels.feedback')}</PanelLink></li>
+            </Column>
+            <Column title={t('site.footer.legal')}>
+              <li><Link href="/privacy" className={LINK}>{t('landing.footer.links.privacy')}</Link></li>
+              <li><Link href="/terms" className={LINK}>{t('landing.footer.links.terms')}</Link></li>
+            </Column>
+          </div>
         </div>
 
-        <div className="pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="flex flex-col items-start justify-between gap-4 border-t border-border py-6 sm:flex-row sm:items-center">
           <p className="text-sm text-ink-muted">
-            © {new Date().getFullYear()} Study Bro. {t('landing.footer.rightsReserved')}
+            © {new Date().getFullYear()} {t('brand.title')}. {t('landing.footer.rightsReserved')}
           </p>
           <LanguageSwitcher />
         </div>

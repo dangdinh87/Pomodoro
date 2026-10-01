@@ -18,10 +18,15 @@ export default async function NotFound() {
         <h1 className="mt-1 font-heading text-[1.75rem] font-bold leading-[1.1] tracking-[-0.02em] text-ink">
           {t('notFound.title')}
         </h1>
-        <p className="mt-3 text-sm text-ink-muted">{t('notFound.description')}</p>
-        <Button asChild size="lg" className="mt-8">
-          <Link href="/">{t('notFound.backToTimer')}</Link>
-        </Button>
+        <p className="mt-3 text-sm leading-relaxed text-ink-muted">{t('notFound.description')}</p>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Button asChild size="lg">
+            <Link href="/">{t('notFound.backToTimer')}</Link>
+          </Button>
+          <Button asChild size="lg" variant="secondary">
+            <Link href="/guide">{t('site.notFound.guide')}</Link>
+          </Button>
+        </div>
       </div>
     </main>
   );

@@ -1,156 +1,221 @@
-'use client';
-
-import Image from 'next/image';
+import type { Metadata } from 'next';
 import Link from 'next/link';
+import type { ReactNode } from 'react';
+import { ArrowRight } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '@/components/ui/button';
 import { Kbd } from '@/components/ui/kbd';
-import { PageContainer } from '@/components/ui/page-header';
-import { ArrowRight } from '@phosphor-icons/react/dist/ssr';
-import { useI18n } from '@/contexts/i18n-context';
-import { isFeatureEnabled } from '@/config/feature-flags';
+import { DocLayout, OL, P, UL, type DocSection } from '@/components/landing/doc-layout';
+import { PanelLink } from '@/components/landing/panel-link';
+import type { PanelId } from '@/features/app-shell/panel-store';
+import { buildPageMetadata } from '@/lib/seo/page-metadata';
+import { getT } from '@/lib/server-translations';
 
-const FEATURES = [
-    { key: 'timer', href: '/timer' },
-    { key: 'tasks', href: '/tasks' },
-    { key: 'history', href: '/history' },
-    { key: 'entertainment', href: '/entertainment' },
-    { key: 'settings', href: '/settings' },
-    { key: 'feedback', href: '/feedback' },
-] as const;
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return buildPageMetadata({
+    path: '/guide',
+    title: t('site.meta.guide.title'),
+    description: t('site.meta.guide.description'),
+  });
+}
 
-const H2 = 'font-heading text-2xl font-bold tracking-[-0.02em] text-ink';
-const BODY = 'text-[1.0625rem] leading-[1.7] text-ink-secondary';
+const SESSION_STEPS = 6;
+const SHORTCUTS: { keys: string[]; action: string }[] = [
+  { keys: ['Space'], action: 'space' },
+  { keys: ['R'], action: 'reset' },
+  { keys: ['T'], action: 'tasks' },
+  { keys: ['S'], action: 'sound' },
+  { keys: ['B'], action: 'scene' },
+  { keys: ['C'], action: 'timer' },
+  { keys: ['H'], action: 'stats' },
+  { keys: ['G'], action: 'arcade' },
+  { keys: ['⌘ K', 'Ctrl K'], action: 'palette' },
+];
+const RHYTHMS = ['classic', 'extended', 'ratio', 'deep'] as const;
 
-export default function GuidePage() {
-    const { t, dict } = useI18n();
-    const benefits: string[] = Array.isArray(dict.guide?.benefits?.list) ? dict.guide.benefits.list : [];
-    const startSteps: string[] = Array.isArray(dict.guide?.getStarted?.steps) ? dict.guide.getStarted.steps : [];
+function Go({ panel, children }: { panel: PanelId; children: ReactNode }) {
+  return (
+    <p>
+      <PanelLink panel={panel} className="inline-flex items-center gap-1.5 font-medium text-brand hover:underline">
+        {children}
+        <ArrowRight size={14} weight="bold" />
+      </PanelLink>
+    </p>
+  );
+}
 
-    return (
-        <PageContainer size="narrow">
-            <article className="mx-auto max-w-[68ch] space-y-14">
-                <header className="space-y-3">
-                    <h1 className="font-heading text-[2rem] font-bold leading-[1.1] tracking-[-0.02em] text-ink sm:text-4xl">
-                        {t('guide.title')}
-                    </h1>
-                    <p className="text-lg leading-relaxed text-ink-muted">{t('guide.subtitle')}</p>
-                </header>
+export default async function GuidePage() {
+  const t = await getT();
+  const list = (prefix: string, n: number) => Array.from({ length: n }, (_, i) => t(`${prefix}.${i + 1}`));
+  const steps = list('guide2.session.steps', SESSION_STEPS);
 
-                <section className="space-y-5">
-                    <h2 className={H2}>{t('guide.pomodoro.title')}</h2>
-                    <p className={BODY} dangerouslySetInnerHTML={{ __html: t('guide.pomodoro.description') }} />
-                    <figure className="space-y-2">
-                        <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-border bg-surface-raised">
-                            <Image
-                                src="/images/content_1/pomodoro_explain.png"
-                                alt={t('guide.pomodoro.imageAlt')}
-                                fill
-                                className="object-contain"
-                                priority
-                            />
-                        </div>
-                        <figcaption className="text-[0.8125rem] text-ink-muted">{t('pagesUi.guide.figureCaption')}</figcaption>
-                    </figure>
-                </section>
-
-                <section className="space-y-5">
-                    <h2 className={H2}>{t('guide.howToApply.title')}</h2>
-                    <ol className="divide-y divide-border rounded-lg border border-border bg-surface">
-                        {(['step1', 'step2', 'step3', 'step4'] as const).map((step, i) => (
-                            <li key={step} className="flex gap-4 px-5 py-4">
-                                <span className="w-5 shrink-0 font-heading text-lg font-bold tabular-nums text-ink-faint">{i + 1}</span>
-                                <div className="space-y-1">
-                                    <h3 className="text-[0.9375rem] font-semibold text-ink">{t(`guide.howToApply.steps.${step}.title`)}</h3>
-                                    <p className="text-sm leading-relaxed text-ink-muted">{t(`guide.howToApply.steps.${step}.description`)}</p>
-                                </div>
-                            </li>
+  const sections: DocSection[] = [
+    {
+      id: 'what-is-pomodoro',
+      title: t('guide2.what.title'),
+      body: (
+        <>
+          <P>{t('guide2.what.p1')}</P>
+          <P>{t('guide2.what.p2')}</P>
+          <P>{t('guide2.what.p3')}</P>
+        </>
+      ),
+    },
+    {
+      id: 'run-a-session',
+      title: t('guide2.session.title'),
+      body: (
+        <>
+          <P>{t('guide2.session.intro')}</P>
+          <OL items={steps} />
+          <P>{t('guide2.session.note')}</P>
+          <Go panel="tasks">{t('shell.panels.tasks')}</Go>
+        </>
+      ),
+    },
+    {
+      id: 'choose-a-rhythm',
+      title: t('guide2.rhythm.title'),
+      body: (
+        <>
+          <P>{t('guide2.rhythm.intro')}</P>
+          <div className="overflow-x-auto rounded-lg border border-border bg-surface">
+            <table className="w-full min-w-[34rem] text-left text-sm">
+              <thead className="bg-surface-raised text-xs font-semibold uppercase tracking-wider text-ink-muted">
+                <tr>
+                  <th scope="col" className="px-4 py-2.5">{t('guide2.rhythm.colName')}</th>
+                  <th scope="col" className="px-4 py-2.5">{t('guide2.rhythm.colTimes')}</th>
+                  <th scope="col" className="px-4 py-2.5">{t('guide2.rhythm.colFor')}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border align-top">
+                {RHYTHMS.map((r) => (
+                  <tr key={r}>
+                    <th scope="row" className="px-4 py-3 font-semibold text-ink">{t(`guide2.rhythm.${r}.name`)}</th>
+                    <td className="whitespace-nowrap px-4 py-3 tabular-nums text-ink">{t(`guide2.rhythm.${r}.times`)}</td>
+                    <td className="px-4 py-3 text-ink-secondary">{t(`guide2.rhythm.${r}.for`)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <P>{t('guide2.rhythm.how')}</P>
+          <P>{t('guide2.rhythm.limits')}</P>
+          <Go panel="timer">{t('shell.panels.timer')}</Go>
+        </>
+      ),
+    },
+    {
+      id: 'interruptions',
+      title: t('guide2.interruptions.title'),
+      body: (
+        <>
+          <P>{t('guide2.interruptions.intro')}</P>
+          <UL items={list('guide2.interruptions.list', 3)} />
+          <P>{t('guide2.interruptions.outro')}</P>
+        </>
+      ),
+    },
+    {
+      id: 'tasks-and-estimates',
+      title: t('guide2.tasks.title'),
+      body: (
+        <>
+          <P>{t('guide2.tasks.intro')}</P>
+          <UL items={list('guide2.tasks.list', 4)} />
+          <Go panel="tasks">{t('shell.panels.tasks')}</Go>
+        </>
+      ),
+    },
+    {
+      id: 'breaks',
+      title: t('guide2.breaks.title'),
+      body: (
+        <>
+          <P>{t('guide2.breaks.intro')}</P>
+          <UL items={list('guide2.breaks.list', 4)} />
+          <P>{t('guide2.breaks.outro')}</P>
+        </>
+      ),
+    },
+    {
+      id: 'sounds-scenes-history',
+      title: t('guide2.tools.title'),
+      body: (
+        <>
+          <UL items={list('guide2.tools.list', 4)} />
+          <Go panel="stats">{t('shell.panels.stats')}</Go>
+        </>
+      ),
+    },
+    {
+      id: 'shortcuts',
+      title: t('guide2.shortcuts.title'),
+      body: (
+        <>
+          <P>{t('guide2.shortcuts.intro')}</P>
+          <div className="overflow-hidden rounded-lg border border-border bg-surface">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-surface-raised text-xs font-semibold uppercase tracking-wider text-ink-muted">
+                <tr>
+                  <th scope="col" className="w-40 px-4 py-2.5">{t('pagesUi.guide.colKey')}</th>
+                  <th scope="col" className="px-4 py-2.5">{t('pagesUi.guide.colAction')}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {SHORTCUTS.map(({ keys, action }) => (
+                  <tr key={action}>
+                    <td className="px-4 py-2.5">
+                      <span className="flex items-center gap-1.5">
+                        {keys.map((k, i) => (
+                          <span key={k} className="flex items-center gap-1.5">
+                            {i > 0 ? <span className="text-xs text-ink-muted">/</span> : null}
+                            <Kbd>{k}</Kbd>
+                          </span>
                         ))}
-                    </ol>
-                </section>
+                      </span>
+                    </td>
+                    <td className="px-4 py-2.5 text-ink-secondary">{t(`guide2.shortcuts.${action}`)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      ),
+    },
+  ];
 
-                <section className="space-y-5">
-                    <h2 className={H2}>{t('guide.benefits.title')}</h2>
-                    <ul className={`list-disc space-y-2 pl-5 marker:text-ink-faint ${BODY}`}>
-                        {benefits.map((benefit) => (
-                            <li key={benefit}>{benefit}</li>
-                        ))}
-                    </ul>
-                    <p className="rounded-lg bg-surface-raised px-5 py-4 text-sm leading-relaxed text-ink-secondary">{t('pagesUi.guide.tip')}</p>
-                </section>
+  const howTo = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: t('guide2.session.title'),
+    description: t('guide2.session.intro'),
+    step: steps.map((text, i) => ({
+      '@type': 'HowToStep',
+      position: i + 1,
+      text: text.replaceAll('**', ''),
+    })),
+  };
 
-                <section className="space-y-5">
-                    <div className="space-y-2">
-                        <h2 className={H2}>{t('guide.howToUse.title')}</h2>
-                        <p className="text-ink-muted">{t('guide.howToUse.description')}</p>
-                    </div>
-                    <ul className="divide-y divide-border rounded-lg border border-border bg-surface">
-                        {FEATURES.filter((f) => f.key !== 'history' || isFeatureEnabled('history')).map(({ key, href }) => (
-                            <li key={key}>
-                                <Link
-                                    href={href}
-                                    className="group flex items-center justify-between gap-4 px-5 py-4 transition-colors duration-150 hover:bg-surface-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"
-                                >
-                                    <span className="min-w-0 space-y-0.5">
-                                        <span className="block text-[0.9375rem] font-semibold text-ink">{t(`guide.howToUse.features.${key}.title`)}</span>
-                                        <span className="block text-[0.8125rem] text-ink-muted">{t(`guide.howToUse.features.${key}.subtitle`)}</span>
-                                    </span>
-                                    <ArrowRight size={16} className="shrink-0 text-ink-faint transition-transform duration-150 group-hover:translate-x-0.5 group-hover:text-ink-secondary" />
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
-                </section>
-
-                <section className="space-y-5">
-                    <div className="space-y-2">
-                        <h2 className={H2}>{t('pagesUi.guide.shortcutsTitle')}</h2>
-                        <p className="text-ink-muted">{t('pagesUi.guide.shortcutsIntro')}</p>
-                    </div>
-                    <div className="overflow-hidden rounded-lg border border-border">
-                        <table className="w-full text-left text-sm">
-                            <thead className="bg-surface-raised text-[0.6875rem] font-semibold uppercase tracking-wider text-ink-muted">
-                                <tr>
-                                    <th scope="col" className="w-32 px-5 py-2.5">{t('pagesUi.guide.colKey')}</th>
-                                    <th scope="col" className="px-5 py-2.5">{t('pagesUi.guide.colAction')}</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-border bg-surface text-ink-secondary">
-                                <tr>
-                                    <td className="px-5 py-3"><Kbd>{t('pagesUi.guide.keySpace')}</Kbd></td>
-                                    <td className="px-5 py-3">{t('pagesUi.guide.actionStartPause')}</td>
-                                </tr>
-                                <tr>
-                                    <td className="px-5 py-3"><Kbd>R</Kbd></td>
-                                    <td className="px-5 py-3">{t('pagesUi.guide.actionReset')}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <section className="space-y-5 border-t border-border pt-10">
-                    <h2 className={H2}>{t('guide.getStarted.title')}</h2>
-                    <p className={BODY}>{t('guide.getStarted.description')}</p>
-                    <ol className="space-y-3 text-ink-secondary">
-                        {startSteps.map((step, index) => (
-                            <li key={step} className="flex items-start gap-3">
-                                <span className="w-5 shrink-0 font-heading font-bold tabular-nums text-ink-faint">{index + 1}</span>
-                                <span
-                                    dangerouslySetInnerHTML={{
-                                        __html: step
-                                            .replace('<link>', '<a href="/?panel=tasks" class="font-medium text-brand hover:underline">')
-                                            .replace('<link>', '<a href="/" class="font-medium text-brand hover:underline">')
-                                            .replace(/<\/link>/g, '</a>'),
-                                    }}
-                                />
-                            </li>
-                        ))}
-                    </ol>
-                    <Button asChild size="lg">
-                        <Link href="/">{t('guide.getStarted.cta')}</Link>
-                    </Button>
-                </section>
-            </article>
-        </PageContainer>
-    );
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howTo) }} />
+      <DocLayout
+        title={t('guide2.title')}
+        lead={t('guide2.lead')}
+        tocLabel={t('guide2.toc')}
+        sections={sections}
+        after={
+          <section className="border-t border-border pt-10">
+            <h2 className="font-heading text-2xl font-bold leading-[1.15] tracking-[-0.02em] text-ink">{t('guide2.cta.title')}</h2>
+            <p className="mt-3 text-base leading-[1.7] text-ink-secondary">{t('guide2.cta.text')}</p>
+            <Button asChild size="lg" className="mt-6">
+              <Link href="/">{t('guide2.cta.button')}</Link>
+            </Button>
+          </section>
+        }
+      />
+    </>
+  );
 }

@@ -6,6 +6,7 @@
 import { FeaturesSSR } from '@/components/landing/FeaturesSSR';
 import { Footer } from '@/components/landing/Footer';
 import { FAQ } from '@/components/landing/FAQ';
+import { getFaqItems } from '@/components/landing/faq-items';
 import { HowItWorks } from '@/components/landing/HowItWorks';
 import { Metadata } from 'next';
 import { buildPageMetadata } from '@/lib/seo/page-metadata';
@@ -45,18 +46,15 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   const [t, user] = await Promise.all([getT(), getSessionUser()]);
   const isMember = Boolean(user && !user.isAnonymous);
-  // FAQ structured data for rich snippets
+  // Same items as the visible FAQ, so the structured data never drifts from the page
   const faqStructuredData = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: [
-      { '@type': 'Question', name: t('landing.faq.items.q1.question'), acceptedAnswer: { '@type': 'Answer', text: t('landing.faq.items.q1.answer') } },
-      { '@type': 'Question', name: t('landing.faq.items.q2.question'), acceptedAnswer: { '@type': 'Answer', text: t('landing.faq.items.q2.answer') } },
-      { '@type': 'Question', name: t('landing.faq.items.q3.question'), acceptedAnswer: { '@type': 'Answer', text: t('landing.faq.items.q3.answer') } },
-      { '@type': 'Question', name: t('landing.faq.items.q4.question'), acceptedAnswer: { '@type': 'Answer', text: t('landing.faq.items.q4.answer') } },
-      { '@type': 'Question', name: t('landing.faq.items.q5.question'), acceptedAnswer: { '@type': 'Answer', text: t('landing.faq.items.q5.answer') } },
-      { '@type': 'Question', name: t('landing.faq.items.q6.question'), acceptedAnswer: { '@type': 'Answer', text: t('landing.faq.items.q6.answer') } },
-    ],
+    mainEntity: getFaqItems(t).map(({ question, answer }) => ({
+      '@type': 'Question',
+      name: question,
+      acceptedAnswer: { '@type': 'Answer', text: answer },
+    })),
   };
 
   return (

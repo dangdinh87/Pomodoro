@@ -1,28 +1,28 @@
 import type { Metadata } from 'next';
+import { LegalPage, type LegalSectionSpec } from '@/components/landing/legal-page';
 import { buildPageMetadata } from '@/lib/seo/page-metadata';
+import { getT } from '@/lib/server-translations';
 
-export const metadata: Metadata = buildPageMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return buildPageMetadata({
     path: '/terms',
-    title: 'Terms of Service • Study Bro',
-    description: 'The terms for using Study Bro, the free Pomodoro timer with tasks and focus sounds.',
-});
+    title: t('site.meta.terms.title'),
+    description: t('site.meta.terms.description'),
+  });
+}
 
-export default function TermsPage() {
-    return (
-        <div className="container mx-auto px-4 py-24 min-h-[60vh]">
-            <div className="max-w-3xl mx-auto space-y-8">
-                <h1 className="text-4xl font-bold text-ink">
-                    Terms of Service
-                </h1>
-                <div className="prose dark:prose-invert max-w-none">
-                    <p className="text-lg text-ink-secondary">
-                        Content is updating...
-                    </p>
-                    <p className="text-lg text-ink-secondary">
-                        Nội dung đang được cập nhật...
-                    </p>
-                </div>
-            </div>
-        </div>
-    );
+const SPECS: LegalSectionSpec[] = [
+  { id: 'service', intro: true },
+  { id: 'use', intro: true, list: 4 },
+  { id: 'content', intro: true },
+  { id: 'thirdParty', intro: true },
+  { id: 'availability', intro: true },
+  { id: 'liability', intro: true, list: 2 },
+  { id: 'ending', intro: true },
+  { id: 'changes', intro: true },
+];
+
+export default async function TermsPage() {
+  return <LegalPage t={await getT()} ns="terms" specs={SPECS} />;
 }
