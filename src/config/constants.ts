@@ -1,4 +1,4 @@
-// Session recording guards — sessions feed streaks and the public leaderboard.
+// Session recording guards — sessions feed streaks and stats.
 /** Timer settings allow at most 60 min per phase; 4h leaves room for future presets. */
 export const SESSION_MAX_DURATION_SEC = 4 * 60 * 60;
 /** A user cannot log more focus/break time than wall-clock time in a rolling day. */

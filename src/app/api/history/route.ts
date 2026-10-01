@@ -1,68 +1,49 @@
-import { createClient } from '@/lib/supabase-server'
-import { NextResponse } from 'next/server'
+import { NextResponse } from 'next/server';
+import { and, desc, eq, gte, lt, type SQL } from 'drizzle-orm';
+import { db } from '@/db';
+import { focusSessions, tasks } from '@/db/schema';
+import { getSessionUser } from '@/lib/auth/session-user';
+import { serverError, unauthorized } from '@/lib/api/responses';
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+const DEFAULT_LIMIT = 50;
+const MAX_LIMIT = 1000;
+
+function parseDay(value: string | null) {
+  return value && /^\d{4}-\d{2}-\d{2}$/.test(value) ? new Date(`${value}T00:00:00Z`) : null;
+}
 
 export async function GET(request: Request) {
-    const supabase = await createClient()
+  const user = await getSessionUser();
+  if (!user) return unauthorized();
 
-    try {
-        // 1. Get authenticated user
-        const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const { searchParams } = new URL(request.url);
+  const startDate = parseDay(searchParams.get('startDate'));
+  const endDate = parseDay(searchParams.get('endDate'));
+  const conditions: SQL[] = [eq(focusSessions.userId, user.id)];
+  if (startDate) conditions.push(gte(focusSessions.createdAt, startDate));
+  if (endDate) conditions.push(lt(focusSessions.createdAt, new Date(endDate.getTime() + DAY_MS)));
 
-        if (authError || !user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 },
-            )
-        }
+  try {
+    const rows = await db
+      .select({ session: focusSessions, taskTitle: tasks.title })
+      .from(focusSessions)
+      .leftJoin(tasks, eq(tasks.id, focusSessions.taskId))
+      .where(and(...conditions))
+      .orderBy(desc(focusSessions.createdAt))
+      .limit(startDate || endDate ? MAX_LIMIT : DEFAULT_LIMIT);
 
-        const userId = user.id
-
-        // Get date range from query parameters
-        const { searchParams } = new URL(request.url)
-        const startDate = searchParams.get('startDate')
-        const endDate = searchParams.get('endDate')
-
-        let query = supabase
-            .from('sessions')
-            .select('*, tasks(title)')
-            .eq('user_id', userId)
-            .order('created_at', { ascending: false })
-
-        if (startDate) {
-            query = query.gte('created_at', startDate)
-        }
-        if (endDate) {
-            // Add one day to include the end date fully
-            const endDateTime = new Date(endDate)
-            endDateTime.setDate(endDateTime.getDate() + 1)
-            query = query.lt('created_at', endDateTime.toISOString())
-        } else {
-            // Default limit if no date range? Or maybe just limit to recent 50?
-            // Let's stick to date range if provided, otherwise maybe last 30 days?
-            // The original stats API had a default. Let's keep it simple for now.
-        }
-
-        // If no date range, maybe limit to 50 recent sessions?
-        if (!startDate && !endDate) {
-            query = query.limit(50)
-        }
-
-        const { data: sessions, error: sessionsError } = await query
-
-        if (sessionsError) {
-            console.error('Error fetching sessions:', sessionsError)
-            return NextResponse.json(
-                { error: 'Failed to fetch sessions' },
-                { status: 500 },
-            )
-        }
-
-        return NextResponse.json({ sessions })
-    } catch (error) {
-        console.error('Error in history API:', error)
-        return NextResponse.json(
-            { error: 'Internal Server Error' },
-            { status: 500 },
-        )
-    }
+    return NextResponse.json({
+      sessions: rows.map(({ session, taskTitle }) => ({
+        id: session.id,
+        task_id: session.taskId,
+        mode: session.mode,
+        duration: session.durationSec,
+        created_at: session.createdAt,
+        tasks: taskTitle === null ? null : { title: taskTitle },
+      })),
+    });
+  } catch (error) {
+    return serverError('Failed to fetch sessions', error);
+  }
 }

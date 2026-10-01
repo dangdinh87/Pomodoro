@@ -13,7 +13,7 @@ import { TaskSelector } from './task-selector';
 
 export const DailyProgress = memo(function DailyProgress() {
     const { t } = useTranslation();
-    const { isAuthenticated } = useAuth();
+    const { hasSession } = useAuth();
     const mode = useTimerStore((state) => state.mode);
     const isFocusMode = useSystemStore((state) => state.isFocusMode);
     const activeTaskId = useTasksStore((state) => state.activeTaskId);
@@ -61,7 +61,7 @@ export const DailyProgress = memo(function DailyProgress() {
                 </div>
             )}
 
-            {isAuthenticated && summary && <p data-chrome className="text-xs text-ink-muted tabular-nums">{summary}</p>}
+            {hasSession && summary && <p data-chrome className="text-xs text-ink-muted tabular-nums">{summary}</p>}
         </div>
     );
 });

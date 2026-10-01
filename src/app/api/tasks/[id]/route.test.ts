@@ -1,95 +1,103 @@
-/**
- * @jest-environment node
- */
-import { PATCH, DELETE } from './route';
-import { createClient } from '@/lib/supabase-server';
-import { createSupabaseMock, jsonRequest, type SupabaseMockOptions } from '@/test-utils/supabase-mock';
+/** @vitest-environment node */
+import { eq } from 'drizzle-orm';
+import { createTestDb, createTestUser, jsonRequest, resetTestDb, type TestDb } from '@/test-utils/test-db';
+import { getSessionUser } from '@/lib/auth/session-user';
+import { tasks } from '@/db/schema';
+import { DELETE, PATCH } from './route';
+import { POST as CLONE } from './clone/route';
+import { POST as REORDER } from '../reorder/route';
 
-jest.mock('@/lib/supabase-server', () => ({ createClient: jest.fn() }));
+let mockDb: TestDb;
+vi.mock('@/db', () => ({ get db() { return mockDb; } }));
+vi.mock('@/lib/auth/session-user', () => ({ getSessionUser: vi.fn() }));
 
-const USER = { id: '11111111-1111-4111-8111-111111111111' };
-const TASK_A = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
-const TASK_B = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
-const URL = `http://localhost/api/tasks/${TASK_A}`;
+const params = (id: string) => ({ params: Promise.resolve({ id }) });
+const patch = (id: string, body: unknown) =>
+  PATCH(jsonRequest(`http://localhost/api/tasks/${id}`, body, { method: 'PATCH' }), params(id));
+const remove = (id: string, query = '') =>
+  DELETE(new Request(`http://localhost/api/tasks/${id}${query}`, { method: 'DELETE' }), params(id));
 
-function setup(tables: SupabaseMockOptions['tables'] = {}) {
-  const mock = createSupabaseMock({ user: USER, tables });
-  (createClient as jest.Mock).mockResolvedValue(mock.client);
-  return mock;
-}
+let mine: string;
+let theirs: string;
 
-const patch = (body: unknown) =>
-  PATCH(jsonRequest(URL, body, { method: 'PATCH' }), { params: Promise.resolve({ id: TASK_A }) });
+beforeAll(async () => {
+  mockDb = await createTestDb();
+});
 
-const updates = (mock: ReturnType<typeof setup>) =>
-  mock.callsFor('tasks').filter((c) => c.method === 'update');
+beforeEach(async () => {
+  await resetTestDb(mockDb);
+  vi.mocked(getSessionUser).mockResolvedValue(await createTestUser(mockDb, 'u1'));
+  await createTestUser(mockDb, 'u2');
+  [{ id: mine }, { id: theirs }] = await mockDb
+    .insert(tasks)
+    .values([
+      { userId: 'u1', title: 'mine', actualPomodoros: 2, timeSpentMs: 3000, status: 'DOING', displayOrder: 4 },
+      { userId: 'u2', title: 'theirs' },
+    ])
+    .returning({ id: tasks.id });
+});
 
 describe('PATCH /api/tasks/[id]', () => {
-  beforeEach(() => jest.clearAllMocks());
-
-  it('rejects nesting a task under itself', async () => {
-    const mock = setup({ tasks: { data: { id: TASK_A, parent_task_id: null } } });
-    const res = await patch({ parent_task_id: TASK_A });
-
-    expect(res.status).toBe(400);
-    expect(updates(mock)).toHaveLength(0);
-  });
-
-  it('rejects a parent cycle (A under B while B is under A)', async () => {
-    const mock = setup({
-      tasks: [
-        { data: { id: TASK_B } }, // ownership check of B
-        { data: { parent_task_id: TASK_A } }, // B's parent is A → cycle
-      ],
-    });
-    const res = await patch({ parent_task_id: TASK_B });
-    const body = await res.json();
-
-    expect(res.status).toBe(400);
-    expect(body.details.parent_task_id[0]).toMatch(/itself or its subtasks/);
-    expect(updates(mock)).toHaveLength(0);
-  });
-
-  it('allows a parent outside the subtree', async () => {
-    const mock = setup({
-      tasks: [
-        { data: { id: TASK_B } }, // ownership
-        { data: { parent_task_id: null } }, // B is a root task
-        { data: { id: TASK_A, parent_task_id: TASK_B } }, // update result
-      ],
-    });
-    const res = await patch({ parent_task_id: TASK_B });
-
+  it('updates the own task', async () => {
+    const res = await patch(mine, { status: 'done', title: 'Renamed', due_date: '2026-10-05' });
     expect(res.status).toBe(200);
-    expect(updates(mock)).toHaveLength(1);
+    expect((await res.json()).task).toMatchObject({ status: 'DONE', title: 'Renamed' });
   });
 
-  it('returns 404 when the task does not exist for this user', async () => {
-    setup({ tasks: { data: null, error: { code: 'PGRST116', message: 'no rows' } } });
-    const res = await patch({ title: 'Renamed' });
-    expect(res.status).toBe(404);
+  it("answers 404 for someone else's task or a malformed id", async () => {
+    expect((await patch(theirs, { title: 'hijack' })).status).toBe(404);
+    expect((await patch('not-a-uuid', { title: 'x' })).status).toBe(404);
+    const [row] = await mockDb.select().from(tasks).where(eq(tasks.id, theirs));
+    expect(row.title).toBe('theirs');
   });
 
-  it('returns 400 for malformed JSON', async () => {
-    setup();
-    const res = await PATCH(jsonRequest(URL, '{bad', { method: 'PATCH' }), { params: Promise.resolve({ id: TASK_A }) });
-    expect(res.status).toBe(400);
+  it('rejects an invalid body', async () => {
+    expect((await patch(mine, { title: '' })).status).toBe(400);
   });
 });
 
 describe('DELETE /api/tasks/[id]', () => {
-  beforeEach(() => jest.clearAllMocks());
-
-  it('returns 404 when soft-deleting a missing task', async () => {
-    setup({ tasks: { data: null, error: { code: 'PGRST116', message: 'no rows' } } });
-    const res = await DELETE(new Request(URL, { method: 'DELETE' }), { params: Promise.resolve({ id: TASK_A }) });
-    expect(res.status).toBe(404);
+  it('soft-deletes by default and hard-deletes on request', async () => {
+    expect((await (await remove(mine)).json()).task.is_deleted).toBe(true);
+    expect((await remove(mine, '?hard=true')).status).toBe(200);
+    expect(await mockDb.select().from(tasks).where(eq(tasks.id, mine))).toHaveLength(0);
   });
 
-  it('returns 401 without a user', async () => {
-    const mock = createSupabaseMock({ user: null });
-    (createClient as jest.Mock).mockResolvedValue(mock.client);
-    const res = await DELETE(new Request(URL, { method: 'DELETE' }), { params: Promise.resolve({ id: TASK_A }) });
-    expect(res.status).toBe(401);
+  it("never touches someone else's task", async () => {
+    expect((await remove(theirs)).status).toBe(404);
+    await remove(theirs, '?hard=true');
+    expect(await mockDb.select().from(tasks).where(eq(tasks.id, theirs))).toHaveLength(1);
+  });
+});
+
+describe('POST /api/tasks/[id]/clone', () => {
+  it('copies the task with progress reset', async () => {
+    const res = await CLONE(new Request('http://localhost'), params(mine));
+    expect(res.status).toBe(201);
+    expect((await res.json()).task).toMatchObject({
+      title: 'mine (Copy)',
+      status: 'TODO',
+      actual_pomodoros: 0,
+      time_spent: 0,
+      display_order: 5,
+    });
+    expect((await CLONE(new Request('http://localhost'), params(theirs))).status).toBe(404);
+  });
+});
+
+describe('POST /api/tasks/reorder', () => {
+  const reorder = (body: unknown) => REORDER(jsonRequest('http://localhost/api/tasks/reorder', body));
+
+  it('reorders own tasks only', async () => {
+    const res = await reorder({ tasks: [{ id: mine, displayOrder: 9 }, { id: theirs, displayOrder: 9 }] });
+    expect(res.status).toBe(200);
+    const rows = await mockDb.select().from(tasks);
+    expect(rows.find((t) => t.id === mine)?.displayOrder).toBe(9);
+    expect(rows.find((t) => t.id === theirs)?.displayOrder).toBe(0);
+  });
+
+  it('validates the payload', async () => {
+    expect((await reorder({ tasks: [] })).status).toBe(400);
+    expect((await reorder({ tasks: [{ id: mine, displayOrder: 'x' }] })).status).toBe(400);
   });
 });

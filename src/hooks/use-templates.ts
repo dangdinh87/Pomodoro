@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Task, TaskPriority } from '@/stores/task-store'
 import { toast } from 'sonner'
+import { useAuthStore } from '@/stores/auth-store'
 
 export interface TaskTemplate {
   id: string
@@ -53,8 +54,11 @@ async function removeTemplate(taskId: string): Promise<void> {
 export function useTemplates() {
   const queryClient = useQueryClient()
 
+  const hasSession = useAuthStore((state) => !!state.user)
+
   const templatesQuery = useQuery({
     queryKey: ['templates'],
+    enabled: hasSession,
     queryFn: fetchTemplates,
   })
 

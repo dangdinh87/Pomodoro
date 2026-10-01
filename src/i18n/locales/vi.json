@@ -41,7 +41,6 @@
     "timer": "Tập trung",
     "tasks": "Công việc",
     "history": "Lịch sử",
-    "leaderboard": "Bảng xếp hạng",
     "chatAI": "Chat AI",
     "entertainment": "Giải trí",
     "settings": "Cài đặt",
@@ -55,13 +54,11 @@
   "auth": {
     "login": "Đăng nhập",
     "pleaseLogin": "Vui lòng đăng nhập để tiếp tục",
-    "signInToManageTasks": "Vui lòng đăng nhập để quản lý công việc",
     "signInToViewStats": "Vui lòng đăng nhập để xem thống kê",
     "signInButton": "Đăng nhập",
     "signOutSuccess": "Đã đăng xuất",
     "signOutError": "Không thể đăng xuất",
     "signOutConfirm": "Bạn có chắc muốn đăng xuất?",
-    "supabaseNotConfigured": "Supabase chưa được cấu hình",
     "signOutUnexpectedError": "Có lỗi xảy ra khi đăng xuất"
   },
   "timer": {
@@ -326,17 +323,6 @@
       "selectDate": "Chọn khoảng thời gian"
     }
   },
-  "leaderboard": {
-    "title": "Bảng xếp hạng",
-    "comingSoon": "Tính năng sắp ra mắt",
-    "description": "Cùng thi đua với cộng đồng StudyBro. Xem ai là người tập trung chăm chỉ nhất!",
-    "tabs": {
-      "focusTime": "Thời gian tập trung",
-      "completedTasks": "Task hoàn thành"
-    },
-    "empty": "Chưa có dữ liệu. Hãy là người đầu tiên!",
-    "you": "Bạn"
-  },
   "settings": {
     "title": "Cài đặt",
     "subtitle": "Quản lý tùy chọn, cài đặt hẹn giờ và giao diện.",
@@ -352,26 +338,9 @@
       "subtitle": "Quản lý mật khẩu, xuất dữ liệu hoặc xóa tài khoản của bạn.",
       "guestPrompt": "Đăng nhập để quản lý tài khoản của bạn.",
       "guestLogin": "Đăng nhập",
-      "password": {
-        "title": "Đổi mật khẩu",
-        "description": "Chọn mật khẩu mới có ít nhất 8 ký tự.",
-        "currentLabel": "Mật khẩu hiện tại",
-        "sameAsCurrent": "Mật khẩu mới phải khác mật khẩu hiện tại.",
-        "wrongCurrent": "Mật khẩu hiện tại không đúng.",
-        "weak": "Mật khẩu này quá yếu. Hãy chọn mật khẩu mạnh hơn.",
-        "noEmail": "Tài khoản của bạn không có email nên không thể đổi mật khẩu tại đây.",
-        "oauthManaged": "Đăng nhập của bạn được quản lý bởi {provider}. Hãy đổi mật khẩu tại đó.",
-        "newLabel": "Mật khẩu mới",
-        "confirmLabel": "Xác nhận mật khẩu mới",
-        "submit": "Cập nhật mật khẩu",
-        "tooShort": "Mật khẩu phải có ít nhất 8 ký tự.",
-        "mismatch": "Mật khẩu không khớp.",
-        "success": "Đã cập nhật mật khẩu.",
-        "error": "Không thể cập nhật mật khẩu."
-      },
       "export": {
         "title": "Xuất dữ liệu của tôi",
-        "description": "Tải về tệp JSON chứa hồ sơ, công việc, phiên tập trung, chuỗi ngày, thẻ và cuộc trò chuyện của bạn.",
+        "description": "Tải file JSON gồm tài khoản, việc, phiên tập trung và thẻ của bạn.",
         "button": "Tải dữ liệu của tôi",
         "success": "Dữ liệu của bạn đã sẵn sàng.",
         "error": "Không thể xuất dữ liệu của bạn.",
@@ -382,14 +351,12 @@
         "description": "Xóa vĩnh viễn tài khoản và toàn bộ dữ liệu liên quan. Không thể hoàn tác.",
         "button": "Xóa tài khoản của tôi",
         "confirmTitle": "Xóa tài khoản của bạn?",
-        "confirmDescription": "Thao tác này xóa vĩnh viễn công việc, phiên tập trung, chuỗi ngày, thẻ và cuộc trò chuyện của bạn. Để xác nhận, hãy nhập {value} bên dưới.",
+        "confirmDescription": "Thao tác này xoá vĩnh viễn việc, phiên tập trung và thẻ của bạn. Để xác nhận, gõ {value} vào ô dưới.",
         "confirmLabel": "Nhập để xác nhận",
         "cancel": "Hủy",
         "confirmButton": "Xóa vĩnh viễn",
         "success": "Tài khoản của bạn đã được xóa.",
-        "error": "Không thể xóa tài khoản của bạn.",
-        "partial": "Tài khoản của bạn có thể đã bị xóa một phần. Bạn có thể thử lại an toàn, vui lòng thử lại.",
-        "notConfigured": "Hiện chưa thể xóa tài khoản. Vui lòng liên hệ hỗ trợ qua trang góp ý."
+        "error": "Không thể xóa tài khoản của bạn."
       }
     },
     "general": {
@@ -831,7 +798,11 @@
           "title": "Feedback",
           "subtitle": "Giúp chúng tôi cải thiện",
           "description": "Chia sẻ ý kiến của bạn:",
-          "points": ["Báo lỗi", "Đề xuất tính năng", "Đánh giá trải nghiệm"],
+          "points": [
+            "Báo lỗi",
+            "Đề xuất tính năng",
+            "Đánh giá trải nghiệm"
+          ],
           "cta": "Gửi phản hồi"
         },
         "settings": {
@@ -893,66 +864,6 @@
     "toast": {
       "success": "Cảm ơn bạn đã đóng góp ý kiến!",
       "error": "Có lỗi xảy ra. Vui lòng thử lại sau."
-    }
-  },
-  "chat": {
-    "modelSelector": {
-      "searchPlaceholder": "Tìm mô hình...",
-      "noResults": "Không tìm thấy mô hình",
-      "noResultsHint": "Hãy thử thay đổi từ khóa tìm kiếm"
-    },
-    "title": "Chat AI",
-    "subtitle": "Trò chuyện với trợ lý AI",
-    "placeholder": "Nhập tin nhắn của bạn...",
-    "send": "Gửi",
-    "clear": "Xóa cuộc trò chuyện",
-    "newChat": "Cuộc trò chuyện mới",
-    "historyTitle": "Lịch sử trò chuyện",
-    "noConversations": "Chưa có cuộc trò chuyện nào. Bắt đầu chat mới nhé!",
-    "deleteConfirmTitle": "Xóa cuộc trò chuyện?",
-    "deleteConfirmDescription": "Hành động này không thể hoàn tác. Cuộc trò chuyện và tất cả tin nhắn sẽ bị xóa vĩnh viễn.",
-    "thread": {
-      "welcome": "Yo! Chào bạn 👋",
-      "welcomeSubtitle": "Mình là Bro Chat - người bạn đồng hành của bạn!",
-      "scrollToBottom": "Cuộn xuống cuối",
-      "inputPlaceholder": "Hỏi mình bất cứ điều gì...",
-      "sendMessage": "Gửi tin nhắn",
-      "stopGenerating": "Dừng tạo",
-      "error": "⚠️ Lỗi",
-      "copy": "Sao chép",
-      "exportMarkdown": "Xuất dạng Markdown",
-      "refresh": "Làm mới",
-      "edit": "Chỉnh sửa",
-      "previous": "Trước",
-      "next": "Tiếp theo",
-      "cancel": "Hủy",
-      "update": "Cập nhật",
-      "instruction": "Mình có thể giúp bạn về: phương pháp Pomodoro 🍅, mẹo học tập 📚, quản lý thời gian ⏰, và cách dùng app này. Cứ hỏi thoải mái nhé!",
-      "conversationGroups": {
-        "older": "Cũ hơn"
-      },
-      "suggestions": {
-        "pomodoro": {
-          "title": "Giải thích kỹ thuật Pomodoro",
-          "label": "và cách nó tăng năng suất",
-          "prompt": "Giải thích kỹ thuật Pomodoro và cách nó giúp tăng năng suất và tập trung"
-        },
-        "studyTips": {
-          "title": "Cho tôi mẹo học tập",
-          "label": "để tập trung lâu hơn",
-          "prompt": "Cho tôi một số mẹo học tập để tập trung trong thời gian dài hơn và tránh mất tập trung"
-        },
-        "studyPlan": {
-          "title": "Tạo kế hoạch học tập",
-          "label": "cho mục tiêu của tôi",
-          "prompt": "Giúp tôi tạo một kế hoạch học tập hiệu quả với các phiên Pomodoro cho mục tiêu học tập của tôi"
-        },
-        "breakActivities": {
-          "title": "Đề xuất hoạt động nghỉ ngơi",
-          "label": "cho giờ nghỉ Pomodoro",
-          "prompt": "Đề xuất một số hoạt động thư giãn tôi có thể làm trong 5 phút nghỉ ngơi Pomodoro"
-        }
-      }
     }
   },
   "entertainment": {
@@ -1148,89 +1059,29 @@
   },
   "login": {
     "title": "Đăng nhập với Study Bro",
-    "description": "Chào mừng trở lại! Tiếp tục hành trình nâng cao sự tập trung.",
+    "description": "Nhận mã 6 số qua email để đăng nhập, không cần mật khẩu.",
     "form": {
       "email": "Email",
       "emailPlaceholder": "email@example.com",
-      "password": "Mật khẩu",
       "passwordPlaceholder": "Nhập mật khẩu",
-      "forgotPassword": "Quên mật khẩu?",
       "signingIn": "Đang đăng nhập...",
       "signIn": "Đăng nhập",
       "or": "hoặc",
       "continueWithGoogle": "Tiếp tục với Google",
-      "noAccount": "Chưa có tài khoản?",
-      "signUpNow": "Đăng ký ngay",
-      "backToApp": "Quay lại ứng dụng"
+      "backToApp": "Quay lại ứng dụng",
+      "sendCode": "Gửi mã",
+      "sending": "Đang gửi…",
+      "code": "Mã 6 số",
+      "codeSent": "Nhập mã đã gửi tới {email}.",
+      "changeEmail": "Dùng email khác",
+      "resend": "Gửi lại mã"
     },
     "errors": {
-      "supabaseNotConfigured": "Supabase chưa được cấu hình. Vui lòng bổ sung biến môi trường.",
-      "emailPasswordRequired": "Vui lòng nhập email và mật khẩu.",
-      "loginFailed": "Không thể đăng nhập.",
-      "loginError": "Có lỗi xảy ra khi đăng nhập.",
       "googleConnectionFailed": "Không thể kết nối Google. Thử lại sau.",
-      "googleAuthError": "Có lỗi xảy ra khi khởi tạo đăng nhập."
+      "sendFailed": "Chưa gửi được mã. Thử lại sau ít phút.",
+      "invalidCode": "Mã không đúng hoặc đã hết hạn."
     },
-    "success": {
-      "loginSuccess": "Đăng nhập thành công!",
-      "redirectingToGoogle": "Đang chuyển hướng đến Google…"
-    },
-    "forgot": {
-      "title": "Đặt lại mật khẩu",
-      "description": "Nhập email của bạn, chúng tôi sẽ gửi link đặt lại mật khẩu.",
-      "emailRequired": "Vui lòng nhập địa chỉ email.",
-      "sendLink": "Gửi link đặt lại",
-      "sending": "Đang gửi...",
-      "success": "Kiểm tra email để nhận link đặt lại mật khẩu.",
-      "error": "Không thể gửi email đặt lại. Vui lòng thử lại."
-    }
-  },
-  "resetPassword": {
-    "title": "Đặt mật khẩu mới",
-    "description": "Nhập mật khẩu mới của bạn bên dưới.",
-    "newPassword": "Mật khẩu mới",
-    "newPasswordPlaceholder": "Tối thiểu 6 ký tự",
-    "confirmPassword": "Xác nhận mật khẩu",
-    "confirmPasswordPlaceholder": "Nhập lại mật khẩu",
-    "submit": "Cập nhật mật khẩu",
-    "updating": "Đang cập nhật...",
-    "success": "Đã cập nhật mật khẩu! Bạn có thể đăng nhập ngay.",
-    "invalidTitle": "Link không hợp lệ hoặc đã hết hạn",
-    "invalidDescription": "Link đặt lại này không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu link mới từ trang đăng nhập.",
-    "errors": {
-      "passwordTooShort": "Mật khẩu phải có ít nhất 6 ký tự.",
-      "passwordMismatch": "Mật khẩu không trùng khớp.",
-      "updateFailed": "Không thể cập nhật mật khẩu. Vui lòng thử lại."
-    }
-  },
-  "signup": {
-    "title": "Đăng ký với Study Bro",
-    "description": "Bắt đầu hành trình nâng cao sự tập trung và năng suất.",
-    "form": {
-      "email": "Email",
-      "emailPlaceholder": "email@example.com",
-      "password": "Mật khẩu",
-      "passwordPlaceholder": "Tạo mật khẩu",
-      "signingUp": "Đang đăng ký...",
-      "signUp": "Đăng ký",
-      "or": "hoặc",
-      "signUpWithGoogle": "Đăng ký với Google",
-      "haveAccount": "Đã có tài khoản?",
-      "signInNow": "Đăng nhập ngay",
-      "backToApp": "Quay lại ứng dụng"
-    },
-    "errors": {
-      "supabaseNotConfigured": "Supabase chưa được cấu hình. Vui lòng bổ sung biến môi trường.",
-      "emailPasswordRequired": "Vui lòng nhập email và mật khẩu để đăng ký.",
-      "signupFailed": "Không thể đăng ký.",
-      "signupError": "Có lỗi xảy ra khi đăng ký.",
-      "googleConnectionFailed": "Không thể kết nối Google. Thử lại sau.",
-      "googleAuthError": "Có lỗi xảy ra khi khởi tạo đăng nhập."
-    },
-    "success": {
-      "checkEmail": "Vui lòng kiểm tra email để xác nhận tài khoản.",
-      "redirectingToGoogle": "Đang chuyển hướng đến Google…"
-    }
+    "guestNote": "Việc và phiên bạn tạo khi chưa đăng nhập sẽ được chuyển vào tài khoản."
   },
   "notFound": {
     "title": "Không tìm thấy trang này",
@@ -1477,7 +1328,6 @@
       "subtitle": "Nhận ngay hướng dẫn cá nhân hóa về chiến lược năng suất, phương pháp học tập và tối ưu hóa quy trình làm việc.",
       "cta": "Tư Vấn Cùng AI"
     },
-
     "howItWorks": {
       "badge": "Quy Trình",
       "title": "Thành Thạo Trong",
@@ -1574,10 +1424,6 @@
           "title": "Lịch Sử & Phân Tích",
           "description": "Lịch sử phiên, thống kê theo ngày/tuần/tháng, biểu đồ năng suất."
         },
-        "chatAI": {
-          "title": "Bro Chat AI",
-          "description": "Trợ lý AI cho mẹo Pomodoro, học tập và quản lý thời gian. Lịch sử hội thoại được lưu."
-        },
         "entertainment": {
           "title": "Game Giải Lao",
           "description": "Snake, 2048, Brick Breaker, Space Shooter, Memory Match, Tic Tac Toe—chơi khi nghỉ."
@@ -1600,7 +1446,6 @@
       "indicator": "Trợ Lý Năng Suất AI",
       "prompt": "Làm thế nào tôi có thể tối ưu hóa lịch trình..."
     },
-
     "pricing": {
       "badge": "Giá Trị Mang Lại 💎",
       "title": "Bảng Giá",
@@ -1618,9 +1463,7 @@
           "timer": "Đồng hồ Pomodoro (Làm việc, Nghỉ, Liên kết task)",
           "tasks": "Quản lý Task & Bộ lọc",
           "history": "Lịch sử phiên & Phân tích",
-          "chatAI": "Bro Chat AI Coach",
           "games": "Game giải lao (Snake, 2048, ...)",
-          "leaderboard": "Bảng xếp hạng toàn cầu",
           "focus": "Focus Mode & Streak",
           "themes": "Bộ màu & hình nền",
           "sounds": "Âm thanh, Spotify & YouTube",
@@ -1675,7 +1518,11 @@
     "title": "Lịch sử",
     "description": "Thời gian tập trung, chuỗi ngày và các phiên gần đây.",
     "rangeLabel": "Khoảng thời gian",
-    "ranges": { "today": "Hôm nay", "week": "Tuần này", "month": "Tháng này" },
+    "ranges": {
+      "today": "Hôm nay",
+      "week": "Tuần này",
+      "month": "Tháng này"
+    },
     "stats": {
       "focusTime": "Thời gian tập trung",
       "sessions": "Số phiên",
@@ -1704,7 +1551,11 @@
       "title": "Phiên gần đây",
       "none": "Chưa có phiên nào trong khoảng này.",
       "noTask": "Không có công việc",
-      "modes": { "work": "Tập trung", "shortBreak": "Nghỉ ngắn", "longBreak": "Nghỉ dài" }
+      "modes": {
+        "work": "Tập trung",
+        "shortBreak": "Nghỉ ngắn",
+        "longBreak": "Nghỉ dài"
+      }
     },
     "empty": {
       "title": "Chưa có phiên nào",
@@ -1800,7 +1651,6 @@
     "dragHandle": "Kéo để sắp xếp",
     "manage": "Quản lý thẻ và mẫu",
     "page": "Trang {page} / {total}",
-    "signedOutDescription": "Công việc được đồng bộ giữa các thiết bị sau khi bạn đăng nhập.",
     "pickDate": "Chọn ngày",
     "clearDate": "Xóa ngày",
     "estimateMin": "Nhập ít nhất 1 pomodoro",
@@ -1834,7 +1684,6 @@
       "timer": "Chế độ làm việc, nghỉ ngắn và nghỉ dài, có phím tắt.",
       "tasks": "Gắn công việc vào phiên và lọc theo trạng thái, ngày.",
       "analytics": "Lịch sử phiên và thống kê theo ngày, tuần, tháng.",
-      "chatAI": "Hỏi Bro Chat về cách học và quản lý thời gian.",
       "sounds": "Âm thanh thiên nhiên, lo-fi, tiếng ồn trắng, hoặc Spotify và YouTube của bạn.",
       "entertainment": "Snake, 2048 và nhiều trò khác cho lúc đồng hồ báo nghỉ."
     },
@@ -1882,7 +1731,6 @@
     "todaySummaryOne": "Hôm nay: {count} phiên · {time}",
     "timeHm": "{h} giờ {m} phút",
     "timeM": "{m} phút",
-    "signInToLink": "Đăng nhập để gắn nhiệm vụ",
     "activeTasks": "Nhiệm vụ đang làm",
     "noActiveTasks": "Chưa có nhiệm vụ nào. Thêm một nhiệm vụ bên dưới.",
     "addTaskPlaceholder": "Bạn đang làm gì?",

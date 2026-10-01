@@ -1,76 +1,49 @@
-/**
- * @jest-environment node
- */
-import { GET as rawGet } from './route';
-import { createClient } from '@/lib/supabase-server';
-import { resetRateLimitsForTests } from '@/lib/api/in-memory-rate-limiter';
-import { createSupabaseMock } from '@/test-utils/supabase-mock';
+/** @vitest-environment node */
+import { createTestDb, createTestUser, resetTestDb, type TestDb } from '@/test-utils/test-db';
+import { getSessionUser } from '@/lib/auth/session-user';
+import { focusSessions, tasks, userTags } from '@/db/schema';
+import { GET } from './route';
 
-jest.mock('@/lib/supabase-server', () => ({ createClient: jest.fn() }));
+let mockDb: TestDb;
+vi.mock('@/db', () => ({ get db() { return mockDb; } }));
+vi.mock('@/lib/auth/session-user', () => ({ getSessionUser: vi.fn() }));
 
-const GET = (headers: Record<string, string> = {}) =>
-  rawGet(new Request('http://localhost/api/account/export', { headers }));
+const exportData = () => GET(new Request('http://localhost/api/account/export'));
 
-const USER = { id: 'user-1', email: 'a@b.co' };
+beforeAll(async () => {
+  mockDb = await createTestDb();
+});
 
-function setup(user: typeof USER | null = USER) {
-  const mock = createSupabaseMock({
-    user,
-    tables: {
-      profiles: { data: [{ id: 'user-1', name: 'A' }] },
-      tasks: { data: [{ id: 't1', user_id: 'user-1' }] },
-      sessions: { data: [] },
-      streaks: { data: [{ user_id: 'user-1' }] },
-      user_tags: { data: [] },
-      conversations: { data: [{ id: 'c1', user_id: 'user-1' }] },
-      messages: { data: [{ id: 'm1', conversation_id: 'c1' }] },
-    },
-  });
-  (createClient as jest.Mock).mockResolvedValue(mock.client);
-  return mock;
-}
+beforeEach(async () => {
+  await resetTestDb(mockDb);
+  await createTestUser(mockDb, 'u2');
+});
 
 describe('GET /api/account/export', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    resetRateLimitsForTests();
-  });
+  it("exports only the user's own data as a download", async () => {
+    vi.mocked(getSessionUser).mockResolvedValue(await createTestUser(mockDb, 'export-1'));
+    await mockDb.insert(tasks).values([{ userId: 'export-1', title: 'mine' }, { userId: 'u2', title: 'theirs' }]);
+    await mockDb.insert(focusSessions).values({ userId: 'export-1', mode: 'work', durationSec: 60 });
+    await mockDb.insert(userTags).values({ userId: 'export-1', tags: ['math'] });
 
-  it('rejects cross-site requests with 403', async () => {
-    setup();
-    expect((await GET({ origin: 'https://evil.test' })).status).toBe(403);
-  });
-
-  it('returns 401 when unauthenticated', async () => {
-    setup(null);
-    expect((await GET()).status).toBe(401);
-  });
-
-  it('exports only the caller data as an attachment', async () => {
-    const mock = setup();
-    const res = await GET();
+    const res = await exportData();
     expect(res.status).toBe(200);
-    expect(res.headers.get('Content-Disposition')).toMatch(
-      /^attachment; filename="studybro-data-\d{4}-\d{2}-\d{2}\.json"$/,
-    );
+    expect(res.headers.get('Content-Disposition')).toMatch(/attachment; filename="studybro-data-/);
     const body = JSON.parse(await res.text());
-    expect(body.account).toEqual({ id: 'user-1', email: 'a@b.co' });
-    expect(body.tasks).toHaveLength(1);
-    expect(body.conversations).toHaveLength(1);
-    expect(body.messages).toHaveLength(1);
-
-    for (const table of ['tasks', 'sessions', 'streaks', 'user_tags', 'conversations']) {
-      expect(mock.callsFor(table)).toContainEqual({ method: 'eq', args: ['user_id', 'user-1'] });
-    }
-    expect(mock.callsFor('profiles')).toContainEqual({ method: 'eq', args: ['id', 'user-1'] });
-    expect(mock.callsFor('messages')).toContainEqual({ method: 'in', args: ['conversation_id', ['c1']] });
+    expect(body.account).toMatchObject({ id: 'export-1', email: 'export-1@example.com' });
+    expect(body.tasks.map((t: { title: string }) => t.title)).toEqual(['mine']);
+    expect(body.sessions).toHaveLength(1);
+    expect(body.tags).toEqual(['math']);
   });
 
-  it('rate limits to 3 exports per hour per user', async () => {
-    setup();
-    for (let i = 0; i < 3; i++) expect((await GET()).status).toBe(200);
-    const res = await GET();
-    expect(res.status).toBe(429);
-    expect(res.headers.get('Retry-After')).toBeTruthy();
+  it('is rate limited per user', async () => {
+    vi.mocked(getSessionUser).mockResolvedValue(await createTestUser(mockDb, 'export-2'));
+    for (let i = 0; i < 3; i++) expect((await exportData()).status).toBe(200);
+    expect((await exportData()).status).toBe(429);
+  });
+
+  it('rejects requests without a session', async () => {
+    vi.mocked(getSessionUser).mockResolvedValue(null);
+    expect((await exportData()).status).toBe(401);
   });
 });

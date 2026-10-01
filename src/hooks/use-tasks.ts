@@ -13,6 +13,7 @@ import {
   TaskStatus,
 } from '@/stores/task-store';
 import { useAuthStore } from '@/stores/auth-store';
+import { ensureSession } from '@/lib/auth-client';
 import { toast } from 'sonner';
 import { startOfDay, endOfDay } from 'date-fns';
 
@@ -58,7 +59,6 @@ function mapTaskFromApi(raw: any): Task {
     updatedAt: raw.updatedAt ?? raw.updated_at ?? now,
     // New fields
     dueDate: raw.dueDate ?? raw.due_date ?? null,
-    parentTaskId: raw.parentTaskId ?? raw.parent_task_id ?? null,
     displayOrder: raw.displayOrder ?? raw.display_order ?? 0,
     isTemplate: raw.isTemplate ?? raw.is_template ?? false,
   };
@@ -111,6 +111,7 @@ async function fetchTasks({
 }
 
 async function createTask(input: CreateTaskInput): Promise<Task> {
+  await ensureSession();
   const body = {
     title: input.title,
     description: input.description,
@@ -118,7 +119,6 @@ async function createTask(input: CreateTaskInput): Promise<Task> {
     estimate_pomodoros: input.estimatePomodoros ?? 1,
     tags: input.tags ?? [],
     due_date: input.dueDate ?? null,
-    parent_task_id: input.parentTaskId ?? null,
     is_template: input.isTemplate ?? false,
   };
 
@@ -158,7 +158,6 @@ async function updateTask({
     tags: input.tags,
     status: input.status?.toUpperCase(),
     due_date: input.dueDate,
-    parent_task_id: input.parentTaskId,
     display_order: input.displayOrder,
     is_template: input.isTemplate,
   };

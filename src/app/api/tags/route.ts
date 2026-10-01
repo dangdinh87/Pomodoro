@@ -1,144 +1,66 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase-server'
+import { NextResponse } from 'next/server';
+import { eq } from 'drizzle-orm';
+import { db } from '@/db';
+import { userTags } from '@/db/schema';
+import { getSessionUser } from '@/lib/auth/session-user';
+import { badRequest, readJson, serverError, unauthorized } from '@/lib/api/responses';
+import { MAX_TAG_LENGTH, MAX_USER_TAGS } from '@/lib/tasks/tag-limits';
 
-const MAX_TAGS = 10
-const MAX_TAG_LENGTH = 50
+async function readTags(userId: string) {
+  const [row] = await db.select({ tags: userTags.tags }).from(userTags).where(eq(userTags.userId, userId));
+  return row?.tags ?? [];
+}
 
-// GET: Lấy danh sách tags của user
+async function saveTags(userId: string, tags: string[]) {
+  await db
+    .insert(userTags)
+    .values({ userId, tags })
+    .onConflictDoUpdate({ target: userTags.userId, set: { tags } });
+  return NextResponse.json({ tags });
+}
+
 export async function GET() {
-    const supabase = await createClient()
-    if (!supabase) {
-        return NextResponse.json({ error: 'Supabase client is not configured' }, { status: 500 })
-    }
-
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const { data, error } = await supabase
-        .from('user_tags')
-        .select('tags')
-        .eq('user_id', user.id)
-        .single()
-
-    if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching tags', error)
-        return NextResponse.json({ error: 'Failed to load tags' }, { status: 500 })
-    }
-
-    return NextResponse.json({ tags: data?.tags ?? [] })
+  const user = await getSessionUser();
+  if (!user) return unauthorized();
+  try {
+    return NextResponse.json({ tags: await readTags(user.id) });
+  } catch (error) {
+    return serverError('Failed to load tags', error);
+  }
 }
 
-// POST: Thêm tag mới
-export async function POST(request: NextRequest) {
-    const supabase = await createClient()
-    if (!supabase) {
-        return NextResponse.json({ error: 'Supabase client is not configured' }, { status: 500 })
-    }
+export async function POST(request: Request) {
+  const user = await getSessionUser();
+  if (!user) return unauthorized();
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+  const body = await readJson(request);
+  if (body === undefined) return badRequest('Request body must be valid JSON');
+  const rawTag = (body as { tag?: unknown } | null)?.tag;
+  const tag = typeof rawTag === 'string' ? rawTag.trim().toLowerCase() : '';
+  if (!tag) return badRequest('Tag is required');
+  if (tag.length > MAX_TAG_LENGTH) return badRequest(`Tag must be at most ${MAX_TAG_LENGTH} characters`);
 
-    let body: unknown
-    try {
-        body = await request.json()
-    } catch {
-        return NextResponse.json({ error: 'Request body must be valid JSON' }, { status: 400 })
-    }
-
-    const rawTag = (body as { tag?: unknown } | null)?.tag
-    const newTag = typeof rawTag === 'string' ? rawTag.trim().toLowerCase() : ''
-
-    if (!newTag) {
-        return NextResponse.json({ error: 'Tag is required' }, { status: 400 })
-    }
-
-    if (newTag.length > MAX_TAG_LENGTH) {
-        return NextResponse.json({ error: `Tag must be at most ${MAX_TAG_LENGTH} characters` }, { status: 400 })
-    }
-
-    // Lấy tags hiện tại
-    const { data: existing } = await supabase
-        .from('user_tags')
-        .select('tags')
-        .eq('user_id', user.id)
-        .single()
-
-    const currentTags: string[] = existing?.tags ?? []
-
-    // Kiểm tra đã tồn tại
-    if (currentTags.includes(newTag)) {
-        return NextResponse.json({ error: 'Tag already exists' }, { status: 400 })
-    }
-
-    // Kiểm tra max tags
-    if (currentTags.length >= MAX_TAGS) {
-        return NextResponse.json({ error: `Maximum ${MAX_TAGS} tags allowed` }, { status: 400 })
-    }
-
-    const updatedTags = [...currentTags, newTag]
-
-    // Upsert
-    const { error } = await supabase
-        .from('user_tags')
-        .upsert({
-            user_id: user.id,
-            tags: updatedTags,
-            updated_at: new Date().toISOString(),
-        }, { onConflict: 'user_id' })
-
-    if (error) {
-        console.error('Error saving tags', error)
-        return NextResponse.json({ error: 'Failed to save tags' }, { status: 500 })
-    }
-
-    return NextResponse.json({ tags: updatedTags })
+  try {
+    const current = await readTags(user.id);
+    if (current.includes(tag)) return badRequest('Tag already exists');
+    if (current.length >= MAX_USER_TAGS) return badRequest(`Maximum ${MAX_USER_TAGS} tags allowed`);
+    return await saveTags(user.id, [...current, tag]);
+  } catch (error) {
+    return serverError('Failed to save tags', error);
+  }
 }
 
-// DELETE: Xóa tag
-export async function DELETE(request: NextRequest) {
-    const supabase = await createClient()
-    if (!supabase) {
-        return NextResponse.json({ error: 'Supabase client is not configured' }, { status: 500 })
-    }
+export async function DELETE(request: Request) {
+  const user = await getSessionUser();
+  if (!user) return unauthorized();
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+  const tag = new URL(request.url).searchParams.get('tag')?.toLowerCase();
+  if (!tag) return badRequest('Tag is required');
 
-    const { searchParams } = new URL(request.url)
-    const tagToDelete = searchParams.get('tag')?.toLowerCase()
-
-    if (!tagToDelete) {
-        return NextResponse.json({ error: 'Tag is required' }, { status: 400 })
-    }
-
-    // Lấy tags hiện tại
-    const { data: existing } = await supabase
-        .from('user_tags')
-        .select('tags')
-        .eq('user_id', user.id)
-        .single()
-
-    const currentTags: string[] = existing?.tags ?? []
-    const updatedTags = currentTags.filter(t => t !== tagToDelete)
-
-    const { error } = await supabase
-        .from('user_tags')
-        .upsert({
-            user_id: user.id,
-            tags: updatedTags,
-            updated_at: new Date().toISOString(),
-        }, { onConflict: 'user_id' })
-
-    if (error) {
-        console.error('Error saving tags', error)
-        return NextResponse.json({ error: 'Failed to save tags' }, { status: 500 })
-    }
-
-    return NextResponse.json({ tags: updatedTags })
+  try {
+    const current = await readTags(user.id);
+    return await saveTags(user.id, current.filter((t) => t !== tag));
+  } catch (error) {
+    return serverError('Failed to save tags', error);
+  }
 }

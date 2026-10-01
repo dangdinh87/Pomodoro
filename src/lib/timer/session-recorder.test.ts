@@ -10,14 +10,14 @@ const payload = { taskId: 't1', durationSec: 1500, mode: 'work' as const };
 const res = (status: number) => ({ ok: status >= 200 && status < 300, status });
 
 describe('session-recorder', () => {
-  let fetchMock: jest.Mock;
+  let fetchMock: ReturnType<typeof vi.fn>;
   let mem: Map<string, string>;
 
   beforeEach(() => {
     mem = installMemoryStorage().mem;
-    fetchMock = jest.fn();
+    fetchMock = vi.fn();
     global.fetch = fetchMock as never;
-    useAuthStore.setState({ user: { id: 'u1' }, isLoading: false });
+    useAuthStore.setState({ user: { id: 'u1', isAnonymous: false }, isLoading: false });
   });
 
   const queue = () => JSON.parse(mem.get('session-record-queue') ?? '[]');
@@ -47,7 +47,7 @@ describe('session-recorder', () => {
       queuedDuringSend = queue().length;
       return res(200);
     });
-    const onRecorded = jest.fn();
+    const onRecorded = vi.fn();
     await expect(recordSession(payload, onRecorded)).resolves.toBe('recorded');
     expect(queuedDuringSend).toBe(1); // outbox: persisted before the request
     expect(fetchMock.mock.calls[0][1].keepalive).toBe(true);
@@ -69,7 +69,7 @@ describe('session-recorder', () => {
     expect(fetchMock).not.toHaveBeenCalled();
     expect(queue()[0].userId).toBeNull();
 
-    useAuthStore.setState({ user: { id: 'u2' }, isLoading: false });
+    useAuthStore.setState({ user: { id: 'u2', isAnonymous: false }, isLoading: false });
     fetchMock.mockResolvedValue(res(200));
     await flushSessionQueue();
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -85,7 +85,7 @@ describe('session-recorder', () => {
 
   it.each([400, 429])('does not retry %i', async (status) => {
     fetchMock.mockResolvedValue(res(status));
-    const onRecorded = jest.fn();
+    const onRecorded = vi.fn();
     await expect(recordSession(payload, onRecorded)).resolves.toBe('dropped');
     expect(queue()).toHaveLength(0);
     expect(onRecorded).not.toHaveBeenCalled();
@@ -118,7 +118,7 @@ describe('session-recorder', () => {
     seedItem({ id: 'a', payload: { ...payload, durationSec: 100 } });
     seedItem({ id: 'b', payload: { ...payload, durationSec: 200 } });
     fetchMock.mockResolvedValue(res(200));
-    const onRecorded = jest.fn();
+    const onRecorded = vi.fn();
     await flushSessionQueue(onRecorded);
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(JSON.parse(fetchMock.mock.calls[0][1].body).durationSec).toBe(100);

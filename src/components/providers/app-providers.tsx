@@ -8,7 +8,7 @@
 import { ThemeProvider } from '@/components/layout/theme-provider';
 import { QueryProvider } from '@/components/providers/query-provider';
 import { I18nProvider } from '@/contexts/i18n-context';
-import { SupabaseAuthProvider } from '@/components/providers/supabase-auth-provider';
+import { AuthSessionSync } from '@/components/providers/auth-session-sync';
 import { BackgroundRenderer } from '@/components/background/background-renderer';
 import { ThemeRestorer } from '@/components/providers/theme-restorer';
 import { AudioCleanupProvider } from '@/components/providers/audio-cleanup-provider';
@@ -86,7 +86,7 @@ export function AppProviders({ children }: AppProvidersProps) {
       <I18nProvider>
         <TooltipProvider>
           <QueryProvider>
-            <SupabaseAuthProvider />
+            <AuthSessionSync />
             <ThemeRestorer />
             <AudioCleanupProvider />
             <BackgroundRenderer />

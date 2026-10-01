@@ -10,7 +10,6 @@ import { LOCALE_COOKIE, normalizeLang } from '@/lib/i18n/negotiate-locale';
 import { Be_Vietnam_Pro, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
 import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/next';
-import { AuthCodeHandler } from '@/components/auth/auth-code-handler';
 import './globals.css';
 
 const spaceGrotesk = Space_Grotesk({
@@ -155,7 +154,6 @@ export default async function RootLayout(
             `}</Script>
           </>
         ) : null}
-        <AuthCodeHandler />
         <InitialLangProvider lang={lang}>{children}</InitialLangProvider>
         <Analytics />
       </body>

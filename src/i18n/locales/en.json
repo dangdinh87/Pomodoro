@@ -41,7 +41,6 @@
     "timer": "Focus",
     "tasks": "Tasks",
     "history": "History",
-    "leaderboard": "Leaderboard",
     "chatAI": "Chat AI",
     "entertainment": "Arcade",
     "settings": "Settings",
@@ -55,13 +54,11 @@
   "auth": {
     "login": "Log in",
     "pleaseLogin": "Please sign in to continue",
-    "signInToManageTasks": "Please sign in to manage tasks",
     "signInToViewStats": "Please sign in to view statistics",
     "signInButton": "Sign in",
     "signOutSuccess": "Successfully signed out",
     "signOutError": "Unable to sign out",
     "signOutConfirm": "Are you sure you want to sign out?",
-    "supabaseNotConfigured": "Supabase is not configured yet",
     "signOutUnexpectedError": "An error occurred while signing out"
   },
   "timer": {
@@ -326,17 +323,6 @@
       "selectDate": "Select date range"
     }
   },
-  "leaderboard": {
-    "title": "Leaderboard",
-    "comingSoon": "Coming soon",
-    "description": "Compete with the StudyBro community. See who is the most focused!",
-    "tabs": {
-      "focusTime": "Focus time",
-      "completedTasks": "Completed tasks"
-    },
-    "empty": "No data yet. Be the first!",
-    "you": "You"
-  },
   "settings": {
     "title": "Settings",
     "subtitle": "Manage your preferences, timer settings, and appearance.",
@@ -352,26 +338,9 @@
       "subtitle": "Manage your password, export your data or delete your account.",
       "guestPrompt": "Sign in to manage your account.",
       "guestLogin": "Sign in",
-      "password": {
-        "title": "Change password",
-        "description": "Choose a new password of at least 8 characters.",
-        "currentLabel": "Current password",
-        "sameAsCurrent": "New password must be different from the current one.",
-        "wrongCurrent": "Current password is incorrect.",
-        "weak": "This password is too weak. Choose a stronger one.",
-        "noEmail": "Your account has no email, so the password cannot be changed here.",
-        "oauthManaged": "Your sign-in is managed by {provider}. Change your password there.",
-        "newLabel": "New password",
-        "confirmLabel": "Confirm new password",
-        "submit": "Update password",
-        "tooShort": "Password must be at least 8 characters.",
-        "mismatch": "Passwords do not match.",
-        "success": "Password updated.",
-        "error": "Could not update password."
-      },
       "export": {
         "title": "Export my data",
-        "description": "Download a JSON file with your profile, tasks, sessions, streaks, tags and conversations.",
+        "description": "Download a JSON file with your account, tasks, sessions and tags.",
         "button": "Download my data",
         "success": "Your data export is ready.",
         "error": "Could not export your data.",
@@ -382,14 +351,12 @@
         "description": "Permanently delete your account and all associated data. This cannot be undone.",
         "button": "Delete my account",
         "confirmTitle": "Delete your account?",
-        "confirmDescription": "This permanently removes your tasks, sessions, streaks, tags and conversations. To confirm, type {value} below.",
+        "confirmDescription": "This permanently removes your tasks, sessions and tags. To confirm, type {value} below.",
         "confirmLabel": "Type to confirm",
         "cancel": "Cancel",
         "confirmButton": "Delete permanently",
         "success": "Your account has been deleted.",
-        "error": "Could not delete your account.",
-        "partial": "Your account may be partly deleted. Retrying is safe, please try again.",
-        "notConfigured": "Account deletion is not available right now. Please contact support via the feedback page."
+        "error": "Could not delete your account."
       }
     },
     "general": {
@@ -831,7 +798,11 @@
           "title": "Feedback",
           "subtitle": "Help us improve",
           "description": "Share your thoughts:",
-          "points": ["Report bugs", "Suggest features", "Rate your experience"],
+          "points": [
+            "Report bugs",
+            "Suggest features",
+            "Rate your experience"
+          ],
           "cta": "Send feedback"
         },
         "settings": {
@@ -893,66 +864,6 @@
     "toast": {
       "success": "Thank you for your feedback!",
       "error": "An error occurred. Please try again later."
-    }
-  },
-  "chat": {
-    "modelSelector": {
-      "searchPlaceholder": "Search models...",
-      "noResults": "No models found",
-      "noResultsHint": "Try adjusting your search"
-    },
-    "title": "Chat AI",
-    "subtitle": "Chat with AI assistant",
-    "placeholder": "Type your message...",
-    "send": "Send",
-    "clear": "Clear Chat",
-    "newChat": "New Chat",
-    "historyTitle": "Chat history",
-    "noConversations": "No conversations yet. Start a new one!",
-    "deleteConfirmTitle": "Delete Conversation?",
-    "deleteConfirmDescription": "This action cannot be undone. This will permanently delete this conversation and all its messages.",
-    "thread": {
-      "welcome": "Hey there! 👋",
-      "welcomeSubtitle": "I'm Bro Chat - your study buddy!",
-      "scrollToBottom": "Scroll to bottom",
-      "inputPlaceholder": "Ask me anything...",
-      "sendMessage": "Send message",
-      "stopGenerating": "Stop generating",
-      "error": "Something went wrong",
-      "copy": "Copy",
-      "exportMarkdown": "Export as Markdown",
-      "refresh": "Refresh",
-      "edit": "Edit",
-      "previous": "Previous",
-      "next": "Next",
-      "cancel": "Cancel",
-      "update": "Update",
-      "instruction": "I can help with: Pomodoro technique 🍅, study tips 📚, time management ⏰, and app usage. Ask me anything!",
-      "conversationGroups": {
-        "older": "Older"
-      },
-      "suggestions": {
-        "pomodoro": {
-          "title": "Explain the Pomodoro technique",
-          "label": "and how it boosts productivity",
-          "prompt": "Explain the Pomodoro Technique and how it helps boost productivity and focus"
-        },
-        "studyTips": {
-          "title": "Give me study tips",
-          "label": "for staying focused longer",
-          "prompt": "Give me some study tips for staying focused for longer periods and avoiding distractions"
-        },
-        "studyPlan": {
-          "title": "Create a study plan",
-          "label": "for my goals",
-          "prompt": "Help me create an effective study plan with Pomodoro sessions for my learning goals"
-        },
-        "breakActivities": {
-          "title": "Suggest break activities",
-          "label": "for Pomodoro breaks",
-          "prompt": "Suggest some relaxing activities I can do during my 5-minute Pomodoro breaks"
-        }
-      }
     }
   },
   "entertainment": {
@@ -1148,89 +1059,29 @@
   },
   "login": {
     "title": "Sign in to Study Bro",
-    "description": "Welcome back! Continue your journey to better focus.",
+    "description": "We'll email you a 6-digit code. No password needed.",
     "form": {
       "email": "Email",
       "emailPlaceholder": "your@email.com",
-      "password": "Password",
       "passwordPlaceholder": "Enter your password",
-      "forgotPassword": "Forgot password?",
       "signingIn": "Signing in...",
       "signIn": "Sign in",
       "or": "or",
       "continueWithGoogle": "Continue with Google",
-      "noAccount": "Don't have an account?",
-      "signUpNow": "Sign up now",
-      "backToApp": "Back to app"
+      "backToApp": "Back to app",
+      "sendCode": "Send code",
+      "sending": "Sending…",
+      "code": "6-digit code",
+      "codeSent": "Enter the code we sent to {email}.",
+      "changeEmail": "Use another email",
+      "resend": "Resend code"
     },
     "errors": {
-      "supabaseNotConfigured": "Supabase is not configured. Please add environment variables.",
-      "emailPasswordRequired": "Please enter email and password.",
-      "loginFailed": "Unable to sign in.",
-      "loginError": "An error occurred while signing in.",
       "googleConnectionFailed": "Unable to connect to Google. Try again later.",
-      "googleAuthError": "An error occurred while initiating sign in."
+      "sendFailed": "Couldn't send the code. Try again in a minute.",
+      "invalidCode": "That code is wrong or has expired."
     },
-    "success": {
-      "loginSuccess": "Successfully signed in!",
-      "redirectingToGoogle": "Redirecting to Google..."
-    },
-    "forgot": {
-      "title": "Reset password",
-      "description": "Enter your email and we'll send you a link to reset your password.",
-      "emailRequired": "Please enter your email address.",
-      "sendLink": "Send reset link",
-      "sending": "Sending...",
-      "success": "Check your email for the reset link.",
-      "error": "Unable to send reset email. Please try again."
-    }
-  },
-  "resetPassword": {
-    "title": "Set new password",
-    "description": "Enter your new password below.",
-    "newPassword": "New password",
-    "newPasswordPlaceholder": "Minimum 6 characters",
-    "confirmPassword": "Confirm password",
-    "confirmPasswordPlaceholder": "Re-enter your password",
-    "submit": "Update password",
-    "updating": "Updating...",
-    "success": "Password updated! You can now sign in.",
-    "invalidTitle": "Invalid or expired link",
-    "invalidDescription": "This reset link is invalid or has expired. Please request a new one from the login page.",
-    "errors": {
-      "passwordTooShort": "Password must be at least 6 characters.",
-      "passwordMismatch": "Passwords do not match.",
-      "updateFailed": "Unable to update password. Please try again."
-    }
-  },
-  "signup": {
-    "title": "Sign up for Study Bro",
-    "description": "Start your journey to better focus and productivity.",
-    "form": {
-      "email": "Email",
-      "emailPlaceholder": "your@email.com",
-      "password": "Password",
-      "passwordPlaceholder": "Create a password",
-      "signingUp": "Signing up...",
-      "signUp": "Sign up",
-      "or": "or",
-      "signUpWithGoogle": "Sign up with Google",
-      "haveAccount": "Already have an account?",
-      "signInNow": "Sign in now",
-      "backToApp": "Back to app"
-    },
-    "errors": {
-      "supabaseNotConfigured": "Supabase is not configured. Please add environment variables.",
-      "emailPasswordRequired": "Please enter email and password to sign up.",
-      "signupFailed": "Unable to sign up.",
-      "signupError": "An error occurred while signing up.",
-      "googleConnectionFailed": "Unable to connect to Google. Try again later.",
-      "googleAuthError": "An error occurred while initiating sign in."
-    },
-    "success": {
-      "checkEmail": "Please check your email to confirm your account.",
-      "redirectingToGoogle": "Redirecting to Google..."
-    }
+    "guestNote": "Tasks and sessions you made as a guest move to your account."
   },
   "notFound": {
     "title": "This page could not be found",
@@ -1477,7 +1328,6 @@
       "subtitle": "Get instant, personalized guidance on productivity strategies, study techniques, and workflow optimization.",
       "cta": "Consult AI Coach"
     },
-
     "howItWorks": {
       "badge": "Workflow",
       "title": "Achieve Mastery in",
@@ -1574,10 +1424,6 @@
           "title": "History & Analytics",
           "description": "Session history, stats by day/week/month, productivity charts."
         },
-        "chatAI": {
-          "title": "Bro Chat AI",
-          "description": "AI coach for Pomodoro tips, study advice, and time management. Conversation history saved."
-        },
         "entertainment": {
           "title": "Mini Games",
           "description": "Snake, 2048, Brick Breaker, Space Shooter, Memory Match, Tic Tac Toe—play during breaks."
@@ -1600,7 +1446,6 @@
       "indicator": "AI Productivity Assistant",
       "prompt": "How can I optimize my schedule..."
     },
-
     "pricing": {
       "badge": "Value Proposition 💎",
       "title": "Transparent",
@@ -1618,9 +1463,7 @@
           "timer": "Pomodoro Timer (Work, Breaks, Task Linking)",
           "tasks": "Task Management & Filters",
           "history": "Session History & Analytics",
-          "chatAI": "Bro Chat AI Coach",
           "games": "Mini Games (Snake, 2048, etc.)",
-          "leaderboard": "Global Leaderboard",
           "focus": "Focus Mode & Streaks",
           "themes": "Color themes & backgrounds",
           "sounds": "Sounds, Spotify & YouTube",
@@ -1675,7 +1518,11 @@
     "title": "History",
     "description": "Your focus time, streaks and recent sessions.",
     "rangeLabel": "Date range",
-    "ranges": { "today": "Today", "week": "This week", "month": "This month" },
+    "ranges": {
+      "today": "Today",
+      "week": "This week",
+      "month": "This month"
+    },
     "stats": {
       "focusTime": "Focus time",
       "sessions": "Sessions",
@@ -1704,7 +1551,11 @@
       "title": "Recent sessions",
       "none": "No sessions in this range yet.",
       "noTask": "No task",
-      "modes": { "work": "Focus", "shortBreak": "Short break", "longBreak": "Long break" }
+      "modes": {
+        "work": "Focus",
+        "shortBreak": "Short break",
+        "longBreak": "Long break"
+      }
     },
     "empty": {
       "title": "No sessions yet",
@@ -1800,7 +1651,6 @@
     "dragHandle": "Drag to reorder",
     "manage": "Manage tags and templates",
     "page": "Page {page} of {total}",
-    "signedOutDescription": "Your tasks sync across devices once you sign in.",
     "pickDate": "Pick a date",
     "clearDate": "Clear date",
     "estimateMin": "Enter at least 1 pomodoro",
@@ -1834,7 +1684,6 @@
       "timer": "Work, short break and long break modes, with keyboard shortcuts.",
       "tasks": "Link tasks to sessions and filter them by status and date.",
       "analytics": "Session history and stats by day, week and month.",
-      "chatAI": "Ask Bro Chat for study tips and time management advice.",
       "sounds": "Nature sounds, lo-fi and white noise, or your own Spotify and YouTube.",
       "entertainment": "Snake, 2048 and more for when the timer says rest."
     },
@@ -1882,7 +1731,6 @@
     "todaySummaryOne": "Today: {count} session · {time}",
     "timeHm": "{h}h {m}m",
     "timeM": "{m}m",
-    "signInToLink": "Sign in to link tasks",
     "activeTasks": "Active tasks",
     "noActiveTasks": "No active tasks yet. Add one below.",
     "addTaskPlaceholder": "What are you working on?",

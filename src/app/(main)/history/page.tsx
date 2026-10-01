@@ -30,7 +30,7 @@ function rangeFor(key: RangeKey): DateRange {
 }
 
 export default function HistoryPage() {
-    const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
+    const { hasSession, isLoading: isAuthLoading } = useAuth()
     const router = useRouter()
     const { t } = useI18n()
     const [rangeKey, setRangeKey] = useState<RangeKey>("week")
@@ -66,7 +66,7 @@ export default function HistoryPage() {
         )
     }
 
-    if (!isAuthenticated) {
+    if (!hasSession) {
         return (
             <PageContainer className="flex flex-1 items-center justify-center">
                 <EmptyState

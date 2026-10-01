@@ -1,33 +1,23 @@
-import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase-server'
+import { NextResponse } from 'next/server';
+import { and, desc, eq } from 'drizzle-orm';
+import { db } from '@/db';
+import { tasks } from '@/db/schema';
+import { getSessionUser } from '@/lib/auth/session-user';
+import { serverError, unauthorized } from '@/lib/api/responses';
+import { toTaskJson } from '@/lib/tasks/task-json';
 
 export async function GET() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getSessionUser();
+  if (!user) return unauthorized();
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  // Try to fetch templates - if is_template column doesn't exist, return empty array
   try {
-    const { data, error } = await supabase
-      .from('tasks')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('is_template', true)
-      .eq('is_deleted', false)
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      // Column might not exist yet
-      console.error('Error fetching templates:', error.message)
-      return NextResponse.json({ templates: [] })
-    }
-
-    return NextResponse.json({ templates: data ?? [] })
+    const rows = await db
+      .select()
+      .from(tasks)
+      .where(and(eq(tasks.userId, user.id), eq(tasks.isTemplate, true), eq(tasks.isDeleted, false)))
+      .orderBy(desc(tasks.createdAt));
+    return NextResponse.json({ templates: rows.map(toTaskJson) });
   } catch (error) {
-    console.error('Error fetching templates:', error)
-    return NextResponse.json({ templates: [] })
+    return serverError('Failed to load templates', error);
   }
 }

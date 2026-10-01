@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { DateRange } from 'react-day-picker'
 import { format } from 'date-fns'
+import { useAuthStore } from '@/stores/auth-store'
 
 export interface Session {
     id: string
@@ -41,6 +42,7 @@ async function fetchHistory(dateRange: DateRange | undefined): Promise<HistoryDa
 }
 
 export function useHistory(dateRange: DateRange | undefined) {
+    const hasSession = useAuthStore((state) => !!state.user)
     const queryKey = ['history',
         dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : undefined,
         dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : undefined
@@ -48,6 +50,7 @@ export function useHistory(dateRange: DateRange | undefined) {
 
     return useQuery({
         queryKey,
+        enabled: hasSession,
         queryFn: () => fetchHistory(dateRange),
         staleTime: 1000 * 60 * 5, // 5 minutes
     })

@@ -1,16 +1,15 @@
 import { render, screen } from '@testing-library/react';
 import { TimerControls } from './timer-controls';
-import '@testing-library/jest-dom';
 
 // Mock translation
-jest.mock('@/contexts/i18n-context', () => ({
+vi.mock('@/contexts/i18n-context', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
 }));
 
 // Mock stores
-jest.mock('@/stores/timer-store', () => ({
+vi.mock('@/stores/timer-store', () => ({
   useTimerStore: (selector: any) => {
     if (typeof selector !== 'function') return selector; // Handle non-selector usage if any
     return selector({
@@ -22,22 +21,22 @@ jest.mock('@/stores/timer-store', () => ({
             shortBreakDuration: 5,
             longBreakDuration: 15,
         },
-        setIsRunning: jest.fn(),
-        resetTimer: jest.fn(),
-        pauseTimer: jest.fn(),
-        resumeTimer: jest.fn(),
-        incrementCompletedSessions: jest.fn(),
-        incrementSessionCount: jest.fn(),
-        setMode: jest.fn(),
-        setTimeLeft: jest.fn(),
-        setDeadlineAt: jest.fn(),
+        setIsRunning: vi.fn(),
+        resetTimer: vi.fn(),
+        pauseTimer: vi.fn(),
+        resumeTimer: vi.fn(),
+        incrementCompletedSessions: vi.fn(),
+        incrementSessionCount: vi.fn(),
+        setMode: vi.fn(),
+        setTimeLeft: vi.fn(),
+        setDeadlineAt: vi.fn(),
         sessionCount: 0,
     });
   },
 }));
 
 // Mock task store
-jest.mock('@/stores/task-store', () => ({
+vi.mock('@/stores/task-store', () => ({
   useTasksStore: {
     getState: () => ({
       activeTaskId: null,
@@ -46,22 +45,22 @@ jest.mock('@/stores/task-store', () => ({
 }));
 
 // Mock analog clock state
-jest.mock('./clocks/use-analog-clock-state', () => ({
+vi.mock('./clocks/use-analog-clock-state', () => ({
   useAnalogClockState: () => ({
     color: '#000000',
   }),
 }));
 
 // Mock other hooks
-jest.mock('@tanstack/react-query', () => ({
+vi.mock('@tanstack/react-query', () => ({
   useQueryClient: () => ({
-    invalidateQueries: jest.fn(),
+    invalidateQueries: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/use-confetti', () => ({
+vi.mock('@/hooks/use-confetti', () => ({
   useConfetti: () => ({
-    fireWorkComplete: jest.fn(),
+    fireWorkComplete: vi.fn(),
   }),
 }));
 

@@ -19,7 +19,6 @@ export interface StatsData {
   distribution: {
     name: string;
     value: number;
-    color: string;
   }[];
 }
 

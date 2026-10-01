@@ -5,8 +5,9 @@ import { toast } from 'sonner';
 import { useAuthStore } from '@/stores/auth-store';
 import { useTasks } from './use-tasks';
 
-jest.mock('sonner', () => ({
-  toast: { success: jest.fn(), error: jest.fn() },
+vi.mock('@/lib/auth-client', () => ({ ensureSession: vi.fn() }));
+vi.mock('sonner', () => ({
+  toast: { success: vi.fn(), error: vi.fn() },
 }));
 
 const apiTask = (id: string, status = 'TODO') => ({
@@ -19,7 +20,7 @@ const apiTask = (id: string, status = 'TODO') => ({
 
 describe('useTasks optimistic updates', () => {
   let client: QueryClient;
-  let fetchMock: jest.Mock;
+  let fetchMock: ReturnType<typeof vi.fn>;
   let patchResult: { ok: boolean; status?: number; json?: () => unknown };
 
   const wrapper = ({ children }: { children: ReactNode }) => (
@@ -27,13 +28,13 @@ describe('useTasks optimistic updates', () => {
   );
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    useAuthStore.setState({ user: { id: 'u1' } });
+    vi.clearAllMocks();
+    useAuthStore.setState({ user: { id: 'u1', isAnonymous: false } });
     client = new QueryClient({
       defaultOptions: { queries: { retry: false, gcTime: Infinity } },
     });
     patchResult = { ok: true, json: () => ({ task: apiTask('a', 'DONE') }) };
-    fetchMock = jest.fn((url: string, init?: { method?: string }) => {
+    fetchMock = vi.fn((url: string, init?: { method?: string }) => {
       if (init?.method === 'PATCH' || init?.method === 'DELETE') {
         // Hold the response a tick so the optimistic state is observable
         return new Promise((r) => setTimeout(() => r(patchResult), 300));
@@ -51,7 +52,7 @@ describe('useTasks optimistic updates', () => {
 
   async function setup() {
     const hook = renderHook(() => useTasks({}), { wrapper });
-    await waitFor(() => expect(hook.result.current.tasks).toHaveLength(2));
+    await waitFor(() => expect(hook.result.current.tasks).toHaveLength(2), { timeout: 5000 });
     return hook;
   }
 

@@ -27,12 +27,12 @@ const persistedSettings = {
 describe('timer-store persistence', () => {
   beforeEach(() => {
     installMemoryStorage();
-    jest.spyOn(Date, 'now').mockReturnValue(NOW);
+    vi.spyOn(Date, 'now').mockReturnValue(NOW);
     useTimerStore.persist.setOptions({
       storage: createJSONStorage(() => window.localStorage),
     });
   });
-  afterEach(() => jest.restoreAllMocks());
+  afterEach(() => vi.restoreAllMocks());
 
   it('persists lastSessionTimeLeft so a 50 minute session survives reload', async () => {
     useTimerStore.getState().updateSettings({ workDuration: 50 });

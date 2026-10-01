@@ -1,5 +1,5 @@
 /**
- * @jest-environment node
+ * @vitest-environment node
  */
 import { sameOriginJsonGuard } from './same-origin-json-guard';
 

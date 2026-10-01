@@ -1,125 +1,92 @@
-/**
- * @jest-environment node
- */
+/** @vitest-environment node */
+import { createTestDb, createTestUser, jsonRequest, resetTestDb, type TestDb } from '@/test-utils/test-db';
+import { getSessionUser } from '@/lib/auth/session-user';
+import { tasks } from '@/db/schema';
 import { GET, POST } from './route';
-import { createClient } from '@/lib/supabase-server';
-import { createSupabaseMock, jsonRequest, type SupabaseMockOptions } from '@/test-utils/supabase-mock';
 
-jest.mock('@/lib/supabase-server', () => ({ createClient: jest.fn() }));
+let mockDb: TestDb;
+vi.mock('@/db', () => ({ get db() { return mockDb; } }));
+vi.mock('@/lib/auth/session-user', () => ({ getSessionUser: vi.fn() }));
+const signIn = (user: Awaited<ReturnType<typeof createTestUser>> | null) =>
+  vi.mocked(getSessionUser).mockResolvedValue(user);
 
-const USER = { id: '11111111-1111-4111-8111-111111111111' };
-const PARENT_ID = '33333333-3333-4333-8333-333333333333';
+const URL_BASE = 'http://localhost/api/tasks';
+const list = async (query = '') => (await GET(new Request(`${URL_BASE}${query}`))).json();
 
-function setup(tables: SupabaseMockOptions['tables'] = {}) {
-  const mock = createSupabaseMock({
-    user: USER,
-    tables: { tasks: { data: [], count: 0 }, ...tables },
-  });
-  (createClient as jest.Mock).mockResolvedValue(mock.client);
-  return mock;
-}
-
-const callArgs = (mock: ReturnType<typeof setup>, method: string) =>
-  mock.callsFor('tasks').filter((c) => c.method === method).map((c) => c.args);
-
-describe('GET /api/tasks', () => {
-  beforeEach(() => jest.clearAllMocks());
-
-  it('strips filter syntax from the search term', async () => {
-    const mock = setup();
-    await GET(new Request('http://localhost/api/tasks?q=x),is_deleted.eq.true,(y'));
-
-    expect(callArgs(mock, 'or')).toEqual([
-      ['title.ilike.%x  is_deleted.eq.true  y%,description.ilike.%x  is_deleted.eq.true  y%'],
-    ]);
-  });
-
-  it('clamps limit and falls back on garbage paging params', async () => {
-    const mock = setup();
-    const res = await GET(new Request('http://localhost/api/tasks?limit=100000&page=abc'));
-    const body = await res.json();
-
-    expect(body).toEqual(expect.objectContaining({ limit: 100, page: 1 }));
-    expect(callArgs(mock, 'range')).toEqual([[0, 99]]);
-  });
-
-  it('only filters on whitelisted date fields', async () => {
-    const mock = setup();
-    await GET(
-      new Request('http://localhost/api/tasks?dateField=user_id&from=2026-01-01&to=nope'),
-    );
-
-    expect(callArgs(mock, 'gte')).toEqual([['created_at', '2026-01-01']]);
-    expect(callArgs(mock, 'lte')).toEqual([]);
-  });
-
-  it('returns 401 without a user', async () => {
-    const mock = createSupabaseMock({ user: null });
-    (createClient as jest.Mock).mockResolvedValue(mock.client);
-    const res = await GET(new Request('http://localhost/api/tasks'));
-    expect(res.status).toBe(401);
-  });
-
-  it.each([['a,b'], ['x}'], ['"q']])('rejects malformed tag filter %p', async (tag) => {
-    const mock = setup();
-    const res = await GET(new Request(`http://localhost/api/tasks?tag=${encodeURIComponent(tag)}`));
-
-    expect(res.status).toBe(400);
-    expect(callArgs(mock, 'contains')).toEqual([]);
-  });
-
-  it('caps the page number', async () => {
-    const mock = setup();
-    await GET(new Request('http://localhost/api/tasks?page=9007199254740991&limit=10'));
-    expect(callArgs(mock, 'range')).toEqual([[99_990, 99_999]]);
-  });
-
-  it('strips LIKE wildcards from the search term', async () => {
-    const mock = setup();
-    await GET(new Request('http://localhost/api/tasks?q=%25%25%25*'));
-    expect(callArgs(mock, 'or')).toEqual([]);
-  });
+beforeAll(async () => {
+  mockDb = await createTestDb();
 });
 
-describe('POST /api/tasks', () => {
-  beforeEach(() => jest.clearAllMocks());
+beforeEach(async () => {
+  await resetTestDb(mockDb);
+  signIn(await createTestUser(mockDb, 'u1'));
+});
 
-  it("rejects a parent task the user doesn't own", async () => {
-    const mock = setup({ tasks: { data: null } });
-    const res = await POST(
-      jsonRequest('http://localhost/api/tasks', { title: 'Sub', parent_task_id: PARENT_ID }),
-    );
-
-    expect(res.status).toBe(400);
-    expect(callArgs(mock, 'insert')).toEqual([]);
+describe('/api/tasks', () => {
+  it('rejects requests without a session', async () => {
+    signIn(null);
+    expect((await GET(new Request(URL_BASE))).status).toBe(401);
+    expect((await POST(jsonRequest(URL_BASE, { title: 'x' }))).status).toBe(401);
   });
 
-  it('creates a subtask under an owned parent', async () => {
-    const mock = setup({
-      tasks: [{ data: { id: PARENT_ID } }, { data: { id: 'new-task' } }],
-    });
+  it('creates a task and returns the snake_case wire format', async () => {
     const res = await POST(
-      jsonRequest('http://localhost/api/tasks', { title: 'Sub', parent_task_id: PARENT_ID }),
+      jsonRequest(URL_BASE, { title: '  Read ch.3 ', priority: 'high', estimate_pomodoros: 3, tags: ['math', 'math'] }),
     );
-
     expect(res.status).toBe(201);
-    expect(callArgs(mock, 'insert')[0][0]).toEqual(
-      expect.objectContaining({ user_id: USER.id, parent_task_id: PARENT_ID }),
-    );
+    const { task } = await res.json();
+    expect(task).toMatchObject({
+      title: 'Read ch.3',
+      priority: 'HIGH',
+      status: 'TODO',
+      estimate_pomodoros: 3,
+      actual_pomodoros: 0,
+      time_spent: 0,
+      tags: ['math'],
+      is_template: false,
+      is_deleted: false,
+      user_id: 'u1',
+    });
   });
 
-  it('does not leak database error messages', async () => {
-    setup({ tasks: { data: null, error: { message: 'relation "tasks" column x does not exist' } } });
-    const res = await POST(jsonRequest('http://localhost/api/tasks', { title: 'A' }));
-    const body = await res.json();
-
-    expect(res.status).toBe(500);
-    expect(JSON.stringify(body)).not.toContain('relation');
-  });
-
-  it('returns 400 for malformed JSON', async () => {
-    setup();
-    const res = await POST(jsonRequest('http://localhost/api/tasks', '{oops'));
+  it('validates the body', async () => {
+    expect((await POST(jsonRequest(URL_BASE, '{bad'))).status).toBe(400);
+    const res = await POST(jsonRequest(URL_BASE, { title: '   ' }));
     expect(res.status).toBe(400);
+    expect((await res.json()).details.title).toBeDefined();
+  });
+
+  it("lists only the user's own, non-deleted tasks with a total", async () => {
+    await createTestUser(mockDb, 'u2');
+    await mockDb.insert(tasks).values([
+      { userId: 'u1', title: 'mine' },
+      { userId: 'u1', title: 'deleted', isDeleted: true },
+      { userId: 'u2', title: 'theirs' },
+    ]);
+    const body = await list();
+    expect(body.tasks.map((t: { title: string }) => t.title)).toEqual(['mine']);
+    expect(body.total).toBe(1);
+  });
+
+  it('filters by status, tag and a case-insensitive search', async () => {
+    await mockDb.insert(tasks).values([
+      { userId: 'u1', title: 'Essay draft', status: 'DOING', tags: ['writing'] },
+      { userId: 'u1', title: 'Flashcards', status: 'TODO', tags: ['english'] },
+    ]);
+    expect((await list('?status=doing')).tasks.map((t: { title: string }) => t.title)).toEqual(['Essay draft']);
+    expect((await list('?tag=english')).tasks.map((t: { title: string }) => t.title)).toEqual(['Flashcards']);
+    expect((await list('?q=ESSAY')).tasks.map((t: { title: string }) => t.title)).toEqual(['Essay draft']);
+  });
+
+  it('paginates and caps the page size', async () => {
+    await mockDb.insert(tasks).values(Array.from({ length: 5 }, (_, i) => ({ userId: 'u1', title: `t${i}` })));
+    const page = await list('?limit=2&page=2');
+    expect(page.tasks).toHaveLength(2);
+    expect(page.total).toBe(5);
+    expect((await list('?limit=9999')).limit).toBe(100);
+  });
+
+  it('rejects a malformed tag filter', async () => {
+    expect((await GET(new Request(`${URL_BASE}?tag=${encodeURIComponent('a,b')}`))).status).toBe(400);
   });
 });

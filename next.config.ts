@@ -6,7 +6,7 @@ const isDev = process.env.NODE_ENV === 'development';
  * Content-Security-Policy, shipped as Report-Only first: violations show up in
  * the browser console without breaking anything. Once a deploy shows no
  * unexpected reports, rename the header to `Content-Security-Policy` to enforce.
- * External origins: YouTube iframe API/embeds, Google Analytics, Supabase.
+ * External origins: YouTube iframe API/embeds, Google Analytics.
  */
 const contentSecurityPolicy = [
   "default-src 'self'",
@@ -15,7 +15,7 @@ const contentSecurityPolicy = [
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
   // youtube.com: oEmbed lookups (src/lib/youtube-utils.ts); the rest: GA4 beacons
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.youtube.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://stats.g.doubleclick.net https://www.google.com",
+  "connect-src 'self' https://www.youtube.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://stats.g.doubleclick.net https://www.google.com",
   "media-src 'self' data: blob: https:",
   'frame-src https://www.youtube.com https://www.youtube-nocookie.com',
   "worker-src 'self' blob:",
@@ -41,6 +41,8 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   // Type and lint errors fail the build (also enforced in CI).
   poweredByHeader: false,
+  // PGlite loads its WASM and data files from disk at runtime.
+  serverExternalPackages: ['@electric-sql/pglite'],
   // The /dist/ssr barrel re-exports ~1500 icons; without this every page compiles all of them.
   modularizeImports: {
     '@phosphor-icons/react/dist/ssr': {
@@ -55,7 +57,6 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: '**.googleusercontent.com' }, // Google OAuth avatars
       { protocol: 'https', hostname: 'img.youtube.com' },
       { protocol: 'https', hostname: 'i.ytimg.com' },
-      { protocol: 'https', hostname: '**.supabase.co' }, // Supabase Storage
     ],
   },
   async headers() {
@@ -67,6 +68,9 @@ const nextConfig: NextConfig = {
       // showed the streak tracker, which now lives on /history.
       { source: '/progress', destination: '/history', permanent: true },
       { source: '/focus', destination: '/history', permanent: true },
+      // Email codes replaced passwords: sign-up and reset are the same sign-in flow now.
+      { source: '/signup', destination: '/login', permanent: true },
+      { source: '/reset-password', destination: '/login', permanent: true },
     ];
   },
 };

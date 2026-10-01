@@ -17,7 +17,7 @@ type ValidationResult =
 
 /**
  * Validates a finished (or partially finished) timer session sent by the client.
- * Durations feed streaks and the public leaderboard, so they are bounded here.
+ * Durations feed streaks and stats, so they are bounded here.
  * An unknown/invalid taskId is not an error: the session is recorded without a task.
  */
 export function validateSessionCompletion(body: unknown): ValidationResult {

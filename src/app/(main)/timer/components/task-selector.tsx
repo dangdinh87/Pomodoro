@@ -17,7 +17,6 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import Link from 'next/link';
-import { useAuth } from '@/hooks/use-auth';
 import { useI18n } from '@/contexts/i18n-context';
 import { useTimerStore } from '@/stores/timer-store';
 
@@ -30,7 +29,6 @@ interface TaskSelectorProps {
 
 export function TaskSelector({ className }: TaskSelectorProps) {
   const { t } = useI18n();
-  const { isAuthenticated } = useAuth();
 
   // Show all incomplete tasks (no date filter) so tasks created anytime are visible
   const { tasks, updateTask, createTask, isCreating, isLoading } = useTasks({
@@ -111,170 +109,161 @@ export function TaskSelector({ className }: TaskSelectorProps) {
 
   return (
     <>
-      {!isAuthenticated ? (
-        <Link href="/login?redirect=/timer" className={PILL}>
-          <Target size={14} className="shrink-0 text-ink-faint" aria-hidden="true" />
-          <span className="truncate text-[0.8125rem] font-medium text-ink-secondary">{t('timerUi.signInToLink')}</span>
-        </Link>
-      ) : (
-        <>
-          <Popover open={isOpen} onOpenChange={setIsOpen}>
-            <PopoverTrigger asChild>
-              <button type="button" className={cn(PILL, className)}>
-                <Target size={14} className={cn('shrink-0', activeTask ? 'text-brand' : 'text-ink-faint')} aria-hidden="true" />
-                <span className={cn('truncate text-[0.8125rem] font-medium', activeTask ? 'text-ink' : 'text-ink-secondary')}>
-                  {activeTask ? activeTask.title : t('timerComponents.taskSelector.selectToFocus')}
-                </span>
-                {activeTask && (
-                  <span className="shrink-0 text-xs font-semibold tabular-nums text-ink-muted">
-                    {activeTask.actualPomodoros}/{activeTask.estimatePomodoros}
-                  </span>
-                )}
-                <CaretDown size={12} className="shrink-0 text-ink-faint" aria-hidden="true" />
-              </button>
-            </PopoverTrigger>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <button type="button" className={cn(PILL, className)}>
+            <Target size={14} className={cn('shrink-0', activeTask ? 'text-brand' : 'text-ink-faint')} aria-hidden="true" />
+            <span className={cn('truncate text-[0.8125rem] font-medium', activeTask ? 'text-ink' : 'text-ink-secondary')}>
+              {activeTask ? activeTask.title : t('timerComponents.taskSelector.selectToFocus')}
+            </span>
+            {activeTask && (
+              <span className="shrink-0 text-xs font-semibold tabular-nums text-ink-muted">
+                {activeTask.actualPomodoros}/{activeTask.estimatePomodoros}
+              </span>
+            )}
+            <CaretDown size={12} className="shrink-0 text-ink-faint" aria-hidden="true" />
+          </button>
+        </PopoverTrigger>
 
-            <PopoverContent
-              data-theme="dark"
-              data-timer
-              data-mode={timerMode === 'work' ? 'work' : 'break'}
-              align="center"
-              sideOffset={8}
-              className="w-[min(92vw,380px)] overflow-hidden rounded-lg border-border bg-surface p-0 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.4)]"
-            >
-              <div className="flex items-center justify-between px-4 pb-2 pt-3">
-                <h3 className="text-[0.8125rem] font-semibold text-ink">{t('timerUi.activeTasks')}</h3>
-                <span className="text-xs tabular-nums text-ink-muted">{pendingTasks.length}</span>
-              </div>
+        <PopoverContent
+          data-theme="dark"
+          data-timer
+          data-mode={timerMode === 'work' ? 'work' : 'break'}
+          align="center"
+          sideOffset={8}
+          className="w-[min(92vw,380px)] overflow-hidden rounded-lg border-border bg-surface p-0 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.4)]"
+        >
+          <div className="flex items-center justify-between px-4 pb-2 pt-3">
+            <h3 className="text-[0.8125rem] font-semibold text-ink">{t('timerUi.activeTasks')}</h3>
+            <span className="text-xs tabular-nums text-ink-muted">{pendingTasks.length}</span>
+          </div>
 
-              {pendingTasks.length === 0 ? (
-                <p className="border-t border-border px-4 py-6 text-center text-[0.8125rem] text-ink-muted">
-                  {t('timerUi.noActiveTasks')}
-                </p>
-              ) : (
-                <ul className="max-h-[260px] divide-y divide-border overflow-y-auto border-t border-border custom-scrollbar">
-                  {pendingTasks.map((task) => {
-                    const isActive = task.id === activeTaskId;
-                    const progress = Math.min(100, Math.round((task.actualPomodoros / task.estimatePomodoros) * 100));
-                    return (
-                      <li key={task.id}>
-                        <button
-                          type="button"
-                          aria-pressed={isActive}
-                          onClick={() => handleSelectTask(task.id)}
-                          className={cn(
-                            'flex w-full items-center gap-3 px-4 py-2.5 text-start transition-colors hover:bg-surface-hover focus-visible:bg-surface-hover focus-visible:outline-hidden',
-                            isActive && 'bg-surface-raised',
-                          )}
-                        >
-                          <span className="min-w-0 flex-1">
-                            <span className="block truncate text-sm font-medium text-ink">{task.title}</span>
-                            <span className="mt-1.5 flex items-center gap-2">
-                              <span className="h-1 w-14 overflow-hidden rounded-full bg-border" aria-hidden="true">
-                                <span className="block h-full bg-primary transition-[width] duration-600" style={{ width: `${progress}%` }} />
-                              </span>
-                              <span className="text-xs tabular-nums text-ink-muted">
-                                {task.actualPomodoros}/{task.estimatePomodoros}
-                              </span>
-                            </span>
+          {pendingTasks.length === 0 ? (
+            <p className="border-t border-border px-4 py-6 text-center text-[0.8125rem] text-ink-muted">
+              {t('timerUi.noActiveTasks')}
+            </p>
+          ) : (
+            <ul className="max-h-[260px] divide-y divide-border overflow-y-auto border-t border-border custom-scrollbar">
+              {pendingTasks.map((task) => {
+                const isActive = task.id === activeTaskId;
+                const progress = Math.min(100, Math.round((task.actualPomodoros / task.estimatePomodoros) * 100));
+                return (
+                  <li key={task.id}>
+                    <button
+                      type="button"
+                      aria-pressed={isActive}
+                      onClick={() => handleSelectTask(task.id)}
+                      className={cn(
+                        'flex w-full items-center gap-3 px-4 py-2.5 text-start transition-colors hover:bg-surface-hover focus-visible:bg-surface-hover focus-visible:outline-hidden',
+                        isActive && 'bg-surface-raised',
+                      )}
+                    >
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-medium text-ink">{task.title}</span>
+                        <span className="mt-1.5 flex items-center gap-2">
+                          <span className="h-1 w-14 overflow-hidden rounded-full bg-border" aria-hidden="true">
+                            <span className="block h-full bg-primary transition-[width] duration-600" style={{ width: `${progress}%` }} />
                           </span>
-                          {isActive && <Check size={16} weight="bold" className="shrink-0 text-brand" aria-hidden="true" />}
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
+                          <span className="text-xs tabular-nums text-ink-muted">
+                            {task.actualPomodoros}/{task.estimatePomodoros}
+                          </span>
+                        </span>
+                      </span>
+                      {isActive && <Check size={16} weight="bold" className="shrink-0 text-brand" aria-hidden="true" />}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+
+          <form onSubmit={handleAddTask} className="flex items-center gap-2 border-t border-border p-3">
+            <Input
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              placeholder={t('timerUi.addTaskPlaceholder')}
+              aria-label={t('timerUi.addTask')}
+              maxLength={120}
+              className="h-9"
+            />
+            <Button type="submit" variant="secondary" size="sm" disabled={!draft.trim() || isCreating}>
+              {t('timerUi.addTask')}
+            </Button>
+          </form>
+
+          <div className="border-t border-border px-4 py-2.5">
+            <Link href="/tasks" className="inline-flex items-center gap-1.5 text-[0.8125rem] font-medium text-brand hover:text-brand-hover">
+              {t('timerUi.manageTasks')} <ArrowRight size={14} aria-hidden="true" />
+            </Link>
+          </div>
+        </PopoverContent>
+      </Popover>
+
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('timerComponents.taskSelector.switchConfirm.title')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('timerComponents.taskSelector.switchConfirm.description')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setPendingTaskId(null)}>
+              {t('common.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={() => pendingTaskId && selectTask(pendingTaskId)}>
+              {t('common.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Task pomodoro completion dialog */}
+      <AlertDialog open={taskCompleteOpen} onOpenChange={(open) => {
+        if (!open) {
+          setTaskCompleteOpen(false);
+          setActiveTask(null);
+          completedTaskRef.current = null;
+        }
+      }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Confetti size={20} className="text-gold" />
+              {t('timerComponents.taskSelector.taskComplete.title') || 'Task complete!'}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {completedTaskRef.current && (
+                <>
+                  <span className="font-semibold text-ink">{completedTaskRef.current.title}</span>
+                  {' '}
+                  {t('timerComponents.taskSelector.taskComplete.description') || 'has reached all planned pomodoros. Mark as done?'}
+                </>
               )}
-
-              <form onSubmit={handleAddTask} className="flex items-center gap-2 border-t border-border p-3">
-                <Input
-                  value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
-                  placeholder={t('timerUi.addTaskPlaceholder')}
-                  aria-label={t('timerUi.addTask')}
-                  maxLength={120}
-                  className="h-9"
-                />
-                <Button type="submit" variant="secondary" size="sm" disabled={!draft.trim() || isCreating}>
-                  {t('timerUi.addTask')}
-                </Button>
-              </form>
-
-              <div className="border-t border-border px-4 py-2.5">
-                <Link href="/tasks" className="inline-flex items-center gap-1.5 text-[0.8125rem] font-medium text-brand hover:text-brand-hover">
-                  {t('timerUi.manageTasks')} <ArrowRight size={14} aria-hidden="true" />
-                </Link>
-              </div>
-            </PopoverContent>
-          </Popover>
-
-          <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>{t('timerComponents.taskSelector.switchConfirm.title')}</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {t('timerComponents.taskSelector.switchConfirm.description')}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => setPendingTaskId(null)}>
-                  {t('common.cancel')}
-                </AlertDialogCancel>
-                <AlertDialogAction onClick={() => pendingTaskId && selectTask(pendingTaskId)}>
-                  {t('common.confirm')}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-
-          {/* Task pomodoro completion dialog */}
-          <AlertDialog open={taskCompleteOpen} onOpenChange={(open) => {
-            if (!open) {
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
               setTaskCompleteOpen(false);
               setActiveTask(null);
               completedTaskRef.current = null;
-            }
-          }}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle className="flex items-center gap-2">
-                  <Confetti size={20} className="text-gold" />
-                  {t('timerComponents.taskSelector.taskComplete.title') || 'Task complete!'}
-                </AlertDialogTitle>
-                <AlertDialogDescription>
-                  {completedTaskRef.current && (
-                    <>
-                      <span className="font-semibold text-ink">{completedTaskRef.current.title}</span>
-                      {' '}
-                      {t('timerComponents.taskSelector.taskComplete.description') || 'has reached all planned pomodoros. Mark as done?'}
-                    </>
-                  )}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => {
-                  setTaskCompleteOpen(false);
-                  setActiveTask(null);
-                  completedTaskRef.current = null;
-                }}>
-                  {t('timerComponents.taskSelector.taskComplete.skip') || 'Skip'}
-                </AlertDialogCancel>
-                <AlertDialogAction onClick={() => {
-                  if (completedTaskRef.current) {
-                    updateTask({ id: completedTaskRef.current.id, input: { status: 'done' } });
-                  }
-                  setTaskCompleteOpen(false);
-                  setActiveTask(null);
-                  completedTaskRef.current = null;
-                }}>
-                  <CheckCircle size={16} className="mr-1.5" />
-                  {t('timerComponents.taskSelector.taskComplete.markDone') || 'Mark as done'}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </>
-      )}
+            }}>
+              {t('timerComponents.taskSelector.taskComplete.skip') || 'Skip'}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={() => {
+              if (completedTaskRef.current) {
+                updateTask({ id: completedTaskRef.current.id, input: { status: 'done' } });
+              }
+              setTaskCompleteOpen(false);
+              setActiveTask(null);
+              completedTaskRef.current = null;
+            }}>
+              <CheckCircle size={16} className="mr-1.5" />
+              {t('timerComponents.taskSelector.taskComplete.markDone') || 'Mark as done'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

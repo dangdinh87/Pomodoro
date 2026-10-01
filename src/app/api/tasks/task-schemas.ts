@@ -11,7 +11,6 @@ export interface CreateTaskPayload {
   estimate_pomodoros: number
   tags: string[]
   due_date?: string | null
-  parent_task_id?: string | null
   is_template?: boolean
 }
 
@@ -114,22 +113,15 @@ const parseEstimate = (value: unknown): number => {
 const MAX_SEARCH_LENGTH = 100
 
 /**
- * The search term is interpolated into a PostgREST `or=(...)` filter, where
- * `,` `(` `)` separate clauses and `"` `\` quote values. Stripping them keeps
- * user input from adding or altering filter clauses. `%` and `*` are LIKE
- * wildcards and are stripped too, so a search is always a plain substring match.
+ * The term is bound as a parameter (no injection risk), but `%` and `*` are
+ * stripped so a search is always a plain substring match, and the length is capped.
  */
 export function sanitizeSearchTerm(value: string | null): string {
   if (!value) return ''
   return value.replace(/[,()"\\%*]/g, ' ').trim().slice(0, MAX_SEARCH_LENGTH)
 }
 
-/**
- * Tags are matched with `contains('tags', [tag])`, which supabase-js renders as
- * an unquoted `cs.{tag}` array literal: `,` would split it into several tags and
- * `{` `}` `"` `\` break the literal (500). Such tags can't be created through
- * the UI, so reject them.
- */
+/** Tags containing these characters can't be created through the UI, so reject them as filters. */
 export function isValidTagFilter(value: string): boolean {
   return value.length > 0 && value.length <= 50 && !/[,{}"\\]/.test(value)
 }
@@ -159,9 +151,6 @@ export function validateCreateTask(body: unknown): ValidationResult<CreateTaskPa
   const dueDate = parseOptionalField(
     body.due_date, isValidDateString, 'due_date', 'Due date is invalid', issues,
   )
-  const parentTaskId = parseOptionalField(
-    body.parent_task_id, isUuid, 'parent_task_id', 'Parent task id is invalid', issues,
-  )
 
   if (Object.keys(issues).length) {
     return formatError('Invalid task data', issues)
@@ -175,7 +164,6 @@ export function validateCreateTask(body: unknown): ValidationResult<CreateTaskPa
       estimate_pomodoros: parseEstimate(body.estimate_pomodoros),
       tags: normalizeTags(body.tags),
       due_date: dueDate ?? null,
-      parent_task_id: parentTaskId ?? null,
       is_template: Boolean(body.is_template),
     }
 
@@ -237,13 +225,6 @@ export function validateUpdateTask(body: unknown): ValidationResult<UpdateTaskPa
   )
   if (dueDate !== undefined) {
     normalized.due_date = dueDate
-  }
-
-  const parentTaskId = parseOptionalField(
-    body.parent_task_id, isUuid, 'parent_task_id', 'Parent task id is invalid', issues,
-  )
-  if (parentTaskId !== undefined) {
-    normalized.parent_task_id = parentTaskId
   }
 
   if (body.display_order !== undefined) {

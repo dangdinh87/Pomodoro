@@ -41,7 +41,6 @@
     "timer": "集中",
     "tasks": "タスク",
     "history": "履歴",
-    "leaderboard": "ランキング",
     "chatAI": "AIチャット",
     "entertainment": "ゲーム",
     "settings": "設定",
@@ -55,13 +54,11 @@
   "auth": {
     "login": "ログイン",
     "pleaseLogin": "続行するにはログインしてください",
-    "signInToManageTasks": "タスクを管理するにはログインしてください",
     "signInToViewStats": "統計を見るにはログインしてください",
     "signInButton": "ログイン",
     "signOutSuccess": "ログアウトしました",
     "signOutError": "ログアウトできません",
     "signOutConfirm": "ログアウトしますか？",
-    "supabaseNotConfigured": "Supabaseが設定されていません",
     "signOutUnexpectedError": "ログアウト中にエラーが発生しました"
   },
   "timer": {
@@ -326,17 +323,6 @@
       "selectDate": "日付範囲を選択"
     }
   },
-  "leaderboard": {
-    "title": "ランキング",
-    "comingSoon": "近日公開",
-    "description": "StudyBroコミュニティと競争しよう。誰が一番集中できるか！",
-    "tabs": {
-      "focusTime": "集中時間",
-      "completedTasks": "完了タスク"
-    },
-    "empty": "まだデータがありません。最初の一人になろう！",
-    "you": "あなた"
-  },
   "settings": {
     "title": "設定",
     "subtitle": "好み、タイマー設定、外観を管理します。",
@@ -352,26 +338,9 @@
       "subtitle": "パスワードの変更、データのエクスポート、アカウントの削除ができます。",
       "guestPrompt": "アカウントを管理するにはサインインしてください。",
       "guestLogin": "サインイン",
-      "password": {
-        "title": "パスワードを変更",
-        "description": "8文字以上の新しいパスワードを設定してください。",
-        "currentLabel": "現在のパスワード",
-        "sameAsCurrent": "新しいパスワードは現在のものと異なる必要があります。",
-        "wrongCurrent": "現在のパスワードが正しくありません。",
-        "weak": "このパスワードは弱すぎます。より強いパスワードを選んでください。",
-        "noEmail": "アカウントにメールアドレスがないため、ここではパスワードを変更できません。",
-        "oauthManaged": "サインインは {provider} で管理されています。パスワードはそちらで変更してください。",
-        "newLabel": "新しいパスワード",
-        "confirmLabel": "新しいパスワード(確認)",
-        "submit": "パスワードを更新",
-        "tooShort": "パスワードは8文字以上にしてください。",
-        "mismatch": "パスワードが一致しません。",
-        "success": "パスワードを更新しました。",
-        "error": "パスワードを更新できませんでした。"
-      },
       "export": {
         "title": "データをエクスポート",
-        "description": "プロフィール、タスク、セッション、連続記録、タグ、会話を含む JSON ファイルをダウンロードします。",
+        "description": "アカウント、タスク、セッション、タグを含むJSONファイルをダウンロードします。",
         "button": "データをダウンロード",
         "success": "エクスポートの準備ができました。",
         "error": "データをエクスポートできませんでした。",
@@ -382,14 +351,12 @@
         "description": "アカウントと関連するすべてのデータを完全に削除します。この操作は元に戻せません。",
         "button": "アカウントを削除",
         "confirmTitle": "アカウントを削除しますか?",
-        "confirmDescription": "タスク、セッション、連続記録、タグ、会話が完全に削除されます。確認のため、下に {value} を入力してください。",
+        "confirmDescription": "タスク、セッション、タグが完全に削除されます。確認のため、下に {value} と入力してください。",
         "confirmLabel": "確認のため入力",
         "cancel": "キャンセル",
         "confirmButton": "完全に削除",
         "success": "アカウントを削除しました。",
-        "error": "アカウントを削除できませんでした。",
-        "partial": "アカウントが一部のみ削除された可能性があります。安全に再試行できますので、もう一度お試しください。",
-        "notConfigured": "現在アカウントを削除できません。フィードバックページからサポートにお問い合わせください。"
+        "error": "アカウントを削除できませんでした。"
       }
     },
     "general": {
@@ -831,7 +798,11 @@
           "title": "フィードバック",
           "subtitle": "改善にご協力ください",
           "description": "ご意見をお聞かせください：",
-          "points": ["バグを報告", "機能を提案", "体験を評価"],
+          "points": [
+            "バグを報告",
+            "機能を提案",
+            "体験を評価"
+          ],
           "cta": "フィードバックを送信"
         },
         "settings": {
@@ -893,66 +864,6 @@
     "toast": {
       "success": "フィードバックありがとうございます！",
       "error": "エラーが発生しました。後でもう一度お試しください。"
-    }
-  },
-  "chat": {
-    "modelSelector": {
-      "searchPlaceholder": "モデルを検索...",
-      "noResults": "モデルが見つかりません",
-      "noResultsHint": "検索条件を変更してみてください"
-    },
-    "title": "AIチャット",
-    "subtitle": "AIアシスタントとチャット",
-    "placeholder": "メッセージを入力...",
-    "send": "送信",
-    "clear": "チャットをクリア",
-    "newChat": "新しいチャット",
-    "historyTitle": "チャット履歴",
-    "noConversations": "まだ会話がありません。新しいチャットを始めましょう！",
-    "deleteConfirmTitle": "会話を削除しますか？",
-    "deleteConfirmDescription": "この操作は元に戻せません。この会話とすべてのメッセージが完全に削除されます。",
-    "thread": {
-      "welcome": "こんにちは！👋",
-      "welcomeSubtitle": "私はBro Chat - あなたの勉強仲間です！",
-      "scrollToBottom": "一番下にスクロール",
-      "inputPlaceholder": "何でも聞いてください...",
-      "sendMessage": "メッセージを送信",
-      "stopGenerating": "生成を停止",
-      "error": "⚠️ エラー",
-      "copy": "コピー",
-      "exportMarkdown": "Markdownでエクスポート",
-      "refresh": "更新",
-      "edit": "編集",
-      "previous": "前へ",
-      "next": "次へ",
-      "cancel": "キャンセル",
-      "update": "更新",
-      "instruction": "お手伝いできること：ポモドーロメソッド🍅、勉強のヒント📚、時間管理⏰、このアプリの使い方。お気軽にどうぞ！",
-      "conversationGroups": {
-        "older": "古い"
-      },
-      "suggestions": {
-        "pomodoro": {
-          "title": "ポモドーロテクニックを説明して",
-          "label": "生産性向上について",
-          "prompt": "ポモドーロテクニックと、それが生産性と集中力を高める仕組みを説明してください"
-        },
-        "studyTips": {
-          "title": "勉強のヒントを教えて",
-          "label": "長時間集中するための",
-          "prompt": "長時間集中して気が散らないようにするための勉強のヒントを教えてください"
-        },
-        "studyPlan": {
-          "title": "勉強計画を作成して",
-          "label": "私の目標に合わせて",
-          "prompt": "私の学習目標に合わせた効果的なポモドーロセッション付きの勉強計画を作成してください"
-        },
-        "breakActivities": {
-          "title": "休憩中のアクティビティを提案して",
-          "label": "ポモドーロ休憩用",
-          "prompt": "5分間のポモドーロ休憩中にできるリラックスできるアクティビティを提案してください"
-        }
-      }
     }
   },
   "entertainment": {
@@ -1148,89 +1059,29 @@
   },
   "login": {
     "title": "Study Broにログイン",
-    "description": "おかえりなさい！集中力を高める旅を続けましょう。",
+    "description": "メールに届く6桁のコードでログイン。パスワードは不要です。",
     "form": {
       "email": "メールアドレス",
       "emailPlaceholder": "your@email.com",
-      "password": "パスワード",
       "passwordPlaceholder": "パスワードを入力",
-      "forgotPassword": "パスワードを忘れましたか？",
       "signingIn": "ログイン中...",
       "signIn": "ログイン",
       "or": "または",
       "continueWithGoogle": "Googleで続行",
-      "noAccount": "アカウントをお持ちでないですか？",
-      "signUpNow": "今すぐ登録",
-      "backToApp": "アプリに戻る"
+      "backToApp": "アプリに戻る",
+      "sendCode": "コードを送信",
+      "sending": "送信中…",
+      "code": "6桁のコード",
+      "codeSent": "{email} に送ったコードを入力してください。",
+      "changeEmail": "別のメールを使う",
+      "resend": "コードを再送"
     },
     "errors": {
-      "supabaseNotConfigured": "Supabaseが設定されていません。環境変数を追加してください。",
-      "emailPasswordRequired": "メールアドレスとパスワードを入力してください。",
-      "loginFailed": "ログインできません。",
-      "loginError": "ログイン中にエラーが発生しました。",
       "googleConnectionFailed": "Googleに接続できません。後でもう一度お試しください。",
-      "googleAuthError": "ログイン開始中にエラーが発生しました。"
+      "sendFailed": "コードを送信できませんでした。少し待ってから再試行してください。",
+      "invalidCode": "コードが正しくないか、期限切れです。"
     },
-    "success": {
-      "loginSuccess": "ログインしました！",
-      "redirectingToGoogle": "Googleにリダイレクト中..."
-    },
-    "forgot": {
-      "title": "パスワードをリセット",
-      "description": "メールアドレスを入力してください。リセット用のリンクをお送りします。",
-      "emailRequired": "メールアドレスを入力してください。",
-      "sendLink": "リセットリンクを送信",
-      "sending": "送信中...",
-      "success": "メールでリセットリンクをご確認ください。",
-      "error": "リセットメールを送信できません。もう一度お試しください。"
-    }
-  },
-  "resetPassword": {
-    "title": "新しいパスワードを設定",
-    "description": "下に新しいパスワードを入力してください。",
-    "newPassword": "新しいパスワード",
-    "newPasswordPlaceholder": "6文字以上",
-    "confirmPassword": "パスワードを確認",
-    "confirmPasswordPlaceholder": "パスワードを再入力",
-    "submit": "パスワードを更新",
-    "updating": "更新中...",
-    "success": "パスワードを更新しました！ログインできます。",
-    "invalidTitle": "無効または期限切れのリンク",
-    "invalidDescription": "このリセットリンクは無効か期限切れです。ログインページから新しいリンクをリクエストしてください。",
-    "errors": {
-      "passwordTooShort": "パスワードは6文字以上必要です。",
-      "passwordMismatch": "パスワードが一致しません。",
-      "updateFailed": "パスワードを更新できません。もう一度お試しください。"
-    }
-  },
-  "signup": {
-    "title": "Study Broに登録",
-    "description": "集中力と生産性を高める旅を始めましょう。",
-    "form": {
-      "email": "メールアドレス",
-      "emailPlaceholder": "your@email.com",
-      "password": "パスワード",
-      "passwordPlaceholder": "パスワードを作成",
-      "signingUp": "登録中...",
-      "signUp": "登録",
-      "or": "または",
-      "signUpWithGoogle": "Googleで登録",
-      "haveAccount": "すでにアカウントをお持ちですか？",
-      "signInNow": "今すぐログイン",
-      "backToApp": "アプリに戻る"
-    },
-    "errors": {
-      "supabaseNotConfigured": "Supabaseが設定されていません。環境変数を追加してください。",
-      "emailPasswordRequired": "登録にはメールアドレスとパスワードを入力してください。",
-      "signupFailed": "登録できません。",
-      "signupError": "登録中にエラーが発生しました。",
-      "googleConnectionFailed": "Googleに接続できません。後でもう一度お試しください。",
-      "googleAuthError": "ログイン開始中にエラーが発生しました。"
-    },
-    "success": {
-      "checkEmail": "メールを確認してアカウントを認証してください。",
-      "redirectingToGoogle": "Googleにリダイレクト中..."
-    }
+    "guestNote": "ゲストとして作成したタスクとセッションはアカウントに引き継がれます。"
   },
   "notFound": {
     "title": "このページは見つかりませんでした",
@@ -1573,10 +1424,6 @@
           "title": "履歴と分析",
           "description": "セッション履歴、日別/週別/月別の統計、生産性チャート。"
         },
-        "chatAI": {
-          "title": "Bro Chat AI",
-          "description": "ポモドーロのヒント、勉強アドバイス、時間管理のAIコーチ。会話履歴を保存。"
-        },
         "entertainment": {
           "title": "ミニゲーム",
           "description": "スネーク、2048、ブロック崩し、スペースシューター、神経衰弱、三目並べ—休憩中にプレイ。"
@@ -1616,9 +1463,7 @@
           "timer": "ポモドーロタイマー（作業、休憩、タスク連携）",
           "tasks": "タスク管理＆フィルター",
           "history": "セッション履歴＆分析",
-          "chatAI": "Bro Chat AIコーチ",
           "games": "ミニゲーム（スネーク、2048など）",
-          "leaderboard": "グローバルランキング",
           "focus": "集中モード＆連続記録",
           "themes": "カラーテーマ＆背景",
           "sounds": "サウンド、Spotify＆YouTube",
@@ -1673,7 +1518,11 @@
     "title": "履歴",
     "description": "集中時間、連続記録、最近のセッションを確認できます。",
     "rangeLabel": "期間",
-    "ranges": { "today": "今日", "week": "今週", "month": "今月" },
+    "ranges": {
+      "today": "今日",
+      "week": "今週",
+      "month": "今月"
+    },
     "stats": {
       "focusTime": "集中時間",
       "sessions": "セッション数",
@@ -1702,7 +1551,11 @@
       "title": "最近のセッション",
       "none": "この期間のセッションはまだありません。",
       "noTask": "タスクなし",
-      "modes": { "work": "集中", "shortBreak": "短い休憩", "longBreak": "長い休憩" }
+      "modes": {
+        "work": "集中",
+        "shortBreak": "短い休憩",
+        "longBreak": "長い休憩"
+      }
     },
     "empty": {
       "title": "まだセッションがありません",
@@ -1798,7 +1651,6 @@
     "dragHandle": "ドラッグして並べ替え",
     "manage": "タグとテンプレートの管理",
     "page": "{page} / {total} ページ",
-    "signedOutDescription": "ログインすると、タスクがデバイス間で同期されます。",
     "pickDate": "日付を選択",
     "clearDate": "日付をクリア",
     "estimateMin": "ポモドーロは1以上で入力してください",
@@ -1832,7 +1684,6 @@
       "timer": "作業・短い休憩・長い休憩のモード。キーボードショートカット対応。",
       "tasks": "タスクをセッションに紐づけ、状態や日付で絞り込めます。",
       "analytics": "セッション履歴と、日・週・月ごとの統計。",
-      "chatAI": "Bro Chat に勉強のコツや時間管理を相談できます。",
       "sounds": "自然音、ローファイ、ホワイトノイズ、Spotify や YouTube も。",
       "entertainment": "休憩の合図が鳴ったら、Snake や 2048 などで一息。"
     },
@@ -1880,7 +1731,6 @@
     "todaySummaryOne": "今日: {count} セッション · {time}",
     "timeHm": "{h}時間{m}分",
     "timeM": "{m}分",
-    "signInToLink": "ログインしてタスクを紐づける",
     "activeTasks": "進行中のタスク",
     "noActiveTasks": "進行中のタスクはまだありません。下から追加できます。",
     "addTaskPlaceholder": "何に取り組みますか？",

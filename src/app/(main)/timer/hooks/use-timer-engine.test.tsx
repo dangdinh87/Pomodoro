@@ -5,19 +5,19 @@ import { useTimerStore } from '@/stores/timer-store';
 import { useTasksStore } from '@/stores/task-store';
 import { useTimerEngine } from './use-timer-engine';
 
-const mockRecord = jest.fn();
-const mockFlush = jest.fn();
-const mockPlayAlarm = jest.fn();
-const mockNotify = jest.fn();
+const mockRecord = vi.fn();
+const mockFlush = vi.fn();
+const mockPlayAlarm = vi.fn();
+const mockNotify = vi.fn();
 
-jest.mock('@/lib/timer/use-session-recorder', () => ({
+vi.mock('@/lib/timer/use-session-recorder', () => ({
   useSessionRecorder: () => ({ record: mockRecord, flush: mockFlush }),
 }));
-jest.mock('@/lib/timer/alarm', () => ({ playAlarm: () => mockPlayAlarm() }));
-jest.mock('@/lib/timer/notifications', () => ({
+vi.mock('@/lib/timer/alarm', () => ({ playAlarm: () => mockPlayAlarm() }));
+vi.mock('@/lib/timer/notifications', () => ({
   notifyPhaseComplete: (m: string) => mockNotify(m),
 }));
-jest.mock('canvas-confetti', () => jest.fn());
+vi.mock('canvas-confetti', () => ({ default: vi.fn() }));
 
 const NOW = 1_800_000_000_000;
 const settings = {
@@ -36,9 +36,9 @@ const settings = {
 describe('useTimerEngine', () => {
   beforeEach(() => {
     installMemoryStorage();
-    jest.useFakeTimers();
-    jest.setSystemTime(NOW);
-    jest.clearAllMocks();
+    vi.useFakeTimers();
+    vi.setSystemTime(NOW);
+    vi.clearAllMocks();
     useTasksStore.setState({ activeTaskId: 'task-1' } as never);
     useTimerStore.setState({
       mode: 'work',
@@ -53,7 +53,7 @@ describe('useTimerEngine', () => {
       plan: [],
     });
   });
-  afterEach(() => jest.useRealTimers());
+  afterEach(() => vi.useRealTimers());
 
   it('records the focused segment, plays the alarm and auto-starts the break', () => {
     useTimerStore.setState({
@@ -65,7 +65,7 @@ describe('useTimerEngine', () => {
     renderHook(() => useTimerEngine());
 
     act(() => {
-      jest.advanceTimersByTime(2500);
+      vi.advanceTimersByTime(2500);
     });
 
     expect(mockRecord).toHaveBeenCalledTimes(1);
@@ -93,7 +93,7 @@ describe('useTimerEngine', () => {
     });
     renderHook(() => useTimerEngine());
     act(() => {
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
     });
 
     expect(mockRecord).toHaveBeenCalledTimes(1);
@@ -118,7 +118,7 @@ describe('useTimerEngine', () => {
     });
     renderHook(() => useTimerEngine());
     act(() => {
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
     });
 
     expect(mockRecord).not.toHaveBeenCalled();
@@ -139,7 +139,7 @@ describe('useTimerEngine', () => {
     });
     renderHook(() => useTimerEngine());
     act(() => {
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
     });
     expect(mockRecord).toHaveBeenCalledTimes(1);
     expect(useTimerStore.getState().completedSessions).toBe(1);
@@ -154,7 +154,7 @@ describe('useTimerEngine', () => {
     });
     renderHook(() => useTimerEngine(), { wrapper: StrictMode });
     act(() => {
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
     });
     expect(mockRecord).toHaveBeenCalledTimes(1);
     expect(useTimerStore.getState().isRunning).toBe(false);
@@ -169,14 +169,14 @@ describe('useTimerEngine', () => {
     });
     renderHook(() => useTimerEngine());
     act(() => {
-      jest.advanceTimersByTime(500);
+      vi.advanceTimersByTime(500);
     });
     // another tab paused/resumed: same running state, earlier deadline
     act(() => {
       useTimerStore.setState({ timeLeft: 1, deadlineAt: Date.now() + 1000 });
     });
     act(() => {
-      jest.advanceTimersByTime(1500);
+      vi.advanceTimersByTime(1500);
     });
     expect(mockRecord).toHaveBeenCalledTimes(1);
   });
@@ -194,7 +194,7 @@ describe('useTimerEngine', () => {
     });
     renderHook(() => useTimerEngine());
     act(() => {
-      jest.advanceTimersByTime(1500);
+      vi.advanceTimersByTime(1500);
     });
 
     expect(mockRecord).not.toHaveBeenCalled();
@@ -212,7 +212,7 @@ describe('useTimerEngine', () => {
     });
     renderHook(() => useTimerEngine());
     act(() => {
-      jest.advanceTimersByTime(1500);
+      vi.advanceTimersByTime(1500);
     });
     expect(mockRecord).toHaveBeenCalledWith({
       taskId: null,

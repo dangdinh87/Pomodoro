@@ -13,8 +13,7 @@ import { Metadata } from 'next';
 import { buildPageMetadata } from '@/lib/seo/page-metadata';
 import { getT } from '@/lib/server-translations';
 
-// SEO Metadata. Copy only claims features that are always on (the
-// leaderboard is behind a feature flag, see src/config/feature-flags.ts).
+// SEO Metadata. Copy only claims features that ship today.
 export const metadata: Metadata = {
   ...buildPageMetadata({
     path: '/',
