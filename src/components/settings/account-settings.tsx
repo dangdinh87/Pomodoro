@@ -15,6 +15,9 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useAuth } from '@/hooks/use-auth';
 import { useI18n } from '@/contexts/i18n-context';
+import { SettingsRow, SettingsSection } from '@/components/settings/settings-section';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { DownloadSimple, SignOut, UserCircle } from '@phosphor-icons/react/dist/ssr';
 import { openPanel } from '@/features/app-shell/panel-store';
 
 export function AccountSettings() {
@@ -32,13 +35,22 @@ export function AccountSettings() {
 
   if (!isAuthenticated || !user) {
     return (
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold">{t('settings.account.title')}</h2>
-        <p>{t('settings.account.guestPrompt')}</p>
-        <Button onClick={() => openPanel('login')}>
+      <div className="rounded-lg border border-border bg-surface p-5">
+        <div className="flex items-start gap-3.5">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-surface-raised text-ink-secondary">
+            <UserCircle size={22} aria-hidden />
+          </span>
+          <div className="min-w-0 space-y-1">
+            <h2 className="font-heading text-[0.9375rem] font-bold tracking-[-0.01em] text-ink">
+              {t('settings.account.guest.title')}
+            </h2>
+            <p className="text-[0.8125rem] leading-snug text-ink-muted">{t('settings.account.guest.description')}</p>
+          </div>
+        </div>
+        <Button className="mt-4 w-full sm:w-auto" onClick={() => openPanel('login')}>
           {t('settings.account.guestLogin')}
         </Button>
-      </section>
+      </div>
     );
   }
 
@@ -70,6 +82,14 @@ export function AccountSettings() {
     }
   }
 
+  async function handleSignOut() {
+    try {
+      await signOut();
+    } catch {
+      toast.error(t('settings.account.signOutError'));
+    }
+  }
+
   async function handleDelete() {
     setDeleting(true);
     setDeleteError(null);
@@ -97,33 +117,54 @@ export function AccountSettings() {
     }
   }
 
-  return (
-    <div className="space-y-10">
-      <section className="space-y-4">
-        <div>
-          <h2 className="text-lg font-semibold">{t('settings.account.export.title')}</h2>
-          <p>{t('settings.account.export.description')}</p>
-        </div>
-        <Button variant="outline" onClick={handleExport} disabled={exporting}>
-          {t('settings.account.export.button')}
-        </Button>
-      </section>
+  const initial = (user.name || user.email || '?').trim().charAt(0).toUpperCase();
 
-      <section className="space-y-4">
-        <div>
-          <h2 className="text-lg font-semibold">{t('settings.account.delete.title')}</h2>
-          <p>{t('settings.account.delete.description')}</p>
+  return (
+    <div className="space-y-8">
+      <SettingsSection title={t('settings.account.title')}>
+        <div className="flex items-center gap-3.5 px-4 py-4 sm:px-5">
+          <Avatar className="size-11">
+            {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt="" />}
+            <AvatarFallback className="bg-surface-raised font-heading text-base font-bold text-ink-secondary">
+              {initial}
+            </AvatarFallback>
+          </Avatar>
+          <div className="min-w-0 flex-1">
+            {user.name && <p className="truncate text-[0.9375rem] font-semibold text-ink">{user.name}</p>}
+            <p className="truncate text-[0.8125rem] text-ink-muted">{user.email}</p>
+          </div>
+          <Button variant="outline" size="sm" onClick={handleSignOut}>
+            <SignOut size={14} aria-hidden />
+            {t('settings.account.signOut')}
+          </Button>
         </div>
-        <Button
-          variant="destructive"
-          onClick={() => {
-            setDeleteConfirm('');
-            setDeleteError(null);
-            setDeleteOpen(true);
-          }}
-        >
-          {t('settings.account.delete.button')}
-        </Button>
+        <SettingsRow label={t('settings.account.export.title')} description={t('settings.account.export.description')}>
+          <Button variant="outline" className="w-full" onClick={handleExport} disabled={exporting}>
+            <DownloadSimple size={14} aria-hidden />
+            {t('settings.account.export.button')}
+          </Button>
+        </SettingsRow>
+      </SettingsSection>
+
+      <section className="space-y-3">
+        <h2 className="font-heading text-[0.9375rem] font-bold tracking-[-0.01em] text-danger-ink">
+          {t('settings.account.delete.title')}
+        </h2>
+        <div className="rounded-lg border border-danger/40 bg-surface">
+          <SettingsRow label={t('settings.account.delete.title')} description={t('settings.account.delete.description')}>
+            <Button
+              variant="destructive"
+              className="w-full"
+              onClick={() => {
+                setDeleteConfirm('');
+                setDeleteError(null);
+                setDeleteOpen(true);
+              }}
+            >
+              {t('settings.account.delete.button')}
+            </Button>
+          </SettingsRow>
+        </div>
 
         <AlertDialog open={deleteOpen} onOpenChange={(open) => !deleting && setDeleteOpen(open)}>
           <AlertDialogContent>

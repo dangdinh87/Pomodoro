@@ -4,7 +4,10 @@ import { useEffect, useState } from "react"
 import { SettingsSection, SettingsRow } from "@/components/settings/settings-section"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useI18n, LANGS } from "@/contexts/i18n-context"
-import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { openPanel } from "@/features/app-shell/panel-store"
+import { SavedIndicator } from "@/features/settings/saved-indicator"
+import { useSavedFlash } from "@/features/settings/use-saved-flash"
 import { allColorPresets, defaultTheme, type ColorPreset } from '@/config/themes'
 import {
     UI_FONTS,
@@ -22,8 +25,9 @@ function Swatch({ preset }: { preset: ColorPreset }) {
     return <span aria-hidden className="size-3 shrink-0 rounded-full" style={{ backgroundColor: preset.swatch }} />
 }
 
-export function GeneralSettings() {
-    const { lang, setLang, t } = useI18n()
+export function AppearanceSettings() {
+    const { t } = useI18n()
+    const [saved, flash] = useSavedFlash()
     const [preset, setPreset] = useState<ColorPreset>(defaultTheme)
     const [font, setFont] = useState<UiFontName>(UI_FONTS[0].name)
     const [fontSize, setFontSize] = useState<UiFontSize>('medium')
@@ -41,25 +45,25 @@ export function GeneralSettings() {
         if (!next) return
         saveColorPreset(next)
         setPreset(next)
-        toast.success(t('settings.general.theme.themeApplied', { name: presetName(next) }))
+        flash()
     }
 
     const handleFontChange = (name: string) => {
         const next = name as UiFontName
         applyUiFont(next, true)
         setFont(next)
-        toast.success(t('settings.general.theme.fontChanged', { font: next }))
+        flash()
     }
 
     const handleFontSizeChange = (size: string) => {
         const next = size as UiFontSize
         applyUiFontSize(next, true)
         setFontSize(next)
+        flash()
     }
 
     return (
-        <div className="space-y-8">
-            <SettingsSection title={t('settings.general.appearance')}>
+        <SettingsSection title={t('settings.general.appearance')} action={<SavedIndicator show={saved} />}>
                 <SettingsRow
                     label={t('settings.general.theme.colorTheme')}
                     description={t('settings.general.theme.colorThemeDescription')}
@@ -134,15 +138,36 @@ export function GeneralSettings() {
                     </Select>
                 </SettingsRow>
             </SettingsSection>
+    )
+}
 
-            <SettingsSection title={t('settings.general.language.sectionTitle')}>
+export function GeneralSettings() {
+    const { lang, setLang, t } = useI18n()
+    const [saved, flash] = useSavedFlash()
+
+    return (
+        <div className="space-y-8">
+            <SettingsSection title={t('settings.shortcuts.title')}>
+                <SettingsRow label={t('settings.shortcuts.timer.label')} description={t('settings.shortcuts.timer.description')}>
+                    <Button variant="outline" className="w-full" onClick={() => openPanel('timer')}>
+                        {t('settings.shortcuts.timer.button')}
+                    </Button>
+                </SettingsRow>
+                <SettingsRow label={t('settings.shortcuts.scene.label')} description={t('settings.shortcuts.scene.description')}>
+                    <Button variant="outline" className="w-full" onClick={() => openPanel('scene')}>
+                        {t('settings.shortcuts.scene.button')}
+                    </Button>
+                </SettingsRow>
+            </SettingsSection>
+
+            <SettingsSection title={t('settings.general.language.sectionTitle')} action={<SavedIndicator show={saved} />}>
                 <SettingsRow
                     label={t('settings.general.language.title')}
                     description={t('settings.general.language.description')}
                 >
                     <Select value={lang} onValueChange={(value) => {
-                        setLang(value as any)
-                        toast.success(t('settings.general.language.updated'))
+                        setLang(value as typeof lang)
+                        flash()
                     }}>
                         <SelectTrigger>
                             <SelectValue placeholder={t('settings.general.language.selectPlaceholder')} />

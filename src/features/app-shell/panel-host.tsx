@@ -77,7 +77,7 @@ export function PanelHost({ googleEnabled }: { googleEnabled: boolean }) {
         <StatsPanel />
       </SheetPanel>
 
-      <DialogPanel id="settings">
+      <DialogPanel id="settings" className="max-w-3xl">
         <SettingsPanel />
       </DialogPanel>
       <DialogPanel id="feedback">
