@@ -15,6 +15,11 @@ export default function AppHome({ googleEnabled }: { googleEnabled: boolean }) {
   const mode = useTimerStore((state) => state.mode);
   usePanelHotkeys();
 
+  // Lets the scene layer (outside the stage) tint itself by mode.
+  useEffect(() => {
+    document.documentElement.dataset.timerMode = mode;
+  }, [mode]);
+
   useEffect(() => {
     syncPanelFromUrl();
     window.addEventListener('popstate', syncPanelFromUrl);
@@ -26,7 +31,7 @@ export default function AppHome({ googleEnabled }: { googleEnabled: boolean }) {
       <section
         data-theme="dark"
         data-timer
-        data-mode={mode === 'work' ? 'work' : 'break'}
+        data-mode={mode}
         className="relative flex min-h-dvh w-full flex-col items-center justify-center px-[clamp(16px,4vw,32px)] pb-24 pt-16"
       >
         <AppStatusBar />

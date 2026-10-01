@@ -473,17 +473,40 @@ html[data-chrome-idle='true'] body {
 }
 
 /*
- * Breaks re-point the accent at cyan (the tone the system leaves unassigned) so the mode chip,
- * progress line and primary button all read "rest". Specificity (0,2,0) beats colour presets.
+ * Pomodoro mode colours: focus = tomato (the brand, or the chosen colour preset), short
+ * break = teal, long break = blue. The stage re-points the accent so the mode chip,
+ * progress line and primary button all read the current mode. The stage is always dark,
+ * so only dark-mode steps are needed. Specificity (0,2,0) beats colour presets.
  */
-[data-timer][data-mode='break'] {
-  --accent: #22D3EE;
-  --accent-hover: #67E8F9;
-  --accent-soft: color-mix(in srgb, #06B6D4 30%, #18181b);
-  --accent-ink: #67E8F9;
-  --accent-solid: #0E7490;
-  --accent-solid-hover: #155E75;
-  --accent-edge: #164E63;
+[data-timer][data-mode='shortBreak'] {
+  --accent: #2DD4BF;
+  --accent-hover: #5EEAD4;
+  --accent-soft: color-mix(in srgb, #14B8A6 30%, #18181b);
+  --accent-ink: #5EEAD4;
+  --accent-solid: #0F766E;
+  --accent-solid-hover: #115E59;
+  --accent-edge: #134E4A;
+}
+[data-timer][data-mode='longBreak'] {
+  --accent: #60A5FA;
+  --accent-hover: #93C5FD;
+  --accent-soft: color-mix(in srgb, #3B82F6 30%, #18181b);
+  --accent-ink: #93C5FD;
+  --accent-solid: #2563EB;
+  --accent-solid-hover: #1D4ED8;
+  --accent-edge: #1E3A8A;
+}
+
+/* Default scene: a deep solid tint of the mode colour (no gradient), cross-faded on mode change.
+   Set on <html> because the scene layer sits outside the stage. */
+html {
+  --stage-tint: color-mix(in srgb, var(--accent-solid) 16%, #0a0a0b);
+}
+html[data-timer-mode='shortBreak'] {
+  --stage-tint: color-mix(in srgb, #0F766E 24%, #0a0a0b);
+}
+html[data-timer-mode='longBreak'] {
+  --stage-tint: color-mix(in srgb, #1D4ED8 20%, #0a0a0b);
 }
 
 /* Reduced motion: neutralize decorative CSS animations (functional state changes stay).

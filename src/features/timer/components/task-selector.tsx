@@ -128,7 +128,7 @@ export function TaskSelector({ className }: TaskSelectorProps) {
         <PopoverContent
           data-theme="dark"
           data-timer
-          data-mode={timerMode === 'work' ? 'work' : 'break'}
+          data-mode={timerMode}
           align="center"
           sideOffset={8}
           className="w-[min(92vw,380px)] overflow-hidden rounded-lg border-border bg-surface p-0 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.4)]"

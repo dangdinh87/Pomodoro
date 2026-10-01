@@ -35,7 +35,8 @@ export function BackgroundRenderer() {
   const [loaded, setLoaded] = useState(false);
 
   const pathname = usePathname();
-  const isTimerPage = pathname === '/timer';
+  // The timer stage lives on `/`; content pages keep the plain theme background.
+  const isTimerPage = pathname === '/';
 
   // Resolve theme (light/dark)
   const resolvedTheme = useMemo<'light' | 'dark'>(() => {
@@ -182,7 +183,11 @@ export function BackgroundRenderer() {
 
   switch (background.type) {
     case 'solid':
-      style = { ...base, backgroundColor: background.value };
+      // The default scene follows the timer mode (see --stage-tint in globals.css).
+      style =
+        background.value === 'var(--surface-page)'
+          ? { ...base, backgroundColor: 'var(--stage-tint)', transition: 'opacity 800ms ease, background-color 700ms ease' }
+          : { ...base, backgroundColor: background.value };
       break;
     case 'gradient':
       style = { ...base, background: background.value };
