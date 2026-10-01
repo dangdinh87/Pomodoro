@@ -46,7 +46,7 @@ function TooltipContent({
   return (
     <TooltipContentPrimitive
       className={cn(
-        'z-[100] w-fit bg-primary text-primary-foreground rounded-md',
+        'z-[100] w-fit rounded-md bg-surface-raised text-ink shadow-[0_4px_20px_-8px_rgba(0,0,0,0.3)]',
         className,
       )}
       {...props}
@@ -55,7 +55,7 @@ function TooltipContent({
         <motion.div layout={layout}>{children}</motion.div>
       </motion.div>
       <TooltipArrowPrimitive
-        className="fill-primary size-3 data-[side='bottom']:translate-y-[1px] data-[side='right']:translate-x-[1px] data-[side='left']:translate-x-[-1px] data-[side='top']:translate-y-[-1px]"
+        className="fill-surface-raised size-3 data-[side='bottom']:translate-y-[1px] data-[side='right']:translate-x-[1px] data-[side='left']:translate-x-[-1px] data-[side='top']:translate-y-[-1px]"
         tipRadius={2}
       />
     </TooltipContentPrimitive>

@@ -4,32 +4,32 @@
  * Providers are added in group-specific layouts ((main), (auth))
  */
 import type { Metadata } from 'next';
-import { Be_Vietnam_Pro, Space_Grotesk, Nunito } from 'next/font/google';
+import { Be_Vietnam_Pro, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
 import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/next';
 import { AuthCodeHandler } from '@/components/auth/auth-code-handler';
 import { LocatorSetup } from '@/components/dev/locator-setup';
 import './globals.css';
 
-const beVietnamPro = Be_Vietnam_Pro({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  display: 'swap',
-  variable: '--font-be-vietnam-pro',
-});
-
 const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
+  subsets: ['latin', 'vietnamese'],
+  weight: ['500', '700'],
   display: 'swap',
   variable: '--font-space-grotesk',
 });
 
-const nunito = Nunito({
+const beVietnamPro = Be_Vietnam_Pro({
   subsets: ['latin', 'vietnamese'],
-  weight: ['300', '400', '500', '600', '700', '800'],
+  weight: ['400', '500', '600', '700'],
   display: 'swap',
-  variable: '--font-nunito',
+  variable: '--font-be-vietnam-pro',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin', 'vietnamese'],
+  weight: ['400'],
+  display: 'swap',
+  variable: '--font-jetbrains-mono',
 });
 
 export const metadata: Metadata = {
@@ -83,8 +83,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${spaceGrotesk.variable} ${beVietnamPro.variable} ${nunito.variable}`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${spaceGrotesk.variable} ${beVietnamPro.variable} ${jetbrainsMono.variable}`}
+    >
+      <body>
         {/* JSON-LD structured data for SEO */}
         <script
           type="application/ld+json"

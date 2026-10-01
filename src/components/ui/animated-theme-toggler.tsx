@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Sun } from '@phosphor-icons/react/dist/ssr';
 import { useTheme } from 'next-themes';
 
 import { cn } from '@/lib/utils';
@@ -84,9 +84,9 @@ export const AnimatedThemeToggler = ({
       {mounted ? (
         <>
           {isDark ? (
-            <Sun className="w-5 h-5" />
+            <Sun size={20} />
           ) : (
-            <Moon className="w-5 h-5" />
+            <Moon size={20} />
           )}
           {showLabel && (
             <span className="text-sm font-medium">

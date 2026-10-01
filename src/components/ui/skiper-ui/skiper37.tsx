@@ -1,9 +1,9 @@
 "use client";
 
 import NumberFlow from "@number-flow/react";
-import { AnimatePresence, motion, useSpring } from "framer-motion";
-import { animate, useMotionValue } from "framer-motion";
-import { Plus } from "lucide-react";
+import { AnimatePresence, motion, useSpring } from "motion/react";
+import { animate, useMotionValue } from "motion/react";
+import { Plus } from '@phosphor-icons/react/dist/ssr';
 import React, { useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
@@ -112,7 +112,7 @@ const AnimatedNumber_001 = () => {
           onClick={handleReset}
           className="flex h-10 w-10 items-center justify-center rounded-full bg-white/45 text-[#ff3828] shadow-2xl transition-colors hover:bg-white/70"
         >
-          <Plus className="rotate-45" />
+          <Plus size={24} className="rotate-45" />
         </button>
       </div>
     </div>

@@ -7,6 +7,13 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // The /dist/ssr barrel re-exports ~1500 icons; without this every page compiles all of them.
+  modularizeImports: {
+    '@phosphor-icons/react/dist/ssr': {
+      transform: '@phosphor-icons/react/dist/ssr/{{member}}',
+      skipDefaultConversion: true,
+    },
+  },
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '**' },

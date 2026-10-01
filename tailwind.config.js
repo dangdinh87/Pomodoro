@@ -1,6 +1,15 @@
+// Tokens are hex values; color-mix keeps Tailwind opacity modifiers (bg-primary/10) working.
+const token = (name) => `color-mix(in srgb, var(${name}) calc(<alpha-value> * 100%), transparent)`;
+const WHITE = 'rgb(255 255 255 / <alpha-value>)';
+const tone = (hue) => ({
+  DEFAULT: token(`--${hue}-solid`),
+  bg: token(`--${hue}-bg`),
+  ink: token(`--${hue}-ink`),
+});
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: ['class'],
+  darkMode: ['selector', '[data-theme="dark"]'],
   content: [
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
@@ -18,96 +27,61 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        'space-grotesk': ['var(--font-space-grotesk)', 'sans-serif'],
+        heading: ['var(--font-heading)'],
+        body: ['var(--font-body)'],
+        mono: ['var(--font-mono)'],
+        'space-grotesk': ['var(--font-heading)'],
       },
       colors: {
-        'background-light': '#F8F9FA',
-        'background-dark': '#101622',
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
-        primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
-        },
-        secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))',
-        },
-        destructive: {
-          DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))',
-        },
-        muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
-        },
-        accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
-        },
-        popover: {
-          DEFAULT: 'hsl(var(--popover))',
-          foreground: 'hsl(var(--popover-foreground))',
-        },
-        card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))',
+        // shadcn/ui names, bridged to the design tokens in globals.css
+        border: { DEFAULT: token('--border'), strong: token('--border-strong') },
+        input: token('--border'),
+        ring: token('--accent'),
+        background: token('--surface-page'),
+        foreground: token('--ink'),
+        primary: { DEFAULT: token('--accent-solid'), foreground: WHITE },
+        secondary: { DEFAULT: token('--surface-raised'), foreground: token('--ink') },
+        destructive: { DEFAULT: token('--rose-solid'), foreground: WHITE },
+        muted: { DEFAULT: token('--surface-raised'), foreground: token('--ink-muted') },
+        accent: { DEFAULT: token('--surface-hover'), foreground: token('--ink') },
+        popover: { DEFAULT: token('--surface'), foreground: token('--ink') },
+        card: { DEFAULT: token('--surface'), foreground: token('--ink') },
+
+        // Design-system tokens
+        ink: {
+          DEFAULT: token('--ink'),
+          secondary: token('--ink-secondary'),
+          muted: token('--ink-muted'),
+          faint: token('--ink-faint'),
         },
         surface: {
-          DEFAULT: 'hsl(var(--surface))',
-          foreground: 'hsl(var(--surface-foreground))',
+          DEFAULT: token('--surface'),
+          page: token('--surface-page'),
+          raised: token('--surface-raised'),
+          hover: token('--surface-hover'),
         },
-        'surface-variant': {
-          DEFAULT: 'hsl(var(--surface-variant))',
-          foreground: 'hsl(var(--surface-variant-foreground))',
+        brand: {
+          DEFAULT: token('--accent'),
+          hover: token('--accent-hover'),
+          soft: token('--accent-soft'),
+          ink: token('--accent-ink'),
+          solid: token('--accent-solid'),
+          edge: token('--accent-edge'),
         },
-        outline: 'hsl(var(--outline))',
-        'outline-variant': 'hsl(var(--outline-variant))',
-        scrim: 'hsl(var(--scrim))',
-        shadow: 'hsl(var(--shadow))',
-        'focus-active': 'hsl(var(--focus-active))',
-        'focus-inactive': 'hsl(var(--focus-inactive))',
-        chart: {
-          1: 'hsl(var(--chart-1))',
-          2: 'hsl(var(--chart-2))',
-          3: 'hsl(var(--chart-3))',
-          4: 'hsl(var(--chart-4))',
-          5: 'hsl(var(--chart-5))',
-        },
-        sidebar: {
-          DEFAULT: 'hsl(var(--sidebar-background))',
-          foreground: 'hsl(var(--sidebar-foreground))',
-          primary: 'hsl(var(--sidebar-primary))',
-          'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-          accent: 'hsl(var(--sidebar-accent))',
-          'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-          border: 'hsl(var(--sidebar-border))',
-          ring: 'hsl(var(--sidebar-ring))',
-        },
-        streak: {
-          flame: 'hsl(var(--streak-flame))',
-          ember: 'hsl(var(--streak-ember))',
-          'at-risk': 'hsl(var(--streak-at-risk))',
-        },
-        xp: { fill: 'hsl(var(--xp-fill))' },
-        level: { glow: 'hsl(var(--level-glow))' },
-        badge: {
-          bronze: 'hsl(var(--badge-bronze))',
-          silver: 'hsl(var(--badge-silver))',
-          gold: 'hsl(var(--badge-gold))',
-        },
-        coin: {
-          DEFAULT: 'hsl(var(--coin-primary))',
-          shine: 'hsl(var(--coin-shine))',
-        },
+        // Semantic tones — pick by meaning, never for decoration (docs/design-system.md §4.2)
+        success: tone('green'),
+        warning: tone('amber'),
+        danger: tone('rose'),
+        info: tone('blue'),
+        ai: tone('purple'),
+        gold: token('--gold'),
+        timer: token('--timer-foreground'),
       },
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        DEFAULT: 'var(--radius)',
+        sm: '4px',
+        md: 'var(--radius)',
+        lg: 'var(--radius-lg)',
       },
       keyframes: {
         'accordion-down': {

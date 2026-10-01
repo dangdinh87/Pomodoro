@@ -3,18 +3,21 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
+// Tag / badge — docs/design-system.md §7.4. Pick a tone by meaning (§4.2); neutral by default.
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex items-center gap-1 whitespace-nowrap rounded-full px-[9px] py-[3px] text-[0.6875rem] font-medium leading-[1.4]",
   {
     variants: {
       variant: {
-        default:
-          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive:
-          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground",
+        default: "bg-surface-raised text-ink-secondary",
+        secondary: "bg-surface-raised text-ink-secondary",
+        outline: "border border-border text-ink-secondary",
+        brand: "bg-brand-soft text-brand-ink",
+        success: "bg-success-bg text-success-ink",
+        warning: "bg-warning-bg text-warning-ink",
+        destructive: "bg-danger-bg text-danger-ink",
+        info: "bg-info-bg text-info-ink",
+        ai: "bg-ai-bg text-ai-ink",
       },
     },
     defaultVariants: {

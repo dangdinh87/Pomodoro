@@ -42,9 +42,9 @@ export function EmptyState({
         </picture>
       </div>
       <div className="space-y-2">
-        <h3 className="text-xl font-semibold">{title}</h3>
+        <h3 className="font-heading text-xl font-semibold text-ink">{title}</h3>
         {description && (
-          <p className="text-muted-foreground max-w-sm mx-auto text-sm">
+          <p className="text-ink-muted max-w-sm mx-auto text-sm">
             {description}
           </p>
         )}

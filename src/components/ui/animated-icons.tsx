@@ -1,7 +1,7 @@
 "use client"
 
-import { motion, Variants } from "framer-motion"
-import { Trash2, Edit, Target, Play, Square } from "lucide-react"
+import { motion, Variants } from "motion/react"
+import { Trash, PencilSimple, Target, Play, Square } from '@phosphor-icons/react/dist/ssr';
 import { cn } from "@/lib/utils"
 
 const trashVariants: Variants = {
@@ -36,13 +36,13 @@ const playVariants: Variants = {
 
 export const AnimatedTrash = ({ className }: { className?: string }) => (
   <motion.div variants={trashVariants} whileHover="hover" className="inline-block">
-    <Trash2 className={cn("h-4 w-4", className)} />
+    <Trash className={cn("h-4 w-4", className)} />
   </motion.div>
 )
 
 export const AnimatedEdit = ({ className }: { className?: string }) => (
   <motion.div variants={editVariants} whileHover="hover" className="inline-block">
-    <Edit className={cn("h-4 w-4", className)} />
+    <PencilSimple className={cn("h-4 w-4", className)} />
   </motion.div>
 )
 
