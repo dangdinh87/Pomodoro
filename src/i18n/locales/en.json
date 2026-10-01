@@ -1,7 +1,7 @@
 {
   "brand": {
     "title": "Study Bro",
-    "subtitle": "Study Together"
+    "subtitle": "Study together"
   },
   "common": {
     "loading": "Loading...",
@@ -40,20 +40,21 @@
     "history": "History",
     "leaderboard": "Leaderboard",
     "chatAI": "Chat AI",
-    "entertainment": "Entertainment",
+    "entertainment": "Arcade",
     "settings": "Settings",
     "guide": "Guide",
     "feedback": "Feedback",
-    "login": "Sign In",
-    "logout": "Sign Out",
-    "loginNow": "Sign in now"
+    "login": "Sign in",
+    "logout": "Sign out",
+    "loginNow": "Sign in now",
+    "signInHint": "Sync tasks and stats across devices"
   },
   "auth": {
-    "login": "Log In",
+    "login": "Log in",
     "pleaseLogin": "Please sign in to continue",
     "signInToManageTasks": "Please sign in to manage tasks",
     "signInToViewStats": "Please sign in to view statistics",
-    "signInButton": "Sign In",
+    "signInButton": "Sign in",
     "signOutSuccess": "Successfully signed out",
     "signOutError": "Unable to sign out",
     "signOutConfirm": "Are you sure you want to sign out?",
@@ -111,7 +112,7 @@
     },
     "mode_switch_confirm": {
       "title": "Switch mode?",
-      "description": "Timer is running. Switching mode will discard your current progress.",
+      "description": "This session has already started. Switching mode discards its progress.",
       "confirm": "Switch anyway"
     },
     "doneAt": "Done at",
@@ -158,11 +159,11 @@
     "gotIt": "Start focusing"
   },
   "timerSettings": {
-    "title": "Timer Settings",
+    "title": "Timer settings",
     "labels": {
-      "workDuration": "Work Time (min)",
-      "shortBreakDuration": "Short Break (min)",
-      "longBreakDuration": "Long Break (min)",
+      "workDuration": "Focus time",
+      "shortBreakDuration": "Short break",
+      "longBreakDuration": "Long break",
       "longBreakInterval": "Sessions before long break",
       "autoStartBreaks": "Auto-start break",
       "autoStartWork": "Auto-start work",
@@ -175,23 +176,23 @@
       "flip": "Flip",
       "clockPreview": "Clock Preview",
       "endsAround": "Ends around {time}",
-      "clockSize": "Clock Size",
+      "clockSize": "Clock size",
       "small": "Small",
       "medium": "Medium",
       "large": "Large",
-      "timerDurations": "Timer Duration",
+      "timerDurations": "Durations",
       "behavior": "Behavior",
-      "clockDisplay": "Clock Display",
-      "clockStyle": "Clock Style",
+      "clockDisplay": "Clock display",
+      "clockStyle": "Clock style",
       "preview": "Preview",
       "selectSize": "Select size",
       "lowTimeWarning": "Low time warning (under 10s)"
     },
     "actions": {
-      "resetDefaults": "Reset to Defaults",
+      "resetDefaults": "Reset to defaults",
       "cancel": "Cancel",
-      "save": "Save Settings",
-      "saveChanges": "Save Changes"
+      "save": "Save",
+      "saveChanges": "Save changes"
     },
     "toasts": {
       "saved": "Timer settings saved successfully!",
@@ -201,15 +202,15 @@
   "tasks": {
     "title": "Tasks",
     "subtitle": "Manage your tasks and track progress with Pomodoro technique",
-    "addTask": "Add Task",
-    "manageTags": "Manage Tags",
+    "addTask": "Add task",
+    "manageTags": "Manage tags",
     "manageTagsDescription": "Tags are for organizing only. Removing a tag here won't affect your tasks.",
     "newTagPlaceholder": "New tag...",
     "noTags": "No tags yet",
     "tagsLimit": "tags",
     "tag": "Tag",
-    "editTask": "Edit Task",
-    "deleteTask": "Delete Task",
+    "editTask": "Edit task",
+    "deleteTask": "Delete task",
     "noTasks": "No tasks found",
     "noTasksDescription": "You don't have any tasks yet. Create one to get started with your focus session.",
     "noResults": "No results found",
@@ -227,14 +228,14 @@
       "tags": "Tags",
       "progress": "Progress"
     },
-    "taskName": "Task Name",
+    "taskName": "Task name",
     "taskNamePlaceholder": "What are you working on?",
     "taskDescription": "Description",
     "taskDescriptionPlaceholder": "Add some notes...",
     "priority": "Priority",
-    "dueDate": "Due Date",
+    "dueDate": "Due date",
     "status": "Status",
-    "estimated": "Estimate Pomodoros",
+    "estimated": "Estimate pomodoros",
     "estimatedHint": "Number of Pomodoro sessions (~25 min each) you estimate to complete this task.",
     "actual": "Actual",
     "completed": "Completed",
@@ -260,14 +261,14 @@
       "reset": "Reset Filters"
     },
     "actions": {
-      "markComplete": "Mark as Complete",
-      "markIncomplete": "Mark as Incomplete",
+      "markComplete": "Mark as complete",
+      "markIncomplete": "Mark as incomplete",
       "startFocus": "Focus on this task",
       "stopFocus": "Stop focusing",
       "edit": "Edit task",
       "delete": "Delete task",
-      "save": "Save Task",
-      "create": "Create Task",
+      "save": "Save task",
+      "create": "Create task",
       "deleting": "Deleting...",
       "clone": "Clone task",
       "saveAsTemplate": "Save as template",
@@ -275,60 +276,60 @@
     },
     "count": "tasks",
     "confirmDelete": {
-      "title": "Are you sure?",
-      "description": "This action cannot be undone. This will permanently delete the task and all associated session data.",
-      "action": "Delete Permanently"
+      "title": "Delete this task?",
+      "description": "The task and its session history will be permanently deleted. This can't be undone.",
+      "action": "Delete task"
     },
     "templates": {
-      "title": "Task Templates",
+      "title": "Task templates",
       "description": "Quick-start from a saved template",
-      "useTemplate": "Use Template",
-      "saveAsTemplate": "Save as Template",
-      "removeTemplate": "Remove Template",
+      "useTemplate": "Use template",
+      "saveAsTemplate": "Save as template",
+      "removeTemplate": "Remove template",
       "noTemplates": "No templates yet",
       "createTemplateHint": "Save any task as a template to reuse it later",
       "empty": "No templates yet",
-      "emptyHint": "Click the bookmark icon on any task to save it as a template"
+      "emptyHint": "Open the more actions menu on a task and choose Save as template."
     }
   },
   "history": {
-    "title": "History & Statistics",
+    "title": "History & statistics",
     "subtitle": "Review your focus performance over time",
-    "startNewSession": "Start New Session",
+    "startNewSession": "Start new session",
     "errorLoading": "An error occurred while loading data",
     "noData": "No data available",
     "noDataDescription": "Complete your first Pomodoro session to see your stats here",
     "stats": {
-      "totalFocusTime": "Total Focus Time",
-      "completedSessions": "Completed Sessions",
-      "currentStreak": "Current Streak",
+      "totalFocusTime": "Total focus time",
+      "completedSessions": "Completed sessions",
+      "currentStreak": "Current streak",
       "days": "days",
       "hours": "hours",
       "minutes": "minutes",
       "sessions": "sessions"
     },
     "charts": {
-      "focusOverview": "Focus Time Overview",
-      "distribution": "Session Distribution",
-      "sessionHistory": "Session History",
+      "focusOverview": "Focus time overview",
+      "distribution": "Session distribution",
+      "sessionHistory": "Session history",
       "noTask": "No task"
     },
     "dateRange": {
       "today": "Today",
       "yesterday": "Yesterday",
-      "last7Days": "Last 7 Days",
-      "last30Days": "Last 30 Days",
-      "custom": "Custom Range",
+      "last7Days": "Last 7 days",
+      "last30Days": "Last 30 days",
+      "custom": "Custom range",
       "selectDate": "Select date range"
     }
   },
   "leaderboard": {
     "title": "Leaderboard",
-    "comingSoon": "Coming Soon",
+    "comingSoon": "Coming soon",
     "description": "Compete with the StudyBro community. See who is the most focused!",
     "tabs": {
-      "focusTime": "Focus Time",
-      "completedTasks": "Completed Tasks"
+      "focusTime": "Focus time",
+      "completedTasks": "Completed tasks"
     },
     "empty": "No data yet. Be the first!",
     "you": "You"
@@ -343,10 +344,10 @@
       "audio": "Audio"
     },
     "general": {
-      "title": "General Settings",
+      "title": "General settings",
       "appearance": "Appearance",
       "language": {
-        "title": "Display Language",
+        "title": "Display language",
         "description": "Select display language.",
         "sectionTitle": "Language",
         "selectPlaceholder": "Select language",
@@ -357,14 +358,14 @@
       "theme": {
         "title": "Theme",
         "description": "Choose your app theme",
-        "mode": "Theme Mode",
+        "mode": "Theme mode",
         "modeDescription": "Select display mode.",
-        "colorTheme": "Color Palette",
+        "colorTheme": "Color palette",
         "colorThemeDescription": "Choose a color palette for the UI.",
         "systemSolidColorHint": "This palette defines the system solid color. In Background settings, select \"System solid color\" to use it as the timer background.",
-        "fontFamily": "Font Family",
+        "fontFamily": "Font family",
         "fontDescription": "Choose a display font.",
-        "fontSize": "Font Size",
+        "fontSize": "Font size",
         "fontSizeDescription": "Adjust display text size.",
         "selectModePlaceholder": "Select mode",
         "selectColorPlaceholder": "Select color",
@@ -383,6 +384,7 @@
         "themes": {
           "recommended": "Recommended",
           "default": "Default",
+          "blue": "Blue",
           "rose": "Rose",
           "emerald": "Forest",
           "indigo": "Midnight",
@@ -390,12 +392,12 @@
           "amber": "Autumn",
           "cyan": "Mint",
           "teal": "Ocean",
-          "pink-light": "Sakura",
-          "pink-mild": "Berry",
+          "pink": "Sakura",
           "mono": "Monochrome"
         },
         "themeDescriptions": {
-          "default": "Neutral & safe",
+          "default": "Classic tomato",
+          "blue": "Calm & focused",
           "rose": "Romantic & love vibe",
           "emerald": "Nature & chill",
           "indigo": "Deep focus mode",
@@ -403,8 +405,7 @@
           "amber": "Warm vintage mood",
           "cyan": "Fresh & clean",
           "teal": "Deep blue energy",
-          "pink-light": "Soft spring vibe",
-          "pink-mild": "Sweet & playful",
+          "pink": "Soft spring vibe",
           "mono": "Minimal & pro"
         }
       },
@@ -647,16 +648,16 @@
     }
   },
   "guide": {
-    "title": "User Guide",
+    "title": "User guide",
     "subtitle": "Learn about the Pomodoro method and how to use Study Bro to optimize your learning and work productivity",
     "pomodoro": {
-      "badge": "Pomodoro Method",
+      "badge": "Pomodoro method",
       "title": "What is Pomodoro?",
       "description": "<strong>Pomodoro</strong> is a simple time management method that helps you work and study efficiently by breaking work into <strong>25-minute</strong> sessions called a Pomodoro. In each session, you focus completely on a single task. Then, take a <strong>5-minute</strong> break to relax and recharge.",
       "imageAlt": "Pomodoro method illustration"
     },
     "howToApply": {
-      "badge": "How To Apply",
+      "badge": "How to apply",
       "title": "How to apply Pomodoro",
       "steps": {
         "step1": {
@@ -690,7 +691,7 @@
       "tip": "💡 <strong>Tip:</strong> You can completely adjust work and rest time to suit yourself, as long as you keep the principle of \"breaking time into small chunks to focus and rest regularly.\""
     },
     "howToUse": {
-      "badge": "Website Guide",
+      "badge": "Website guide",
       "title": "How to use Study Bro",
       "description": "Study Bro provides tools to help you apply the Pomodoro method effectively.",
       "features": {
@@ -704,7 +705,7 @@
             "Valid session rule: ≥50% time to count",
             "Space: Start/Pause · R: Reset · Skip session"
           ],
-          "cta": "Go to Timer"
+          "cta": "Go to timer"
         },
         "tasks": {
           "title": "Tasks",
@@ -716,7 +717,7 @@
             "Filter tasks by status, date",
             "Estimate required Pomodoros"
           ],
-          "cta": "Go to Tasks"
+          "cta": "Go to tasks"
         },
         "history": {
           "title": "History",
@@ -728,7 +729,7 @@
             "Total working time",
             "Productivity charts"
           ],
-          "cta": "Go to History"
+          "cta": "Go to history"
         },
         "chatAI": {
           "title": "Chat AI",
@@ -752,7 +753,7 @@
             "Tic Tac Toe vs AI",
             "High scores tracked locally"
           ],
-          "cta": "Play Games"
+          "cta": "Play games"
         },
         "leaderboard": {
           "title": "Leaderboard",
@@ -763,10 +764,10 @@
             "Weekly & monthly charts",
             "Build healthy competition"
           ],
-          "cta": "View Leaderboard"
+          "cta": "View leaderboard"
         },
         "focus": {
-          "title": "Focus Mode",
+          "title": "Focus mode",
           "subtitle": "Minimal distraction-free UI",
           "description": "Focus mode helps you:",
           "points": [
@@ -774,14 +775,14 @@
             "Streak tracking & motivation",
             "Dedicated focus workspace"
           ],
-          "cta": "Enter Focus Mode"
+          "cta": "Enter focus mode"
         },
         "feedback": {
           "title": "Feedback",
           "subtitle": "Help us improve",
           "description": "Share your thoughts:",
           "points": ["Report bugs", "Suggest features", "Rate your experience"],
-          "cta": "Send Feedback"
+          "cta": "Send feedback"
         },
         "settings": {
           "title": "Settings",
@@ -793,12 +794,12 @@
             "Set notification sounds",
             "Customize personal preferences"
           ],
-          "cta": "Go to Settings"
+          "cta": "Go to settings"
         }
       }
     },
     "getStarted": {
-      "badge": "Get Started",
+      "badge": "Get started",
       "title": "Ready to start?",
       "description": "Start your productive work journey with Study Bro!",
       "steps": [
@@ -806,18 +807,18 @@
         "Adjust Settings to your liking (optional)",
         "Turn on <link>Timer</link> and start your first Pomodoro!"
       ],
-      "cta": "Start Now"
+      "cta": "Start now"
     }
   },
   "feedback": {
-    "title": "Send Feedback",
+    "title": "Send feedback",
     "subtitle": "Share bug reports or feature ideas to help us improve.",
     "form": {
-      "name": "Your Name (Optional)",
+      "name": "Your name (optional)",
       "namePlaceholder": "Enter your name...",
       "email": "Email (Optional)",
       "emailPlaceholder": "example@email.com",
-      "type": "Feedback Type",
+      "type": "Feedback type",
       "typeOptions": {
         "feature": "Feature",
         "bug": "Bug",
@@ -828,7 +829,7 @@
       "message": "Content",
       "messagePlaceholder": "Describe your feedback in detail...",
       "required": "*",
-      "submit": "Send Feedback"
+      "submit": "Send feedback"
     },
     "success": {
       "title": "Thank you!",
@@ -851,7 +852,7 @@
     "send": "Send",
     "clear": "Clear Chat",
     "newChat": "New Chat",
-    "historyTitle": "Chat History",
+    "historyTitle": "Chat history",
     "noConversations": "No conversations yet. Start a new one!",
     "deleteConfirmTitle": "Delete Conversation?",
     "deleteConfirmDescription": "This action cannot be undone. This will permanently delete this conversation and all its messages.",
@@ -862,7 +863,7 @@
       "inputPlaceholder": "Ask me anything...",
       "sendMessage": "Send message",
       "stopGenerating": "Stop generating",
-      "error": "⚠️ Error",
+      "error": "Something went wrong",
       "copy": "Copy",
       "exportMarkdown": "Export as Markdown",
       "refresh": "Refresh",
@@ -877,7 +878,7 @@
       },
       "suggestions": {
         "pomodoro": {
-          "title": "Explain the Pomodoro Technique",
+          "title": "Explain the Pomodoro technique",
           "label": "and how it boosts productivity",
           "prompt": "Explain the Pomodoro Technique and how it helps boost productivity and focus"
         },
@@ -903,7 +904,7 @@
     "title": "Arcade Zone",
     "subtitle": "Take a break and have some fun!",
     "gamesCount": "{count} games available",
-    "yourBest": "Your Best",
+    "yourBest": "Your best",
     "games": {
       "spaceShooter": {
         "title": "Space Shooter",
@@ -920,7 +921,7 @@
         "time": "Time",
         "moves": "moves",
         "win": "Excellent!",
-        "reset": "Play Again"
+        "reset": "Play again"
       },
       "ticTacToe": {
         "title": "Tic Tac Toe",
@@ -939,7 +940,7 @@
         "youWin": "You win! Well played!",
         "aiWins": "AI wins! Try again!",
         "draw": "It's a draw!",
-        "newGame": "New Game"
+        "newGame": "New game"
       },
       "snake": {
         "title": "Snake",
@@ -959,60 +960,62 @@
         "tips": "Keep your highest tile in a corner",
         "score": "Score",
         "best": "Best",
-        "youWin": "You Win!",
+        "youWin": "You win!",
         "keepGoing": "Can you reach higher?",
-        "continue": "Keep Going",
-        "newGame": "New Game"
+        "continue": "Keep going",
+        "newGame": "New game"
       },
       "brickBreaker": {
         "title": "Brick Breaker",
         "description": "Break all bricks with your bouncing ball",
         "instructions": "Move the paddle with mouse/touch or arrow keys to bounce the ball. Break all bricks to advance to the next level! Hit multiple bricks in a row for combo bonus points.",
         "tips": "Aim for corners to create chain reactions",
-        "start": "Start Game",
+        "start": "Start game",
         "score": "Score",
         "level": "Level",
         "lives": "Lives",
-        "gameOver": "Game Over",
-        "finalScore": "Final Score",
-        "reachedLevel": "Reached Level",
-        "levelComplete": "Level Complete!",
-        "nextLevel": "Next Level",
-        "playAgain": "Play Again"
+        "gameOver": "Game over",
+        "finalScore": "Final score",
+        "reachedLevel": "Reached level",
+        "levelComplete": "Level complete!",
+        "nextLevel": "Next level",
+        "playAgain": "Play again"
       }
     },
     "leaderboard": {
-      "title": "Global Leaderboard",
-      "comingSoon": "Coming Soon",
+      "title": "Global leaderboard",
+      "comingSoon": "Coming soon",
       "description": "Compete with players worldwide! Global rankings will be available soon.",
       "features": {
-        "global": "Global Rankings",
-        "weekly": "Weekly Challenges",
-        "rewards": "Exclusive Rewards"
+        "global": "Global rankings",
+        "weekly": "Weekly challenges",
+        "rewards": "Exclusive rewards"
       }
     },
-    "playNow": "Play Now",
-    "backToList": "Back to Games",
-    "closeGame": "Close Game",
+    "playNow": "Play now",
+    "playAgain": "Play again",
+    "gameOver": "Game over",
+    "backToList": "Back to games",
+    "closeGame": "Close game",
     "controls": {
       "title": "Controls",
       "up": "Up",
       "down": "Down",
       "left": "Left",
       "right": "Right",
-      "restart": "Restart Game",
-      "close": "Close Game",
+      "restart": "Restart game",
+      "close": "Close game",
       "delete": "Delete",
       "enter": "Enter",
       "back": "Back"
     },
     "instructions": "Move mouse or touch to control the spaceship. Shoot down enemies and avoid collisions!",
     "loading": "Loading game...",
-    "highScore": "High Score",
-    "lastScore": "Last Score",
-    "howToPlay": "How to Play",
-    "tips": "Pro Tip",
-    "startGame": "Start Game",
+    "highScore": "High score",
+    "lastScore": "Last score",
+    "howToPlay": "How to play",
+    "tips": "Pro tip",
+    "startGame": "Start game",
     "loadingStages": {
       "initializing": "Initializing",
       "loadingAssets": "Loading assets",
@@ -1029,14 +1032,14 @@
   },
   "tooltips": {
     "toggleTheme": "Toggle theme",
-    "timerSettings": "Timer Settings",
+    "timerSettings": "Timer settings",
     "themeSettings": "Theme settings",
     "backgroundSetup": "Background setup",
-    "backgroundSettings": "Background Settings",
-    "soundSettings": "Sound Settings",
-    "focusAudio": "Focus music / Nature sounds",
-    "enterFocus": "Enter Focus",
-    "exitFocus": "Exit Focus"
+    "backgroundSettings": "Background settings",
+    "soundSettings": "Sound settings",
+    "focusAudio": "Focus music / nature sounds",
+    "enterFocus": "Enter focus",
+    "exitFocus": "Exit focus"
   },
   "errors": {
     "generic": "An error occurred",
@@ -1047,19 +1050,19 @@
   },
   "metadata": {
     "timer": {
-      "title": "Timer • Study Bro App",
+      "title": "Timer • Study Bro app",
       "description": "Manage work and break sessions with a refined Pomodoro timer and unified settings."
     },
     "tasks": {
-      "title": "Tasks • Study Bro App",
+      "title": "Tasks • Study Bro app",
       "description": "Organize and manage your tasks efficiently with our task management system."
     },
     "history": {
-      "title": "History • Study Bro App",
+      "title": "History • Study Bro app",
       "description": "Review your focus performance and productivity statistics over time."
     },
     "guide": {
-      "title": "User Guide • Study Bro App",
+      "title": "User guide • Study Bro app",
       "description": "Learn about the Pomodoro method and how to use Study Bro features."
     }
   },
@@ -1073,7 +1076,7 @@
       "passwordPlaceholder": "Enter your password",
       "forgotPassword": "Forgot password?",
       "signingIn": "Signing in...",
-      "signIn": "Sign In",
+      "signIn": "Sign in",
       "or": "or",
       "continueWithGoogle": "Continue with Google",
       "noAccount": "Don't have an account?",
@@ -1129,7 +1132,7 @@
       "password": "Password",
       "passwordPlaceholder": "Create a password",
       "signingUp": "Signing up...",
-      "signUp": "Sign Up",
+      "signUp": "Sign up",
       "or": "or",
       "signUpWithGoogle": "Sign up with Google",
       "haveAccount": "Already have an account?",
@@ -1152,20 +1155,20 @@
   "notFound": {
     "title": "This page could not be found",
     "description": "The page you're looking for doesn't exist or has been moved.",
-    "backToTimer": "Back to Timer",
+    "backToTimer": "Back to timer",
     "home": "Home",
     "goBack": "Go back"
   },
   "progress": {
-    "comingSoon": "Coming Soon",
+    "comingSoon": "Coming soon",
     "description": "Stats page is coming soon. You'll be able to track focus time, streaks, and progress.",
     "features": {
       "focusTime": {
-        "title": "Focus Time",
+        "title": "Focus time",
         "description": "By day/week/month"
       },
       "pomodoroSessions": {
-        "title": "Pomodoro & Sessions",
+        "title": "Pomodoro & sessions",
         "description": "Number of sessions, completion rate"
       },
       "streaks": {
@@ -1173,7 +1176,7 @@
         "description": "Keep streak, earn badges"
       }
     },
-    "backToTimer": "Back to Timer"
+    "backToTimer": "Back to timer"
   },
   "clockDemo": {
     "title": "Clock Components Demo",
@@ -1258,7 +1261,7 @@
       "startFocus": "Start focusing",
       "stopFocus": "Stop focusing",
       "switchConfirm": {
-        "title": "Switch Task?",
+        "title": "Switch task?",
         "description": "You are focusing on another task. Are you sure you want to switch?"
       }
     },
@@ -1267,12 +1270,12 @@
       "poms": "poms",
       "time": "Time",
       "minutes": "min",
-      "focusMode": "Focus Mode",
-      "soundSettings": "Sound Settings",
-      "backgroundSettings": "Background Settings",
-      "timerSettings": "Timer Settings",
-      "exitFocus": "Exit Focus",
-      "enterFocus": "Enter Focus"
+      "focusMode": "Focus mode",
+      "soundSettings": "Sound settings",
+      "backgroundSettings": "Background settings",
+      "timerSettings": "Timer settings",
+      "exitFocus": "Exit focus mode",
+      "enterFocus": "Enter focus mode"
     },
     "animatedCountdown": {
       "modes": {
@@ -1287,33 +1290,33 @@
       "selectRange": "Select date range",
       "presets": {
         "today": "Today",
-        "last3Days": "Last 3 Days",
-        "last7Days": "Last 7 Days",
-        "last30Days": "Last 30 Days",
-        "thisMonth": "This Month"
+        "last3Days": "Last 3 days",
+        "last7Days": "Last 7 days",
+        "last30Days": "Last 30 days",
+        "thisMonth": "This month"
       }
     },
     "distributionChart": {
-      "title": "Time Distribution",
+      "title": "Time distribution",
       "time": "Time",
       "total": "Total",
       "minutes": "{minutes} minutes"
     },
     "focusChart": {
-      "title": "Daily Focus Time",
+      "title": "Daily focus time",
       "minutes": "{minutes} minutes"
     },
     "sessionHistory": {
-      "title": "Completed Session Details",
+      "title": "Completed session details",
       "modes": {
         "focus": "Focus",
-        "shortBreak": "Short Break",
-        "longBreak": "Long Break"
+        "shortBreak": "Short break",
+        "longBreak": "Long break"
       },
       "tableHeaders": {
         "task": "Task",
-        "sessionType": "Session Type",
-        "dateTime": "Date & Time",
+        "sessionType": "Session type",
+        "dateTime": "Date & time",
         "duration": "Duration"
       },
       "noTask": "No task",
@@ -1321,17 +1324,17 @@
       "noData": "No session data for this period yet."
     },
     "statsCards": {
-      "totalFocusTime": "Total Focus Time",
+      "totalFocusTime": "Total focus time",
       "timeFormat": "{hours} hours {minutes} minutes",
-      "completedSessions": "Completed Sessions",
-      "longestStreak": "Longest Streak",
+      "completedSessions": "Completed sessions",
+      "longestStreak": "Longest streak",
       "days": "{days} days",
       "currentStreak": "Current: {current} days"
     },
     "statsEmpty": {
       "title": "No data available",
       "description": "No focus sessions in this period. Start one to see your stats!",
-      "startFocus": "Start Focus"
+      "startFocus": "Start focus"
     }
   },
   "landing": {
@@ -1539,7 +1542,7 @@
           "games": "Mini Games (Snake, 2048, etc.)",
           "leaderboard": "Global Leaderboard",
           "focus": "Focus Mode & Streaks",
-          "themes": "Light/Dark & Backgrounds",
+          "themes": "Color themes & backgrounds",
           "sounds": "Sounds, Spotify & YouTube",
           "stats": "Core Analytics"
         }
@@ -1587,5 +1590,237 @@
         }
       }
     }
+  },
+  "historyUi": {
+    "title": "History",
+    "description": "Your focus time, streaks and recent sessions.",
+    "rangeLabel": "Date range",
+    "ranges": { "today": "Today", "week": "This week", "month": "This month" },
+    "stats": {
+      "focusTime": "Focus time",
+      "sessions": "Sessions",
+      "currentStreak": "Current streak",
+      "bestStreak": "Best streak"
+    },
+    "hoursMinutes": "{hours}h {minutes}m",
+    "minutesOnly": "{minutes}m",
+    "dayOne": "{count} day",
+    "dayOther": "{count} days",
+    "minutesShort": "{minutes} min",
+    "chart": {
+      "title": "Last 7 days",
+      "subtitle": "Focus minutes per day",
+      "summary": "Focus minutes for the last 7 days"
+    },
+    "heatmap": {
+      "title": "Streak",
+      "subtitle": "Last 12 weeks",
+      "less": "Less",
+      "more": "More",
+      "cell": "{date}: {minutes} min of focus",
+      "cellNone": "{date}: no focus"
+    },
+    "sessions": {
+      "title": "Recent sessions",
+      "none": "No sessions in this range yet.",
+      "noTask": "No task",
+      "modes": { "work": "Focus", "shortBreak": "Short break", "longBreak": "Long break" }
+    },
+    "empty": {
+      "title": "No sessions yet",
+      "description": "Finish a focus session and your history will show up here.",
+      "action": "Start focusing"
+    },
+    "error": "Couldn't load your history."
+  },
+  "arcadeUi": {
+    "title": "Arcade",
+    "description": "Short games for your break.",
+    "runningNote": "Games pause your focus. Finish the session first.",
+    "best": "Best {score}"
+  },
+  "settingsUi": {
+    "unitMin": "min",
+    "unitSessions": "sessions",
+    "autoStartBreakHint": "Start the break as soon as a work session ends.",
+    "autoStartWorkHint": "Start the next work session as soon as a break ends.",
+    "lowTimeWarningHint": "Pulse the clock during the last 10 seconds.",
+    "clockStyleHint": "How the countdown looks on the timer page.",
+    "clockSizeHint": "Scales the clock on the timer page.",
+    "livePreview": "Live preview",
+    "adjust": "Adjust",
+    "selected": "Selected"
+  },
+  "pagesUi": {
+    "guide": {
+      "figureCaption": "One Pomodoro: a focus session, then a short break.",
+      "tip": "You can change work and break lengths in Settings, as long as you keep the rhythm of focusing in small blocks and resting often.",
+      "shortcutsTitle": "Keyboard shortcuts",
+      "shortcutsIntro": "Available on the timer page when no text field is focused.",
+      "colKey": "Key",
+      "colAction": "Action",
+      "keySpace": "Space",
+      "actionStartPause": "Start or pause the timer",
+      "actionReset": "Reset the current session"
+    },
+    "feedback": {
+      "optional": "Optional",
+      "contactHint": "Only used if we need to follow up."
+    },
+    "leaderboard": {
+      "tasksCount": "{count} tasks"
+    }
+  },
+  "tasksUi": {
+    "summary": "{todo} to do, {doing} in progress, {done} done",
+    "viewList": "List",
+    "viewBoard": "Board",
+    "viewLabel": "Task view",
+    "quickAddPlaceholder": "Add a task…",
+    "quickAddLabel": "New task title",
+    "add": "Add",
+    "addDetails": "Add with details",
+    "estimateLabel": "Estimated pomodoros",
+    "estimateShort": "Estimate",
+    "estimateDecrease": "Fewer pomodoros",
+    "estimateIncrease": "More pomodoros",
+    "estimateValue": "{count} pomodoro",
+    "estimateValuePlural": "{count} pomodoros",
+    "priorityLabel": "Priority",
+    "filterLabel": "Filter tasks",
+    "filterAll": "All",
+    "filterToday": "Today",
+    "filterTodo": "To do",
+    "filterDoing": "In progress",
+    "filterDone": "Done",
+    "searchOpen": "Search tasks",
+    "searchClose": "Close search",
+    "searchPlaceholder": "Search by title or tag",
+    "showCompleted": "Show {count} completed tasks",
+    "hideCompleted": "Hide completed tasks",
+    "focus": "Focus",
+    "stopFocus": "Stop focusing",
+    "focusingBadge": "Focusing",
+    "edit": "Edit",
+    "more": "More actions",
+    "duplicate": "Duplicate",
+    "saveAsTemplate": "Save as template",
+    "delete": "Delete",
+    "dueToday": "Due today",
+    "dueTomorrow": "Due tomorrow",
+    "overdue": "Overdue",
+    "pomodoroProgress": "{done} of {total} pomodoros",
+    "emptyTitle": "No tasks yet",
+    "emptyDescription": "Add your first task above, then press Focus to start a session.",
+    "emptyAction": "Add your first task",
+    "noMatchTitle": "No tasks match",
+    "noMatchDescription": "Try a different filter or search term.",
+    "clearFilters": "Clear filters",
+    "boardEmpty": "Nothing here",
+    "dragHandle": "Drag to reorder",
+    "manage": "Manage tags and templates",
+    "page": "Page {page} of {total}",
+    "signedOutDescription": "Your tasks sync across devices once you sign in.",
+    "pickDate": "Pick a date",
+    "clearDate": "Clear date",
+    "estimateMin": "Enter at least 1 pomodoro",
+    "tagsLabel": "Tags",
+    "tagsPlaceholder": "Add a tag",
+    "tagSuggestions": "Suggestions",
+    "noTagsHint": "Add a tag above to group related tasks.",
+    "tagsUsed": "{count} of {max} tags used",
+    "templatesDescription": "Saved task setups you can reuse when creating a task."
+  },
+  "landingUi": {
+    "hero": {
+      "title": "A Pomodoro timer that keeps you in the session",
+      "lead": "Work in focused blocks, take real breaks, and keep your tasks and history in one place. Free to use, no account needed to start.",
+      "start": "Start focusing",
+      "login": "Log in"
+    },
+    "timer": {
+      "modeGroup": "Timer mode",
+      "work": "Work",
+      "shortBreak": "Short break",
+      "longBreak": "Long break",
+      "start": "Start",
+      "pause": "Pause",
+      "restart": "Start again",
+      "reset": "Reset",
+      "openApp": "Open the full app"
+    },
+    "features": {
+      "title": "Everything a focus session needs",
+      "timer": "Work, short break and long break modes, with keyboard shortcuts.",
+      "tasks": "Link tasks to sessions and filter them by status and date.",
+      "analytics": "Session history and stats by day, week and month.",
+      "chatAI": "Ask Bro Chat for study tips and time management advice.",
+      "sounds": "Nature sounds, lo-fi and white noise, or your own Spotify and YouTube.",
+      "entertainment": "Snake, 2048 and more for when the timer says rest."
+    },
+    "how": {
+      "title": "How a session works",
+      "step1": {
+        "title": "Pick a task",
+        "description": "Add what you are working on and estimate how many Pomodoros it needs."
+      },
+      "step2": {
+        "title": "Focus for 25 minutes",
+        "description": "Start the timer and stay on that one task until it rings."
+      },
+      "step3": {
+        "title": "Rest, then review",
+        "description": "Take a short break. Your history and stats show how the day went."
+      }
+    },
+    "pricing": {
+      "title": "Free to use, Pro on the way",
+      "subtitle": "Everything in Starter is free today, with no credit card. Pro is still in development."
+    },
+    "faq": {
+      "title": "Frequently asked questions"
+    }
+  },
+  "timerUi": {
+    "soundOff": "Off",
+    "modeGroup": "Timer mode",
+    "mode": {
+      "work": "Focus",
+      "shortBreak": "Short break",
+      "longBreak": "Long break"
+    },
+    "startFocus": "Start focus",
+    "startBreak": "Start break",
+    "resume": "Resume",
+    "spaceKey": "Space",
+    "hintStart": "{key} to start",
+    "hintPause": "{key} to pause",
+    "hintResume": "{key} to resume",
+    "sessionOf": "Session {current} of {total}",
+    "sessionsDone": "{done} of {total} sessions done",
+    "todaySummary": "Today: {count} sessions · {time}",
+    "todaySummaryOne": "Today: {count} session · {time}",
+    "timeHm": "{h}h {m}m",
+    "timeM": "{m}m",
+    "signInToLink": "Sign in to link tasks",
+    "activeTasks": "Active tasks",
+    "noActiveTasks": "No active tasks yet. Add one below.",
+    "addTaskPlaceholder": "What are you working on?",
+    "addTask": "Add task",
+    "manageTasks": "Manage tasks",
+    "filterAll": "All",
+    "dock": {
+      "sounds": "Sounds",
+      "scene": "Scene",
+      "timer": "Timer",
+      "focus": "Focus mode",
+      "exitFocus": "Exit focus mode",
+      "moreAmbient": "+ {count} ambient",
+      "ambientPlaying": "Ambient sound playing",
+      "ambientMix": "Ambient mix ({count} sounds)"
+    }
+  },
+  "skipLink": {
+    "label": "Skip to content"
   }
 }

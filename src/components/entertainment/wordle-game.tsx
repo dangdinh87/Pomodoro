@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/contexts/i18n-context';
 import { cn } from '@/lib/utils';
-import { Delete, CornerDownLeft, Lightbulb, RotateCcw } from 'lucide-react';
+import { Backspace, ArrowElbowDownLeft, Lightbulb, ArrowCounterClockwise } from '@phosphor-icons/react/dist/ssr';
 
 interface WordleGameProps {
   fullscreen?: boolean;
@@ -294,7 +294,7 @@ export const WordleGame = memo(function WordleGame({
     >
       {/* Difficulty Selection / Start Screen */}
       {!isStarted && (
-        <div className="absolute inset-0 bg-black/85 backdrop-blur-sm flex flex-col justify-center items-center z-10 p-6">
+        <div className="absolute inset-0 bg-black/85 flex flex-col justify-center items-center z-10 p-6">
           <h1
             className="text-white uppercase tracking-widest text-center font-bold mb-4 text-3xl md:text-4xl"
             style={{ textShadow: '0 0 20px #22c55e' }}
@@ -369,7 +369,7 @@ export const WordleGame = memo(function WordleGame({
                     (hintsUsed >= maxHints || isGameOver) && "opacity-40"
                   )}
                 >
-                  <Lightbulb className="h-4 w-4 mr-1" />
+                  <Lightbulb size={16} className="mr-1" />
                   {maxHints - hintsUsed}
                 </Button>
               )}
@@ -380,7 +380,7 @@ export const WordleGame = memo(function WordleGame({
                 className="h-8 w-8 text-gray-400 hover:text-white hover:bg-white/10"
                 aria-label={t('entertainment.controls.back')}
               >
-                <RotateCcw className="h-4 w-4" />
+                <ArrowCounterClockwise size={16} />
               </Button>
             </div>
           </div>
@@ -463,8 +463,8 @@ export const WordleGame = memo(function WordleGame({
                       key
                     }
                   >
-                    {key === 'DELETE' ? <Delete className="h-4 w-4" /> :
-                     key === 'ENTER' ? <CornerDownLeft className="h-4 w-4" /> : key}
+                    {key === 'DELETE' ? <Backspace size={16} /> :
+                     key === 'ENTER' ? <ArrowElbowDownLeft size={16} /> : key}
                   </Button>
                 ))}
               </div>
@@ -473,7 +473,7 @@ export const WordleGame = memo(function WordleGame({
 
           {/* Game Over overlay */}
           {isGameOver && (
-            <div className="absolute inset-0 bg-black/85 backdrop-blur-sm flex flex-col justify-center items-center z-20 p-6">
+            <div className="absolute inset-0 bg-black/85 flex flex-col justify-center items-center z-20 p-6">
               <h2
                 className={cn(
                   "text-4xl md:text-5xl font-bold mb-4",

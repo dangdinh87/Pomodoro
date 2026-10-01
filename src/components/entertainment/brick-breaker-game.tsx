@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/contexts/i18n-context';
-import { Play, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Play, ArrowCounterClockwise, CaretLeft, CaretRight } from '@phosphor-icons/react/dist/ssr';
+import { GameOverlay, GameStat } from './game-overlay';
 
 interface BrickBreakerGameProps {
   onGameEnd?: (score: number) => void;
@@ -416,61 +417,43 @@ export function BrickBreakerGame({ onGameEnd, fullscreen }: BrickBreakerGameProp
           ref={canvasRef}
           width={CANVAS_WIDTH}
           height={CANVAS_HEIGHT}
-          className="rounded-xl border-2 border-cyan-500/30 shadow-[0_0_30px_rgba(6,182,212,0.2)] max-w-full"
+          className="rounded-lg border border-border max-w-full"
           style={{ maxHeight: fullscreen ? '75vh' : '60vh', width: 'auto' }}
         />
 
-        {/* Menu Overlay */}
         {gameState === 'menu' && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/90 rounded-xl backdrop-blur-sm">
-            <h2 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-500 mb-2">
-              {t('entertainment.games.brickBreaker.title')}
-            </h2>
-            <p className="text-slate-400 text-sm mb-6 text-center max-w-xs px-4">
-              {t('entertainment.games.brickBreaker.instructions')}
-            </p>
-            <Button
-              onClick={startGame}
-              className="bg-gradient-to-r from-cyan-500 to-pink-500 hover:from-cyan-600 hover:to-pink-600 text-white font-bold px-8 py-3"
-            >
-              <Play className="w-5 h-5 mr-2" />
+          <GameOverlay
+            title={t('entertainment.games.brickBreaker.title')}
+            description={t('entertainment.games.brickBreaker.instructions')}
+            className="rounded-lg"
+          >
+            <Button onClick={startGame} size="lg">
+              <Play size={18} weight="fill" className="mr-2" />
               {t('entertainment.games.brickBreaker.start')}
             </Button>
-          </div>
+          </GameOverlay>
         )}
 
-        {/* Level Up Overlay */}
         {gameState === 'levelup' && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/90 rounded-xl backdrop-blur-sm">
-            <h2 className="text-3xl font-black text-green-400 mb-2">
-              {t('entertainment.games.brickBreaker.levelComplete')}
-            </h2>
-            <p className="text-slate-400 mb-4">{t('entertainment.games.brickBreaker.score')}: {score}</p>
-            <Button
-              onClick={nextLevel}
-              className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold px-8 py-3"
-            >
+          <GameOverlay title={t('entertainment.games.brickBreaker.levelComplete')} className="rounded-lg">
+            <GameStat label={t('entertainment.games.brickBreaker.score')} value={score} className="min-w-[120px] py-3" />
+            <Button onClick={nextLevel} size="lg">
               {t('entertainment.games.brickBreaker.nextLevel')} {level + 1}
             </Button>
-          </div>
+          </GameOverlay>
         )}
 
-        {/* Game Over Overlay */}
         {gameState === 'gameover' && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/90 rounded-xl backdrop-blur-sm">
-            <h2 className="text-3xl font-black text-red-500 mb-2">
-              {t('entertainment.games.brickBreaker.gameOver')}
-            </h2>
-            <p className="text-slate-400 mb-1">{t('entertainment.games.brickBreaker.finalScore')}: {score}</p>
-            <p className="text-slate-500 text-sm mb-4">{t('entertainment.games.brickBreaker.reachedLevel')} {level}</p>
-            <Button
-              onClick={startGame}
-              className="bg-gradient-to-r from-cyan-500 to-pink-500 hover:from-cyan-600 hover:to-pink-600 text-white font-bold px-8 py-3"
-            >
-              <RotateCcw className="w-5 h-5 mr-2" />
+          <GameOverlay title={t('entertainment.games.brickBreaker.gameOver')} className="rounded-lg">
+            <div className="flex gap-3">
+              <GameStat label={t('entertainment.games.brickBreaker.finalScore')} value={score} />
+              <GameStat label={t('entertainment.games.brickBreaker.reachedLevel')} value={level} />
+            </div>
+            <Button onClick={startGame} size="lg">
+              <ArrowCounterClockwise size={18} className="mr-2" />
               {t('entertainment.games.brickBreaker.playAgain')}
             </Button>
-          </div>
+          </GameOverlay>
         )}
       </div>
 
@@ -480,20 +463,20 @@ export function BrickBreakerGame({ onGameEnd, fullscreen }: BrickBreakerGameProp
           <Button
             variant="outline"
             size="lg"
-            className="w-20 h-14 border-cyan-500/50 text-cyan-400"
+            className="w-20 h-14"
             onTouchStart={() => movePaddle('left')}
             aria-label={t('entertainment.controls.left')}
           >
-            <ChevronLeft className="w-8 h-8" />
+            <CaretLeft size={32} />
           </Button>
           <Button
             variant="outline"
             size="lg"
-            className="w-20 h-14 border-cyan-500/50 text-cyan-400"
+            className="w-20 h-14"
             onTouchStart={() => movePaddle('right')}
             aria-label={t('entertainment.controls.right')}
           >
-            <ChevronRight className="w-8 h-8" />
+            <CaretRight size={32} />
           </Button>
         </div>
       )}

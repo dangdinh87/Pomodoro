@@ -1,25 +1,21 @@
 'use client';
 
-import { BorderBeam } from '@/components/ui/border-beam';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { FilterChip, FilterChipGroup } from '@/components/ui/filter-chip';
+import { PageContainer, PageHeader } from '@/components/ui/page-header';
 import { useI18n } from '@/contexts/i18n-context';
 import { useAuthStore } from '@/stores/auth-store';
-import {
-    CheckCircle2,
-    Loader2,
-    Send,
-    Star,
-} from 'lucide-react';
+import { Bug, CheckCircle, CircleNotch, Lightbulb, NotePencil, PaperPlaneTilt, Question, Star } from '@phosphor-icons/react/dist/ssr';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 const FEEDBACK_TYPES = [
-    { key: 'feature', emoji: '✨', color: 'bg-purple-500/10 border-purple-500/30 hover:border-purple-500/60 text-purple-600 dark:text-purple-400' },
-    { key: 'bug', emoji: '🐛', color: 'bg-red-500/10 border-red-500/30 hover:border-red-500/60 text-red-600 dark:text-red-400' },
-    { key: 'question', emoji: '❓', color: 'bg-blue-500/10 border-blue-500/30 hover:border-blue-500/60 text-blue-600 dark:text-blue-400' },
-    { key: 'other', emoji: '📝', color: 'bg-amber-500/10 border-amber-500/30 hover:border-amber-500/60 text-amber-600 dark:text-amber-400' },
+    { key: 'feature', Icon: Lightbulb },
+    { key: 'bug', Icon: Bug },
+    { key: 'question', Icon: Question },
+    { key: 'other', Icon: NotePencil },
 ] as const;
 
 type FeedbackType = (typeof FEEDBACK_TYPES)[number]['key'];
@@ -36,13 +32,14 @@ function StarRating({ value, onChange }: { value: number; onChange: (v: number) 
                     onClick={() => onChange(star)}
                     onMouseEnter={() => setHover(star)}
                     onMouseLeave={() => setHover(0)}
-                    className="transition-transform hover:scale-110 active:scale-95"
+                    className="rounded-md p-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+                    aria-label={`${star}`}
                 >
                     <Star
-                        className={`h-7 w-7 transition-colors ${
-                            star <= (hover || value)
-                                ? 'fill-yellow-400 text-yellow-400'
-                                : 'text-muted-foreground/30'
+                        size={28}
+                        weight={star <= (hover || value) ? 'fill' : 'regular'}
+                        className={`transition-colors duration-150 ${
+                            star <= (hover || value) ? 'text-gold' : 'text-ink-faint'
                         }`}
                     />
                 </button>
@@ -101,89 +98,65 @@ export default function FeedbackPage() {
 
     if (success) {
         return (
-            <div className="mx-auto flex max-w-lg flex-col items-center justify-center px-4 py-16 text-center animate-in fade-in zoom-in duration-300">
-                <div className="mb-4 rounded-full bg-green-100 p-4 text-green-600 dark:bg-green-900/30">
-                    <CheckCircle2 className="h-12 w-12" />
+            <PageContainer size="narrow">
+                <div className="mx-auto flex max-w-md flex-col items-center py-12 text-center">
+                    <CheckCircle size={40} weight="fill" className="mb-4 text-success" />
+                    <h2 className="mb-2 font-heading text-2xl font-bold tracking-[-0.02em] text-ink">{t('feedback.success.title')}</h2>
+                    <p className="mb-6 text-sm text-ink-muted">{t('feedback.success.message')}</p>
+                    <Button
+                        variant="outline"
+                        onClick={() => {
+                            setSuccess(false);
+                            setFormData(prev => ({ ...prev, message: '', rating: 0 }));
+                        }}
+                    >
+                        {t('feedback.success.cta')}
+                    </Button>
                 </div>
-                <h2 className="mb-2 text-2xl font-bold">{t('feedback.success.title')}</h2>
-                <p className="mb-6 max-w-md text-muted-foreground">
-                    {t('feedback.success.message')}
-                </p>
-                <Button
-                    size="lg"
-                    onClick={() => {
-                        setSuccess(false);
-                        setFormData(prev => ({ ...prev, message: '', rating: 0 }));
-                    }}
-                >
-                    {t('feedback.success.cta')}
-                </Button>
-            </div>
+            </PageContainer>
         );
     }
 
     return (
-        <div className="mx-auto max-w-lg px-4 py-8">
-            {/* Header */}
-            <div className="mb-6 text-center">
-                <h1 className="text-2xl font-bold tracking-tight">{t('feedback.title')}</h1>
-                <p className="mt-1.5 text-sm text-muted-foreground">
-                    {t('feedback.subtitle')}
-                </p>
-            </div>
+        <PageContainer size="narrow">
+            <PageHeader title={t('feedback.title')} description={t('feedback.subtitle')} />
 
-            {/* Form Card */}
             <form
                 onSubmit={handleSubmit}
-                className="relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-b from-card/80 to-card/50 p-6 shadow-lg backdrop-blur-xl"
+                className="max-w-xl rounded-lg border border-border bg-surface p-6"
             >
-                <BorderBeam />
-
                 <div className="space-y-5">
-                    {/* Feedback Type Cards */}
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground/80">
+                        <p className="text-sm font-medium text-ink-secondary">
                             {t('feedback.form.type')}
-                        </label>
-                        <div className="grid grid-cols-4 gap-2">
-                            {FEEDBACK_TYPES.map((ft) => {
-                                const isSelected = formData.type === ft.key;
-                                return (
-                                    <button
-                                        key={ft.key}
-                                        type="button"
-                                        onClick={() => setFormData({ ...formData, type: ft.key })}
-                                        className={`flex flex-col items-center gap-1 rounded-xl border-2 p-2.5 transition-all ${
-                                            isSelected
-                                                ? `${ft.color} ring-2 ring-offset-2 ring-offset-background scale-[1.02]`
-                                                : 'border-border/50 hover:border-border bg-card/50'
-                                        }`}
-                                    >
-                                        <span className="text-xl">{ft.emoji}</span>
-                                        <span className={`text-xs font-medium ${isSelected ? '' : 'text-muted-foreground'}`}>
-                                            {t(`feedback.form.typeOptions.${ft.key}`)}
-                                        </span>
-                                    </button>
-                                );
-                            })}
-                        </div>
+                        </p>
+                        <FilterChipGroup label={t('feedback.form.type')} className="flex-wrap">
+                            {FEEDBACK_TYPES.map((ft) => (
+                                <FilterChip
+                                    key={ft.key}
+                                    active={formData.type === ft.key}
+                                    onClick={() => setFormData({ ...formData, type: ft.key })}
+                                >
+                                    <ft.Icon size={14} />
+                                    {t(`feedback.form.typeOptions.${ft.key}`)}
+                                </FilterChip>
+                            ))}
+                        </FilterChipGroup>
                     </div>
 
-                    {/* Star Rating */}
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground/80">
+                        <p className="text-sm font-medium text-ink-secondary">
                             {t('feedback.form.rating')}
-                        </label>
+                        </p>
                         <StarRating
                             value={formData.rating}
                             onChange={(v) => setFormData({ ...formData, rating: v })}
                         />
                     </div>
 
-                    {/* Message */}
                     <div className="space-y-2">
-                        <label htmlFor="message" className="text-sm font-medium text-foreground/80">
-                            {t('feedback.form.message')} <span className="text-red-500">{t('feedback.form.required')}</span>
+                        <label htmlFor="message" className="text-sm font-medium text-ink-secondary">
+                            {t('feedback.form.message')} <span className="text-danger-ink">{t('feedback.form.required')}</span>
                         </label>
                         <Textarea
                             id="message"
@@ -197,10 +170,9 @@ export default function FeedbackPage() {
                         />
                     </div>
 
-                    {/* Name & Email */}
                     <div className="grid gap-3 sm:grid-cols-2">
                         <div className="space-y-1.5">
-                            <label htmlFor="name" className="text-sm font-medium text-foreground/80">
+                            <label htmlFor="name" className="text-sm font-medium text-ink-secondary">
                                 {t('feedback.form.name')}
                             </label>
                             <Input
@@ -211,7 +183,7 @@ export default function FeedbackPage() {
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label htmlFor="email" className="text-sm font-medium text-foreground/80">
+                            <label htmlFor="email" className="text-sm font-medium text-ink-secondary">
                                 {t('feedback.form.email')}
                             </label>
                             <Input
@@ -222,24 +194,24 @@ export default function FeedbackPage() {
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             />
                         </div>
+                        <p className="text-xs text-ink-muted sm:col-span-2">{t('pagesUi.feedback.contactHint')}</p>
                     </div>
 
-                    {/* Submit */}
                     <Button
                         type="submit"
                         size="lg"
-                        className="w-full"
+                        className="w-full sm:w-auto"
                         disabled={loading || !formData.message.trim()}
                     >
                         {loading ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            <CircleNotch size={16} className="mr-2 animate-spin" />
                         ) : (
-                            <Send className="mr-2 h-4 w-4" />
+                            <PaperPlaneTilt size={16} className="mr-2" />
                         )}
                         {t('feedback.form.submit')}
                     </Button>
                 </div>
             </form>
-        </div>
+        </PageContainer>
     );
 }

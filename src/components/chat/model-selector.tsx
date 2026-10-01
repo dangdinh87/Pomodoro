@@ -12,22 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-    ChevronDown,
-    Sparkles,
-    Zap,
-    Crown,
-    Building2,
-    Search,
-    Check,
-    Bot,
-    Cpu,
-    Brain,
-    Flame,
-    Lock,
-    AlertCircle,
-} from "lucide-react";
+import { CaretDown, Gauge, Globe, Lightning, Crown, Buildings, MagnifyingGlass, Check, Robot, Cpu, Brain, Flame, Lock, WarningCircle } from '@phosphor-icons/react/dist/ssr';
 import {
     Tooltip,
     TooltipContent,
@@ -50,44 +35,36 @@ type ModelSelectorProps<T extends string> = {
     onModelChange: (model: T) => void;
 };
 
-const tierConfig: Record<string, { icon: React.ReactNode; color: string; bgColor: string; description: string; requiresUpgrade: boolean }> = {
+const tierConfig: Record<string, { icon: React.ReactNode; description: string; requiresUpgrade: boolean }> = {
     Economy: {
-        icon: <Zap className="h-4 w-4" />,
-        color: "text-emerald-500",
-        bgColor: "bg-emerald-500/10 border-emerald-500/20",
+        icon: <Lightning size={16} />,
         description: "Fast & affordable",
         requiresUpgrade: false,
     },
     Standard: {
-        icon: <Sparkles className="h-4 w-4" />,
-        color: "text-blue-500",
-        bgColor: "bg-blue-500/10 border-blue-500/20",
+        icon: <Gauge size={16} />,
         description: "Balanced performance",
         requiresUpgrade: false,
     },
     Premium: {
-        icon: <Crown className="h-4 w-4" />,
-        color: "text-purple-500",
-        bgColor: "bg-purple-500/10 border-purple-500/20",
+        icon: <Crown size={16} />,
         description: "Requires Premium tier",
         requiresUpgrade: true,
     },
     Enterprise: {
-        icon: <Building2 className="h-4 w-4" />,
-        color: "text-amber-500",
-        bgColor: "bg-amber-500/10 border-amber-500/20",
+        icon: <Buildings size={16} />,
         description: "Requires Enterprise tier",
         requiresUpgrade: true,
     },
 };
 
-const providerConfig: Record<string, { icon: React.ReactNode; color: string }> = {
-    OpenAI: { icon: <Brain className="h-3.5 w-3.5" />, color: "text-green-500" },
-    Anthropic: { icon: <Bot className="h-3.5 w-3.5" />, color: "text-orange-500" },
-    Google: { icon: <Sparkles className="h-3.5 w-3.5" />, color: "text-blue-500" },
-    Mistral: { icon: <Flame className="h-3.5 w-3.5" />, color: "text-cyan-500" },
-    "Open Source": { icon: <Cpu className="h-3.5 w-3.5" />, color: "text-violet-500" },
-    Other: { icon: <Cpu className="h-3.5 w-3.5" />, color: "text-gray-500" },
+const providerConfig: Record<string, { icon: React.ReactNode }> = {
+    OpenAI: { icon: <Brain size={14} /> },
+    Anthropic: { icon: <Robot size={14} /> },
+    Google: { icon: <Globe size={14} /> },
+    Mistral: { icon: <Flame size={14} /> },
+    "Open Source": { icon: <Cpu size={14} /> },
+    Other: { icon: <Cpu size={14} /> },
 };
 
 const tiers = ["Economy", "Standard", "Premium", "Enterprise"] as const;
@@ -151,19 +128,9 @@ export function ModelSelector<T extends string>({
             <DialogTrigger asChild>
                 <Button
                     variant="outline"
-                    className={cn(
-                        "gap-2 pl-3 pr-2 transition-all duration-200",
-                        "hover:border-primary/50 hover:bg-accent/50",
-                        "group relative overflow-hidden"
-                    )}
+                    className="gap-2 pl-3 pr-2"
                 >
-                    <div
-                        className={cn(
-                            "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity",
-                            "bg-gradient-to-r from-transparent via-white/5 to-transparent"
-                        )}
-                    />
-                    <span className={cn("flex items-center gap-1.5", tierConfig[currentTier]?.color)}>
+                    <span className="flex items-center gap-1.5 text-ink-muted">
                         {tierConfig[currentTier]?.icon}
                     </span>
                     <span className="hidden sm:inline font-medium max-w-[120px] truncate">
@@ -172,70 +139,66 @@ export function ModelSelector<T extends string>({
                     <span className="sm:hidden font-medium">
                         {currentModel?.provider || "Model"}
                     </span>
-                    <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
+                    <CaretDown size={16} className="shrink-0 text-ink-faint" />
                 </Button>
             </DialogTrigger>
 
             <DialogContent className="sm:max-w-[600px] p-0 gap-0 overflow-hidden">
-                <DialogHeader className="px-6 pt-6 pb-4 border-b bg-gradient-to-b from-background to-muted/30">
-                    <DialogTitle className="text-xl font-semibold flex items-center gap-2">
-                        <Bot className="h-5 w-5 text-primary" />
+                <DialogHeader className="px-6 pt-6 pb-4 border-b border-border">
+                    <DialogTitle className="font-heading text-xl font-semibold flex items-center gap-2">
+                        <Robot size={20} className="text-ai" />
                         Choose AI Model
                     </DialogTitle>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-sm text-ink-muted mt-1">
                         Select the AI model that best fits your needs
                     </p>
                 </DialogHeader>
 
-                <div className="px-6 py-4 border-b bg-muted/30">
+                <div className="px-6 py-4 border-b border-border">
                     {/* Search */}
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <MagnifyingGlass size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" />
                         <Input
                             placeholder="Search models..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="pl-9 bg-background border-muted-foreground/20 focus-visible:ring-primary/30"
+                            className="pl-9"
                         />
                     </div>
 
-                    {/* Tier Filter Tabs */}
-                    <Tabs value={selectedTier} onValueChange={setSelectedTier} className="mt-4">
-                        <TabsList className="w-full h-auto p-1 bg-background/50 grid grid-cols-5 gap-1">
-                            <TabsTrigger
-                                value="all"
-                                className="text-xs px-2 py-1.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                            >
-                                All ({modelsArray.length})
-                            </TabsTrigger>
-                            {tiers.map((tier) => (
-                                <TabsTrigger
+                    {/* Tier filter chips */}
+                    <div className="mt-4 flex flex-wrap gap-2">
+                        {(["all", ...tiers] as const).map((tier) => {
+                            const active = selectedTier === tier;
+                            const count = tier === "all" ? modelsArray.length : tierCounts[tier];
+                            return (
+                                <button
                                     key={tier}
-                                    value={tier}
-                                    disabled={tierCounts[tier] === 0}
+                                    type="button"
+                                    aria-pressed={active}
+                                    disabled={count === 0}
+                                    onClick={() => setSelectedTier(tier)}
                                     className={cn(
-                                        "text-xs px-2 py-1.5 gap-1",
-                                        "data-[state=active]:bg-primary data-[state=active]:text-primary-foreground",
-                                        tierCounts[tier] === 0 && "opacity-50"
+                                        "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition-colors duration-150 disabled:opacity-50",
+                                        active
+                                            ? "border-transparent bg-primary font-semibold text-white"
+                                            : "border-border text-ink-secondary hover:bg-surface-hover"
                                     )}
                                 >
-                                    <span className={cn("hidden sm:inline", tierConfig[tier].color)}>
-                                        {tierConfig[tier].icon}
-                                    </span>
-                                    <span className="truncate">{tier}</span>
-                                    <span className="text-[10px] opacity-70">({tierCounts[tier]})</span>
-                                </TabsTrigger>
-                            ))}
-                        </TabsList>
-                    </Tabs>
+                                    {tier === "all" ? "All" : tier}
+                                    <span className="tabular-nums opacity-70">({count})</span>
+                                </button>
+                            );
+                        })}
+                    </div>
                 </div>
 
                 {/* Models List */}
                 <ScrollArea className="max-h-[400px]">
                     <div className="p-4">
                         {filteredModels.length === 0 ? (
-                            <div className="text-center py-8 text-muted-foreground">
-                                <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                            <div className="text-center py-8 text-ink-muted">
+                                <MagnifyingGlass size={32} className="mx-auto mb-2 text-ink-faint" />
                                 <p>No models found</p>
                                 <p className="text-sm">Try adjusting your search</p>
                             </div>
@@ -248,20 +211,14 @@ export function ModelSelector<T extends string>({
 
                                     return (
                                         <div key={tier}>
-                                            <div
-                                                className={cn(
-                                                    "flex items-center gap-2 mb-3 px-2 py-1.5 rounded-lg",
-                                                    "border",
-                                                    tierConfig[tier].bgColor
-                                                )}
-                                            >
-                                                <span className={tierConfig[tier].color}>
+                                            <div className="mb-3 flex items-center gap-2 border-b border-border px-1 pb-2">
+                                                <span className="text-ink-muted">
                                                     {tierConfig[tier].icon}
                                                 </span>
-                                                <span className={cn("font-semibold text-sm", tierConfig[tier].color)}>
+                                                <span className="text-sm font-semibold text-ink">
                                                     {tier}
                                                 </span>
-                                                <span className="text-xs text-muted-foreground">
+                                                <span className="text-xs text-ink-muted">
                                                     • {tierConfig[tier].description}
                                                 </span>
                                                 <Badge variant="secondary" className="ml-auto text-xs">
@@ -299,14 +256,14 @@ export function ModelSelector<T extends string>({
                 </ScrollArea>
 
                 {/* Footer */}
-                <div className="px-6 py-3 border-t bg-muted/30 flex items-center justify-between">
-                    <div className="text-xs text-muted-foreground">
+                <div className="px-6 py-3 border-t border-border flex items-center justify-between">
+                    <div className="text-xs text-ink-muted">
                         {filteredModels.length} models available
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <kbd className="px-1.5 py-0.5 rounded bg-muted border text-[10px]">↑↓</kbd>
+                    <div className="flex items-center gap-2 text-xs text-ink-muted">
+                        <kbd className="px-1.5 py-0.5 rounded bg-surface-raised border border-border font-mono text-[10px]">↑↓</kbd>
                         <span>Navigate</span>
-                        <kbd className="px-1.5 py-0.5 rounded bg-muted border text-[10px]">Enter</kbd>
+                        <kbd className="px-1.5 py-0.5 rounded bg-surface-raised border border-border font-mono text-[10px]">Enter</kbd>
                         <span>Select</span>
                     </div>
                 </div>
@@ -333,15 +290,14 @@ function ModelCard({
         <button
             onClick={onSelect}
             className={cn(
-                "w-full px-3 py-2.5 rounded-lg border text-left transition-all duration-200",
-                "focus:outline-none focus:ring-2 focus:ring-primary/30",
-                "group relative",
+                "w-full px-3 py-2.5 rounded-lg border bg-surface text-left transition-colors duration-150",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40",
                 requiresUpgrade
                     ? "opacity-70 hover:opacity-90 cursor-pointer"
-                    : "hover:bg-accent/50 hover:border-primary/30 hover:shadow-sm",
+                    : "hover:bg-surface-hover",
                 isSelected
-                    ? "bg-primary/10 border-primary/50 shadow-sm"
-                    : "bg-background border-border/50"
+                    ? "border-[color-mix(in_srgb,var(--accent)_50%,var(--border))]"
+                    : "border-border"
             )}
         >
             <div className="flex items-center justify-between gap-3">
@@ -350,8 +306,7 @@ function ModelCard({
                     <div
                         className={cn(
                             "shrink-0 w-8 h-8 rounded-lg flex items-center justify-center",
-                            "bg-muted/50 border border-border/50",
-                            provider.color
+                            "bg-surface-raised text-ink-secondary"
                         )}
                     >
                         {provider.icon}
@@ -362,18 +317,18 @@ function ModelCard({
                         <div className="flex items-center gap-2">
                             <span className="font-medium text-sm truncate">{model.name}</span>
                             {isSelected && (
-                                <Check className="h-4 w-4 text-primary shrink-0" />
+                                <Check size={16} className="text-brand shrink-0" />
                             )}
                             {requiresUpgrade && (
-                                <Lock className="h-3 w-3 text-muted-foreground shrink-0" />
+                                <Lock size={12} className="text-ink-muted shrink-0" />
                             )}
                         </div>
                         <div className="flex items-center gap-2 mt-0.5">
-                            <span className={cn("text-xs", provider.color)}>
+                            <span className="text-xs text-ink-secondary">
                                 {model.provider}
                             </span>
-                            <span className="text-muted-foreground text-[10px]">•</span>
-                            <span className="text-xs text-muted-foreground truncate">
+                            <span className="text-ink-muted text-[10px]">•</span>
+                            <span className="text-xs text-ink-muted truncate">
                                 {model.id}
                             </span>
                         </div>
@@ -381,28 +336,11 @@ function ModelCard({
                 </div>
 
                 {/* Tier Badge */}
-                <Badge
-                    variant="outline"
-                    className={cn(
-                        "shrink-0 text-[10px] px-1.5 py-0 h-5 gap-1",
-                        tier.color,
-                        "border-current/30 bg-current/5"
-                    )}
-                >
+                <Badge variant="secondary" className="h-5 shrink-0 gap-1 px-1.5 py-0 text-[10px]">
                     {tier.icon}
-                    {requiresUpgrade && <Lock className="h-2.5 w-2.5" />}
+                    {requiresUpgrade && <Lock size={10} />}
                 </Badge>
             </div>
-
-            {/* Hover effect */}
-            <div
-                className={cn(
-                    "absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none",
-                    requiresUpgrade
-                        ? "bg-gradient-to-r from-amber-500/5 via-transparent to-amber-500/5"
-                        : "bg-gradient-to-r from-primary/5 via-transparent to-primary/5"
-                )}
-            />
         </button>
     );
 
@@ -415,7 +353,7 @@ function ModelCard({
                     </TooltipTrigger>
                     <TooltipContent side="left" className="max-w-[200px]">
                         <div className="flex items-center gap-2">
-                            <AlertCircle className="h-4 w-4 text-amber-500 shrink-0" />
+                            <WarningCircle size={16} className="text-warning shrink-0" />
                             <span className="text-sm">
                                 {tier.description}. You can still select it, but API may return an error.
                             </span>

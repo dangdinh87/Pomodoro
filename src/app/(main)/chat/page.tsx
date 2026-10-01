@@ -6,7 +6,7 @@ import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { useChatRuntime, AssistantChatTransport } from "@assistant-ui/react-ai-sdk";
 import { Thread } from "@/components/assistant-ui/thread";
 import { useAuthStore } from "@/stores/auth-store";
-import { Loader2, LogIn, Plus, History } from "lucide-react";
+import { CircleNotch, SignIn, Plus, ClockCounterClockwise } from '@phosphor-icons/react/dist/ssr';
 import { BotMessageSquare } from "@/components/animate-ui/icons/bot-message-square";
 import { AnimateIcon } from "@/components/animate-ui/icons/icon";
 import { Button } from "@/components/ui/button";
@@ -161,7 +161,7 @@ export default function ChatPage() {
 	if (authLoading) {
 		return (
 			<div className="flex h-full items-center justify-center">
-				<Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+				<CircleNotch size={32} className="animate-spin text-ink-muted" />
 			</div>
 		);
 	}
@@ -172,14 +172,14 @@ export default function ChatPage() {
 			<div className="flex h-full flex-col items-center justify-center gap-4 p-8 relative overflow-hidden">
 				<div className="relative z-10 flex flex-col items-center gap-4">
 					<AnimateIcon animateOnHover>
-						<BotMessageSquare className="h-16 w-16 text-primary" />
+						<BotMessageSquare className="h-16 w-16 text-ai" />
 					</AnimateIcon>
-					<h1 className="text-2xl font-bold">Bro Chat</h1>
-					<p className="text-center text-muted-foreground max-w-md" suppressHydrationWarning>
+					<h1 className="font-heading text-2xl font-bold text-ink">Bro Chat</h1>
+					<p className="text-center text-ink-muted max-w-md" suppressHydrationWarning>
 						{t("chat.subtitle")}
 					</p>
 					<Button onClick={() => router.push("/login")} size="lg">
-						<LogIn className="mr-2 h-4 w-4" />
+						<SignIn size={16} className="mr-2" />
 						<span suppressHydrationWarning>{t("auth.pleaseLogin")}</span>
 					</Button>
 				</div>
@@ -191,7 +191,7 @@ export default function ChatPage() {
 		<div className="flex h-full flex-col overflow-hidden relative">
 			<div className="relative z-10 flex h-full flex-col overflow-hidden">
 				{/* Header */}
-				<div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+				<div className="sticky top-0 z-10 bg-surface-page">
 					<div className="flex items-center justify-between px-4 py-2 max-w-3xl mx-auto">
 						<div className="flex items-center gap-2">
 							<span className="font-semibold">Bro Chat</span>
@@ -204,7 +204,7 @@ export default function ChatPage() {
 								onClick={handleNewChat}
 								title={t("chat.newChat")}
 							>
-								<Plus className="h-5 w-5" />
+								<Plus size={20} />
 							</Button>
 							<Button
 								variant="ghost"
@@ -213,7 +213,7 @@ export default function ChatPage() {
 								onClick={() => setIsHistoryPanelOpen(true)}
 								title={t("nav.history")}
 							>
-								<History className="h-5 w-5" />
+								<ClockCounterClockwise size={20} />
 							</Button>
 						</div>
 					</div>
@@ -227,63 +227,63 @@ export default function ChatPage() {
 							<div className="space-y-6 animate-in fade-in duration-300">
 								{/* Assistant message skeleton */}
 								<div className="flex gap-3">
-									<div className="w-8 h-8 rounded-full bg-muted animate-pulse shrink-0" />
+									<div className="w-8 h-8 rounded-full bg-surface-raised animate-pulse shrink-0" />
 									<div className="flex-1 space-y-2">
-										<div className="h-4 bg-muted rounded-lg w-3/4 animate-pulse" />
-										<div className="h-4 bg-muted rounded-lg w-1/2 animate-pulse" />
-										<div className="h-4 bg-muted rounded-lg w-2/3 animate-pulse" />
+										<div className="h-4 bg-surface-raised rounded-lg w-3/4 animate-pulse" />
+										<div className="h-4 bg-surface-raised rounded-lg w-1/2 animate-pulse" />
+										<div className="h-4 bg-surface-raised rounded-lg w-2/3 animate-pulse" />
 									</div>
 								</div>
 
 								{/* User message skeleton */}
 								<div className="flex justify-end">
-									<div className="bg-muted rounded-2xl px-4 py-3 max-w-[70%] space-y-2 animate-pulse">
-										<div className="h-4 bg-background/50 rounded w-32" />
+									<div className="bg-surface-raised rounded-lg px-4 py-3 max-w-[70%] space-y-2 animate-pulse">
+										<div className="h-4 bg-surface rounded w-32" />
 									</div>
 								</div>
 
 								{/* Assistant message skeleton */}
 								<div className="flex gap-3">
-									<div className="w-8 h-8 rounded-full bg-muted animate-pulse shrink-0" />
+									<div className="w-8 h-8 rounded-full bg-surface-raised animate-pulse shrink-0" />
 									<div className="flex-1 space-y-2">
-										<div className="h-4 bg-muted rounded-lg w-full animate-pulse" />
-										<div className="h-4 bg-muted rounded-lg w-4/5 animate-pulse" />
-										<div className="h-4 bg-muted rounded-lg w-3/5 animate-pulse" />
-										<div className="h-4 bg-muted rounded-lg w-2/3 animate-pulse" />
+										<div className="h-4 bg-surface-raised rounded-lg w-full animate-pulse" />
+										<div className="h-4 bg-surface-raised rounded-lg w-4/5 animate-pulse" />
+										<div className="h-4 bg-surface-raised rounded-lg w-3/5 animate-pulse" />
+										<div className="h-4 bg-surface-raised rounded-lg w-2/3 animate-pulse" />
 									</div>
 								</div>
 
 								{/* User message skeleton */}
 								<div className="flex justify-end">
-									<div className="bg-muted rounded-2xl px-4 py-3 max-w-[70%] space-y-2 animate-pulse">
-										<div className="h-4 bg-background/50 rounded w-48" />
-										<div className="h-4 bg-background/50 rounded w-24" />
+									<div className="bg-surface-raised rounded-lg px-4 py-3 max-w-[70%] space-y-2 animate-pulse">
+										<div className="h-4 bg-surface rounded w-48" />
+										<div className="h-4 bg-surface rounded w-24" />
 									</div>
 								</div>
 
 								{/* Assistant message skeleton */}
 								<div className="flex gap-3">
-									<div className="w-8 h-8 rounded-full bg-muted animate-pulse shrink-0" />
+									<div className="w-8 h-8 rounded-full bg-surface-raised animate-pulse shrink-0" />
 									<div className="flex-1 space-y-2">
-										<div className="h-4 bg-muted rounded-lg w-2/3 animate-pulse" />
-										<div className="h-4 bg-muted rounded-lg w-1/2 animate-pulse" />
+										<div className="h-4 bg-surface-raised rounded-lg w-2/3 animate-pulse" />
+										<div className="h-4 bg-surface-raised rounded-lg w-1/2 animate-pulse" />
 									</div>
 								</div>
 							</div>
 
 							{/* Loading indicator */}
-							<div className="flex items-center justify-center gap-2 mt-8 text-muted-foreground">
+							<div className="flex items-center justify-center gap-2 mt-8 text-ink-muted">
 								<div className="flex gap-1">
 									<span
-										className="w-2 h-2 bg-primary/60 rounded-full animate-bounce"
+										className="w-2 h-2 bg-ai/60 rounded-full animate-bounce"
 										style={{ animationDelay: "0ms" }}
 									/>
 									<span
-										className="w-2 h-2 bg-primary/60 rounded-full animate-bounce"
+										className="w-2 h-2 bg-ai/60 rounded-full animate-bounce"
 										style={{ animationDelay: "150ms" }}
 									/>
 									<span
-										className="w-2 h-2 bg-primary/60 rounded-full animate-bounce"
+										className="w-2 h-2 bg-ai/60 rounded-full animate-bounce"
 										style={{ animationDelay: "300ms" }}
 									/>
 								</div>

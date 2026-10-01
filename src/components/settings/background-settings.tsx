@@ -1,16 +1,17 @@
 'use client';
 
-import { useEffect, useState, useRef, useMemo, ChangeEvent } from 'react';
+import { useEffect, useState, useRef, ChangeEvent } from 'react';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Check, X, Upload, Link, FolderHeart, Loader2 } from 'lucide-react';
+import { Check, X, UploadSimple, Link, FolderStar, CircleNotch, Info } from '@phosphor-icons/react/dist/ssr';
 import { useBackground } from '@/contexts/background-context';
 import { toast } from 'sonner';
 import { useI18n } from '@/contexts/i18n-context';
 import { useCustomBackgrounds } from '@/hooks/use-custom-backgrounds';
 import { Input } from '@/components/ui/input';
-import { Info } from 'lucide-react';
+import { FilterChip, FilterChipGroup } from '@/components/ui/filter-chip';
+
 import {
   backgroundPacks,
   findImageById,
@@ -86,28 +87,7 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [urlInput, setUrlInput] = useState('');
 
-  // Active tab: set once on mount from persisted background, then only change via user clicks
   const [activeTab, setActiveTab] = useState<string>(() => findPackForValue(background.value));
-
-  // Top-level tab: static (images only) | video (lofi only) | personal (no categories)
-  const topTab = activeTab === 'lofi-video' ? 'video' : activeTab === 'personal' ? 'personal' : 'static';
-  const setTopTab = (tab: 'static' | 'video' | 'personal') => {
-    if (tab === 'static') setActiveTab('system');
-    else if (tab === 'video') setActiveTab('lofi-video');
-    else setActiveTab('personal');
-  };
-
-  // Left sidebar: only static packs (no video) when topTab=static; only lofi when topTab=video; none when personal
-  const staticPacks = useMemo(
-    () => backgroundPacks.filter((p) => p.id !== 'lofi-video'),
-    [],
-  );
-  const videoPack = useMemo(
-    () => backgroundPacks.find((p) => p.id === 'lofi-video'),
-    [],
-  );
-  const leftNavPacks = topTab === 'static' ? staticPacks : topTab === 'video' && videoPack ? [videoPack] : [];
-  const showLeftNav = topTab !== 'personal' && leftNavPacks.length > 0;
 
   useEffect(() => {
     // Normalize to sentinel values for UI so Save/apply paths work from first load
@@ -133,7 +113,7 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
       return {
         ...background,
         type: 'solid' as const,
-        value: 'hsl(var(--background))',
+        value: 'var(--surface-page)',
         opacity: 1,
         blur: 0,
         brightness: 100,
@@ -189,7 +169,7 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
       setBackgroundTemp({
         ...background,
         type: 'solid',
-        value: 'hsl(var(--background))',
+        value: 'var(--surface-page)',
         opacity: 1,
         blur: 0,
         brightness: 100,
@@ -231,225 +211,174 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
     toast.success(t('settings.background.toasts.resetInfo'));
   };
 
+  const isSystem = styleValue.startsWith('system:');
+  const dim = isPreview ? 'opacity-0 pointer-events-none' : '';
+  const activePack = backgroundPacks.find((p) => p.id === activeTab);
+
+  const updateTemp = (patch: { opacity?: number; brightness?: number; blur?: number }) => {
+    if (isSystem) return;
+    setBackgroundTemp({
+      ...background,
+      type: 'image',
+      value: styleValue,
+      opacity: opacity / 100,
+      brightness,
+      blur,
+      ...patch,
+    });
+  };
+
+  const saveButton = (
+    <Button size="sm" onClick={apply}>
+      {t('settings.background.saveChanges')}
+    </Button>
+  );
+
   return (
-    <div className="flex flex-col h-full">
-      {/* Fixed Header — ẩn khi đang kéo slider để xem nền */}
-      <div className={`flex items-center justify-between px-6 py-4 border-b shrink-0 transition-opacity duration-150 ${isPreview ? 'opacity-0 pointer-events-none' : ''}`}>
-        <div>
-          <h2 className="text-lg font-semibold leading-none tracking-tight">{t('settings.background.selectImage')}</h2>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button size="sm" onClick={apply}>
-            {t('settings.background.saveChanges')}
-          </Button>
-          {onClose && (
-            <Button variant="ghost" size="icon" className="ml-2" onClick={cancel}>
-              <X className="h-4 w-4" />
+    <div className={onClose ? 'flex h-full flex-col' : 'flex flex-col gap-6'}>
+      {onClose && (
+        <div className={`flex shrink-0 items-center justify-between border-b border-border px-6 py-4 transition-opacity duration-150 ${dim}`}>
+          <h2 className="font-heading text-lg font-semibold leading-none tracking-tight text-ink">{t('settings.background.selectImage')}</h2>
+          <div className="flex items-center gap-2">
+            {saveButton}
+            <Button variant="ghost" size="icon" onClick={cancel}>
+              <X size={16} />
+              <span className="sr-only">{t('common.close')}</span>
             </Button>
-          )}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Top: 3 main tabs — ẩn khi đang kéo slider */}
-      <div className={`shrink-0 border-b px-6 transition-opacity duration-150 ${isPreview ? 'opacity-0 pointer-events-none' : ''}`}>
-        <div className="flex gap-0" role="tablist" aria-label={t('settings.background.selectImage')}>
-          {(['static', 'video', 'personal'] as const).map((tab) => (
-            <button
-              key={tab}
-              type="button"
-              role="tab"
-              aria-selected={topTab === tab}
-              onClick={() => setTopTab(tab)}
-              className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
-                topTab === tab
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/30'
-              }`}
-            >
-              {tab === 'personal' ? t('settings.background.topTabs.myImages') : t(`settings.background.topTabs.${tab}`)}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Main Content: [Left categories when static/video] | Center content | Right sliders */}
-      <div className="flex-1 flex min-h-0">
-        {/* Left: Vertical category list — only for Ảnh tĩnh (static packs) or Ảnh động (lofi only); Ảnh của tôi has no categories */}
-        {showLeftNav && (
-          <nav
-            className={`shrink-0 w-36 border-r flex flex-col py-3 gap-0.5 transition-opacity duration-150 ${isPreview ? 'opacity-0 pointer-events-none' : ''}`}
-            aria-label={t('settings.background.selectImage')}
+      <div className={onClose ? 'flex-1 min-h-0 overflow-y-auto p-6' : ''}>
+        <div className="flex flex-col gap-6">
+          <FilterChipGroup
+            label={t('settings.background.selectImage')}
+            className={`-mx-1 px-1 py-1 transition-opacity duration-150 ${dim}`}
           >
-            {leftNavPacks.map((pack) => (
-              <button
-                key={pack.id}
-                type="button"
-                onClick={() => setActiveTab(pack.id)}
-                className={`flex items-center gap-2 px-3 py-2.5 text-left text-sm rounded-r-md transition-colors ${
-                  activeTab === pack.id
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                }`}
-              >
-                <span className="text-base">{pack.icon}</span>
-                <span className="truncate">{t(pack.nameKey)}</span>
-              </button>
+            {backgroundPacks.map((pack) => (
+              <FilterChip key={pack.id} active={activeTab === pack.id} onClick={() => setActiveTab(pack.id)}>
+                {t(pack.nameKey)}
+              </FilterChip>
             ))}
-          </nav>
-        )}
+            <FilterChip active={activeTab === 'personal'} onClick={() => setActiveTab('personal')}>
+              {t('settings.background.topTabs.myImages')}
+            </FilterChip>
+          </FilterChipGroup>
 
-        {/* Center — ẩn khi đang kéo slider */}
-        <div className={`flex-1 overflow-y-auto p-6 min-w-0 transition-opacity duration-150 ${isPreview ? 'opacity-0 pointer-events-none' : ''}`}>
-          {activeTab === 'personal' ? (
-            <>
-              <PersonalTab
-                customImages={customImages}
-                canAddMore={canAddMore}
-                addImageByUrl={addImageByUrl}
-                onUploadClick={() => fileInputRef.current?.click()}
-                urlInput={urlInput}
-                setUrlInput={setUrlInput}
-                styleValue={styleValue}
-                setStyleValue={selectImage}
-                t={t}
-              />
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={async (e: ChangeEvent<HTMLInputElement>) => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-                  const result = await addImage(file);
-                  if (result.success) {
-                    if (result.image) selectImage(result.image.dataUrl);
-                    toast.success(t('settings.background.customImages.uploadSuccess'));
-                  } else {
-                    const errorKey = `settings.background.customImages.${result.error}` as any;
-                    toast.error(t(errorKey));
-                  }
-                  e.target.value = '';
-                }}
-              />
-            </>
-          ) : (
-            <>
-              {(() => {
-                const pack = backgroundPacks.find((p) => p.id === activeTab);
-                if (!pack) return null;
-                return (
+          <div className="grid items-start gap-6 md:grid-cols-[minmax(0,1fr)_15rem]">
+            <div className={`min-w-0 transition-opacity duration-150 ${dim}`}>
+              {activeTab === 'personal' ? (
+                <>
+                  <PersonalTab
+                    customImages={customImages}
+                    canAddMore={canAddMore}
+                    addImageByUrl={addImageByUrl}
+                    onUploadClick={() => fileInputRef.current?.click()}
+                    urlInput={urlInput}
+                    setUrlInput={setUrlInput}
+                    styleValue={styleValue}
+                    setStyleValue={selectImage}
+                    t={t}
+                  />
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={async (e: ChangeEvent<HTMLInputElement>) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const result = await addImage(file);
+                      if (result.success) {
+                        if (result.image) selectImage(result.image.dataUrl);
+                        toast.success(t('settings.background.customImages.uploadSuccess'));
+                      } else {
+                        const errorKey = `settings.background.customImages.${result.error}` as any;
+                        toast.error(t(errorKey));
+                      }
+                      e.target.value = '';
+                    }}
+                  />
+                </>
+              ) : (
+                activePack && (
                   <div className="space-y-3">
-                    {pack.descriptionKey && (
-                      <p className="text-xs text-muted-foreground">
-                        {t(pack.descriptionKey)}
-                      </p>
+                    {activePack.descriptionKey && (
+                      <p className="text-[0.8125rem] text-ink-muted">{t(activePack.descriptionKey)}</p>
                     )}
                     <PackGrid
-                      pack={pack}
+                      pack={activePack}
                       styleValue={styleValue}
                       loadingValue={loadingValue}
                       onSelect={selectImage}
                       t={t}
                     />
                   </div>
-                );
-              })()}
-            </>
-          )}
-        </div>
-
-        {/* Right: Sliders — giữ hiện khi kéo để user vẫn thấy và kéo được */}
-        <div className={`shrink-0 w-56 p-4 flex flex-col gap-4 overflow-y-auto relative transition-all duration-150 ${
-          isPreview ? 'bg-background/95 backdrop-blur-sm rounded-lg shadow-2xl border' : 'border-l bg-muted/10'
-        }`}>
-          {styleValue.startsWith('system:') && (
-            <div className="absolute inset-0 z-10 bg-background/60 backdrop-blur-[1px] flex items-center justify-center p-6">
-              <p className="text-xs text-muted-foreground text-center">
-                {t('settings.background.sliderDisabledHint')}
-              </p>
+                )
+              )}
             </div>
-          )}
-          <p className="text-xs text-muted-foreground">
-            {t('settings.background.sliderHint')}
-          </p>
 
-          <SliderControl
-            id="bg-opacity"
-            label={t('settings.background.opacity')}
-            value={opacity}
-            min={10}
-            max={100}
-            disabled={styleValue.startsWith('system:')}
-            description={t('settings.background.opacityDescription')}
-            onDragStart={startPreview}
-            onChange={(val) => {
-              setOpacity(val);
-              if (!styleValue.startsWith('system:')) {
-                setBackgroundTemp({
-                  ...background,
-                  type: 'image',
-                  value: styleValue,
-                  opacity: val / 100,
-                  brightness,
-                  blur,
-                });
-              }
-            }}
-          />
+            <div
+              className={`relative flex flex-col gap-5 rounded-lg border p-4 transition-colors duration-150 ${
+                isPreview ? 'border-border-strong bg-surface shadow-[0_4px_20px_-8px_rgba(0,0,0,0.06)]' : 'border-border bg-surface'
+              }`}
+            >
+              <div className="space-y-1">
+                <h3 className="font-heading text-[0.9375rem] font-bold tracking-[-0.01em] text-ink">{t('settingsUi.adjust')}</h3>
+                <p className="text-xs text-ink-muted">{isSystem ? t('settings.background.sliderDisabledHint') : t('settings.background.sliderHint')}</p>
+              </div>
 
-          <SliderControl
-            id="bg-brightness"
-            label={t('settings.background.brightness')}
-            value={brightness}
-            min={0}
-            max={200}
-            disabled={styleValue.startsWith('system:')}
-            description={t('settings.background.brightnessDescription')}
-            onDragStart={startPreview}
-            onChange={(val) => {
-              setBrightness(val);
-              if (!styleValue.startsWith('system:')) {
-                setBackgroundTemp({
-                  ...background,
-                  type: 'image',
-                  value: styleValue,
-                  opacity: opacity / 100,
-                  brightness: val,
-                  blur,
-                });
-              }
-            }}
-          />
+              <SliderControl
+                id="bg-opacity"
+                label={t('settings.background.opacity')}
+                value={opacity}
+                min={10}
+                max={100}
+                disabled={isSystem}
+                description={t('settings.background.opacityDescription')}
+                onDragStart={startPreview}
+                onChange={(val) => {
+                  setOpacity(val);
+                  updateTemp({ opacity: val / 100 });
+                }}
+              />
+              <SliderControl
+                id="bg-brightness"
+                label={t('settings.background.brightness')}
+                value={brightness}
+                min={0}
+                max={200}
+                disabled={isSystem}
+                description={t('settings.background.brightnessDescription')}
+                onDragStart={startPreview}
+                onChange={(val) => {
+                  setBrightness(val);
+                  updateTemp({ brightness: val });
+                }}
+              />
+              <SliderControl
+                id="bg-blur"
+                label={t('settings.background.blur')}
+                value={blur}
+                min={0}
+                max={20}
+                disabled={isSystem}
+                description={t('settings.background.blurDescription')}
+                onDragStart={startPreview}
+                onChange={(val) => {
+                  setBlur(val);
+                  updateTemp({ blur: val });
+                }}
+                suffix="px"
+              />
 
-          <SliderControl
-            id="bg-blur"
-            label={t('settings.background.blur')}
-            value={blur}
-            min={0}
-            max={20}
-            disabled={styleValue.startsWith('system:')}
-            description={t('settings.background.blurDescription')}
-            onDragStart={startPreview}
-            onChange={(val) => {
-              setBlur(val);
-              if (!styleValue.startsWith('system:')) {
-                setBackgroundTemp({
-                  ...background,
-                  type: 'image',
-                  value: styleValue,
-                  opacity: opacity / 100,
-                  brightness,
-                  blur: val,
-                });
-              }
-            }}
-            suffix="px"
-          />
+              <Button variant="outline" size="sm" className="w-full" onClick={reset}>
+                {t('settings.background.reset')}
+              </Button>
+            </div>
+          </div>
 
-          <Button variant="outline" size="sm" className="w-full mt-auto" onClick={reset}>
-            {t('settings.background.reset')}
-          </Button>
+          {!onClose && <div className="flex justify-end border-t border-border pt-4">{saveButton}</div>}
         </div>
       </div>
     </div>
@@ -474,7 +403,7 @@ function PackGrid({
   t: (key: string) => string;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
       {pack.items.map((item) => {
         const value = itemToStyleValue(item);
         const selected = styleValue === value || styleValue === item.id;
@@ -511,29 +440,30 @@ function PackThumbnail({
   onSelect: (v: string) => void;
   t: (key: string) => string;
 }) {
-  const label = t(item.nameKey);
+  const label = t(item.nameKey).replace(/[\u2600-\u27BF\uFE0F]|[\uD83C-\uD83E][\uDC00-\uDFFF]/g, '').trim();
 
   return (
     <button
       type="button"
-      className={`relative h-24 rounded-lg overflow-hidden border-2 transition-all hover:scale-105 ${
-        selected ? 'border-primary ring-2 ring-primary/20' : 'border-border'
+      aria-pressed={selected}
+      className={`relative aspect-video w-full overflow-hidden rounded-lg border transition-shadow duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
+        selected ? 'border-transparent ring-2 ring-brand' : 'border-border hover:border-border-strong'
       }`}
       onClick={() => onSelect(value)}
       title={label}
     >
       <ThumbnailContent item={item} label={label} />
       {selected && !isLoading && (
-        <div className="absolute top-2 right-2 bg-primary text-primary-foreground rounded-full p-0.5 shadow-sm">
-          <Check className="h-3 w-3" />
+        <div className="absolute top-2 right-2 rounded-full bg-primary p-0.5 text-white">
+          <Check size={12} weight="bold" />
         </div>
       )}
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
-          <Loader2 className="h-5 w-5 text-white animate-spin" />
+        <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+          <CircleNotch size={20} className="text-white animate-spin" />
         </div>
       )}
-      <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-[1px] text-white text-xs py-1.5 text-center font-medium">
+      <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-2 py-1.5 text-center text-xs font-medium text-white">
         {label}
       </div>
     </button>
@@ -544,12 +474,12 @@ function ThumbnailContent({ item, label }: { item: BackgroundImage; label: strin
   switch (item.kind) {
     case 'system':
       return (
-        <div className="absolute inset-0 flex items-center justify-center bg-muted/20">
+        <div className="absolute inset-0 flex items-center justify-center bg-surface-raised">
           <div
             className="w-10 h-10 rounded-full border-2 shadow-sm"
             style={{
-              backgroundColor: 'hsl(var(--background))',
-              borderColor: 'hsl(var(--border))',
+              backgroundColor: 'var(--surface-page)',
+              borderColor: 'var(--border)',
             }}
           />
         </div>
@@ -607,7 +537,7 @@ function PersonalTab({
   return (
     <>
       {/* Upload Controls */}
-      <div className="flex flex-col gap-3 p-4 rounded-lg border border-dashed bg-muted/30">
+      <div className="flex flex-col gap-3 p-4 rounded-lg border border-dashed border-border-strong bg-surface-raised">
         {/* URL Input Row */}
         <div className="flex gap-2">
           <Input
@@ -647,14 +577,14 @@ function PersonalTab({
             }}
             title={t('settings.background.customImages.addUrl')}
           >
-            <Link className="h-4 w-4" />
+            <Link size={16} />
           </Button>
         </div>
 
         {/* Divider with OR text */}
         <div className="flex items-center gap-3">
           <div className="flex-1 h-px bg-border" />
-          <span className="text-xs text-muted-foreground uppercase">{t('settings.background.customImages.or')}</span>
+          <span className="text-xs text-ink-muted">{t('settings.background.customImages.or')}</span>
           <div className="flex-1 h-px bg-border" />
         </div>
 
@@ -664,16 +594,16 @@ function PersonalTab({
           className="w-full"
           onClick={onUploadClick}
         >
-          <Upload className="h-4 w-4 mr-2" />
+          <UploadSimple size={16} className="mr-2" />
           {t('settings.background.customImages.uploadFile')}
         </Button>
       </div>
 
       {/* Info */}
       <div className="space-y-3">
-        <div className="bg-muted/50 border border-muted rounded-lg p-3 flex gap-3 items-start">
-          <Info className="h-4 w-4 mt-0.5 shrink-0" />
-          <p className="text-xs font-semibold">{t('settings.background.customImages.limit2MB')}</p>
+        <div className="bg-surface-raised rounded-lg p-3 flex gap-3 items-start">
+          <Info size={16} className="mt-0.5 shrink-0" />
+          <p className="text-xs font-medium text-ink-secondary">{t('settings.background.customImages.limit2MB')}</p>
         </div>
       </div>
 
@@ -682,10 +612,10 @@ function PersonalTab({
         <div className="mt-4">
           <button
             type="button"
-            className={`relative w-full aspect-video rounded-lg overflow-hidden border-2 transition-all hover:scale-[1.02] ${
+            className={`relative w-full aspect-video rounded-lg overflow-hidden border border-border transition-shadow duration-150 ${
               styleValue === customImages[0].dataUrl
-                ? 'border-primary ring-2 ring-primary/20'
-                : 'border-border'
+                ? 'ring-2 ring-brand'
+                : 'hover:border-border-strong'
             }`}
             onClick={() => setStyleValue(customImages[0].dataUrl)}
           >
@@ -695,21 +625,21 @@ function PersonalTab({
               className="h-full w-full object-cover"
             />
             {styleValue === customImages[0].dataUrl && (
-              <div className="absolute top-2 right-2 bg-primary text-primary-foreground rounded-full p-0.5 shadow-sm">
-                <Check className="h-3 w-3" />
+              <div className="absolute top-2 right-2 bg-primary text-white rounded-full p-0.5">
+                <Check size={12} />
               </div>
             )}
-            <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
+            <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
               {t('settings.background.customImages.current')}
             </div>
           </button>
-          <p className="text-xs text-center mt-2 text-muted-foreground">
+          <p className="text-xs text-center mt-2 text-ink-muted">
             {t('settings.background.customImages.replaceNotice')}
           </p>
         </div>
       ) : (
-        <div className="text-center py-12 text-muted-foreground">
-          <FolderHeart className="h-12 w-12 mx-auto mb-3 opacity-50" />
+        <div className="text-center py-12 text-ink-muted">
+          <FolderStar size={48} className="mx-auto mb-3 opacity-50" />
           <p className="text-sm">{t('settings.background.customImages.empty')}</p>
         </div>
       )}
@@ -744,7 +674,7 @@ function SliderControl({
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <Label htmlFor={id} className="text-sm">{label}</Label>
-        <span className="text-xs font-mono text-muted-foreground">{value}{suffix}</span>
+        <span className="text-xs font-mono tabular-nums text-ink-muted">{value}{suffix}</span>
       </div>
       <div onPointerDown={disabled ? undefined : onDragStart}>
         <Slider
@@ -759,7 +689,7 @@ function SliderControl({
         />
       </div>
       {description && (
-        <p className="text-[11px] text-muted-foreground">{description}</p>
+        <p className="text-[11px] text-ink-muted">{description}</p>
       )}
     </div>
   );

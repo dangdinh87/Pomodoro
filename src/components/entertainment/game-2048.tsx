@@ -4,7 +4,8 @@ import { useState, useCallback, useEffect, memo, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/contexts/i18n-context';
 import { cn } from '@/lib/utils';
-import { RotateCcw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowCounterClockwise, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from '@phosphor-icons/react/dist/ssr';
+import { GameOverlay, GameStat } from './game-overlay';
 
 interface Game2048Props {
   fullscreen?: boolean;
@@ -352,43 +353,14 @@ export const Game2048 = memo(function Game2048({
         "relative flex flex-col items-center justify-center overflow-hidden",
         fullscreen ? "w-full h-full p-4" : "w-full h-[600px] rounded-lg p-4"
       )}
-      style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' }}
+      style={{ background: '#16213e' }}
     >
-      {/* Start Screen */}
       {!isStarted && (
-        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col justify-center items-center z-10 p-4">
-          <h1
-            className={cn(
-              "text-white uppercase tracking-widest text-center font-bold mb-4",
-              fullscreen ? "text-5xl md:text-6xl" : "text-4xl md:text-5xl"
-            )}
-            style={{ textShadow: '0 0 20px #f59e0b, 0 0 40px #f59e0b' }}
-            suppressHydrationWarning
-          >
-            2048
-          </h1>
-          <p
-            className={cn(
-              "text-gray-300 mb-8 text-center max-w-md",
-              fullscreen ? "text-base md:text-lg" : "text-sm md:text-base"
-            )}
-            suppressHydrationWarning
-          >
-            {t('entertainment.games.game2048.instructions')}
-          </p>
-          <Button
-            onClick={initGame}
-            className={cn(
-              "bg-transparent text-amber-400 border-2 border-amber-400 uppercase tracking-wider font-bold",
-              "hover:bg-amber-400 hover:text-black transition-all",
-              "hover:shadow-[0_0_30px_rgba(245,158,11,0.8)] hover:scale-105",
-              fullscreen ? "px-10 py-4 text-xl" : "px-6 py-2 text-base"
-            )}
-            suppressHydrationWarning
-          >
+        <GameOverlay title="2048" description={t('entertainment.games.game2048.instructions')}>
+          <Button onClick={initGame} size="lg" suppressHydrationWarning>
             {t('entertainment.playNow')}
           </Button>
-        </div>
+        </GameOverlay>
       )}
 
       {isStarted && (
@@ -399,23 +371,17 @@ export const Game2048 = memo(function Game2048({
             fullscreen ? "px-4" : ""
           )}>
             <div className="flex gap-3">
-              <div className="bg-gray-800/80 rounded-lg px-3 py-2 text-center min-w-[70px]">
-                <div className="text-gray-400 text-[10px] uppercase">{t('entertainment.games.game2048.score')}</div>
-                <div className="text-white font-bold text-lg">{score}</div>
-              </div>
-              <div className="bg-gray-800/80 rounded-lg px-3 py-2 text-center min-w-[70px]">
-                <div className="text-gray-400 text-[10px] uppercase">{t('entertainment.games.game2048.best')}</div>
-                <div className="text-amber-400 font-bold text-lg">{bestScore}</div>
-              </div>
+              <GameStat label={t('entertainment.games.game2048.score')} value={score} />
+              <GameStat label={t('entertainment.games.game2048.best')} value={bestScore} />
             </div>
             <Button
               variant="ghost"
               size="icon"
               onClick={initGame}
-              className="bg-gray-800/80 hover:bg-gray-700 text-white rounded-lg w-9 h-9"
+              className="border border-white/10 bg-white/[0.06] text-white hover:bg-white/10 hover:text-white rounded-md w-9 h-9"
               aria-label={t('entertainment.controls.restart')}
             >
-              <RotateCcw className="h-4 w-4" />
+              <ArrowCounterClockwise size={16} />
             </Button>
           </div>
 
@@ -483,7 +449,7 @@ export const Game2048 = memo(function Game2048({
               onClick={() => move('up')}
               aria-label={t('entertainment.controls.up')}
             >
-              <ArrowUp className="h-5 w-5" />
+              <ArrowUp size={20} />
             </Button>
             <div className="flex gap-2">
               <Button
@@ -493,7 +459,7 @@ export const Game2048 = memo(function Game2048({
                 onClick={() => move('left')}
                 aria-label={t('entertainment.controls.left')}
               >
-                <ArrowLeft className="h-5 w-5" />
+                <ArrowLeft size={20} />
               </Button>
               <Button
                 variant="ghost"
@@ -502,7 +468,7 @@ export const Game2048 = memo(function Game2048({
                 onClick={() => move('down')}
                 aria-label={t('entertainment.controls.down')}
               >
-                <ArrowDown className="h-5 w-5" />
+                <ArrowDown size={20} />
               </Button>
               <Button
                 variant="ghost"
@@ -511,66 +477,31 @@ export const Game2048 = memo(function Game2048({
                 onClick={() => move('right')}
                 aria-label={t('entertainment.controls.right')}
               >
-                <ArrowRight className="h-5 w-5" />
+                <ArrowRight size={20} />
               </Button>
             </div>
           </div>
 
-          {/* Win overlay */}
           {isWon && !isGameOver && (
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col justify-center items-center z-20 p-4">
-              <h2
-                className="text-4xl md:text-5xl font-bold text-amber-400 mb-4"
-                style={{ textShadow: '0 0 30px #f59e0b' }}
-              >
-                {t('entertainment.games.game2048.youWin')} 🎉
-              </h2>
-              <p className="text-gray-300 mb-6">{t('entertainment.games.game2048.keepGoing')}</p>
-              <div className="flex gap-4">
-                <Button
-                  onClick={() => setIsWon(false)}
-                  className="bg-amber-500 hover:bg-amber-600 text-white font-bold"
-                >
+            <GameOverlay title={t('entertainment.games.game2048.youWin')} description={t('entertainment.games.game2048.keepGoing')}>
+              <div className="flex gap-3">
+                <Button onClick={() => setIsWon(false)} size="lg">
                   {t('entertainment.games.game2048.continue')}
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={initGame}
-                  className="border-white/30 text-white hover:bg-white/10"
-                >
+                <Button variant="outline" onClick={initGame} size="lg">
                   {t('entertainment.games.game2048.newGame')}
                 </Button>
               </div>
-            </div>
+            </GameOverlay>
           )}
 
-          {/* Game over overlay */}
           {isGameOver && (
-            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col justify-center items-center z-20 p-4">
-              <h2
-                className="text-4xl md:text-5xl font-bold text-red-400 mb-2"
-                style={{ textShadow: '0 0 20px #ef4444' }}
-              >
-                Game Over!
-              </h2>
-              <div
-                className="text-5xl md:text-6xl font-bold text-amber-400 my-6"
-                style={{ textShadow: '0 0 20px #f59e0b' }}
-              >
-                {score}
-              </div>
-              <Button
-                onClick={initGame}
-                className={cn(
-                  "bg-transparent text-amber-400 border-2 border-amber-400 uppercase tracking-wider font-bold",
-                  "hover:bg-amber-400 hover:text-black transition-all",
-                  "hover:shadow-[0_0_30px_rgba(245,158,11,0.8)] hover:scale-105",
-                  "px-8 py-3 text-lg"
-                )}
-              >
+            <GameOverlay title={t('entertainment.gameOver')}>
+              <GameStat label={t('entertainment.games.game2048.score')} value={score} className="min-w-[120px] py-3" />
+              <Button onClick={initGame} size="lg">
                 {t('entertainment.games.game2048.newGame')}
               </Button>
-            </div>
+            </GameOverlay>
           )}
         </>
       )}

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback, memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/contexts/i18n-context';
 import { cn } from '@/lib/utils';
+import { GameOverlay, GameStat } from './game-overlay';
 
 interface GameState {
   score: number;
@@ -502,91 +503,33 @@ export const SpaceShooterGame = memo(function SpaceShooterGame({
         className="absolute inset-0 w-full h-full"
       />
 
-      {/* HUD */}
       {displayState.isRunning && (
         <div
           className={cn(
-            "absolute left-0 w-full flex justify-between text-cyan-400 font-bold pointer-events-none px-6",
-            fullscreen ? "top-20 text-xl" : "top-4 text-lg"
+            "absolute left-0 w-full flex justify-between gap-3 px-6 pointer-events-none",
+            fullscreen ? "top-20" : "top-4"
           )}
-          style={{ textShadow: '0 0 10px #00ffff' }}
         >
-          <span>Score: {displayState.score}</span>
-          <span>Level: {displayState.level}</span>
+          <GameStat label={t('entertainment.games.snake.score')} value={displayState.score} />
+          <GameStat label={t('entertainment.games.snake.level')} value={displayState.level} />
         </div>
       )}
 
-      {/* Start Screen */}
       {!displayState.isRunning && !displayState.isGameOver && (
-        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col justify-center items-center z-10 p-4">
-          <h1
-            className={cn(
-              "text-white uppercase tracking-widest text-center font-bold mb-4",
-              fullscreen ? "text-4xl md:text-5xl" : "text-3xl md:text-4xl"
-            )}
-            style={{ textShadow: '0 0 20px #ff00de, 0 0 40px #ff00de' }}
-            suppressHydrationWarning
-          >
-            {t('entertainment.games.spaceShooter.title')}
-          </h1>
-          <p
-            className={cn(
-              "text-gray-300 mb-8 text-center max-w-md",
-              fullscreen ? "text-base md:text-lg" : "text-sm md:text-base"
-            )}
-            suppressHydrationWarning
-          >
-            {t('entertainment.instructions')}
-          </p>
-          <Button
-            onClick={initGame}
-            className={cn(
-              "bg-transparent text-cyan-400 border-2 border-cyan-400 uppercase tracking-wider font-bold",
-              "hover:bg-cyan-400 hover:text-black transition-all",
-              "hover:shadow-[0_0_30px_rgba(0,255,255,0.8)] hover:scale-105",
-              fullscreen ? "px-10 py-4 text-xl" : "px-6 py-2 text-base"
-            )}
-            suppressHydrationWarning
-          >
+        <GameOverlay title={t('entertainment.games.spaceShooter.title')} description={t('entertainment.instructions')}>
+          <Button onClick={initGame} size="lg" suppressHydrationWarning>
             {t('entertainment.playNow')}
           </Button>
-        </div>
+        </GameOverlay>
       )}
 
-      {/* Game Over Screen */}
       {displayState.isGameOver && (
-        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col justify-center items-center z-10 p-4">
-          <h1
-            className={cn(
-              "text-white uppercase tracking-widest text-center font-bold mb-2",
-              fullscreen ? "text-4xl md:text-5xl" : "text-3xl md:text-4xl"
-            )}
-            style={{ textShadow: '0 0 20px #ff00de, 0 0 40px #ff00de' }}
-          >
-            Game Over!
-          </h1>
-          <div
-            className={cn(
-              "text-yellow-400 my-6 font-bold",
-              fullscreen ? "text-6xl md:text-7xl" : "text-4xl md:text-5xl"
-            )}
-            style={{ textShadow: '0 0 20px #ffcc00' }}
-          >
-            {displayState.score}
-          </div>
-          <Button
-            onClick={initGame}
-            className={cn(
-              "bg-transparent text-cyan-400 border-2 border-cyan-400 uppercase tracking-wider font-bold",
-              "hover:bg-cyan-400 hover:text-black transition-all",
-              "hover:shadow-[0_0_30px_rgba(0,255,255,0.8)] hover:scale-105",
-              fullscreen ? "px-10 py-4 text-xl" : "px-6 py-2 text-base"
-            )}
-            suppressHydrationWarning
-          >
-            {t('entertainment.playNow')}
+        <GameOverlay title={t('entertainment.gameOver')}>
+          <GameStat label={t('entertainment.games.snake.score')} value={displayState.score} className="min-w-[120px] py-3" />
+          <Button onClick={initGame} size="lg" suppressHydrationWarning>
+            {t('entertainment.playAgain')}
           </Button>
-        </div>
+        </GameOverlay>
       )}
     </div>
   );

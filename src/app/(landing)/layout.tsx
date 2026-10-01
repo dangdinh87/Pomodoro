@@ -13,14 +13,14 @@ export default function LandingLayout({
 }) {
   return (
     <ThemeProvider
-      attribute="class"
+      attribute="data-theme"
       defaultTheme="dark"
       forcedTheme="dark"
       enableSystem={false}
       disableTransitionOnChange
     >
       <I18nProvider>
-        <div className="min-h-screen relative">
+        <div className="min-h-screen relative bg-surface-page text-ink">
           <main className="relative z-10">{children}</main>
         </div>
       </I18nProvider>

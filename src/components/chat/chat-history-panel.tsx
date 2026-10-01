@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { MessageSquare, Trash2, Search, MoreHorizontal, Plus } from "lucide-react";
+import { Chat, Trash, MagnifyingGlass, DotsThree, Plus } from '@phosphor-icons/react/dist/ssr';
 import { isToday, isYesterday, isWithinInterval, subDays, startOfDay } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -141,8 +141,8 @@ export function ChatHistoryPanel({
             className={cn(
                 "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors cursor-pointer",
                 currentConversationId === conversation.id
-                    ? "bg-primary/10 text-primary"
-                    : "hover:bg-muted"
+                    ? "bg-surface-hover text-ink font-medium"
+                    : "hover:bg-surface-hover"
             )}
         >
             <div
@@ -167,22 +167,22 @@ export function ChatHistoryPanel({
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7 min-w-[28px] shrink-0 text-muted-foreground hover:text-foreground"
+                            className="h-7 w-7 min-w-[28px] shrink-0 text-ink-muted hover:text-ink"
                             onClick={(e) => e.stopPropagation()}
                             aria-label={t('common.actions')}
                         >
-                            <MoreHorizontal className="h-4 w-4" />
+                            <DotsThree size={16} />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuItem
-                            className="text-destructive focus:text-destructive"
+                            className="text-danger-ink focus:text-danger-ink"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 handleDeleteClick(conversation, e);
                             }}
                         >
-                            <Trash2 className="mr-2 h-4 w-4" />
+                            <Trash size={16} className="mr-2" />
                             {t('common.delete')}
                         </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -195,7 +195,7 @@ export function ChatHistoryPanel({
         if (conversations.length === 0) return null;
         return (
             <div key={group} className="mb-2">
-                <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
+                <div className="px-2 py-1 text-xs font-medium text-ink-muted">
                     {timeGroupLabels[group]}
                 </div>
                 <div className="space-y-0.5">
@@ -222,7 +222,7 @@ export function ChatHistoryPanel({
                     {/* Search Input */}
                     <div className="px-2 py-2 border-b">
                         <div className="relative">
-                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                            <MagnifyingGlass size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-ink-muted" />
                             <Input
                                 placeholder={t('common.search')}
                                 value={searchQuery}
@@ -235,8 +235,8 @@ export function ChatHistoryPanel({
                     <ScrollArea className="h-[calc(100vh-120px)]">
                         {!hasConversations ? (
                             <div className="flex flex-col items-center justify-center py-8 px-4 text-center animate-in fade-in-50 duration-300">
-                                <MessageSquare className="h-10 w-10 text-muted-foreground/40 mb-3" />
-                                <p className="text-sm text-muted-foreground">
+                                <Chat size={40} className="text-ink-faint mb-3" />
+                                <p className="text-sm text-ink-muted">
                                     {searchQuery ? t('common.noResults') : t('chat.noConversations')}
                                 </p>
                             </div>
@@ -264,7 +264,7 @@ export function ChatHistoryPanel({
                         <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleConfirmDelete}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            className="bg-danger text-white hover:bg-danger/90"
                         >
                             {t('common.delete')}
                         </AlertDialogAction>

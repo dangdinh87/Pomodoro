@@ -4,7 +4,8 @@ import { useEffect, useRef, useState, useCallback, memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/contexts/i18n-context';
 import { cn } from '@/lib/utils';
-import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Zap, Skull } from 'lucide-react';
+import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Lightning, Skull } from '@phosphor-icons/react/dist/ssr';
+import { GameOverlay, GameStat } from './game-overlay';
 
 interface SnakeGameProps {
   fullscreen?: boolean;
@@ -429,24 +430,15 @@ export const SnakeGame = memo(function SnakeGame({
       )}
       style={{ background: '#0f172a' }}
     >
-      {/* HUD */}
       {isRunning && (
         <div className="flex items-center justify-between w-full max-w-md mb-3">
           <div className="flex gap-3">
-            <div className="bg-gray-800/80 rounded-lg px-3 py-1.5 text-center">
-              <div className="text-gray-400 text-[10px] uppercase">Điểm</div>
-              <div className="text-green-400 font-bold text-lg">{score}</div>
-            </div>
-            <div className="bg-gray-800/80 rounded-lg px-3 py-1.5 text-center">
-              <div className="text-gray-400 text-[10px] uppercase flex items-center gap-1">
-                <Zap className="h-3 w-3" /> Level
-              </div>
-              <div className="text-yellow-400 font-bold text-lg">{level}</div>
-            </div>
+            <GameStat label={t('entertainment.games.snake.score')} value={score} />
+            <GameStat label={t('entertainment.games.snake.level')} value={level} />
           </div>
           {obstacleCount > 0 && (
-            <div className="flex items-center gap-1 text-gray-400 text-sm">
-              <Skull className="h-4 w-4" />
+            <div className="flex items-center gap-1 text-white/60 text-sm">
+              <Skull size={16} />
               <span>{obstacleCount}</span>
             </div>
           )}
@@ -473,7 +465,7 @@ export const SnakeGame = memo(function SnakeGame({
             onClick={() => handleDirectionButton('UP')}
             aria-label={t('entertainment.controls.up')}
           >
-            <ArrowUp className="h-6 w-6" />
+            <ArrowUp size={24} />
           </Button>
           <div className="flex gap-2">
             <Button
@@ -483,7 +475,7 @@ export const SnakeGame = memo(function SnakeGame({
               onClick={() => handleDirectionButton('LEFT')}
               aria-label={t('entertainment.controls.left')}
             >
-              <ArrowLeft className="h-6 w-6" />
+              <ArrowLeft size={24} />
             </Button>
             <Button
               variant="ghost"
@@ -492,7 +484,7 @@ export const SnakeGame = memo(function SnakeGame({
               onClick={() => handleDirectionButton('DOWN')}
               aria-label={t('entertainment.controls.down')}
             >
-              <ArrowDown className="h-6 w-6" />
+              <ArrowDown size={24} />
             </Button>
             <Button
               variant="ghost"
@@ -501,96 +493,31 @@ export const SnakeGame = memo(function SnakeGame({
               onClick={() => handleDirectionButton('RIGHT')}
               aria-label={t('entertainment.controls.right')}
             >
-              <ArrowRight className="h-6 w-6" />
+              <ArrowRight size={24} />
             </Button>
           </div>
         </div>
       )}
 
-      {/* Start Screen with Instructions */}
       {!isRunning && !isGameOver && (
-        <div className="absolute inset-0 bg-black/85 backdrop-blur-sm flex flex-col justify-center items-center z-10 p-6">
-          <h1
-            className="text-white uppercase tracking-widest text-center font-bold mb-6 text-3xl md:text-4xl"
-            style={{ textShadow: '0 0 20px #4ade80' }}
-            suppressHydrationWarning
-          >
-            🐍 {t('entertainment.games.snake.title')}
-          </h1>
-
-          {/* How to play */}
-          <div className="bg-gray-800/60 rounded-xl p-4 mb-6 max-w-sm w-full">
-            <h3 className="text-green-400 font-bold mb-3 text-center">Cách chơi</h3>
-            <ul className="text-gray-300 text-sm space-y-2">
-              <li className="flex items-start gap-2">
-                <span className="text-green-400">⌨️</span>
-                <span>Dùng <strong>phím mũi tên</strong> hoặc <strong>WASD</strong> để điều khiển</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-red-400">🍎</span>
-                <span>Ăn táo đỏ để ghi <strong>+10 điểm</strong> và dài thêm</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-yellow-400">⚡</span>
-                <span>Mỗi <strong>50 điểm</strong> = lên 1 level, rắn chạy nhanh hơn</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-gray-400">💀</span>
-                <span>Từ Level 2: xuất hiện <strong>chướng ngại vật</strong></span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-red-500">⚠️</span>
-                <span>Tránh đâm <strong>tường, thân</strong> và <strong>chướng ngại vật</strong></span>
-              </li>
-            </ul>
-          </div>
-
-          <Button
-            onClick={startGame}
-            className={cn(
-              "bg-green-500 hover:bg-green-600 text-white uppercase tracking-wider font-bold",
-              "px-8 py-3 text-lg rounded-xl",
-              "hover:shadow-[0_0_30px_rgba(74,222,128,0.5)] hover:scale-105 transition-all"
-            )}
-            suppressHydrationWarning
-          >
+        <GameOverlay title={t('entertainment.games.snake.title')} description={t('entertainment.games.snake.instructions')}>
+          <Button onClick={startGame} size="lg" suppressHydrationWarning>
             {t('entertainment.playNow')}
           </Button>
-        </div>
+        </GameOverlay>
       )}
 
-      {/* Game Over Screen */}
       {isGameOver && (
-        <div className="absolute inset-0 bg-black/85 backdrop-blur-sm flex flex-col justify-center items-center z-10 p-6">
-          <h1
-            className="text-white uppercase tracking-widest text-center font-bold mb-2 text-3xl md:text-4xl"
-            style={{ textShadow: '0 0 20px #ef4444' }}
-          >
-            Game Over!
-          </h1>
-
-          <div className="bg-gray-800/60 rounded-xl p-4 my-4 text-center">
-            <div className="text-green-400 text-5xl font-bold mb-2" style={{ textShadow: '0 0 15px #4ade80' }}>
-              {score}
-            </div>
-            <div className="flex justify-center gap-6 text-gray-300 text-sm">
-              <span>Level: <strong className="text-yellow-400">{level}</strong></span>
-              <span>Độ dài: <strong className="text-green-400">{snakeRef.current.length}</strong></span>
-            </div>
+        <GameOverlay title={t('entertainment.gameOver')}>
+          <div className="flex gap-3">
+            <GameStat label={t('entertainment.games.snake.score')} value={score} />
+            <GameStat label={t('entertainment.games.snake.level')} value={level} />
+            <GameStat label={t('entertainment.games.snake.length')} value={snakeRef.current.length} />
           </div>
-
-          <Button
-            onClick={startGame}
-            className={cn(
-              "bg-green-500 hover:bg-green-600 text-white uppercase tracking-wider font-bold",
-              "px-8 py-3 text-lg rounded-xl",
-              "hover:shadow-[0_0_30px_rgba(74,222,128,0.5)] hover:scale-105 transition-all"
-            )}
-            suppressHydrationWarning
-          >
-            Chơi lại
+          <Button onClick={startGame} size="lg" suppressHydrationWarning>
+            {t('entertainment.playAgain')}
           </Button>
-        </div>
+        </GameOverlay>
       )}
     </div>
   );

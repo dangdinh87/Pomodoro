@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, CircleNotch } from '@phosphor-icons/react/dist/ssr';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -22,7 +22,6 @@ import { supabase } from '@/lib/supabase-client';
 import { useAuthStore } from '@/stores/auth-store';
 import { useI18n } from '@/contexts/i18n-context';
 
-import { BorderBeam } from '@/components/ui/border-beam';
 import Image from 'next/image';
 
 // Component that handles redirect logic with useSearchParams
@@ -119,14 +118,13 @@ export default function SignupPage() {
       <Suspense fallback={null}>
         <SignupRedirect />
       </Suspense>
-        <Card className="relative w-full max-w-md overflow-hidden border-white/10 bg-background/80 shadow-2xl backdrop-blur">
-          <BorderBeam size={250} duration={12} delay={0} />
+        <Card className="w-full max-w-md">
         <CardHeader className="space-y-2 text-center">
-          <CardTitle className="text-2xl font-semibold flex flex-col items-center gap-2">
+          <CardTitle className="font-heading text-2xl font-bold flex flex-col items-center gap-3">
             <Image src="/images/logo.svg" alt={t('brand.title')} width={52} height={52} />
             {t('signup.title')}
           </CardTitle>
-          <CardDescription className="text-sm text-muted-foreground">
+          <CardDescription className="text-sm text-ink-muted">
             {t('signup.description')}
           </CardDescription>
         </CardHeader>
@@ -158,7 +156,7 @@ export default function SignupPage() {
             <Button className="w-full" type="submit" disabled={signupLoading}>
               {signupLoading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <CircleNotch size={16} className="animate-spin" />
                   {t('signup.form.signingUp')}
                 </>
               ) : (
@@ -167,7 +165,7 @@ export default function SignupPage() {
             </Button>
           </form>
 
-          <div className="flex items-center gap-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+          <div className="flex items-center gap-4 text-xs text-ink-muted">
             <Separator className="flex-1" />
             {t('signup.form.or')}
             <Separator className="flex-1" />
@@ -182,13 +180,13 @@ export default function SignupPage() {
           >
             {googleLoading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <CircleNotch size={16} className="animate-spin" />
                 Google
               </>
             ) : (
               <>
                 <svg
-                  className="mr-2 h-4 w-4"
+                  className="h-4 w-4"
                   aria-hidden="true"
                   focusable="false"
                   data-prefix="fab"
@@ -220,16 +218,16 @@ export default function SignupPage() {
           </Button>
         </CardContent>
 
-        <CardFooter className="flex flex-col gap-3 text-sm text-muted-foreground">
+        <CardFooter className="flex flex-col gap-3 text-sm text-ink-muted">
           <p className="text-center">
             {t('signup.form.haveAccount')}{' '}
-            <Link href="/login" className="text-primary hover:underline">
+            <Link href="/login" className="text-brand hover:underline">
               {t('signup.form.signInNow')}
             </Link>
           </p>
           <Button variant="ghost" asChild>
             <Link href="/timer">
-              <ArrowLeft className="mr-2 h-4 w-4" />
+              <ArrowLeft size={16} />
               {t('signup.form.backToApp')}
             </Link>
           </Button>

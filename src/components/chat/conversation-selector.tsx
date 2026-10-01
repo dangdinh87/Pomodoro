@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Check, ChevronsUpDown, MessageSquare, Plus, Trash2, MoreHorizontal, Search } from "lucide-react";
+import { Check, CaretUpDown, Chat, Plus, Trash, DotsThree, MagnifyingGlass } from '@phosphor-icons/react/dist/ssr';
 import { isToday, isYesterday, isWithinInterval, subDays, startOfDay } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -99,7 +99,7 @@ export function ConversationSelector({
 	const renderConversationItem = (conversation: Conversation) => (
 		<div
 			key={conversation.id}
-			className="group flex items-center gap-1 rounded-sm px-2 hover:bg-accent text-sm py-1.5 focus-within:bg-accent relative"
+			className="group flex items-center gap-1 rounded-sm px-2 hover:bg-surface-hover text-sm py-1.5 focus-within:bg-surface-hover relative"
 		>
 			<div
 				className="flex-1 flex items-center gap-2 cursor-pointer truncate min-w-0"
@@ -108,16 +108,16 @@ export function ConversationSelector({
 					setOpen(false);
 				}}
 			>
-				<MessageSquare
+				<Chat
 					className={cn(
 						"h-4 w-4 shrink-0",
-						currentConversationId === conversation.id ? "text-primary" : "text-muted-foreground"
+						currentConversationId === conversation.id ? "text-brand" : "text-ink-muted"
 					)}
 				/>
 				<span className={cn("truncate flex-1", currentConversationId === conversation.id && "font-medium")}>
 					{conversation.title || t("chat.newChat")}
 				</span>
-				{currentConversationId === conversation.id && <Check className="h-4 w-4 shrink-0 text-primary" />}
+				{currentConversationId === conversation.id && <Check size={16} className="shrink-0 text-brand" />}
 			</div>
 
 			<DropdownMenu>
@@ -128,18 +128,18 @@ export function ConversationSelector({
 						className="h-6 w-6 ml-auto opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100 data-[state=open]:opacity-100"
 						aria-label={t('common.actions')}
 					>
-						<MoreHorizontal className="h-3 w-3" />
+						<DotsThree size={12} />
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end">
 					<DropdownMenuItem
-						className="text-destructive focus:text-destructive"
+						className="text-danger-ink focus:text-danger-ink"
 						onClick={(e) => {
 							e.stopPropagation();
 							onDelete(conversation.id);
 						}}
 					>
-						<Trash2 className="mr-2 h-4 w-4" />
+						<Trash size={16} className="mr-2" />
 						{t("common.delete")}
 					</DropdownMenuItem>
 				</DropdownMenuContent>
@@ -151,7 +151,7 @@ export function ConversationSelector({
 		if (conversations.length === 0) return null;
 		return (
 			<div key={group} className="py-1">
-				<div className="px-2 py-1 text-xs font-medium text-muted-foreground">{timeGroupLabels[group]}</div>
+				<div className="px-2 py-1 text-xs font-medium text-ink-muted">{timeGroupLabels[group]}</div>
 				{conversations.map(renderConversationItem)}
 			</div>
 		);
@@ -166,19 +166,19 @@ export function ConversationSelector({
 					variant="outline"
 					role="combobox"
 					aria-expanded={open}
-					className="w-[280px] justify-between bg-muted/50 hover:bg-muted border-0 h-9"
+					className="w-[280px] justify-between bg-surface-raised/50 hover:bg-surface-hover border-0 h-9"
 				>
 					<div className="flex items-center gap-2 truncate">
-						<MessageSquare className="h-4 w-4 shrink-0 text-muted-foreground" />
+						<Chat size={16} className="shrink-0 text-ink-muted" />
 						<span className="truncate">{selectedConversation?.title || t("chat.newChat")}</span>
 					</div>
-					<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+					<CaretUpDown size={16} className="ml-2 shrink-0 opacity-50" />
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent className="w-[280px] p-0" align="start">
 				<div className="p-2">
 					<div className="relative">
-						<Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+						<MagnifyingGlass size={16} className="absolute left-2 top-2.5 text-ink-muted" />
 						<Input
 							placeholder={t("common.search")}
 							value={searchQuery}
@@ -188,18 +188,18 @@ export function ConversationSelector({
 					</div>
 				</div>
 				<div
-					className="flex items-center gap-2 px-3 py-2 hover:bg-accent cursor-pointer text-primary"
+					className="flex items-center gap-2 px-3 py-2 hover:bg-surface-hover cursor-pointer text-brand"
 					onClick={() => {
 						onNewChat();
 						setOpen(false);
 					}}
 				>
-					<Plus className="h-4 w-4" />
+					<Plus size={16} />
 					<span className="font-medium text-sm">{t("chat.newChat")}</span>
 				</div>
 				<ScrollArea className="h-[300px]">
 					{!hasConversations ? (
-						<div className="p-4 text-center text-sm text-muted-foreground">{t("errors.notFound")}</div>
+						<div className="p-4 text-center text-sm text-ink-muted">{t("errors.notFound")}</div>
 					) : (
 						<div className="p-1">
 							{renderGroup("today", groupedConversations.today)}

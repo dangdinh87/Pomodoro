@@ -40,13 +40,14 @@
     "history": "履歴",
     "leaderboard": "ランキング",
     "chatAI": "AIチャット",
-    "entertainment": "エンタメ",
+    "entertainment": "ゲーム",
     "settings": "設定",
     "guide": "ガイド",
     "feedback": "フィードバック",
     "login": "ログイン",
     "logout": "ログアウト",
-    "loginNow": "今すぐログイン"
+    "loginNow": "今すぐログイン",
+    "signInHint": "タスクと統計をデバイス間で同期"
   },
   "auth": {
     "login": "ログイン",
@@ -111,7 +112,7 @@
     },
     "mode_switch_confirm": {
       "title": "モードを切り替えますか？",
-      "description": "タイマーが実行中です。モードを切り替えると現在の進捗が失われます。",
+      "description": "このセッションはすでに始まっています。モードを切り替えると進捗が失われます。",
       "confirm": "切り替える"
     },
     "doneAt": "終了予定",
@@ -160,9 +161,9 @@
   "timerSettings": {
     "title": "タイマー設定",
     "labels": {
-      "workDuration": "作業時間（分）",
-      "shortBreakDuration": "短い休憩（分）",
-      "longBreakDuration": "長い休憩（分）",
+      "workDuration": "作業時間",
+      "shortBreakDuration": "短い休憩",
+      "longBreakDuration": "長い休憩",
       "longBreakInterval": "長い休憩までのセッション数",
       "autoStartBreaks": "休憩を自動開始",
       "autoStartWork": "作業を自動開始",
@@ -288,7 +289,7 @@
       "noTemplates": "テンプレートがありません",
       "createTemplateHint": "タスクをテンプレートとして保存して再利用できます",
       "empty": "テンプレートがありません",
-      "emptyHint": "タスクのブックマークアイコンをクリックしてテンプレートとして保存"
+      "emptyHint": "タスクの「その他の操作」メニューから「テンプレートとして保存」を選んでください。"
     }
   },
   "history": {
@@ -384,6 +385,7 @@
         "themes": {
           "recommended": "推奨",
           "default": "デフォルト",
+          "blue": "ブルー",
           "rose": "ローズ",
           "emerald": "フォレスト",
           "indigo": "ミッドナイト",
@@ -391,12 +393,12 @@
           "amber": "オータム",
           "cyan": "ミント",
           "teal": "オーシャン",
-          "pink-light": "桜",
-          "pink-mild": "ベリー",
+          "pink": "桜",
           "mono": "モノクロ"
         },
         "themeDescriptions": {
-          "default": "ニュートラル＆安心",
+          "default": "定番のトマト",
+          "blue": "落ち着いて集中",
           "rose": "ロマンチック＆愛",
           "emerald": "自然＆癒し",
           "indigo": "深い集中モード",
@@ -404,8 +406,7 @@
           "amber": "温かいビンテージ",
           "cyan": "爽やか＆クリーン",
           "teal": "深いブルーエネルギー",
-          "pink-light": "柔らかな春の雰囲気",
-          "pink-mild": "甘い＆遊び心",
+          "pink": "柔らかな春の雰囲気",
           "mono": "ミニマル＆プロ"
         }
       },
@@ -993,6 +994,8 @@
       }
     },
     "playNow": "今すぐプレイ",
+    "playAgain": "もう一度プレイ",
+    "gameOver": "ゲームオーバー",
     "backToList": "ゲーム一覧に戻る",
     "closeGame": "ゲームを閉じる",
     "controls": "操作方法",
@@ -1527,7 +1530,7 @@
           "games": "ミニゲーム（スネーク、2048など）",
           "leaderboard": "グローバルランキング",
           "focus": "集中モード＆連続記録",
-          "themes": "ライト/ダーク＆背景",
+          "themes": "カラーテーマ＆背景",
           "sounds": "サウンド、Spotify＆YouTube",
           "stats": "コア分析"
         }
@@ -1575,5 +1578,237 @@
         }
       }
     }
+  },
+  "historyUi": {
+    "title": "履歴",
+    "description": "集中時間、連続記録、最近のセッションを確認できます。",
+    "rangeLabel": "期間",
+    "ranges": { "today": "今日", "week": "今週", "month": "今月" },
+    "stats": {
+      "focusTime": "集中時間",
+      "sessions": "セッション数",
+      "currentStreak": "現在の連続日数",
+      "bestStreak": "最長の連続日数"
+    },
+    "hoursMinutes": "{hours}時間{minutes}分",
+    "minutesOnly": "{minutes}分",
+    "dayOne": "{count}日",
+    "dayOther": "{count}日",
+    "minutesShort": "{minutes}分",
+    "chart": {
+      "title": "過去7日間",
+      "subtitle": "1日あたりの集中時間(分)",
+      "summary": "過去7日間の集中時間(分)"
+    },
+    "heatmap": {
+      "title": "連続記録",
+      "subtitle": "直近12週間",
+      "less": "少",
+      "more": "多",
+      "cell": "{date}: 集中 {minutes}分",
+      "cellNone": "{date}: 集中なし"
+    },
+    "sessions": {
+      "title": "最近のセッション",
+      "none": "この期間のセッションはまだありません。",
+      "noTask": "タスクなし",
+      "modes": { "work": "集中", "shortBreak": "短い休憩", "longBreak": "長い休憩" }
+    },
+    "empty": {
+      "title": "まだセッションがありません",
+      "description": "集中セッションを終えると、ここに履歴が表示されます。",
+      "action": "集中を始める"
+    },
+    "error": "履歴を読み込めませんでした。"
+  },
+  "arcadeUi": {
+    "title": "アーケード",
+    "description": "休憩時間にぴったりの短いゲーム。",
+    "runningNote": "ゲームをすると集中が中断されます。先にセッションを終えましょう。",
+    "best": "ベスト {score}"
+  },
+  "settingsUi": {
+    "unitMin": "分",
+    "unitSessions": "回",
+    "autoStartBreakHint": "作業セッションが終わったらすぐに休憩を始めます。",
+    "autoStartWorkHint": "休憩が終わったらすぐに次の作業セッションを始めます。",
+    "lowTimeWarningHint": "残り10秒でクロックが点滅します。",
+    "clockStyleHint": "タイマー画面でのカウントダウンの見た目です。",
+    "clockSizeHint": "タイマー画面のクロックの大きさを変えます。",
+    "livePreview": "プレビュー",
+    "adjust": "調整",
+    "selected": "選択中"
+  },
+  "pagesUi": {
+    "guide": {
+      "figureCaption": "1ポモドーロ：集中セッションのあと、短い休憩。",
+      "tip": "作業と休憩の長さは設定で変えられます。小さな区切りで集中し、こまめに休むリズムを保ちましょう。",
+      "shortcutsTitle": "キーボードショートカット",
+      "shortcutsIntro": "テキスト入力中でないとき、タイマー画面で使えます。",
+      "colKey": "キー",
+      "colAction": "操作",
+      "keySpace": "Space",
+      "actionStartPause": "タイマーの開始と一時停止",
+      "actionReset": "現在のセッションをリセット"
+    },
+    "feedback": {
+      "optional": "任意",
+      "contactHint": "返信が必要な場合にのみ使用します。"
+    },
+    "leaderboard": {
+      "tasksCount": "{count}件"
+    }
+  },
+  "tasksUi": {
+    "summary": "未着手 {todo} 件、進行中 {doing} 件、完了 {done} 件",
+    "viewList": "リスト",
+    "viewBoard": "ボード",
+    "viewLabel": "タスクの表示形式",
+    "quickAddPlaceholder": "タスクを追加…",
+    "quickAddLabel": "新しいタスク名",
+    "add": "追加",
+    "addDetails": "詳細を指定して追加",
+    "estimateLabel": "見積もりポモドーロ数",
+    "estimateShort": "見積もり",
+    "estimateDecrease": "ポモドーロを減らす",
+    "estimateIncrease": "ポモドーロを増やす",
+    "estimateValue": "{count} ポモドーロ",
+    "estimateValuePlural": "{count} ポモドーロ",
+    "priorityLabel": "優先度",
+    "filterLabel": "タスクを絞り込む",
+    "filterAll": "すべて",
+    "filterToday": "今日",
+    "filterTodo": "未着手",
+    "filterDoing": "進行中",
+    "filterDone": "完了",
+    "searchOpen": "タスクを検索",
+    "searchClose": "検索を閉じる",
+    "searchPlaceholder": "タイトルまたはタグで検索",
+    "showCompleted": "完了した {count} 件を表示",
+    "hideCompleted": "完了したタスクを隠す",
+    "focus": "集中する",
+    "stopFocus": "集中を終了",
+    "focusingBadge": "集中中",
+    "edit": "編集",
+    "more": "その他の操作",
+    "duplicate": "複製",
+    "saveAsTemplate": "テンプレートとして保存",
+    "delete": "削除",
+    "dueToday": "今日が期限",
+    "dueTomorrow": "明日が期限",
+    "overdue": "期限切れ",
+    "pomodoroProgress": "{done} / {total} ポモドーロ",
+    "emptyTitle": "タスクはまだありません",
+    "emptyAction": "最初のタスクを追加",
+    "emptyDescription": "上の入力欄から最初のタスクを追加し、「集中する」を押してセッションを始めましょう。",
+    "noMatchTitle": "一致するタスクがありません",
+    "noMatchDescription": "別のフィルターやキーワードをお試しください。",
+    "clearFilters": "フィルターを解除",
+    "boardEmpty": "なし",
+    "dragHandle": "ドラッグして並べ替え",
+    "manage": "タグとテンプレートの管理",
+    "page": "{page} / {total} ページ",
+    "signedOutDescription": "ログインすると、タスクがデバイス間で同期されます。",
+    "pickDate": "日付を選択",
+    "clearDate": "日付をクリア",
+    "estimateMin": "ポモドーロは1以上で入力してください",
+    "tagsLabel": "タグ",
+    "tagsPlaceholder": "タグを追加",
+    "tagSuggestions": "候補",
+    "noTagsHint": "上でタグを追加すると、関連するタスクをまとめられます。",
+    "tagsUsed": "{count}/{max} 個のタグを使用中",
+    "templatesDescription": "保存済みのタスク設定。新しいタスクの作成時に再利用できます。"
+  },
+  "landingUi": {
+    "hero": {
+      "title": "集中を途切れさせないポモドーロタイマー",
+      "lead": "集中する時間を区切り、きちんと休み、タスクと履歴をひとつにまとめます。無料で、アカウントなしですぐ始められます。",
+      "start": "集中を始める",
+      "login": "ログイン"
+    },
+    "timer": {
+      "modeGroup": "タイマーモード",
+      "work": "作業",
+      "shortBreak": "短い休憩",
+      "longBreak": "長い休憩",
+      "start": "開始",
+      "pause": "一時停止",
+      "restart": "もう一度開始",
+      "reset": "リセット",
+      "openApp": "アプリ全体を開く"
+    },
+    "features": {
+      "title": "集中セッションに必要なものがすべて",
+      "timer": "作業・短い休憩・長い休憩のモード。キーボードショートカット対応。",
+      "tasks": "タスクをセッションに紐づけ、状態や日付で絞り込めます。",
+      "analytics": "セッション履歴と、日・週・月ごとの統計。",
+      "chatAI": "Bro Chat に勉強のコツや時間管理を相談できます。",
+      "sounds": "自然音、ローファイ、ホワイトノイズ、Spotify や YouTube も。",
+      "entertainment": "休憩の合図が鳴ったら、Snake や 2048 などで一息。"
+    },
+    "how": {
+      "title": "セッションの流れ",
+      "step1": {
+        "title": "タスクを選ぶ",
+        "description": "取り組む内容を追加し、必要なポモドーロ数を見積もります。"
+      },
+      "step2": {
+        "title": "25分間集中する",
+        "description": "タイマーを開始し、鳴るまでそのタスクだけに取り組みます。"
+      },
+      "step3": {
+        "title": "休んで振り返る",
+        "description": "短く休憩します。履歴と統計で一日の様子を確認できます。"
+      }
+    },
+    "pricing": {
+      "title": "無料で使えて、Pro も準備中",
+      "subtitle": "Starter のすべてが今は無料で、クレジットカードも不要です。Pro は開発中です。"
+    },
+    "faq": {
+      "title": "よくある質問"
+    }
+  },
+  "timerUi": {
+    "soundOff": "オフ",
+    "modeGroup": "タイマーのモード",
+    "mode": {
+      "work": "集中",
+      "shortBreak": "短い休憩",
+      "longBreak": "長い休憩"
+    },
+    "startFocus": "集中を始める",
+    "startBreak": "休憩を始める",
+    "resume": "再開",
+    "spaceKey": "Space",
+    "hintStart": "{key} で開始",
+    "hintPause": "{key} で一時停止",
+    "hintResume": "{key} で再開",
+    "sessionOf": "セッション {current}/{total}",
+    "sessionsDone": "{done}/{total} セッション完了",
+    "todaySummary": "今日: {count} セッション · {time}",
+    "todaySummaryOne": "今日: {count} セッション · {time}",
+    "timeHm": "{h}時間{m}分",
+    "timeM": "{m}分",
+    "signInToLink": "ログインしてタスクを紐づける",
+    "activeTasks": "進行中のタスク",
+    "noActiveTasks": "進行中のタスクはまだありません。下から追加できます。",
+    "addTaskPlaceholder": "何に取り組みますか？",
+    "addTask": "タスクを追加",
+    "manageTasks": "タスクを管理",
+    "filterAll": "すべて",
+    "dock": {
+      "sounds": "サウンド",
+      "scene": "背景",
+      "timer": "タイマー",
+      "focus": "集中モード",
+      "exitFocus": "集中モードを終了",
+      "moreAmbient": "+ 環境音 {count}件",
+      "ambientPlaying": "環境音を再生中",
+      "ambientMix": "環境音ミックス（{count}件）"
+    }
+  },
+  "skipLink": {
+    "label": "コンテンツへスキップ"
   }
 }

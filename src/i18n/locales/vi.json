@@ -46,7 +46,8 @@
     "feedback": "Phản hồi",
     "login": "Đăng nhập",
     "logout": "Đăng xuất",
-    "loginNow": "Đăng nhập ngay"
+    "loginNow": "Đăng nhập ngay",
+    "signInHint": "Đồng bộ công việc và thống kê giữa các thiết bị"
   },
   "auth": {
     "login": "Đăng nhập",
@@ -111,7 +112,7 @@
     },
     "mode_switch_confirm": {
       "title": "Chuyển chế độ?",
-      "description": "Timer đang chạy. Chuyển chế độ sẽ mất tiến độ hiện tại.",
+      "description": "Phiên này đã bắt đầu. Chuyển chế độ sẽ bỏ tiến độ của phiên.",
       "confirm": "Vẫn chuyển"
     },
     "doneAt": "Xong lúc",
@@ -160,9 +161,9 @@
   "timerSettings": {
     "title": "Cài đặt Hẹn giờ",
     "labels": {
-      "workDuration": "Thời gian làm việc (phút)",
-      "shortBreakDuration": "Nghỉ ngắn (phút)",
-      "longBreakDuration": "Nghỉ dài (phút)",
+      "workDuration": "Thời gian tập trung",
+      "shortBreakDuration": "Nghỉ ngắn",
+      "longBreakDuration": "Nghỉ dài",
       "longBreakInterval": "Số phiên trước khi nghỉ dài",
       "autoStartBreaks": "Tự động bắt đầu nghỉ",
       "autoStartWork": "Tự động bắt đầu làm việc",
@@ -288,7 +289,7 @@
       "noTemplates": "Chưa có mẫu nào",
       "createTemplateHint": "Lưu bất kỳ công việc nào làm mẫu để dùng lại sau",
       "empty": "Chưa có mẫu nào",
-      "emptyHint": "Nhấn vào biểu tượng bookmark trên bất kỳ công việc nào để lưu làm mẫu"
+      "emptyHint": "Mở menu thao tác khác của một công việc và chọn Lưu làm mẫu."
     }
   },
   "history": {
@@ -383,6 +384,7 @@
         "themes": {
           "recommended": "Khuyên dùng",
           "default": "Mặc định",
+          "blue": "Xanh Dương",
           "rose": "Hoa Hồng",
           "emerald": "Rừng Xanh",
           "indigo": "Nửa Đêm",
@@ -390,12 +392,12 @@
           "amber": "Thu Vàng",
           "cyan": "Bạc Hà",
           "teal": "Đại Dương",
-          "pink-light": "Hoa Đào",
-          "pink-mild": "Quả Mọng",
+          "pink": "Hoa Đào",
           "mono": "Đơn Sắc"
         },
         "themeDescriptions": {
-          "default": "Trung tính, an toàn",
+          "default": "Cà chua kinh điển",
+          "blue": "Điềm tĩnh, tập trung",
           "rose": "Lãng mạn, tình yêu",
           "emerald": "Thiên nhiên, thư thái",
           "indigo": "Tập trung cao độ",
@@ -403,8 +405,7 @@
           "amber": "Ấm áp, vintage",
           "cyan": "Tươi mát, trong lành",
           "teal": "Rộng lớn, năng lượng",
-          "pink-light": "Nhẹ nhàng, xuân về",
-          "pink-mild": "Ngọt ngào, vui tươi",
+          "pink": "Nhẹ nhàng như mùa xuân",
           "mono": "Tối giản, chuyên nghiệp"
         }
       },
@@ -992,6 +993,8 @@
       }
     },
     "playNow": "Chơi ngay",
+    "playAgain": "Chơi lại",
+    "gameOver": "Hết lượt chơi",
     "backToList": "Quay lại danh sách",
     "closeGame": "Đóng game",
     "controls": {
@@ -1539,7 +1542,7 @@
           "games": "Game giải lao (Snake, 2048, ...)",
           "leaderboard": "Bảng xếp hạng toàn cầu",
           "focus": "Focus Mode & Streak",
-          "themes": "Sáng/Tối & Nền",
+          "themes": "Bộ màu & hình nền",
           "sounds": "Âm thanh, Spotify & YouTube",
           "stats": "Phân tích cốt lõi"
         }
@@ -1587,5 +1590,237 @@
         }
       }
     }
+  },
+  "historyUi": {
+    "title": "Lịch sử",
+    "description": "Thời gian tập trung, chuỗi ngày và các phiên gần đây.",
+    "rangeLabel": "Khoảng thời gian",
+    "ranges": { "today": "Hôm nay", "week": "Tuần này", "month": "Tháng này" },
+    "stats": {
+      "focusTime": "Thời gian tập trung",
+      "sessions": "Số phiên",
+      "currentStreak": "Chuỗi hiện tại",
+      "bestStreak": "Chuỗi dài nhất"
+    },
+    "hoursMinutes": "{hours} giờ {minutes} phút",
+    "minutesOnly": "{minutes} phút",
+    "dayOne": "{count} ngày",
+    "dayOther": "{count} ngày",
+    "minutesShort": "{minutes} phút",
+    "chart": {
+      "title": "7 ngày qua",
+      "subtitle": "Số phút tập trung mỗi ngày",
+      "summary": "Số phút tập trung trong 7 ngày qua"
+    },
+    "heatmap": {
+      "title": "Chuỗi ngày",
+      "subtitle": "12 tuần gần nhất",
+      "less": "Ít",
+      "more": "Nhiều",
+      "cell": "{date}: tập trung {minutes} phút",
+      "cellNone": "{date}: không tập trung"
+    },
+    "sessions": {
+      "title": "Phiên gần đây",
+      "none": "Chưa có phiên nào trong khoảng này.",
+      "noTask": "Không có công việc",
+      "modes": { "work": "Tập trung", "shortBreak": "Nghỉ ngắn", "longBreak": "Nghỉ dài" }
+    },
+    "empty": {
+      "title": "Chưa có phiên nào",
+      "description": "Hoàn thành một phiên tập trung và lịch sử sẽ hiện ở đây.",
+      "action": "Bắt đầu tập trung"
+    },
+    "error": "Không tải được lịch sử."
+  },
+  "arcadeUi": {
+    "title": "Giải trí",
+    "description": "Trò chơi ngắn cho giờ nghỉ.",
+    "runningNote": "Chơi game sẽ làm gián đoạn phiên tập trung. Hãy hoàn thành phiên trước.",
+    "best": "Cao nhất {score}"
+  },
+  "settingsUi": {
+    "unitMin": "phút",
+    "unitSessions": "phiên",
+    "autoStartBreakHint": "Bắt đầu giờ nghỉ ngay khi phiên làm việc kết thúc.",
+    "autoStartWorkHint": "Bắt đầu phiên làm việc tiếp theo ngay khi giờ nghỉ kết thúc.",
+    "lowTimeWarningHint": "Đồng hồ nhấp nháy trong 10 giây cuối.",
+    "clockStyleHint": "Kiểu hiển thị đếm ngược trên trang hẹn giờ.",
+    "clockSizeHint": "Điều chỉnh cỡ đồng hồ trên trang hẹn giờ.",
+    "livePreview": "Xem trước",
+    "adjust": "Tinh chỉnh",
+    "selected": "Đã chọn"
+  },
+  "pagesUi": {
+    "guide": {
+      "figureCaption": "Một Pomodoro: một phiên tập trung, rồi nghỉ ngắn.",
+      "tip": "Bạn có thể đổi thời lượng làm việc và nghỉ trong Cài đặt, miễn là giữ nhịp tập trung theo từng khối nhỏ và nghỉ đều đặn.",
+      "shortcutsTitle": "Phím tắt",
+      "shortcutsIntro": "Dùng được ở trang hẹn giờ khi bạn không đang gõ trong ô nhập.",
+      "colKey": "Phím",
+      "colAction": "Thao tác",
+      "keySpace": "Space",
+      "actionStartPause": "Bắt đầu hoặc tạm dừng đồng hồ",
+      "actionReset": "Đặt lại phiên hiện tại"
+    },
+    "feedback": {
+      "optional": "Không bắt buộc",
+      "contactHint": "Chỉ dùng khi cần liên hệ lại với bạn."
+    },
+    "leaderboard": {
+      "tasksCount": "{count} việc"
+    }
+  },
+  "tasksUi": {
+    "summary": "{todo} cần làm, {doing} đang làm, {done} đã xong",
+    "viewList": "Danh sách",
+    "viewBoard": "Bảng",
+    "viewLabel": "Kiểu xem công việc",
+    "quickAddPlaceholder": "Thêm một công việc…",
+    "quickAddLabel": "Tên công việc mới",
+    "add": "Thêm",
+    "addDetails": "Thêm kèm chi tiết",
+    "estimateLabel": "Số pomodoro dự kiến",
+    "estimateShort": "Dự kiến",
+    "estimateDecrease": "Giảm pomodoro",
+    "estimateIncrease": "Tăng pomodoro",
+    "estimateValue": "{count} pomodoro",
+    "estimateValuePlural": "{count} pomodoro",
+    "priorityLabel": "Độ ưu tiên",
+    "filterLabel": "Lọc công việc",
+    "filterAll": "Tất cả",
+    "filterToday": "Hôm nay",
+    "filterTodo": "Cần làm",
+    "filterDoing": "Đang làm",
+    "filterDone": "Đã xong",
+    "searchOpen": "Tìm công việc",
+    "searchClose": "Đóng tìm kiếm",
+    "searchPlaceholder": "Tìm theo tên hoặc thẻ",
+    "showCompleted": "Hiện {count} công việc đã xong",
+    "hideCompleted": "Ẩn công việc đã xong",
+    "focus": "Tập trung",
+    "stopFocus": "Dừng tập trung",
+    "focusingBadge": "Đang tập trung",
+    "edit": "Sửa",
+    "more": "Thêm thao tác",
+    "duplicate": "Nhân bản",
+    "saveAsTemplate": "Lưu làm mẫu",
+    "delete": "Xoá",
+    "dueToday": "Hạn hôm nay",
+    "dueTomorrow": "Hạn ngày mai",
+    "overdue": "Quá hạn",
+    "pomodoroProgress": "{done}/{total} pomodoro",
+    "emptyTitle": "Chưa có công việc nào",
+    "emptyAction": "Thêm công việc đầu tiên",
+    "emptyDescription": "Thêm công việc đầu tiên ở trên, rồi bấm Tập trung để bắt đầu phiên làm việc.",
+    "noMatchTitle": "Không có công việc phù hợp",
+    "noMatchDescription": "Thử đổi bộ lọc hoặc từ khoá khác.",
+    "clearFilters": "Xoá bộ lọc",
+    "boardEmpty": "Chưa có gì",
+    "dragHandle": "Kéo để sắp xếp",
+    "manage": "Quản lý thẻ và mẫu",
+    "page": "Trang {page} / {total}",
+    "signedOutDescription": "Công việc được đồng bộ giữa các thiết bị sau khi bạn đăng nhập.",
+    "pickDate": "Chọn ngày",
+    "clearDate": "Xóa ngày",
+    "estimateMin": "Nhập ít nhất 1 pomodoro",
+    "tagsLabel": "Tag",
+    "tagsPlaceholder": "Thêm tag",
+    "tagSuggestions": "Gợi ý",
+    "noTagsHint": "Thêm tag ở trên để nhóm các công việc liên quan.",
+    "tagsUsed": "Đã dùng {count}/{max} tag",
+    "templatesDescription": "Các thiết lập công việc đã lưu, dùng lại khi tạo công việc mới."
+  },
+  "landingUi": {
+    "hero": {
+      "title": "Đồng hồ Pomodoro giúp bạn giữ nhịp tập trung",
+      "lead": "Làm việc theo từng khối tập trung, nghỉ đúng lúc, và giữ công việc cùng lịch sử ở một nơi. Miễn phí, không cần tài khoản để bắt đầu.",
+      "start": "Bắt đầu tập trung",
+      "login": "Đăng nhập"
+    },
+    "timer": {
+      "modeGroup": "Chế độ đồng hồ",
+      "work": "Làm việc",
+      "shortBreak": "Nghỉ ngắn",
+      "longBreak": "Nghỉ dài",
+      "start": "Bắt đầu",
+      "pause": "Tạm dừng",
+      "restart": "Bắt đầu lại",
+      "reset": "Đặt lại",
+      "openApp": "Mở ứng dụng đầy đủ"
+    },
+    "features": {
+      "title": "Mọi thứ một phiên tập trung cần",
+      "timer": "Chế độ làm việc, nghỉ ngắn và nghỉ dài, có phím tắt.",
+      "tasks": "Gắn công việc vào phiên và lọc theo trạng thái, ngày.",
+      "analytics": "Lịch sử phiên và thống kê theo ngày, tuần, tháng.",
+      "chatAI": "Hỏi Bro Chat về cách học và quản lý thời gian.",
+      "sounds": "Âm thanh thiên nhiên, lo-fi, tiếng ồn trắng, hoặc Spotify và YouTube của bạn.",
+      "entertainment": "Snake, 2048 và nhiều trò khác cho lúc đồng hồ báo nghỉ."
+    },
+    "how": {
+      "title": "Một phiên diễn ra thế nào",
+      "step1": {
+        "title": "Chọn một việc",
+        "description": "Thêm việc bạn đang làm và ước lượng cần bao nhiêu Pomodoro."
+      },
+      "step2": {
+        "title": "Tập trung 25 phút",
+        "description": "Bấm bắt đầu và chỉ làm đúng việc đó cho đến khi chuông reo."
+      },
+      "step3": {
+        "title": "Nghỉ rồi xem lại",
+        "description": "Nghỉ ngắn một chút. Lịch sử và thống kê cho bạn thấy ngày hôm nay ra sao."
+      }
+    },
+    "pricing": {
+      "title": "Dùng miễn phí, bản Pro sẽ đến sau",
+      "subtitle": "Mọi thứ trong gói Starter đều miễn phí, không cần thẻ tín dụng. Bản Pro vẫn đang được phát triển."
+    },
+    "faq": {
+      "title": "Câu hỏi thường gặp"
+    }
+  },
+  "timerUi": {
+    "soundOff": "Tắt",
+    "modeGroup": "Chế độ hẹn giờ",
+    "mode": {
+      "work": "Tập trung",
+      "shortBreak": "Nghỉ ngắn",
+      "longBreak": "Nghỉ dài"
+    },
+    "startFocus": "Bắt đầu tập trung",
+    "startBreak": "Bắt đầu nghỉ",
+    "resume": "Tiếp tục",
+    "spaceKey": "Space",
+    "hintStart": "Nhấn {key} để bắt đầu",
+    "hintPause": "Nhấn {key} để tạm dừng",
+    "hintResume": "Nhấn {key} để tiếp tục",
+    "sessionOf": "Phiên {current}/{total}",
+    "sessionsDone": "Đã xong {done}/{total} phiên",
+    "todaySummary": "Hôm nay: {count} phiên · {time}",
+    "todaySummaryOne": "Hôm nay: {count} phiên · {time}",
+    "timeHm": "{h} giờ {m} phút",
+    "timeM": "{m} phút",
+    "signInToLink": "Đăng nhập để gắn nhiệm vụ",
+    "activeTasks": "Nhiệm vụ đang làm",
+    "noActiveTasks": "Chưa có nhiệm vụ nào. Thêm một nhiệm vụ bên dưới.",
+    "addTaskPlaceholder": "Bạn đang làm gì?",
+    "addTask": "Thêm nhiệm vụ",
+    "manageTasks": "Quản lý nhiệm vụ",
+    "filterAll": "Tất cả",
+    "dock": {
+      "sounds": "Âm thanh",
+      "scene": "Hình nền",
+      "timer": "Hẹn giờ",
+      "focus": "Chế độ tập trung",
+      "exitFocus": "Thoát chế độ tập trung",
+      "moreAmbient": "+ {count} âm thanh nền",
+      "ambientPlaying": "Đang phát âm thanh nền",
+      "ambientMix": "Trộn âm thanh nền ({count} âm)"
+    }
+  },
+  "skipLink": {
+    "label": "Bỏ qua tới nội dung"
   }
 }

@@ -1,17 +1,24 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
-import { Clock, Timer, Gauge, FlipHorizontal, X } from 'lucide-react'
+import { Check, X } from '@phosphor-icons/react/dist/ssr';
+import { cn } from '@/lib/utils'
 import { useTimerStore } from '@/stores/timer-store'
 import { toast } from 'sonner'
-import { Separator } from '@/components/ui/separator'
+import { SettingsSection, SettingsRow } from '@/components/settings/settings-section'
 import { useI18n } from '@/contexts/i18n-context'
 import { FlipClock } from '@/app/(main)/timer/components/clocks/flip-clock'
+
+const PREVIEW_DIGITS = { small: 'text-3xl', medium: 'text-5xl', large: 'text-6xl' } as const
+const PREVIEW_ANALOG = {
+    small: { box: 'size-24', text: 'text-sm' },
+    medium: { box: 'size-32', text: 'text-lg' },
+    large: { box: 'size-40', text: 'text-xl' },
+} as const
 
 type ClockType = 'digital' | 'analog' | 'progress' | 'flip' | 'animated'
 
@@ -103,7 +110,6 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
         setLongStr(String(normalized.longBreakDuration))
         setIntervalStr(String(normalized.longBreakInterval))
         updateSettings(normalized)
-        // FIX: Removed dead localStorage.setItem - Zustand persist handles storage
         toast.success(t('timerSettings.toasts.saved'))
         onClose?.()
     }
@@ -132,334 +138,235 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
     const formatPreview = (mins: number) =>
         `${String(Math.max(0, Math.min(99, mins))).padStart(2, '0')}:00`;
     const previewTime = formatPreview(clamp(toInt(workStr, localSettings.workDuration), 0, 99));
-    const [previewMM, previewSS] = previewTime.split(':');
 
-    return (
-        <div className="flex flex-col h-full">
-            {/* Fixed Header */}
-            {onClose && (
-                <div className="flex items-center justify-between px-6 py-4 border-b shrink-0 bg-background/95 backdrop-blur-sm">
-                    <h2 className="text-lg font-semibold">{t('timerSettings.title')}</h2>
-                    <div className="flex items-center gap-2">
-                        <Button variant="outline" onClick={resetToDefaults} size="sm" className="h-9">{t('timerSettings.actions.resetDefaults')}</Button>
-                        <Button onClick={saveSettings} size="sm" className="h-9 bg-primary hover:bg-primary/90 text-primary-foreground">{t('timerSettings.actions.save')}</Button>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={onClose}
-                            className="h-8 w-8 rounded-full hover:bg-muted"
-                        >
-                            <X className="h-4 w-4" />
-                            <span className="sr-only">{t('common.close')}</span>
-                        </Button>
+    const commit = (str: string, fallback: number, min: number, max: number, set: (v: string) => void, key: keyof TimerSettingsData) => {
+        const n = clamp(toInt(str, fallback), min, max)
+        set(String(n))
+        setLocalSettings({ ...localSettings, [key]: n })
+    }
+
+    const durationRow = (
+        id: string,
+        label: string,
+        unit: string,
+        str: string,
+        setStr: (v: string) => void,
+        fallback: number,
+        min: number,
+        max: number,
+        key: keyof TimerSettingsData,
+    ) => (
+        <SettingsRow label={label}>
+            <div className="relative ml-auto w-28">
+                <Input
+                    id={id}
+                    type="number"
+                    inputMode="numeric"
+                    min={min}
+                    max={max}
+                    value={str}
+                    onChange={(e) => {
+                        const v = e.target.value
+                        if (v === '' || /^[0-9]{0,2}$/.test(v)) setStr(v)
+                    }}
+                    onBlur={() => commit(str, fallback, min, max, setStr, key)}
+                    className="pr-14 tabular-nums"
+                />
+                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-ink-muted">{unit}</span>
+            </div>
+        </SettingsRow>
+    )
+
+    const toggleRow = (id: string, label: string, description: string, key: 'autoStartBreak' | 'autoStartWork' | 'lowTimeWarningEnabled') => (
+        <SettingsRow label={label} description={description}>
+            <div className="flex sm:justify-end">
+                <Switch
+                    id={id}
+                    checked={localSettings[key]}
+                    onCheckedChange={(checked) => setLocalSettings({ ...localSettings, [key]: checked })}
+                />
+            </div>
+        </SettingsRow>
+    )
+
+    const clockOptions: { value: ClockType; label: string; glyph: ReactNode }[] = [
+        { value: 'digital', label: t('timerSettings.labels.digital'), glyph: <span className="font-heading text-base font-bold tabular-nums">25:00</span> },
+        {
+            value: 'analog',
+            label: t('timerSettings.labels.analog'),
+            glyph: (
+                <svg viewBox="0 0 40 40" className="size-9 -rotate-90" aria-hidden>
+                    <circle cx="20" cy="20" r="16" fill="none" stroke="currentColor" strokeWidth="3" className="opacity-20" />
+                    <circle cx="20" cy="20" r="16" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeDasharray="100.5" strokeDashoffset="25" />
+                </svg>
+            ),
+        },
+        {
+            value: 'flip',
+            label: t('timerSettings.labels.flip'),
+            glyph: (
+                <span className="flex items-center gap-1 font-heading text-base font-bold tabular-nums">
+                    <span className="rounded bg-surface-raised px-1.5 py-0.5">25</span>
+                    <span className="rounded bg-surface-raised px-1.5 py-0.5">00</span>
+                </span>
+            ),
+        },
+        {
+            value: 'progress',
+            label: t('timerSettings.labels.progress'),
+            glyph: (
+                <span className="flex w-16 flex-col items-center gap-1.5">
+                    <span className="font-heading text-sm font-bold tabular-nums">25:00</span>
+                    <span className="h-1 w-full overflow-hidden rounded-full bg-surface-raised">
+                        <span className="block h-full w-3/4 rounded-full bg-current" />
+                    </span>
+                </span>
+            ),
+        },
+    ]
+
+    const body = (
+        <div className="space-y-8">
+            <SettingsSection title={t('timerSettings.labels.timerDurations')}>
+                {durationRow('work-duration', t('timerSettings.labels.workDuration'), t('settingsUi.unitMin'), workStr, setWorkStr, localSettings.workDuration, 1, 60, 'workDuration')}
+                {durationRow('short-break-duration', t('timerSettings.labels.shortBreakDuration'), t('settingsUi.unitMin'), shortStr, setShortStr, localSettings.shortBreakDuration, 1, 30, 'shortBreakDuration')}
+                {durationRow('long-break-duration', t('timerSettings.labels.longBreakDuration'), t('settingsUi.unitMin'), longStr, setLongStr, localSettings.longBreakDuration, 1, 60, 'longBreakDuration')}
+                {durationRow('long-break-interval', t('timerSettings.labels.longBreakInterval'), t('settingsUi.unitSessions'), intervalStr, setIntervalStr, localSettings.longBreakInterval, 2, 10, 'longBreakInterval')}
+            </SettingsSection>
+
+            <SettingsSection title={t('timerSettings.labels.behavior')}>
+                {toggleRow('auto-start-break', t('timerSettings.labels.autoStartBreaks'), t('settingsUi.autoStartBreakHint'), 'autoStartBreak')}
+                {toggleRow('auto-start-work', t('timerSettings.labels.autoStartWork'), t('settingsUi.autoStartWorkHint'), 'autoStartWork')}
+                {toggleRow('low-time-warning', t('timerSettings.labels.lowTimeWarning'), t('settingsUi.lowTimeWarningHint'), 'lowTimeWarningEnabled')}
+            </SettingsSection>
+
+            <SettingsSection title={t('timerSettings.labels.clockDisplay')}>
+                <div className="space-y-3 px-5 py-4">
+                    <div className="space-y-0.5">
+                        <p id="clock-style-label" className="text-[0.9375rem] font-semibold text-ink">{t('timerSettings.labels.clockStyle')}</p>
+                        <p className="text-[0.8125rem] text-ink-muted">{t('settingsUi.clockStyleHint')}</p>
+                    </div>
+                    <div role="radiogroup" aria-labelledby="clock-style-label" className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                        {clockOptions.map(({ value, label, glyph }) => {
+                            const selected = localSettings.clockType === value
+                            return (
+                                <button
+                                    key={value}
+                                    type="button"
+                                    role="radio"
+                                    aria-checked={selected}
+                                    onClick={() => setLocalSettings({ ...localSettings, clockType: value })}
+                                    className={cn(
+                                        'flex flex-col items-center gap-2 rounded-lg border bg-surface px-3 pb-2.5 pt-3 text-[0.8125rem] transition-[border-color,box-shadow] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand',
+                                        selected ? 'border-transparent ring-2 ring-brand' : 'border-border hover:border-border-strong',
+                                    )}
+                                >
+                                    <span className="flex h-12 items-center justify-center text-timer">{glyph}</span>
+                                    <span className={cn('flex items-center gap-1', selected ? 'font-semibold text-ink' : 'font-medium text-ink-secondary')}>
+                                        {selected && <Check size={12} weight="bold" className="text-brand" aria-hidden />}
+                                        {label}
+                                    </span>
+                                </button>
+                            )
+                        })}
                     </div>
                 </div>
-            )}
+                <SettingsRow label={t('timerSettings.labels.clockSize')} description={t('settingsUi.clockSizeHint')}>
+                    <Select
+                        value={localSettings.clockSize}
+                        onValueChange={(value: 'small' | 'medium' | 'large') =>
+                            setLocalSettings({ ...localSettings, clockSize: value })
+                        }
+                    >
+                        <SelectTrigger id="clock-size">
+                            <SelectValue placeholder={t('timerSettings.labels.selectSize')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="small">{t('timerSettings.labels.small')}</SelectItem>
+                            <SelectItem value="medium">{t('timerSettings.labels.medium')}</SelectItem>
+                            <SelectItem value="large">{t('timerSettings.labels.large')}</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </SettingsRow>
+            </SettingsSection>
 
-            {/* Scrollable Content */}
-            <div className={onClose ? "flex-1 overflow-y-auto px-6 py-4" : "space-y-6"}>
-                <div className="grid gap-8 md:grid-cols-[1fr_300px]">
-                    <div className="space-y-8">
-                        {/* Durations */}
-                        <div className="space-y-4">
-                            <h2 className="text-lg font-semibold">{t('timerSettings.labels.timerDurations')}</h2>
-                            <Separator />
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="work-duration" className="text-sm font-medium">{t('timerSettings.labels.workDuration')}</Label>
-                                    <div className="relative">
-                                        <Input
-                                            id="work-duration"
-                                            type="number"
-                                            min={1}
-                                            max={60}
-                                            value={workStr}
-                                            onChange={(e) => {
-                                                const v = e.target.value
-                                                if (v === '' || /^[0-9]{0,2}$/.test(v)) setWorkStr(v)
-                                            }}
-                                            onBlur={() => {
-                                                const n = clamp(toInt(workStr, localSettings.workDuration), 1, 60)
-                                                setWorkStr(String(n))
-                                                setLocalSettings({ ...localSettings, workDuration: n })
-                                            }}
-                                            className="pr-12"
-                                        />
-                                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">min</span>
-                                    </div>
+            <section className="space-y-3">
+                <h2 className="font-body text-[0.6875rem] font-semibold uppercase tracking-[0.05em] text-ink-muted">{t('settingsUi.livePreview')}</h2>
+                <div className="flex min-h-[200px] items-center justify-center rounded-lg border border-border bg-surface-raised p-6">
+                    {(localSettings.clockType === 'digital' || localSettings.clockType === 'progress') && (
+                        <div className="flex flex-col items-center gap-4">
+                            <div className={cn(PREVIEW_DIGITS[localSettings.clockSize], 'font-heading font-bold tabular-nums text-timer')}>
+                                {previewTime}
+                            </div>
+                            {localSettings.clockType === 'progress' && (
+                                <div className="h-1.5 w-48 overflow-hidden rounded-full bg-surface">
+                                    <div className="h-full w-3/4 rounded-full bg-timer" />
                                 </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="short-break-duration" className="text-sm font-medium">{t('timerSettings.labels.shortBreakDuration')}</Label>
-                                    <div className="relative">
-                                        <Input
-                                            id="short-break-duration"
-                                            type="number"
-                                            min={1}
-                                            max={30}
-                                            value={shortStr}
-                                            onChange={(e) => {
-                                                const v = e.target.value
-                                                if (v === '' || /^[0-9]{0,2}$/.test(v)) setShortStr(v)
-                                            }}
-                                            onBlur={() => {
-                                                const n = clamp(toInt(shortStr, localSettings.shortBreakDuration), 1, 30)
-                                                setShortStr(String(n))
-                                                setLocalSettings({ ...localSettings, shortBreakDuration: n })
-                                            }}
-                                            className="pr-12"
-                                        />
-                                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">min</span>
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="long-break-duration" className="text-sm font-medium">{t('timerSettings.labels.longBreakDuration')}</Label>
-                                    <div className="relative">
-                                        <Input
-                                            id="long-break-duration"
-                                            type="number"
-                                            min={1}
-                                            max={60}
-                                            value={longStr}
-                                            onChange={(e) => {
-                                                const v = e.target.value
-                                                if (v === '' || /^[0-9]{0,2}$/.test(v)) setLongStr(v)
-                                            }}
-                                            onBlur={() => {
-                                                const n = clamp(toInt(longStr, localSettings.longBreakDuration), 1, 60)
-                                                setLongStr(String(n))
-                                                setLocalSettings({ ...localSettings, longBreakDuration: n })
-                                            }}
-                                            className="pr-12"
-                                        />
-                                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">min</span>
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="long-break-interval" className="text-sm font-medium">{t('timerSettings.labels.longBreakInterval')}</Label>
-                                    <div className="relative">
-                                        <Input
-                                            id="long-break-interval"
-                                            type="number"
-                                            min={2}
-                                            max={10}
-                                            value={intervalStr}
-                                            onChange={(e) => {
-                                                const v = e.target.value
-                                                if (v === '' || /^[0-9]{0,2}$/.test(v)) setIntervalStr(v)
-                                            }}
-                                            onBlur={() => {
-                                                const n = clamp(toInt(intervalStr, localSettings.longBreakInterval), 2, 10)
-                                                setIntervalStr(String(n))
-                                                setLocalSettings({ ...localSettings, longBreakInterval: n })
-                                            }}
-                                            className="pr-16"
-                                        />
-                                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">cycles</span>
-                                    </div>
-                                </div>
+                            )}
+                        </div>
+                    )}
+                    {localSettings.clockType === 'analog' && (
+                        <div className={cn('relative text-timer', PREVIEW_ANALOG[localSettings.clockSize].box)}>
+                            <svg className="h-full w-full -rotate-90" viewBox="0 0 200 200" aria-label="Analog preview">
+                                <circle cx="100" cy="100" r="90" stroke="currentColor" strokeWidth="8" fill="none" className="opacity-20" />
+                                <circle
+                                    cx="100"
+                                    cy="100"
+                                    r="90"
+                                    stroke="currentColor"
+                                    strokeWidth="8"
+                                    fill="none"
+                                    strokeDasharray={`${2 * Math.PI * 90}`}
+                                    strokeDashoffset={`${2 * Math.PI * 90 * 0.25}`}
+                                    strokeLinecap="round"
+                                />
+                            </svg>
+                            <div className={cn('absolute inset-0 flex items-center justify-center font-heading font-bold tabular-nums', PREVIEW_ANALOG[localSettings.clockSize].text)}>
+                                {previewTime}
                             </div>
                         </div>
-
-                        {/* Behavior */}
-                        <div className="space-y-4">
-                            <h2 className="text-lg font-semibold">{t('timerSettings.labels.behavior')}</h2>
-                            <Separator />
-                            <div className="space-y-3">
-                                <div className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-muted/50 transition-colors">
-                                    <Label htmlFor="auto-start-break" className="flex-1 cursor-pointer text-sm font-medium">{t('timerSettings.labels.autoStartBreaks')}</Label>
-                                    <Switch
-                                        id="auto-start-break"
-                                        checked={localSettings.autoStartBreak}
-                                        onCheckedChange={(checked) =>
-                                            setLocalSettings({ ...localSettings, autoStartBreak: checked })
-                                        }
-                                        className="data-[state=checked]:bg-primary"
-                                    />
-                                </div>
-                                <div className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-muted/50 transition-colors">
-                                    <Label htmlFor="auto-start-work" className="flex-1 cursor-pointer text-sm font-medium">{t('timerSettings.labels.autoStartWork')}</Label>
-                                    <Switch
-                                        id="auto-start-work"
-                                        checked={localSettings.autoStartWork}
-                                        onCheckedChange={(checked) =>
-                                            setLocalSettings({ ...localSettings, autoStartWork: checked })
-                                        }
-                                        className="data-[state=checked]:bg-primary"
-                                    />
-                                </div>
-                                <div className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-muted/50 transition-colors">
-                                    <Label htmlFor="low-time-warning" className="flex-1 cursor-pointer text-sm font-medium">{t('timerSettings.labels.lowTimeWarning')}</Label>
-                                    <Switch
-                                        id="low-time-warning"
-                                        checked={localSettings.lowTimeWarningEnabled}
-                                        onCheckedChange={(checked) =>
-                                            setLocalSettings({
-                                                ...localSettings,
-                                                lowTimeWarningEnabled: checked,
-                                            })
-                                        }
-                                        className="data-[state=checked]:bg-primary"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Right Column: Clock Display + Preview */}
-                    <div className="space-y-6">
-                        {/* Clock Display */}
-                        <div className="space-y-4">
-                            <h2 className="text-lg font-semibold">{t('timerSettings.labels.clockDisplay')}</h2>
-                            <Separator />
-                            <div className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="clock-type" className="text-sm font-medium">{t('timerSettings.labels.clockStyle')}</Label>
-                                    <Select
-                                        value={localSettings.clockType}
-                                        onValueChange={(value: ClockType) =>
-                                            setLocalSettings({ ...localSettings, clockType: value })
-                                        }
-                                    >
-                                        <SelectTrigger className="bg-background">
-                                            <SelectValue placeholder={t('timerSettings.labels.selectClockType')} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="digital">
-                                                <div className="flex items-center gap-2">
-                                                    <Timer className="h-4 w-4" />
-                                                    {t('timerSettings.labels.digital')}
-                                                </div>
-                                            </SelectItem>
-                                            <SelectItem value="analog">
-                                                <div className="flex items-center gap-2">
-                                                    <Clock className="h-4 w-4" />
-                                                    {t('timerSettings.labels.analog')}
-                                                </div>
-                                            </SelectItem>
-                                            <SelectItem value="flip">
-                                                <div className="flex items-center gap-2">
-                                                    <FlipHorizontal className="h-4 w-4" />
-                                                    {t('timerSettings.labels.flip')}
-                                                </div>
-                                            </SelectItem>
-
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="clock-size" className="text-sm font-medium">{t('timerSettings.labels.clockSize')}</Label>
-                                    <Select
-                                        value={localSettings.clockSize}
-                                        onValueChange={(value: 'small' | 'medium' | 'large') =>
-                                            setLocalSettings({ ...localSettings, clockSize: value })
-                                        }
-                                    >
-                                        <SelectTrigger id="clock-size" className="bg-background">
-                                            <SelectValue placeholder={t('timerSettings.labels.selectSize')} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="small">{t('timerSettings.labels.small')}</SelectItem>
-                                            <SelectItem value="medium">{t('timerSettings.labels.medium')}</SelectItem>
-                                            <SelectItem value="large">{t('timerSettings.labels.large')}</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Preview */}
-                        <div className="space-y-4">
-                            <h2 className="text-lg font-semibold">{t('timerSettings.labels.preview')}</h2>
-                            <Separator />
-                            <div className="rounded-lg border bg-muted/30 p-6 flex items-center justify-center min-h-[200px] backdrop-blur-sm">
-                                {(localSettings.clockType === 'digital' || localSettings.clockType === 'progress') && (() => {
-                                    const sizeClasses = {
-                                        small: 'text-2xl',
-                                        medium: 'text-4xl',
-                                        large: 'text-5xl',
-                                    };
-                                    return (
-                                        <div className="text-center">
-                                            <div className={`${sizeClasses[localSettings.clockSize]} font-bold tabular-nums text-[hsl(var(--timer-foreground))]`}>
-                                                {previewTime}
-                                            </div>
-                                        </div>
-                                    );
-                                })()}
-                                {localSettings.clockType === 'analog' && (() => {
-                                    const sizeClasses = {
-                                        small: { container: 'w-24 h-24', text: 'text-sm' },
-                                        medium: { container: 'w-32 h-32', text: 'text-lg' },
-                                        large: { container: 'w-40 h-40', text: 'text-xl' },
-                                    };
-                                    const size = sizeClasses[localSettings.clockSize];
-                                    return (
-                                        <div className="text-center">
-                                            <div
-                                                className={`relative ${size.container} mx-auto`}
-                                                style={{ color: 'hsl(var(--timer-foreground))' }}
-                                            >
-                                                <svg
-                                                    className="w-full h-full transform -rotate-90"
-                                                    viewBox="0 0 200 200"
-                                                    aria-label="Analog preview"
-                                                >
-                                                    <circle
-                                                        cx="100"
-                                                        cy="100"
-                                                        r="90"
-                                                        stroke="currentColor"
-                                                        strokeWidth="8"
-                                                        fill="none"
-                                                        className="opacity-20"
-                                                    />
-                                                    <circle
-                                                        cx="100"
-                                                        cy="100"
-                                                        r="90"
-                                                        stroke="currentColor"
-                                                        strokeWidth="8"
-                                                        fill="none"
-                                                        strokeDasharray={`${2 * Math.PI * 90}`}
-                                                        strokeDashoffset={`${2 * Math.PI * 90 * 0.25}`}
-                                                        strokeLinecap="round"
-                                                    />
-                                                </svg>
-                                                <div className="absolute inset-0 flex items-center justify-center">
-                                                    <div className={`${size.text} font-bold tabular-nums text-[hsl(var(--timer-foreground))]`}>
-                                                        {previewTime}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                                })()}
-                                {localSettings.clockType === 'flip' && (() => {
-                                    const previewMinutes = clamp(toInt(workStr, localSettings.workDuration), 0, 99);
-                                    return (
-                                        <div className="transform scale-[0.6] origin-center w-full flex justify-center">
-                                            <FlipClock 
-                                                formattedTime={previewTime}
-                                                timeLeft={previewMinutes * 60}
-                                                isRunning={false}
-                                                clockSize={localSettings.clockSize}
-                                            />
-                                        </div>
-                                    );
-                                })()}
-                            </div>
-                        </div>
-                    </div>
-
-                    {!onClose && (
-                        <div className="flex justify-between pt-4 border-t">
-                            <Button variant="outline" onClick={resetToDefaults} className="h-10">{t('timerSettings.actions.resetDefaults')}</Button>
-                            <Button onClick={saveSettings} className="h-10 bg-primary hover:bg-primary/90 text-primary-foreground">{t('timerSettings.actions.saveChanges')}</Button>
+                    )}
+                    {localSettings.clockType === 'flip' && (
+                        <div className="flex w-full origin-center scale-[0.6] justify-center">
+                            <FlipClock
+                                formattedTime={previewTime}
+                                timeLeft={clamp(toInt(workStr, localSettings.workDuration), 0, 99) * 60}
+                                isRunning={false}
+                                clockSize={localSettings.clockSize}
+                            />
                         </div>
                     )}
                 </div>
+            </section>
+        </div>
+    )
+
+    if (!onClose) {
+        return (
+            <div className="space-y-6">
+                {body}
+                <div className="flex justify-between border-t border-border pt-4">
+                    <Button variant="outline" onClick={resetToDefaults}>{t('timerSettings.actions.resetDefaults')}</Button>
+                    <Button onClick={saveSettings}>{t('timerSettings.actions.saveChanges')}</Button>
+                </div>
             </div>
+        )
+    }
+
+    return (
+        <div className="flex h-full flex-col">
+            <div className="flex shrink-0 items-center justify-between border-b border-border bg-surface px-6 py-4">
+                <h2 className="font-heading text-lg font-semibold text-ink">{t('timerSettings.title')}</h2>
+                <div className="flex items-center gap-2">
+                    <Button variant="outline" onClick={resetToDefaults} size="sm">{t('timerSettings.actions.resetDefaults')}</Button>
+                    <Button onClick={saveSettings} size="sm">{t('timerSettings.actions.save')}</Button>
+                    <Button variant="ghost" size="icon" onClick={onClose}>
+                        <X size={16} />
+                        <span className="sr-only">{t('common.close')}</span>
+                    </Button>
+                </div>
+            </div>
+            <div className="flex-1 overflow-y-auto px-6 py-4">{body}</div>
         </div>
     )
 }

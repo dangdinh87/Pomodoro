@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Loader2, Lock } from 'lucide-react';
+import { ArrowLeft, CircleNotch, Lock } from '@phosphor-icons/react/dist/ssr';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,6 @@ import {
 } from '@/components/ui/card';
 import { supabase } from '@/lib/supabase-client';
 import { useI18n } from '@/contexts/i18n-context';
-import { BorderBeam } from '@/components/ui/border-beam';
 import Image from 'next/image';
 
 export default function ResetPasswordPage() {
@@ -93,8 +92,7 @@ export default function ResetPasswordPage() {
 
   if (hasValidSession === false) {
     return (
-      <Card className="relative w-full max-w-md overflow-hidden border-white/10 bg-background/80 shadow-2xl backdrop-blur">
-        <BorderBeam size={250} duration={12} delay={0} />
+      <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Image src="/images/logo.svg" alt={t('brand.title')} width={36} height={36} />
@@ -105,7 +103,7 @@ export default function ResetPasswordPage() {
         <CardFooter>
           <Button asChild variant="outline" className="w-full">
             <Link href="/login">
-              <ArrowLeft className="mr-2 h-4 w-4" />
+              <ArrowLeft size={16} />
               {t('login.form.backToApp')}
             </Link>
           </Button>
@@ -116,19 +114,18 @@ export default function ResetPasswordPage() {
 
   if (hasValidSession === null) {
     return (
-      <Card className="relative w-full max-w-md overflow-hidden border-white/10 bg-background/80 shadow-2xl backdrop-blur p-8">
+      <Card className="w-full max-w-md p-8">
         <div className="flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <CircleNotch size={32} className="animate-spin text-ink-muted" />
         </div>
       </Card>
     );
   }
 
   return (
-    <Card className="relative w-full max-w-md overflow-hidden border-white/10 bg-background/80 shadow-2xl backdrop-blur">
-      <BorderBeam size={250} duration={12} delay={0} />
+    <Card className="w-full max-w-md">
       <CardHeader className="space-y-2 text-center">
-        <CardTitle className="text-2xl font-semibold flex flex-col items-center gap-2">
+        <CardTitle className="font-heading text-2xl font-bold flex flex-col items-center gap-3">
           <Image src="/images/logo.svg" alt={t('brand.title')} width={52} height={52} />
           {t('resetPassword.title')}
         </CardTitle>
@@ -164,12 +161,12 @@ export default function ResetPasswordPage() {
           <Button className="w-full" type="submit" disabled={loading}>
             {loading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <CircleNotch size={16} className="animate-spin" />
                 {t('resetPassword.updating')}
               </>
             ) : (
               <>
-                <Lock className="mr-2 h-4 w-4" />
+                <Lock size={16} />
                 {t('resetPassword.submit')}
               </>
             )}
@@ -180,7 +177,7 @@ export default function ResetPasswordPage() {
       <CardFooter>
         <Button variant="ghost" asChild className="w-full">
           <Link href="/login">
-            <ArrowLeft className="mr-2 h-4 w-4" />
+            <ArrowLeft size={16} />
             {t('login.form.backToApp')}
           </Link>
         </Button>

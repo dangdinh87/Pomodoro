@@ -4,7 +4,7 @@ import { useState, useCallback, memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/contexts/i18n-context';
 import { cn } from '@/lib/utils';
-import { ArrowLeft, RotateCcw } from 'lucide-react';
+import { ArrowLeft, ArrowCounterClockwise } from '@phosphor-icons/react/dist/ssr';
 
 interface TicTacToeGameProps {
   fullscreen?: boolean;
@@ -244,34 +244,28 @@ export const TicTacToeGame = memo(function TicTacToeGame({
           fullscreen ? "w-full h-full p-4" : "w-full min-h-[600px] rounded-lg p-4"
         )}
         style={{
-          background: 'radial-gradient(circle at center, #1a1a2e 0%, #16213e 100%)'
+          background: '#16213e'
         }}
       >
         <div
-          className="p-8 text-center max-w-md w-full"
-          style={{
-            background: 'rgba(255, 255, 255, 0.05)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '24px',
-          }}
+          className="rounded-lg border border-white/10 bg-white/[0.05] p-8 text-center max-w-md w-full"
         >
           <h1
-            className="text-3xl font-extrabold mb-2 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent"
+            className="font-heading text-3xl font-bold mb-2 text-white"
             suppressHydrationWarning
           >
             {t('entertainment.games.ticTacToe.title')}
           </h1>
-          <p className="text-gray-400 text-sm mb-8" suppressHydrationWarning>
+          <p className="text-white/70 text-sm mb-8" suppressHydrationWarning>
             {t('entertainment.games.ticTacToe.instructions')}
           </p>
 
           <div className="space-y-4">
             <button
               onClick={() => startGame(3)}
-              className="w-full py-5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl transition-all group"
+              className="w-full py-5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-md transition-colors"
             >
-              <span className="block text-xl font-bold text-green-400 group-hover:scale-110 transition-transform" suppressHydrationWarning>
+              <span className="block text-lg font-semibold text-white" suppressHydrationWarning>
                 {t('entertainment.games.ticTacToe.mode3x3')}
               </span>
               <span className="text-xs text-gray-400" suppressHydrationWarning>
@@ -280,9 +274,9 @@ export const TicTacToeGame = memo(function TicTacToeGame({
             </button>
             <button
               onClick={() => startGame(4)}
-              className="w-full py-5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl transition-all group"
+              className="w-full py-5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-md transition-colors"
             >
-              <span className="block text-xl font-bold text-red-400 group-hover:scale-110 transition-transform" suppressHydrationWarning>
+              <span className="block text-lg font-semibold text-white" suppressHydrationWarning>
                 {t('entertainment.games.ticTacToe.mode4x4')}
               </span>
               <span className="text-xs text-gray-400" suppressHydrationWarning>
@@ -303,17 +297,12 @@ export const TicTacToeGame = memo(function TicTacToeGame({
         fullscreen ? "w-full h-full p-4" : "w-full min-h-[600px] rounded-lg p-4"
       )}
       style={{
-        background: 'radial-gradient(circle at center, #1a1a2e 0%, #16213e 100%)'
+        background: '#16213e'
       }}
     >
       <div
-        className={cn("p-6 md:p-8 text-center max-w-md w-full", fullscreen && "mt-12")}
-        style={{
-          background: 'rgba(255, 255, 255, 0.05)',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: '24px',
-        }}
+        className={cn("rounded-lg border border-white/10 bg-white/[0.05] p-6 md:p-8 text-center max-w-md w-full", fullscreen && "mt-12")}
+        
       >
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
@@ -321,11 +310,11 @@ export const TicTacToeGame = memo(function TicTacToeGame({
             onClick={backToMenu}
             className="text-gray-400 hover:text-white transition-colors"
           >
-            <ArrowLeft className="h-6 w-6" />
+            <ArrowLeft size={24} />
           </button>
           <div
             className={cn(
-              "px-4 py-2 rounded-full font-semibold text-sm uppercase tracking-wide",
+              "px-4 py-2 rounded-full font-medium text-sm",
               isAiThinking
                 ? "bg-yellow-500/20 text-yellow-400"
                 : gameActive
@@ -346,16 +335,16 @@ export const TicTacToeGame = memo(function TicTacToeGame({
         {/* Scores */}
         <div className="flex justify-between items-center mb-6">
           <div className="text-center">
-            <span className="block text-xs text-gray-400 uppercase" suppressHydrationWarning>
+            <span className="block text-xs text-white/60" suppressHydrationWarning>
               {t('entertainment.games.ticTacToe.you')} (X)
             </span>
-            <span className="text-2xl font-bold text-green-400">{scores.player}</span>
+            <span className="font-heading text-2xl font-bold tabular-nums text-white">{scores.player}</span>
           </div>
           <div className="text-center">
-            <span className="block text-xs text-gray-400 uppercase" suppressHydrationWarning>
+            <span className="block text-xs text-white/60" suppressHydrationWarning>
               {t('entertainment.games.ticTacToe.ai')} (O)
             </span>
-            <span className="text-2xl font-bold text-red-400">{scores.ai}</span>
+            <span className="font-heading text-2xl font-bold tabular-nums text-white">{scores.ai}</span>
           </div>
         </div>
 
@@ -370,22 +359,15 @@ export const TicTacToeGame = memo(function TicTacToeGame({
               onClick={() => handleCellClick(index)}
               disabled={cell !== '' || !gameActive || isAiThinking}
               className={cn(
-                "aspect-square rounded-xl flex items-center justify-center font-extrabold transition-all",
+                "aspect-square rounded-md flex items-center justify-center font-heading font-bold transition-colors",
                 gameMode === 3 ? "text-4xl md:text-5xl" : "text-3xl md:text-4xl",
                 cell === ''
                   ? "bg-white/5 hover:bg-white/10 cursor-pointer hover:-translate-y-0.5"
                   : "bg-white/5 cursor-default",
-                cell === 'X' && "text-green-400",
-                cell === 'O' && "text-red-400",
+                cell === 'X' && "text-success",
+                cell === 'O' && "text-danger",
                 winningCells.includes(index) && "bg-white/20 animate-pulse"
               )}
-              style={{
-                textShadow: cell === 'X'
-                  ? '0 0 15px rgba(74, 222, 128, 0.5)'
-                  : cell === 'O'
-                    ? '0 0 15px rgba(248, 113, 113, 0.5)'
-                    : 'none'
-              }}
             >
               {cell}
             </button>
@@ -400,10 +382,11 @@ export const TicTacToeGame = memo(function TicTacToeGame({
         {/* Reset Button */}
         <Button
           onClick={resetGame}
-          className="w-full py-4 bg-white text-gray-900 font-bold rounded-2xl hover:bg-gray-200 transition-colors"
+          variant="secondary"
+          className="w-full"
           suppressHydrationWarning
         >
-          <RotateCcw className="w-4 h-4 mr-2" />
+          <ArrowCounterClockwise size={16} className="mr-2" />
           {t('entertainment.games.ticTacToe.newGame')}
         </Button>
       </div>

@@ -4,7 +4,8 @@ import { useEffect, useRef, useState, useCallback, memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/contexts/i18n-context';
 import { cn } from '@/lib/utils';
-import { RotateCcw, Layers } from 'lucide-react';
+import { ArrowCounterClockwise, Stack, Trophy } from '@phosphor-icons/react/dist/ssr';
+import { GameOverlay, GameStat } from './game-overlay';
 
 interface NeonFlipGameProps {
   fullscreen?: boolean;
@@ -175,74 +176,32 @@ export const NeonFlipGame = memo(function MemoryMatchGame({
         "relative flex flex-col items-center justify-center overflow-hidden",
         fullscreen ? "w-full h-full p-4" : "w-full min-h-[600px] rounded-lg p-4"
       )}
-      style={{
-        background: 'radial-gradient(circle at 50% 50%, #1c1917 0%, #0c0a09 100%)'
-      }}
+      style={{ background: '#1c1917' }}
     >
-      {/* Start Screen */}
       {showStartScreen && (
-        <div className="absolute inset-0 bg-black/90 backdrop-blur-sm flex flex-col justify-center items-center z-20 p-4">
-          <div className="text-6xl mb-4">🃏</div>
-          <h1
-            className={cn(
-              "text-white uppercase tracking-wider text-center font-bold mb-2",
-              fullscreen ? "text-4xl md:text-5xl" : "text-3xl md:text-4xl"
-            )}
-            style={{ textShadow: '0 0 20px #f59e0b, 0 0 40px #f59e0b' }}
-            suppressHydrationWarning
-          >
-            {t('entertainment.games.memoryMatch.title')}
-          </h1>
-          <p
-            className="text-gray-400 mb-8 text-center max-w-sm text-sm md:text-base"
-            suppressHydrationWarning
-          >
-            {t('entertainment.games.memoryMatch.instructions')}
-          </p>
-          <Button
-            onClick={initGame}
-            className={cn(
-              "bg-gradient-to-r from-amber-500 to-orange-500 text-white uppercase tracking-wider font-bold",
-              "hover:from-amber-400 hover:to-orange-400 transition-all",
-              "hover:shadow-[0_0_30px_rgba(245,158,11,0.6)] hover:scale-105",
-              fullscreen ? "px-10 py-4 text-xl" : "px-6 py-3 text-base"
-            )}
-            suppressHydrationWarning
-          >
+        <GameOverlay
+          title={t('entertainment.games.memoryMatch.title')}
+          description={t('entertainment.games.memoryMatch.instructions')}
+          className="z-20 bg-black/80"
+        >
+          <Button onClick={initGame} size="lg" suppressHydrationWarning>
             {t('entertainment.playNow')}
           </Button>
-        </div>
+        </GameOverlay>
       )}
 
-      {/* Win Modal */}
       {gameWon && (
-        <div className="absolute inset-0 bg-black/95 backdrop-blur-md flex items-center justify-center z-30 p-4">
-          <div
-            className="p-8 rounded-2xl text-center max-w-sm w-full border-2"
-            style={{
-              background: 'rgba(255, 255, 255, 0.03)',
-              backdropFilter: 'blur(15px)',
-              borderColor: '#f59e0b',
-              boxShadow: '0 0 50px rgba(245, 158, 11, 0.3)'
-            }}
-          >
-            <div className="text-7xl mb-4">🎉</div>
-            <h2 className="text-4xl font-bold mb-4" style={{ color: '#f59e0b' }}>
-              {t('entertainment.games.memoryMatch.win')}
-            </h2>
-            <p className="text-gray-400 mb-6">
-              <span className="block text-white text-2xl font-bold">{calculateScore(moves, timer, EMOJIS.length)}</span>
-              <span className="text-sm">{moves} {t('entertainment.games.memoryMatch.moves')} | {formatTime(timer)}</span>
-            </p>
-            <Button
-              onClick={initGame}
-              className="w-full py-4 rounded-xl font-bold uppercase tracking-wider text-white hover:brightness-110 bg-gradient-to-r from-amber-500 to-orange-500"
-              suppressHydrationWarning
-            >
-              {t('entertainment.playNow')}
-            </Button>
+        <GameOverlay title={t('entertainment.games.memoryMatch.win')} className="z-30 bg-black/80">
+          <Trophy size={40} weight="fill" className="text-gold" />
+          <div className="flex gap-3">
+            <GameStat label={t('entertainment.games.snake.score')} value={calculateScore(moves, timer, EMOJIS.length)} />
+            <GameStat label={t('entertainment.games.memoryMatch.moves')} value={moves} />
+            <GameStat label={t('entertainment.games.memoryMatch.time')} value={formatTime(timer)} />
           </div>
-        </div>
+          <Button onClick={initGame} size="lg" suppressHydrationWarning>
+            {t('entertainment.playAgain')}
+          </Button>
+        </GameOverlay>
       )}
 
       {/* Header Stats */}
@@ -251,43 +210,9 @@ export const NeonFlipGame = memo(function MemoryMatchGame({
           "w-full max-w-md mb-6",
           fullscreen ? "mt-16" : ""
         )}>
-          <h1
-            className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-1"
-            style={{ textShadow: '0 0 10px #f59e0b, 0 0 20px #f59e0b', color: '#f59e0b' }}
-          >
-            {t('entertainment.games.memoryMatch.title')}
-          </h1>
-          <p className="text-stone-500 text-xs mb-6 uppercase tracking-[0.2em] font-bold text-center">
-            {t('entertainment.games.memoryMatch.instructions')}
-          </p>
-
           <div className="grid grid-cols-2 gap-3">
-            <div
-              className="p-3 rounded-xl border-l-4"
-              style={{
-                background: 'rgba(255, 255, 255, 0.03)',
-                backdropFilter: 'blur(15px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderLeftColor: '#f59e0b',
-                borderLeftWidth: '4px'
-              }}
-            >
-              <p className="text-[10px] text-stone-400 uppercase font-bold mb-1">{t('entertainment.games.memoryMatch.clicks')}</p>
-              <p className="text-2xl font-bold text-white">{moves}</p>
-            </div>
-            <div
-              className="p-3 rounded-xl border-l-4"
-              style={{
-                background: 'rgba(255, 255, 255, 0.03)',
-                backdropFilter: 'blur(15px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderLeftColor: '#fb7185',
-                borderLeftWidth: '4px'
-              }}
-            >
-              <p className="text-[10px] text-stone-400 uppercase font-bold mb-1">{t('entertainment.games.memoryMatch.time')}</p>
-              <p className="text-2xl font-bold text-white">{formatTime(timer)}</p>
-            </div>
+            <GameStat label={t('entertainment.games.memoryMatch.clicks')} value={moves} className="py-2" />
+            <GameStat label={t('entertainment.games.memoryMatch.time')} value={formatTime(timer)} className="py-2" />
           </div>
         </div>
       )}
@@ -322,7 +247,7 @@ export const NeonFlipGame = memo(function MemoryMatchGame({
                     boxShadow: 'inset 0 0 10px rgba(245, 158, 11, 0.15)'
                   }}
                 >
-                  <Layers className="w-6 h-6 text-amber-500 opacity-40" />
+                  <Stack size={24} className="text-amber-500 opacity-40" />
                 </div>
 
                 {/* Back (emoji side) */}
@@ -353,14 +278,9 @@ export const NeonFlipGame = memo(function MemoryMatchGame({
       {!showStartScreen && !gameWon && (
         <Button
           onClick={initGame}
-          className="bg-transparent border-2 px-6 py-3 rounded-full font-bold uppercase tracking-wider text-sm hover:scale-105 transition-all hover:bg-amber-500/10"
-          style={{
-            borderColor: '#f59e0b',
-            color: '#f59e0b',
-            boxShadow: '0 0 10px rgba(245, 158, 11, 0.3)'
-          }}
+          variant="secondary"
         >
-          <RotateCcw className="w-4 h-4 mr-2" />
+          <ArrowCounterClockwise size={16} className="mr-2" />
           {t('entertainment.games.memoryMatch.reset')}
         </Button>
       )}

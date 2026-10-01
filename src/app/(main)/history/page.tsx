@@ -1,140 +1,171 @@
 "use client"
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { StatsCards } from "./components/stats-cards"
-import { FocusChart } from "./components/focus-chart"
-import { DistributionChart } from "./components/distribution-chart"
-import { SessionHistory } from "./components/session-history"
-import { DateRangePicker } from "./components/date-range-picker"
-import { useAuth } from "@/hooks/use-auth"
+import { useMemo, useState } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { startOfMonth, subDays } from "date-fns"
 import { DateRange } from "react-day-picker"
-import { useI18n } from '@/contexts/i18n-context'
-
+import { Button } from "@/components/ui/button"
+import { EmptyState } from "@/components/ui/empty-state"
+import { FilterChip, FilterChipGroup } from "@/components/ui/filter-chip"
+import { PageContainer, PageHeader, SectionHeading } from "@/components/ui/page-header"
+import { StatStrip } from "@/components/ui/stat-strip"
+import { useAuth } from "@/hooks/use-auth"
 import { useStats } from "@/hooks/use-stats"
 import { useHistory } from "@/hooks/use-history"
-import { StatsLoading } from "./components/stats-loading"
-import { StatsEmpty } from "./components/stats-empty"
-import { EmptyState } from "@/components/ui/empty-state"
+import { useI18n } from "@/contexts/i18n-context"
+import { HistoryLoading } from "./components/history-loading"
+import { SessionList } from "./components/session-list"
+import { StreakHeatmap, heatmapRange } from "./components/streak-heatmap"
+import { WeekChart } from "./components/week-chart"
+
+type RangeKey = "today" | "week" | "month"
+const RANGE_KEYS: RangeKey[] = ["today", "week", "month"]
+
+function rangeFor(key: RangeKey): DateRange {
+    const today = new Date()
+    if (key === "today") return { from: today, to: today }
+    if (key === "week") return { from: subDays(today, 6), to: today }
+    return { from: startOfMonth(today), to: today }
+}
 
 export default function HistoryPage() {
     const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
     const router = useRouter()
     const { t } = useI18n()
-    const [dateRange, setDateRange] = useState<DateRange | undefined>({
-        from: new Date(),
-        to: new Date()
-    })
+    const [rangeKey, setRangeKey] = useState<RangeKey>("week")
+    const dateRange = useMemo(() => rangeFor(rangeKey), [rangeKey])
+    const trendRange = useMemo(() => heatmapRange(), [])
 
     const { data: statsData, isLoading: isStatsLoading, isError: isStatsError } = useStats(dateRange)
+    const { data: trendData, isLoading: isTrendLoading } = useStats(trendRange)
     const { data: historyData, isLoading: isHistoryLoading, isError: isHistoryError } = useHistory(dateRange)
 
-    const isLoading = isStatsLoading || isHistoryLoading
-    const isError = isStatsError || isHistoryError
+    const header = (
+        <PageHeader
+            title={t("historyUi.title")}
+            description={t("historyUi.description")}
+            actions={
+                <FilterChipGroup label={t("historyUi.rangeLabel")}>
+                    {RANGE_KEYS.map((key) => (
+                        <FilterChip key={key} active={rangeKey === key} onClick={() => setRangeKey(key)}>
+                            {t(`historyUi.ranges.${key}`)}
+                        </FilterChip>
+                    ))}
+                </FilterChipGroup>
+            }
+        />
+    )
 
     if (isAuthLoading) {
-        return <main
-            className="container mx-auto px-4 py-8 md:py-12 min-h-full"
-            aria-label="History and statistics page"
-        >
-            <StatsLoading />
-        </main>
+        return (
+            <PageContainer>
+                {header}
+                <HistoryLoading />
+            </PageContainer>
+        )
     }
 
     if (!isAuthenticated) {
         return (
-            <main
-                className="container mx-auto px-4 py-8 md:py-12 min-h-full flex flex-col items-center justify-center"
-                aria-label="History and statistics page"
-            >
+            <PageContainer className="flex flex-1 items-center justify-center">
                 <EmptyState
-                    title={t('auth.signInToViewStats')}
+                    title={t("auth.signInToViewStats")}
                     action={
-                        <Button onClick={() => router.push('/login?redirect=/history')}>
-                            {t('auth.signInButton')}
+                        <Button onClick={() => router.push("/login?redirect=/history")}>
+                            {t("auth.signInButton")}
                         </Button>
                     }
                 />
-            </main>
+            </PageContainer>
         )
     }
 
+    const isLoading = isStatsLoading || isHistoryLoading || isTrendLoading
+    const trend = trendData?.dailyFocus ?? []
+    const hasAnyActivity =
+        trend.some((d) => d.duration > 0) ||
+        (statsData?.summary.totalFocusTime ?? 0) > 0 ||
+        (historyData?.sessions.length ?? 0) > 0
+
+    const formatFocus = (seconds: number) => {
+        const hours = Math.floor(seconds / 3600)
+        const minutes = Math.floor((seconds % 3600) / 60)
+        return hours > 0
+            ? t("historyUi.hoursMinutes", { hours, minutes })
+            : t("historyUi.minutesOnly", { minutes })
+    }
+    const formatDays = (count: number) => t(count === 1 ? "historyUi.dayOne" : "historyUi.dayOther", { count })
+
     return (
-        <main
-            className="w-full h-full p-4 md:py-2 md:px-8"
-            aria-label="History and statistics page"
-        >
-            <div className="max-w-5xl mx-auto space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl font-bold">{t('history.title')}</h1>
-                        <p className="text-sm text-muted-foreground">
-                            {t('history.subtitle')}
-                        </p>
-                    </div>
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                        <DateRangePicker
-                            value={dateRange}
-                            onChange={setDateRange}
-                            className="w-full sm:w-auto"
-                        />
-                        <Button onClick={() => router.push('/timer')} className="w-full sm:w-auto">
-                            {t('history.startNewSession')}
-                        </Button>
-                    </div>
+        <PageContainer>
+            {header}
+
+            {isLoading ? (
+                <HistoryLoading />
+            ) : isStatsError || isHistoryError || !statsData || !historyData ? (
+                <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-lg border border-border bg-surface text-center">
+                    <p className="text-sm text-ink-secondary">{t("historyUi.error")}</p>
+                    <Button variant="outline" onClick={() => window.location.reload()}>
+                        {t("common.retry")}
+                    </Button>
                 </div>
-
-                {isLoading ? (
-                    <StatsLoading />
-                ) : isError ? (
-                    <div className="flex h-64 items-center justify-center rounded-xl border bg-card/70 backdrop-blur">
-                        <div className="text-center space-y-2">
-                            <p className="text-destructive font-medium">{t('history.errorLoading')}</p>
-                            <Button variant="outline" onClick={() => window.location.reload()}>
-                                {t('common.retry')}
+            ) : !hasAnyActivity ? (
+                <div className="rounded-lg border border-border bg-surface">
+                    <EmptyState
+                        title={t("historyUi.empty.title")}
+                        description={t("historyUi.empty.description")}
+                        action={
+                            <Button asChild>
+                                <Link href="/timer">{t("historyUi.empty.action")}</Link>
                             </Button>
-                        </div>
-                    </div>
-                ) : !statsData || !historyData || (statsData.summary.totalFocusTime === 0 && historyData.sessions.length === 0) ? (
-                    <section className="rounded-xl border bg-card/70 backdrop-blur p-3 md:p-4">
-                        <StatsEmpty />
-                    </section>
-                ) : (
-                    <>
-                        <StatsCards
-                            totalFocusTime={statsData.summary.totalFocusTime}
-                            completedSessions={statsData.summary.completedSessions}
-                            streak={statsData.summary.streak}
-                        />
+                        }
+                    />
+                </div>
+            ) : (
+                <div className="space-y-10">
+                    <StatStrip
+                        items={[
+                            { label: t("historyUi.stats.focusTime"), value: formatFocus(statsData.summary.totalFocusTime) },
+                            { label: t("historyUi.stats.sessions"), value: statsData.summary.completedSessions },
+                            { label: t("historyUi.stats.currentStreak"), value: formatDays(statsData.summary.streak.current) },
+                            { label: t("historyUi.stats.bestStreak"), value: formatDays(statsData.summary.streak.longest) },
+                        ]}
+                    />
 
-                        <section className="rounded-xl border bg-card/70 backdrop-blur p-3 md:p-4 space-y-6">
-                            <div className="space-y-4">
-                                <h3 className="text-xl font-semibold">{t('history.charts.focusOverview')}</h3>
-                                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-                                    <div className="lg:col-span-4">
-                                        <FocusChart data={statsData.dailyFocus} />
-                                    </div>
-                                    <div className="lg:col-span-3">
-                                        <DistributionChart data={statsData.distribution} />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="space-y-4">
-                                <SessionHistory sessions={historyData.sessions
-                                    .map(s => ({
-                                        id: s.id,
-                                        taskName: s.tasks?.title || t('history.charts.noTask'),
-                                        mode: s.mode,
-                                        date: s.created_at,
-                                        duration: s.duration
-                                    }))} />
+                    <div className="grid gap-x-8 gap-y-10 lg:grid-cols-[minmax(0,1fr)_auto]">
+                        <section>
+                            <SectionHeading action={<span className="text-xs text-ink-muted">{t("historyUi.chart.subtitle")}</span>}>
+                                {t("historyUi.chart.title")}
+                            </SectionHeading>
+                            <div className="rounded-lg border border-border bg-surface p-4 sm:p-5">
+                                <WeekChart data={trend} />
                             </div>
                         </section>
-                    </>
-                )}
-            </div>
-        </main>
+                        <section>
+                            <SectionHeading action={<span className="text-xs text-ink-muted">{t("historyUi.heatmap.subtitle")}</span>}>
+                                {t("historyUi.heatmap.title")}
+                            </SectionHeading>
+                            <div className="rounded-lg border border-border bg-surface p-4 sm:p-5">
+                                <StreakHeatmap data={trend} />
+                            </div>
+                        </section>
+                    </div>
+
+                    <section>
+                        <SectionHeading>{t("historyUi.sessions.title")}</SectionHeading>
+                        <SessionList
+                            sessions={historyData.sessions.map((s) => ({
+                                id: s.id,
+                                taskName: s.tasks?.title ?? null,
+                                mode: s.mode,
+                                date: s.created_at,
+                                duration: s.duration,
+                            }))}
+                        />
+                    </section>
+                </div>
+            )}
+        </PageContainer>
     )
 }

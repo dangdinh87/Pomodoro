@@ -2,488 +2,154 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import {
-    Timer,
-    CheckSquare,
-    BarChart3,
-    Settings,
-    ArrowRight,
-    MessageSquare,
-    Gamepad2,
-    Trophy,
-    Shield,
-    Send,
-} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Kbd } from '@/components/ui/kbd';
+import { PageContainer } from '@/components/ui/page-header';
+import { ArrowRight } from '@phosphor-icons/react/dist/ssr';
 import { useI18n } from '@/contexts/i18n-context';
+
+const FEATURES = [
+    { key: 'timer', href: '/timer' },
+    { key: 'tasks', href: '/tasks' },
+    { key: 'history', href: '/history' },
+    { key: 'entertainment', href: '/entertainment' },
+    { key: 'settings', href: '/settings' },
+    { key: 'feedback', href: '/feedback' },
+] as const;
+
+const H2 = 'font-heading text-2xl font-bold tracking-[-0.02em] text-ink';
+const BODY = 'text-[1.0625rem] leading-[1.7] text-ink-secondary';
 
 export default function GuidePage() {
     const { t, dict } = useI18n();
+    const benefits: string[] = Array.isArray(dict.guide?.benefits?.list) ? dict.guide.benefits.list : [];
+    const startSteps: string[] = Array.isArray(dict.guide?.getStarted?.steps) ? dict.guide.getStarted.steps : [];
+
     return (
-        <main className="max-w-5xl mx-auto space-y-12 py-8 pb-16 px-4 lg:px-8">
-            {/* Header */}
-            <div className="text-center space-y-4">
-                <h1 className="text-4xl font-bold tracking-tight">
-                    {t('guide.title')}
-                </h1>
-                <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                    {t('guide.subtitle')}
-                </p>
-            </div>
+        <PageContainer size="narrow">
+            <article className="mx-auto max-w-[68ch] space-y-14">
+                <header className="space-y-3">
+                    <h1 className="font-heading text-[2rem] font-bold leading-[1.1] tracking-[-0.02em] text-ink sm:text-4xl">
+                        {t('guide.title')}
+                    </h1>
+                    <p className="text-lg leading-relaxed text-ink-muted">{t('guide.subtitle')}</p>
+                </header>
 
-            {/* Pomodoro Introduction */}
-            <section className="space-y-6">
-                <div>
-                    <Badge className="mb-3">{t('guide.pomodoro.badge')}</Badge>
-                    <h2 className="text-3xl font-bold tracking-tight">
-                        {t('guide.pomodoro.title')}
-                    </h2>
-                </div>
-                <div className="prose prose-neutral dark:prose-invert max-w-none">
-                    <p className="text-lg leading-relaxed" dangerouslySetInnerHTML={{ __html: t('guide.pomodoro.description') }} />
-                </div>
-
-                {/* Image Illustration */}
-                <div className="relative w-full aspect-video rounded-lg overflow-hidden border bg-muted">
-                    <Image
-                        src="/images/content_1/pomodoro_explain.png"
-                        alt={t('guide.pomodoro.imageAlt')}
-                        fill
-                        className="object-contain"
-                        priority
-                    />
-                </div>
-            </section>
-
-            {/* How to Apply Pomodoro */}
-            <section className="space-y-6">
-                <div>
-                    <Badge className="mb-3">{t('guide.howToApply.badge')}</Badge>
-                    <h2 className="text-3xl font-bold tracking-tight">
-                        {t('guide.howToApply.title')}
-                    </h2>
-                </div>
-                <div className="grid gap-4 md:grid-cols-2">
-                    <Card>
-                        <CardHeader>
-                            <div className="flex items-center gap-3">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">
-                                    1
-                                </div>
-                                <CardTitle>{t('guide.howToApply.steps.step1.title')}</CardTitle>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">
-                                {t('guide.howToApply.steps.step1.description')}
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <div className="flex items-center gap-3">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">
-                                    2
-                                </div>
-                                <CardTitle>{t('guide.howToApply.steps.step2.title')}</CardTitle>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">
-                                {t('guide.howToApply.steps.step2.description')}
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <div className="flex items-center gap-3">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">
-                                    3
-                                </div>
-                                <CardTitle>{t('guide.howToApply.steps.step3.title')}</CardTitle>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">
-                                {t('guide.howToApply.steps.step3.description')}
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <div className="flex items-center gap-3">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">
-                                    4
-                                </div>
-                                <CardTitle>{t('guide.howToApply.steps.step4.title')}</CardTitle>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">
-                                {t('guide.howToApply.steps.step4.description')}
-                            </p>
-                        </CardContent>
-                    </Card>
-                </div>
-            </section>
-
-            {/* Benefits */}
-            <section className="space-y-6">
-                <div>
-                    <Badge className="mb-3">{t('guide.benefits.badge')}</Badge>
-                    <h2 className="text-3xl font-bold tracking-tight">
-                        {t('guide.benefits.title')}
-                    </h2>
-                </div>
-                <Card>
-                    <CardContent className="pt-6">
-                        <ul className="space-y-3">
-                            {Array.isArray(dict.guide?.benefits?.list) && dict.guide.benefits.list.map((benefit: string, index: number) => (
-                                <li key={index} className="flex items-start gap-3">
-                                    <ArrowRight className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                                    <span>{benefit}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </CardContent>
-                </Card>
-                <div className="bg-muted rounded-lg p-6">
-                    <p className="text-sm text-muted-foreground italic" dangerouslySetInnerHTML={{ __html: t('guide.benefits.tip') }} />
-                </div>
-            </section>
-
-            {/* How to Use This Website */}
-            <section className="space-y-6">
-                <div>
-                    <Badge className="mb-3">{t('guide.howToUse.badge')}</Badge>
-                    <h2 className="text-3xl font-bold tracking-tight">
-                        {t('guide.howToUse.title')}
-                    </h2>
-                </div>
-                <p className="text-lg text-muted-foreground">
-                    {t('guide.howToUse.description')}
-                </p>
-
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {/* Timer Feature */}
-                    <Card className="hover:shadow-lg transition-shadow">
-                        <CardHeader>
-                            <div className="flex items-center gap-3 mb-2">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                                    <Timer className="h-6 w-6 text-primary" />
-                                </div>
-                                <CardTitle>{t('guide.howToUse.features.timer.title')}</CardTitle>
-                            </div>
-                            <CardDescription>
-                                {t('guide.howToUse.features.timer.subtitle')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            <p className="text-sm text-muted-foreground">
-                                {t('guide.howToUse.features.timer.description')}
-                            </p>
-                            <ul className="text-sm space-y-2 text-muted-foreground">
-                                {Array.isArray(dict.guide?.howToUse?.features?.timer?.points) && dict.guide.howToUse.features.timer.points.map((point: string, index: number) => (
-                                    <li key={index}>• {point}</li>
-                                ))}
-                            </ul>
-                            <Link
-                                href="/timer"
-                                className="inline-flex items-center text-sm font-medium text-primary hover:underline mt-3"
-                            >
-                                {t('guide.howToUse.features.timer.cta')} <ArrowRight className="ml-1 h-4 w-4" />
-                            </Link>
-                        </CardContent>
-                    </Card>
-
-                    {/* Tasks Feature */}
-                    <Card className="hover:shadow-lg transition-shadow">
-                        <CardHeader>
-                            <div className="flex items-center gap-3 mb-2">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                                    <CheckSquare className="h-6 w-6 text-primary" />
-                                </div>
-                                <CardTitle>{t('guide.howToUse.features.tasks.title')}</CardTitle>
-                            </div>
-                            <CardDescription>
-                                {t('guide.howToUse.features.tasks.subtitle')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            <p className="text-sm text-muted-foreground">
-                                {t('guide.howToUse.features.tasks.description')}
-                            </p>
-                            <ul className="text-sm space-y-2 text-muted-foreground">
-                                {Array.isArray(dict.guide?.howToUse?.features?.tasks?.points) && dict.guide.howToUse.features.tasks.points.map((point: string, index: number) => (
-                                    <li key={index}>• {point}</li>
-                                ))}
-                            </ul>
-                            <Link
-                                href="/tasks"
-                                className="inline-flex items-center text-sm font-medium text-primary hover:underline mt-3"
-                            >
-                                {t('guide.howToUse.features.tasks.cta')} <ArrowRight className="ml-1 h-4 w-4" />
-                            </Link>
-                        </CardContent>
-                    </Card>
-
-                    {/* History Feature */}
-                    <Card className="hover:shadow-lg transition-shadow">
-                        <CardHeader>
-                            <div className="flex items-center gap-3 mb-2">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                                    <BarChart3 className="h-6 w-6 text-primary" />
-                                </div>
-                                <CardTitle>{t('guide.howToUse.features.history.title')}</CardTitle>
-                            </div>
-                            <CardDescription>
-                                {t('guide.howToUse.features.history.subtitle')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            <p className="text-sm text-muted-foreground">
-                                {t('guide.howToUse.features.history.description')}
-                            </p>
-                            <ul className="text-sm space-y-2 text-muted-foreground">
-                                {Array.isArray(dict.guide?.howToUse?.features?.history?.points) && dict.guide.howToUse.features.history.points.map((point: string, index: number) => (
-                                    <li key={index}>• {point}</li>
-                                ))}
-                            </ul>
-                            <Link
-                                href="/history"
-                                className="inline-flex items-center text-sm font-medium text-primary hover:underline mt-3"
-                            >
-                                {t('guide.howToUse.features.history.cta')} <ArrowRight className="ml-1 h-4 w-4" />
-                            </Link>
-                        </CardContent>
-                    </Card>
-
-                    {/* Chat AI Feature hidden for UI rework */}
-                    {/* <Card className="hover:shadow-lg transition-shadow">
-                        <CardHeader>
-                            <div className="flex items-center gap-3 mb-2">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                                    <MessageSquare className="h-6 w-6 text-primary" />
-                                </div>
-                                <CardTitle>{t('guide.howToUse.features.chatAI.title')}</CardTitle>
-                            </div>
-                            <CardDescription>
-                                {t('guide.howToUse.features.chatAI.subtitle')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            <p className="text-sm text-muted-foreground">
-                                {t('guide.howToUse.features.chatAI.description')}
-                            </p>
-                            <ul className="text-sm space-y-2 text-muted-foreground">
-                                {Array.isArray(dict.guide?.howToUse?.features?.chatAI?.points) && dict.guide.howToUse.features.chatAI.points.map((point: string, index: number) => (
-                                    <li key={index}>• {point}</li>
-                                ))}
-                            </ul>
-                            <Link
-                                href="/chat"
-                                className="inline-flex items-center text-sm font-medium text-primary hover:underline mt-3"
-                            >
-                                {t('guide.howToUse.features.chatAI.cta')} <ArrowRight className="ml-1 h-4 w-4" />
-                            </Link>
-                        </CardContent>
-                    </Card> */}
-
-                    {/* Entertainment Feature */}
-                    <Card className="hover:shadow-lg transition-shadow">
-                        <CardHeader>
-                            <div className="flex items-center gap-3 mb-2">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                                    <Gamepad2 className="h-6 w-6 text-primary" />
-                                </div>
-                                <CardTitle>{t('guide.howToUse.features.entertainment.title')}</CardTitle>
-                            </div>
-                            <CardDescription>
-                                {t('guide.howToUse.features.entertainment.subtitle')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            <p className="text-sm text-muted-foreground">
-                                {t('guide.howToUse.features.entertainment.description')}
-                            </p>
-                            <ul className="text-sm space-y-2 text-muted-foreground">
-                                {Array.isArray(dict.guide?.howToUse?.features?.entertainment?.points) && dict.guide.howToUse.features.entertainment.points.map((point: string, index: number) => (
-                                    <li key={index}>• {point}</li>
-                                ))}
-                            </ul>
-                            <Link
-                                href="/entertainment"
-                                className="inline-flex items-center text-sm font-medium text-primary hover:underline mt-3"
-                            >
-                                {t('guide.howToUse.features.entertainment.cta')} <ArrowRight className="ml-1 h-4 w-4" />
-                            </Link>
-                        </CardContent>
-                    </Card>
-
-                    {/* Leaderboard Feature */}
-                    <Card className="hover:shadow-lg transition-shadow">
-                        <CardHeader>
-                            <div className="flex items-center gap-3 mb-2">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                                    <Trophy className="h-6 w-6 text-primary" />
-                                </div>
-                                <CardTitle>{t('guide.howToUse.features.leaderboard.title')}</CardTitle>
-                            </div>
-                            <CardDescription>
-                                {t('guide.howToUse.features.leaderboard.subtitle')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            <p className="text-sm text-muted-foreground">
-                                {t('guide.howToUse.features.leaderboard.description')}
-                            </p>
-                            <ul className="text-sm space-y-2 text-muted-foreground">
-                                {Array.isArray(dict.guide?.howToUse?.features?.leaderboard?.points) && dict.guide.howToUse.features.leaderboard.points.map((point: string, index: number) => (
-                                    <li key={index}>• {point}</li>
-                                ))}
-                            </ul>
-                            <Link
-                                href="/leaderboard"
-                                className="inline-flex items-center text-sm font-medium text-primary hover:underline mt-3"
-                            >
-                                {t('guide.howToUse.features.leaderboard.cta')} <ArrowRight className="ml-1 h-4 w-4" />
-                            </Link>
-                        </CardContent>
-                    </Card>
-
-                    {/* Focus Feature */}
-                    <Card className="hover:shadow-lg transition-shadow">
-                        <CardHeader>
-                            <div className="flex items-center gap-3 mb-2">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                                    <Shield className="h-6 w-6 text-primary" />
-                                </div>
-                                <CardTitle>{t('guide.howToUse.features.focus.title')}</CardTitle>
-                            </div>
-                            <CardDescription>
-                                {t('guide.howToUse.features.focus.subtitle')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            <p className="text-sm text-muted-foreground">
-                                {t('guide.howToUse.features.focus.description')}
-                            </p>
-                            <ul className="text-sm space-y-2 text-muted-foreground">
-                                {Array.isArray(dict.guide?.howToUse?.features?.focus?.points) && dict.guide.howToUse.features.focus.points.map((point: string, index: number) => (
-                                    <li key={index}>• {point}</li>
-                                ))}
-                            </ul>
-                            <Link
-                                href="/focus"
-                                className="inline-flex items-center text-sm font-medium text-primary hover:underline mt-3"
-                            >
-                                {t('guide.howToUse.features.focus.cta')} <ArrowRight className="ml-1 h-4 w-4" />
-                            </Link>
-                        </CardContent>
-                    </Card>
-
-                    {/* Feedback Feature */}
-                    <Card className="hover:shadow-lg transition-shadow">
-                        <CardHeader>
-                            <div className="flex items-center gap-3 mb-2">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                                    <Send className="h-6 w-6 text-primary" />
-                                </div>
-                                <CardTitle>{t('guide.howToUse.features.feedback.title')}</CardTitle>
-                            </div>
-                            <CardDescription>
-                                {t('guide.howToUse.features.feedback.subtitle')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            <p className="text-sm text-muted-foreground">
-                                {t('guide.howToUse.features.feedback.description')}
-                            </p>
-                            <ul className="text-sm space-y-2 text-muted-foreground">
-                                {Array.isArray(dict.guide?.howToUse?.features?.feedback?.points) && dict.guide.howToUse.features.feedback.points.map((point: string, index: number) => (
-                                    <li key={index}>• {point}</li>
-                                ))}
-                            </ul>
-                            <Link
-                                href="/feedback"
-                                className="inline-flex items-center text-sm font-medium text-primary hover:underline mt-3"
-                            >
-                                {t('guide.howToUse.features.feedback.cta')} <ArrowRight className="ml-1 h-4 w-4" />
-                            </Link>
-                        </CardContent>
-                    </Card>
-
-                    {/* Settings Feature */}
-                    <Card className="hover:shadow-lg transition-shadow">
-                        <CardHeader>
-                            <div className="flex items-center gap-3 mb-2">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                                    <Settings className="h-6 w-6 text-primary" />
-                                </div>
-                                <CardTitle>{t('guide.howToUse.features.settings.title')}</CardTitle>
-                            </div>
-                            <CardDescription>
-                                {t('guide.howToUse.features.settings.subtitle')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            <p className="text-sm text-muted-foreground">
-                                {t('guide.howToUse.features.settings.description')}
-                            </p>
-                            <ul className="text-sm space-y-2 text-muted-foreground">
-                                {Array.isArray(dict.guide?.howToUse?.features?.settings?.points) && dict.guide.howToUse.features.settings.points.map((point: string, index: number) => (
-                                    <li key={index}>• {point}</li>
-                                ))}
-                            </ul>
-                            <Link
-                                href="/settings"
-                                className="inline-flex items-center text-sm font-medium text-primary hover:underline mt-3"
-                            >
-                                {t('guide.howToUse.features.settings.cta')} <ArrowRight className="ml-1 h-4 w-4" />
-                            </Link>
-                        </CardContent>
-                    </Card>
-                </div>
-            </section>
-
-            {/* Getting Started */}
-            <section className="space-y-6">
-                <div>
-                    <Badge className="mb-3">{t('guide.getStarted.badge')}</Badge>
-                    <h2 className="text-3xl font-bold tracking-tight">
-                        {t('guide.getStarted.title')}
-                    </h2>
-                </div>
-                <Card className="bg-primary/5 border-primary/20">
-                    <CardContent className="pt-6">
-                        <div className="space-y-4">
-                            <p className="text-lg">
-                                {t('guide.getStarted.description')}
-                            </p>
-                            <ol className="space-y-3 text-muted-foreground">
-                                {Array.isArray(dict.guide?.getStarted?.steps) && dict.guide.getStarted.steps.map((step: string, index: number) => (
-                                    <li key={index} className="flex items-start gap-3">
-                                        <span className="font-bold text-primary">{index + 1}.</span>
-                                        <span dangerouslySetInnerHTML={{ __html: step.replace(/<link>/g, '<a href="/tasks" class="text-primary hover:underline font-medium">').replace(/<\/link>/g, '</a>').replace(/<link>/g, '<a href="/timer" class="text-primary hover:underline font-medium">') }} />
-                                    </li>
-                                ))}
-                            </ol>
-                            <div className="pt-4">
-                                <Link
-                                    href="/timer"
-                                    className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 transition-colors"
-                                >
-                                    {t('guide.getStarted.cta')} <ArrowRight className="ml-2 h-4 w-4" />
-                                </Link>
-                            </div>
+                <section className="space-y-5">
+                    <h2 className={H2}>{t('guide.pomodoro.title')}</h2>
+                    <p className={BODY} dangerouslySetInnerHTML={{ __html: t('guide.pomodoro.description') }} />
+                    <figure className="space-y-2">
+                        <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-border bg-surface-raised">
+                            <Image
+                                src="/images/content_1/pomodoro_explain.png"
+                                alt={t('guide.pomodoro.imageAlt')}
+                                fill
+                                className="object-contain"
+                                priority
+                            />
                         </div>
-                    </CardContent>
-                </Card>
-            </section>
-        </main>
+                        <figcaption className="text-[0.8125rem] text-ink-muted">{t('pagesUi.guide.figureCaption')}</figcaption>
+                    </figure>
+                </section>
+
+                <section className="space-y-5">
+                    <h2 className={H2}>{t('guide.howToApply.title')}</h2>
+                    <ol className="divide-y divide-border rounded-lg border border-border bg-surface">
+                        {(['step1', 'step2', 'step3', 'step4'] as const).map((step, i) => (
+                            <li key={step} className="flex gap-4 px-5 py-4">
+                                <span className="w-5 shrink-0 font-heading text-lg font-bold tabular-nums text-ink-faint">{i + 1}</span>
+                                <div className="space-y-1">
+                                    <h3 className="text-[0.9375rem] font-semibold text-ink">{t(`guide.howToApply.steps.${step}.title`)}</h3>
+                                    <p className="text-sm leading-relaxed text-ink-muted">{t(`guide.howToApply.steps.${step}.description`)}</p>
+                                </div>
+                            </li>
+                        ))}
+                    </ol>
+                </section>
+
+                <section className="space-y-5">
+                    <h2 className={H2}>{t('guide.benefits.title')}</h2>
+                    <ul className={`list-disc space-y-2 pl-5 marker:text-ink-faint ${BODY}`}>
+                        {benefits.map((benefit) => (
+                            <li key={benefit}>{benefit}</li>
+                        ))}
+                    </ul>
+                    <p className="rounded-lg bg-surface-raised px-5 py-4 text-sm leading-relaxed text-ink-secondary">{t('pagesUi.guide.tip')}</p>
+                </section>
+
+                <section className="space-y-5">
+                    <div className="space-y-2">
+                        <h2 className={H2}>{t('guide.howToUse.title')}</h2>
+                        <p className="text-ink-muted">{t('guide.howToUse.description')}</p>
+                    </div>
+                    <ul className="divide-y divide-border rounded-lg border border-border bg-surface">
+                        {FEATURES.map(({ key, href }) => (
+                            <li key={key}>
+                                <Link
+                                    href={href}
+                                    className="group flex items-center justify-between gap-4 px-5 py-4 transition-colors duration-150 hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"
+                                >
+                                    <span className="min-w-0 space-y-0.5">
+                                        <span className="block text-[0.9375rem] font-semibold text-ink">{t(`guide.howToUse.features.${key}.title`)}</span>
+                                        <span className="block text-[0.8125rem] text-ink-muted">{t(`guide.howToUse.features.${key}.subtitle`)}</span>
+                                    </span>
+                                    <ArrowRight size={16} className="shrink-0 text-ink-faint transition-transform duration-150 group-hover:translate-x-0.5 group-hover:text-ink-secondary" />
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+
+                <section className="space-y-5">
+                    <div className="space-y-2">
+                        <h2 className={H2}>{t('pagesUi.guide.shortcutsTitle')}</h2>
+                        <p className="text-ink-muted">{t('pagesUi.guide.shortcutsIntro')}</p>
+                    </div>
+                    <div className="overflow-hidden rounded-lg border border-border">
+                        <table className="w-full text-left text-sm">
+                            <thead className="bg-surface-raised text-[0.6875rem] font-semibold uppercase tracking-[0.05em] text-ink-muted">
+                                <tr>
+                                    <th scope="col" className="w-32 px-5 py-2.5">{t('pagesUi.guide.colKey')}</th>
+                                    <th scope="col" className="px-5 py-2.5">{t('pagesUi.guide.colAction')}</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border bg-surface text-ink-secondary">
+                                <tr>
+                                    <td className="px-5 py-3"><Kbd>{t('pagesUi.guide.keySpace')}</Kbd></td>
+                                    <td className="px-5 py-3">{t('pagesUi.guide.actionStartPause')}</td>
+                                </tr>
+                                <tr>
+                                    <td className="px-5 py-3"><Kbd>R</Kbd></td>
+                                    <td className="px-5 py-3">{t('pagesUi.guide.actionReset')}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section className="space-y-5 border-t border-border pt-10">
+                    <h2 className={H2}>{t('guide.getStarted.title')}</h2>
+                    <p className={BODY}>{t('guide.getStarted.description')}</p>
+                    <ol className="space-y-3 text-ink-secondary">
+                        {startSteps.map((step, index) => (
+                            <li key={step} className="flex items-start gap-3">
+                                <span className="w-5 shrink-0 font-heading font-bold tabular-nums text-ink-faint">{index + 1}</span>
+                                <span
+                                    dangerouslySetInnerHTML={{
+                                        __html: step
+                                            .replace('<link>', '<a href="/tasks" class="font-medium text-brand hover:underline">')
+                                            .replace('<link>', '<a href="/timer" class="font-medium text-brand hover:underline">')
+                                            .replace(/<\/link>/g, '</a>'),
+                                    }}
+                                />
+                            </li>
+                        ))}
+                    </ol>
+                    <Button asChild size="lg">
+                        <Link href="/timer">{t('guide.getStarted.cta')}</Link>
+                    </Button>
+                </section>
+            </article>
+        </PageContainer>
     );
 }

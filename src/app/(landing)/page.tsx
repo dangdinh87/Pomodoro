@@ -7,8 +7,6 @@ import { HeroSSR } from '@/components/landing/HeroSSR';
 import { FeaturesSSR } from '@/components/landing/FeaturesSSR';
 import { Pricing } from '@/components/landing/Pricing';
 import { Footer } from '@/components/landing/Footer';
-import { AIChatIndicator } from '@/components/landing/AIChatIndicator';
-import { CTA } from '@/components/landing/CTA';
 import { FAQ } from '@/components/landing/FAQ';
 import { HowItWorks } from '@/components/landing/HowItWorks';
 import { Metadata } from 'next';
@@ -89,10 +87,8 @@ export default function LandingPage() {
         <HeroSSR />
         <FeaturesSSR />
         <HowItWorks />
-        {/* <AIChatIndicator /> */}
         <Pricing />
         <FAQ />
-        <CTA />
       </main>
       <Footer />
     </>

@@ -3,24 +3,11 @@
 import { useState, Suspense, lazy, useEffect, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/contexts/i18n-context';
-import {
-  X,
-  Rocket,
-  Gamepad2,
-  Trophy,
-  Layers,
-  Grid3X3,
-  Zap,
-  Hash,
-  Sparkles,
-  Play,
-  Keyboard,
-  Mouse,
-  Smartphone,
-  Lightbulb,
-} from 'lucide-react';
+import { X, Rocket, GameController, Trophy, Stack, GridNine, Lightning, Hash, Wall, Play, Keyboard, Mouse, DeviceMobile, Lightbulb, Info } from '@phosphor-icons/react/dist/ssr';
 import { cn } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
+import { PageContainer, PageHeader } from '@/components/ui/page-header';
+import { useTimerStore } from '@/stores/timer-store';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 
 // Lazy load game components
 const SpaceShooterGame = lazy(() =>
@@ -64,7 +51,6 @@ type GameId = 'space-shooter' | 'neon-flip' | 'tic-tac-toe' | 'snake' | 'game-20
 interface GameConfig {
   id: NonNullable<GameId>;
   icon: React.ElementType;
-  color: string;
   storageKey: string;
   translationKey: string;
   controls: ('keyboard' | 'mouse' | 'touch')[];
@@ -74,23 +60,20 @@ const games: GameConfig[] = [
   {
     id: 'space-shooter',
     icon: Rocket,
-    color: '#a855f7',
     storageKey: 'space-shooter-scores',
     translationKey: 'spaceShooter',
     controls: ['mouse', 'touch'],
   },
   {
     id: 'snake',
-    icon: Zap,
-    color: '#22c55e',
+    icon: Lightning,
     storageKey: 'snake-scores',
     translationKey: 'snake',
     controls: ['keyboard', 'touch'],
   },
   {
     id: 'neon-flip',
-    icon: Layers,
-    color: '#f97316',
+    icon: Stack,
     storageKey: 'memory-match-scores',
     translationKey: 'memoryMatch',
     controls: ['mouse', 'touch'],
@@ -98,23 +81,20 @@ const games: GameConfig[] = [
   {
     id: 'game-2048',
     icon: Hash,
-    color: '#f59e0b',
     storageKey: 'game-2048-scores',
     translationKey: 'game2048',
     controls: ['keyboard', 'touch'],
   },
   {
     id: 'tic-tac-toe',
-    icon: Grid3X3,
-    color: '#3b82f6',
+    icon: GridNine,
     storageKey: 'tic-tac-toe-scores',
     translationKey: 'ticTacToe',
     controls: ['mouse', 'touch'],
   },
   {
     id: 'brick-breaker',
-    icon: Sparkles,
-    color: '#ec4899',
+    icon: Wall,
     storageKey: 'brick-breaker-scores',
     translationKey: 'brickBreaker',
     controls: ['keyboard', 'mouse', 'touch'],
@@ -159,8 +139,9 @@ function useGameScores(storageKey: string): [GameScores, (score: number) => void
 }
 
 // Dynamic loading screen with real progress
-function GameLoadingScreen({ gameName, gameColor }: { gameName: string; gameColor: string }) {
+function GameLoadingScreen({ gameName }: { gameName: string }) {
   const { t } = useI18n();
+  const reduceMotion = useReducedMotion();
   const [progress, setProgress] = useState(0);
   const [loadingTextKey, setLoadingTextKey] = useState('initializing');
   const [particles, setParticles] = useState<Array<{ x: number; opacity: number; scale: number; duration: number; delay: number }>>([]);
@@ -202,41 +183,37 @@ function GameLoadingScreen({ gameName, gameColor }: { gameName: string; gameColo
   }, []);
 
   return (
-    <div className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center overflow-hidden">
-      <div className="absolute inset-0">
-        {particles.map((particle, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 rounded-full"
-            style={{ backgroundColor: gameColor, left: `${particle.x}%` }}
-            initial={{ y: '100vh', opacity: particle.opacity, scale: particle.scale }}
-            animate={{
-              y: '-10px',
-              transition: { duration: particle.duration, repeat: Infinity, ease: 'linear', delay: particle.delay }
-            }}
-          />
-        ))}
-      </div>
+    <div className="fixed inset-0 z-50 bg-surface-page flex flex-col items-center justify-center overflow-hidden">
+      {!reduceMotion && (
+        <div className="absolute inset-0">
+          {particles.map((particle, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 rounded-full bg-ink-faint"
+              style={{ left: `${particle.x}%` }}
+              initial={{ y: '100vh', opacity: particle.opacity, scale: particle.scale }}
+              animate={{
+                y: '-10px',
+                transition: { duration: particle.duration, repeat: Infinity, ease: 'linear', delay: particle.delay }
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       <motion.div
-        className="relative z-10 flex flex-col items-center gap-8"
-        initial={{ opacity: 0, scale: 0.9 }}
+        className="relative z-10 flex flex-col items-center gap-6"
+        initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.3 }}
       >
-        <motion.div className="relative" animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 1.5, repeat: Infinity }}>
-          <div className="absolute inset-0 blur-2xl opacity-50" style={{ backgroundColor: gameColor }} />
-          <div className="relative p-6 rounded-2xl" style={{ backgroundColor: `${gameColor}20` }}>
-            <Gamepad2 className="w-16 h-16" style={{ color: gameColor }} />
-          </div>
-        </motion.div>
+        <GameController size={48} className="text-ink-secondary" />
 
-        <h2 className="text-2xl font-bold text-white">{gameName}</h2>
+        <h2 className="font-heading text-2xl font-bold text-ink">{gameName}</h2>
 
-        <div className="w-64 h-2 bg-white/10 rounded-full overflow-hidden">
+        <div className="w-64 h-1.5 bg-surface-raised rounded-full overflow-hidden">
           <motion.div
-            className="h-full rounded-full"
-            style={{ backgroundColor: gameColor }}
+            className="h-full rounded-full bg-primary"
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.1 }}
@@ -244,10 +221,10 @@ function GameLoadingScreen({ gameName, gameColor }: { gameName: string; gameColo
         </div>
 
         <div className="flex flex-col items-center gap-1">
-          <span className="text-white/60 text-sm" suppressHydrationWarning>
+          <span className="text-ink-muted text-sm" suppressHydrationWarning>
             {t(`entertainment.loadingStages.${loadingTextKey}`)}...
           </span>
-          <span className="text-white font-mono text-lg">{progress}%</span>
+          <span className="text-ink font-mono text-lg tabular-nums">{progress}%</span>
         </div>
       </motion.div>
     </div>
@@ -269,7 +246,7 @@ function GameInstructionPopup({ game, highScore, onStart, onClose }: GameInstruc
   const controlIcons = {
     keyboard: { icon: Keyboard, labelKey: 'keyboard' },
     mouse: { icon: Mouse, labelKey: 'mouse' },
-    touch: { icon: Smartphone, labelKey: 'touch' },
+    touch: { icon: DeviceMobile, labelKey: 'touch' },
   };
 
   const tips = t(`entertainment.games.${game.translationKey}.tips`);
@@ -278,7 +255,7 @@ function GameInstructionPopup({ game, highScore, onStart, onClose }: GameInstruc
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <motion.div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60"
         onClick={onClose}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -286,7 +263,7 @@ function GameInstructionPopup({ game, highScore, onStart, onClose }: GameInstruc
       />
 
       <motion.div
-        className="relative w-full max-w-md bg-background backdrop-blur-md rounded-2xl border border-border shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
+        className="relative w-full max-w-md bg-surface rounded-lg border border-border shadow-[0_4px_20px_-8px_rgba(0,0,0,0.4)] overflow-hidden max-h-[90vh] overflow-y-auto"
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -296,33 +273,32 @@ function GameInstructionPopup({ game, highScore, onStart, onClose }: GameInstruc
         <div className="relative p-5 sm:p-6">
           <button
             onClick={onClose}
-            className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 rounded-full hover:bg-muted transition-colors"
+            aria-label="Close"
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 rounded-md hover:bg-surface-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-strong"
           >
-            <X className="w-5 h-5 text-muted-foreground" />
+            <X size={20} className="text-ink-muted" />
           </button>
 
           <div className="flex items-center gap-3 sm:gap-4">
-            <div className="p-3 sm:p-4 rounded-xl" style={{ backgroundColor: `${game.color}15` }}>
-              <Icon className="w-7 h-7 sm:w-8 sm:h-8" style={{ color: game.color }} />
-            </div>
+            <Icon size={28} className="text-ink-secondary shrink-0" />
             <div className="flex-1 min-w-0">
-              <h2 className="text-xl sm:text-2xl font-bold text-foreground truncate" suppressHydrationWarning>
+              <h2 className="font-heading text-xl sm:text-2xl font-bold text-ink truncate" suppressHydrationWarning>
                 {t(`entertainment.games.${game.translationKey}.title`)}
               </h2>
-              <p className="text-sm text-muted-foreground mt-0.5 line-clamp-1" suppressHydrationWarning>
+              <p className="text-sm text-ink-muted mt-0.5 line-clamp-1" suppressHydrationWarning>
                 {t(`entertainment.games.${game.translationKey}.description`)}
               </p>
             </div>
           </div>
 
           {highScore > 0 && (
-            <div className="flex items-center gap-2 mt-4 p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
-              <Trophy className="w-5 h-5 text-yellow-500 shrink-0" />
+            <div className="flex items-center gap-2 mt-4 p-3 rounded-md bg-surface-raised">
+              <Trophy size={20} className="text-gold shrink-0" />
               <div className="flex-1">
-                <span className="text-xs text-yellow-600 dark:text-yellow-400 uppercase tracking-wide" suppressHydrationWarning>
+                <span className="text-xs font-medium text-ink-muted" suppressHydrationWarning>
                   {t('entertainment.yourBest')}
                 </span>
-                <p className="text-lg font-bold text-yellow-500">{highScore.toLocaleString()}</p>
+                <p className="font-heading text-lg font-bold tabular-nums text-ink">{highScore.toLocaleString()}</p>
               </div>
             </div>
           )}
@@ -331,24 +307,24 @@ function GameInstructionPopup({ game, highScore, onStart, onClose }: GameInstruc
         {/* Content */}
         <div className="px-5 pb-5 sm:px-6 sm:pb-6 space-y-4">
           {/* How to play */}
-          <div className="bg-muted/50 rounded-xl p-4">
-            <h3 className="text-sm font-semibold text-foreground/80 mb-2 uppercase tracking-wide flex items-center gap-2" suppressHydrationWarning>
-              <Play className="w-4 h-4" />
+          <div className="bg-surface-raised rounded-md p-4">
+            <h3 className="text-sm font-semibold text-ink mb-1.5 flex items-center gap-2" suppressHydrationWarning>
+              <Play size={14} weight="fill" className="text-ink-muted" />
               {t('entertainment.howToPlay')}
             </h3>
-            <p className="text-sm text-muted-foreground leading-relaxed" suppressHydrationWarning>
+            <p className="text-sm text-ink-secondary leading-relaxed" suppressHydrationWarning>
               {t(`entertainment.games.${game.translationKey}.instructions`)}
             </p>
           </div>
 
           {/* Pro Tips */}
           {hasTips && (
-            <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-xl p-4 border border-amber-500/20">
-              <h3 className="text-sm font-semibold text-amber-600 dark:text-amber-400 mb-2 uppercase tracking-wide flex items-center gap-2" suppressHydrationWarning>
-                <Lightbulb className="w-4 h-4" />
+            <div className="bg-surface-raised rounded-md p-4">
+              <h3 className="text-sm font-semibold text-ink mb-1.5 flex items-center gap-2" suppressHydrationWarning>
+                <Lightbulb size={14} className="text-ink-muted" />
                 {t('entertainment.tips')}
               </h3>
-              <p className="text-sm text-amber-700 dark:text-amber-300/80" suppressHydrationWarning>
+              <p className="text-sm text-ink-secondary" suppressHydrationWarning>
                 {tips}
               </p>
             </div>
@@ -356,8 +332,8 @@ function GameInstructionPopup({ game, highScore, onStart, onClose }: GameInstruc
 
           {/* Controls */}
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs text-muted-foreground uppercase tracking-wide" suppressHydrationWarning>
-              {t('entertainment.controls.title')}:
+            <span className="text-sm font-semibold text-ink" suppressHydrationWarning>
+              {t('entertainment.controls.title')}
             </span>
             {game.controls.map(control => {
               const ControlIcon = controlIcons[control].icon;
@@ -365,11 +341,11 @@ function GameInstructionPopup({ game, highScore, onStart, onClose }: GameInstruc
               return (
                 <div
                   key={control}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-muted/50 border border-border/50"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-border"
                   title={label}
                 >
-                  <ControlIcon className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground" suppressHydrationWarning>{label}</span>
+                  <ControlIcon className="w-3.5 h-3.5 text-ink-muted" />
+                  <span className="text-xs text-ink-secondary" suppressHydrationWarning>{label}</span>
                 </div>
               );
             })}
@@ -378,10 +354,10 @@ function GameInstructionPopup({ game, highScore, onStart, onClose }: GameInstruc
           {/* Start button */}
           <Button
             onClick={onStart}
-            className="w-full h-12 text-base font-semibold rounded-xl gap-2 mt-2"
-            style={{ backgroundColor: game.color, color: 'white' }}
+            size="lg"
+            className="w-full gap-2 mt-2"
           >
-            <Play className="w-5 h-5" />
+            <Play size={18} weight="fill" />
             <span suppressHydrationWarning>{t('entertainment.startGame')}</span>
           </Button>
         </div>
@@ -409,22 +385,23 @@ function FullscreenGame({ gameId, onClose, onScoreUpdate }: FullscreenGameProps)
   }, []);
 
   if (!isLoaded) {
-    return <GameLoadingScreen gameName={gameName} gameColor={game.color} />;
+    return <GameLoadingScreen gameName={gameName} />;
   }
 
   return (
     <div className="fixed inset-0 z-50 bg-black">
       <Button
-        variant="ghost"
+        variant="secondary"
         size="icon"
         onClick={onClose}
-        className="absolute top-4 right-4 z-50 bg-black/50 hover:bg-black/70 text-white rounded-full w-12 h-12 backdrop-blur-sm border border-white/10"
+        className="absolute top-4 right-4 z-50"
+        aria-label={t('common.close')}
       >
-        <X className="h-6 w-6" />
+        <X size={20} />
       </Button>
 
       <div className="w-full h-full">
-        <Suspense fallback={<GameLoadingScreen gameName={gameName} gameColor={game.color} />}>
+        <Suspense fallback={<GameLoadingScreen gameName={gameName} />}>
           {gameId === 'space-shooter' && <SpaceShooterGame onGameEnd={onScoreUpdate} fullscreen />}
           {gameId === 'neon-flip' && <NeonFlipGame onGameEnd={onScoreUpdate} fullscreen />}
           {gameId === 'tic-tac-toe' && <TicTacToeGame onGameEnd={onScoreUpdate} fullscreen />}
@@ -437,7 +414,6 @@ function FullscreenGame({ gameId, onClose, onScoreUpdate }: FullscreenGameProps)
   );
 }
 
-// Game card with better mobile support
 interface GameCardProps {
   game: GameConfig;
   highScore: number;
@@ -449,36 +425,31 @@ function GameCard({ game, highScore, onClick }: GameCardProps) {
   const Icon = game.icon;
 
   return (
-    <motion.button
+    <button
+      type="button"
       onClick={onClick}
       className={cn(
-        "group relative flex flex-col items-center justify-center p-4 sm:p-6 rounded-2xl",
-        "border border-border/50 hover:border-border",
-        "bg-card hover:bg-accent/50",
-        "transition-all duration-200",
-        "active:scale-95 sm:active:scale-100"
+        'flex h-full flex-col items-start gap-3 rounded-lg border border-border bg-surface p-4 text-left sm:p-5',
+        'transition-colors duration-150 hover:border-border-strong hover:bg-surface-hover',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface-page'
       )}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
     >
-      {highScore > 0 && (
-        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-yellow-500/10">
-          <Trophy className="w-3 h-3 text-yellow-500" />
-          <span className="text-[10px] sm:text-xs font-medium text-yellow-500">{highScore}</span>
-        </div>
-      )}
-
-      <div
-        className="p-3 sm:p-4 rounded-xl mb-2 sm:mb-3 transition-transform group-hover:scale-110 duration-200"
-        style={{ backgroundColor: `${game.color}15` }}
-      >
-        <Icon className="w-6 h-6 sm:w-8 sm:h-8" style={{ color: game.color }} />
+      <Icon size={28} className="text-ink-secondary" />
+      <div className="min-w-0 flex-1 space-y-1">
+        <h2 className="font-heading text-base font-bold leading-tight text-ink" suppressHydrationWarning>
+          {t(`entertainment.games.${game.translationKey}.title`)}
+        </h2>
+        <p className="line-clamp-3 text-[0.8125rem] leading-snug text-ink-muted" suppressHydrationWarning>
+          {t(`entertainment.games.${game.translationKey}.description`)}
+        </p>
       </div>
-
-      <span className="font-medium text-xs sm:text-sm text-center" suppressHydrationWarning>
-        {t(`entertainment.games.${game.translationKey}.title`)}
-      </span>
-    </motion.button>
+      {highScore > 0 && (
+        <span className="inline-flex items-center gap-1 text-xs font-medium tabular-nums text-ink-secondary" suppressHydrationWarning>
+          <Trophy size={12} weight="fill" className="text-gold" />
+          {t('arcadeUi.best', { score: highScore.toLocaleString() })}
+        </span>
+      )}
+    </button>
   );
 }
 
@@ -487,6 +458,7 @@ export default function EntertainmentPage() {
   const [showInstructions, setShowInstructions] = useState(false);
   const [playingGame, setPlayingGame] = useState<GameId>(null);
   const { t } = useI18n();
+  const isFocusRunning = useTimerStore((s) => s.isRunning && s.mode === 'work');
 
   // Game scores hooks
   const [spaceShooterScores, updateSpaceShooterScore] = useGameScores('space-shooter-scores');
@@ -550,26 +522,23 @@ export default function EntertainmentPage() {
   }
 
   return (
-    <div className="container mx-auto p-4 md:p-6 max-w-4xl">
-      {/* Header */}
-      <div className="mb-6 sm:mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="p-2.5 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 shadow-lg shadow-violet-500/20">
-            <Gamepad2 className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold" suppressHydrationWarning>
-              {t('entertainment.title')}
-            </h1>
-            <p className="text-xs sm:text-sm text-muted-foreground" suppressHydrationWarning>
-              {t('entertainment.gamesCount', { count: games.length.toString() })}
-            </p>
-          </div>
-        </div>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title={<span suppressHydrationWarning>{t('arcadeUi.title')}</span>}
+        description={<span suppressHydrationWarning>{t('arcadeUi.description')}</span>}
+      />
 
-      {/* Game Grid */}
-      <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+      {isFocusRunning && (
+        <p
+          className="mb-5 flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-3 text-sm text-ink-secondary"
+          suppressHydrationWarning
+        >
+          <Info size={16} className="shrink-0 text-ink-muted" />
+          {t('arcadeUi.runningNote')}
+        </p>
+      )}
+
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
         {games.map((game) => (
           <GameCard
             key={game.id}
@@ -591,6 +560,6 @@ export default function EntertainmentPage() {
           />
         )}
       </AnimatePresence>
-    </div>
+    </PageContainer>
   );
 }

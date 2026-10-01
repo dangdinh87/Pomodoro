@@ -1,14 +1,12 @@
-
 "use client"
 
 import { useEffect, useState } from "react"
-import { Trophy, Timer, CheckCircle2, User as UserIcon } from "lucide-react"
+import { User as UserIcon } from '@phosphor-icons/react/dist/ssr';
 import { useAuth } from "@/hooks/use-auth"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { EmptyState } from "@/components/ui/empty-state"
+import { FilterChip, FilterChipGroup } from "@/components/ui/filter-chip"
+import { PageContainer, PageHeader } from "@/components/ui/page-header"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/contexts/i18n-context"
 
@@ -20,15 +18,16 @@ type LeaderboardEntry = {
   tasks_completed: number
 }
 
+type SortBy = 'time' | 'tasks'
+
 export default function LeaderboardPage() {
   const { user } = useAuth()
   const { t } = useTranslation()
   const [entries, setEntries] = useState<LeaderboardEntry[]>([])
   const [loading, setLoading] = useState(true)
-  const [sortBy, setSortBy] = useState<'time' | 'tasks'>('time')
+  const [sortBy, setSortBy] = useState<SortBy>('time')
 
   useEffect(() => {
-    // Sync profile on mount if user is logged in
     if (user) {
       fetch('/api/leaderboard', { method: 'POST' }).catch(console.error)
     }
@@ -60,104 +59,75 @@ export default function LeaderboardPage() {
   }
 
   return (
-    <div className="container max-w-4xl py-8 space-y-8 h-full flex flex-col">
-      <div className="flex flex-col items-center text-center space-y-2 shrink-0">
-        <div className="p-2 bg-primary/10 rounded-full ring-1 ring-primary/20">
-          <Trophy className="w-6 h-6 text-primary" />
-        </div>
-        <h1 className="text-xl font-bold tracking-tight">{t('leaderboard.title')}</h1>
-        <p className="text-sm text-muted-foreground max-w-[600px]">
-          {t('leaderboard.description')}
-        </p>
+    <PageContainer size="narrow">
+      <PageHeader
+        title={t('leaderboard.title')}
+        description={t('leaderboard.description')}
+        actions={
+          <FilterChipGroup label={t('leaderboard.title')}>
+            <FilterChip active={sortBy === 'time'} onClick={() => setSortBy('time')}>
+              {t('leaderboard.tabs.focusTime')}
+            </FilterChip>
+            <FilterChip active={sortBy === 'tasks'} onClick={() => setSortBy('tasks')}>
+              {t('leaderboard.tabs.completedTasks')}
+            </FilterChip>
+          </FilterChipGroup>
+        }
+      />
+
+      <div className="overflow-hidden rounded-lg border border-border bg-surface">
+        {loading ? (
+          <div className="divide-y divide-border">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-14 w-full animate-pulse bg-surface-raised/40" />
+            ))}
+          </div>
+        ) : entries.length === 0 ? (
+          <EmptyState title={t('leaderboard.empty')} className="min-h-[280px] py-8" />
+        ) : (
+          <ol className="divide-y divide-border">
+            {entries.map((entry, index) => {
+              const isCurrentUser = entry.user_id === user?.id
+              const rank = index + 1
+
+              return (
+                <li
+                  key={entry.user_id}
+                  aria-current={isCurrentUser ? 'true' : undefined}
+                  className={cn("flex items-center gap-3 px-5 py-3", isCurrentUser && "bg-surface-raised")}
+                >
+                  <span
+                    className={cn(
+                      "w-8 shrink-0 font-heading text-base font-bold tabular-nums",
+                      rank <= 3 ? "text-gold" : "text-ink-muted"
+                    )}
+                  >
+                    {rank}
+                  </span>
+
+                  <Avatar className="h-8 w-8 shrink-0 border border-border">
+                    <AvatarImage src={entry.avatar_url || undefined} />
+                    <AvatarFallback>
+                      <UserIcon size={12} />
+                    </AvatarFallback>
+                  </Avatar>
+
+                  <p className={cn("min-w-0 flex-1 truncate text-sm text-ink", isCurrentUser ? "font-semibold" : "font-medium")}>
+                    {entry.name}
+                    {isCurrentUser && <span className="ml-1.5 font-normal text-ink-muted">({t('leaderboard.you')})</span>}
+                  </p>
+
+                  <span className="shrink-0 font-heading text-sm font-bold tabular-nums text-ink">
+                    {sortBy === 'time'
+                      ? formatTime(entry.total_focus_time)
+                      : t('pagesUi.leaderboard.tasksCount', { count: entry.tasks_completed })}
+                  </span>
+                </li>
+              )
+            })}
+          </ol>
+        )}
       </div>
-
-      <Card className="border-border/50 bg-card/50 backdrop-blur-sm flex-1 flex flex-col min-h-0">
-        <CardHeader className="shrink-0 pb-2">
-          <Tabs value={sortBy} onValueChange={(v) => setSortBy(v as 'time' | 'tasks')} className="w-full">
-            <TabsList className="grid w-full max-w-[400px] mx-auto grid-cols-2 bg-muted/50 p-1 gap-1 h-auto">
-              <TabsTrigger value="time" className="flex items-center gap-2">
-                <Timer className="w-4 h-4" />
-                {t('leaderboard.tabs.focusTime')}
-              </TabsTrigger>
-              <TabsTrigger value="tasks" className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4" />
-                {t('leaderboard.tabs.completedTasks')}
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </CardHeader>
-        <CardContent className="flex-1 min-h-0 overflow-hidden pt-4">
-          {loading ? (
-            <div className="space-y-4">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-16 w-full bg-muted/20 animate-pulse rounded-lg" />
-              ))}
-            </div>
-          ) : (
-            <ScrollArea className="h-full pr-4">
-              <div className="space-y-3">
-                {entries.length === 0 ? (
-                  <EmptyState
-                    title={t('leaderboard.empty')}
-                    className="min-h-[280px] py-8"
-                  />
-                ) : (
-                  entries.map((entry, index) => {
-                    const isCurrentUser = entry.user_id === user?.id
-                    const rank = index + 1
-
-                    return (
-                      <div
-                        key={entry.user_id}
-                        className={cn(
-                          "flex items-center gap-3 p-3 rounded-lg transition-all duration-200",
-                          isCurrentUser
-                            ? "bg-primary/10 border border-primary/20 shadow-sm"
-                            : "bg-muted/30 border border-transparent hover:bg-muted/50 hover:scale-[1.01]"
-                        )}
-                      >
-                        <div className={cn(
-                          "flex items-center justify-center w-6 h-6 rounded-full font-bold text-xs shrink-0",
-                          rank === 1 ? "bg-yellow-500/20 text-yellow-500 ring-1 ring-yellow-500/50" :
-                            rank === 2 ? "bg-slate-300/20 text-slate-300 ring-1 ring-slate-300/50" :
-                              rank === 3 ? "bg-amber-600/20 text-amber-600 ring-1 ring-amber-600/50" :
-                                "text-muted-foreground"
-                        )}>
-                          #{rank}
-                        </div>
-
-                        <Avatar className="h-8 w-8 border border-border shrink-0">
-                          <AvatarImage src={entry.avatar_url || undefined} />
-                          <AvatarFallback>
-                            <UserIcon className="w-3 h-3" />
-                          </AvatarFallback>
-                        </Avatar>
-
-                        <div className="flex-1 min-w-0">
-                          <p className={cn(
-                            "font-medium truncate text-sm",
-                            isCurrentUser && "text-primary"
-                          )}>
-                            {entry.name} {isCurrentUser && `(${t('leaderboard.you')})`}
-                          </p>
-                        </div>
-
-                        <div className="text-right font-mono font-medium shrink-0 text-sm">
-                          {sortBy === 'time' ? (
-                            <span className="text-primary">{formatTime(entry.total_focus_time)}</span>
-                          ) : (
-                            <span className="text-emerald-500">{entry.tasks_completed} tasks</span>
-                          )}
-                        </div>
-                      </div>
-                    )
-                  })
-                )}
-              </div>
-            </ScrollArea>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+    </PageContainer>
   )
 }

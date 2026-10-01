@@ -8,7 +8,7 @@ import { Thread } from "@/components/assistant-ui/thread";
 import { useAuthStore } from "@/stores/auth-store";
 import { useSystemStore } from "@/stores/system-store";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, X, Plus } from "lucide-react";
+import { ChatCircle, X, Plus } from '@phosphor-icons/react/dist/ssr';
 import { useI18n } from "@/contexts/i18n-context";
 import type { UIMessage } from "ai";
 import { BotMessageSquare } from "@/components/animate-ui/icons/bot-message-square";
@@ -198,14 +198,14 @@ export function GlobalChat() {
 	return (
 		<div
 			className={cn(
-				"border-l bg-background flex flex-col shrink-0 h-full transition-transform duration-300 ease-in-out relative",
+				"border-l border-border bg-surface-page flex flex-col shrink-0 h-full transition-transform duration-300 ease-in-out relative",
 				isChatPanelOpen ? "opacity-100 translate-x-0" : "opacity-0 translate-x-full border-l-0"
 			)}
 			style={{ width: isChatPanelOpen ? panelWidth : 0 }}
 		>
 			{/* Drag Handle */}
 			<div
-				className="absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-primary/50 transition-colors z-50"
+				className="absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-brand/50 transition-colors z-50"
 				onMouseDown={() => setIsResizing(true)}
 			/>
 
@@ -226,40 +226,40 @@ export function GlobalChat() {
 				</div>
 				<div className="flex items-center gap-1">
 					<Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setChatPanelOpen(false)} aria-label={t('common.close')}>
-						<X className="h-4 w-4" />
+						<X size={16} />
 					</Button>
 				</div>
 			</div>
 
-			<div className="flex-1 overflow-hidden bg-background/50 relative">
+			<div className="flex-1 overflow-hidden relative">
 				{isHistoryLoading && !isNewThread ? (
 					<div className="flex-1 flex flex-col px-4 pt-4 pb-20 max-w-3xl mx-auto w-full">
 						{/* Skeleton messages */}
 						<div className="space-y-6 animate-in fade-in duration-300">
 							{/* Assistant message skeleton */}
 							<div className="flex gap-3">
-								<div className="w-8 h-8 rounded-full bg-muted animate-pulse shrink-0" />
+								<div className="w-8 h-8 rounded-full bg-surface-raised animate-pulse shrink-0" />
 								<div className="flex-1 space-y-2">
-									<div className="h-4 bg-muted rounded-lg w-3/4 animate-pulse" />
-									<div className="h-4 bg-muted rounded-lg w-1/2 animate-pulse" />
-									<div className="h-4 bg-muted rounded-lg w-2/3 animate-pulse" />
+									<div className="h-4 bg-surface-raised rounded-lg w-3/4 animate-pulse" />
+									<div className="h-4 bg-surface-raised rounded-lg w-1/2 animate-pulse" />
+									<div className="h-4 bg-surface-raised rounded-lg w-2/3 animate-pulse" />
 								</div>
 							</div>
 
 							{/* User message skeleton */}
 							<div className="flex justify-end">
-								<div className="bg-muted rounded-2xl px-4 py-3 max-w-[70%] space-y-2 animate-pulse">
-									<div className="h-4 bg-background/50 rounded w-32" />
+								<div className="bg-surface-raised rounded-lg px-4 py-3 max-w-[70%] space-y-2 animate-pulse">
+									<div className="h-4 bg-surface rounded w-32" />
 								</div>
 							</div>
 
 							{/* Assistant message skeleton */}
 							<div className="flex gap-3">
-								<div className="w-8 h-8 rounded-full bg-muted animate-pulse shrink-0" />
+								<div className="w-8 h-8 rounded-full bg-surface-raised animate-pulse shrink-0" />
 								<div className="flex-1 space-y-2">
-									<div className="h-4 bg-muted rounded-lg w-full animate-pulse" />
-									<div className="h-4 bg-muted rounded-lg w-4/5 animate-pulse" />
-									<div className="h-4 bg-muted rounded-lg w-3/5 animate-pulse" />
+									<div className="h-4 bg-surface-raised rounded-lg w-full animate-pulse" />
+									<div className="h-4 bg-surface-raised rounded-lg w-4/5 animate-pulse" />
+									<div className="h-4 bg-surface-raised rounded-lg w-3/5 animate-pulse" />
 								</div>
 							</div>
 						</div>

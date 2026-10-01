@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, Loader2, LogIn } from 'lucide-react';
+import { ArrowLeft, CircleNotch, SignIn } from '@phosphor-icons/react/dist/ssr';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -29,7 +29,6 @@ import { supabase } from '@/lib/supabase-client';
 import { useAuthStore } from '@/stores/auth-store';
 import { useI18n } from '@/contexts/i18n-context';
 
-import { BorderBeam } from '@/components/ui/border-beam';
 import Image from 'next/image';
 
 // Component that handles redirect logic with useSearchParams
@@ -185,14 +184,13 @@ export default function LoginPage() {
       <Suspense fallback={null}>
         <LoginRedirect />
       </Suspense>
-        <Card className="relative w-full max-w-md overflow-hidden border-white/10 bg-background/80 shadow-2xl backdrop-blur">
-          <BorderBeam size={250} duration={12} delay={0} />
+        <Card className="w-full max-w-md">
         <CardHeader className="space-y-2 text-center">
-          <CardTitle className="text-2xl font-semibold flex flex-col items-center gap-2">
+          <CardTitle className="font-heading text-2xl font-bold flex flex-col items-center gap-3">
             <Image src="/images/logo.svg" alt={t('brand.title')} width={52} height={52} />
             {t('login.title')}
           </CardTitle>
-          <CardDescription className="text-sm text-muted-foreground">
+          <CardDescription className="text-sm text-ink-muted">
             {t('login.description')}
           </CardDescription>
         </CardHeader>
@@ -215,7 +213,7 @@ export default function LoginPage() {
                 <Label htmlFor="password">{t('login.form.password')}</Label>
                 <button
                   type="button"
-                  className="text-xs text-muted-foreground hover:text-foreground"
+                  className="text-xs text-brand hover:underline"
                   onClick={() => {
                     setForgotEmail(email);
                     setForgotPasswordOpen(true);
@@ -236,19 +234,19 @@ export default function LoginPage() {
             <Button className="w-full" type="submit" disabled={emailLoading}>
               {emailLoading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <CircleNotch size={16} className="animate-spin" />
                   {t('login.form.signingIn')}
                 </>
               ) : (
                 <>
-                  <LogIn className="mr-2 h-4 w-4" />
+                  <SignIn size={16} />
                   {t('login.form.signIn')}
                 </>
               )}
             </Button>
           </form>
 
-          <div className="flex items-center gap-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+          <div className="flex items-center gap-4 text-xs text-ink-muted">
             <Separator className="flex-1" />
             {t('login.form.or')}
             <Separator className="flex-1" />
@@ -263,13 +261,13 @@ export default function LoginPage() {
           >
             {googleLoading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <CircleNotch size={16} className="animate-spin" />
                 Google
               </>
             ) : (
               <>
                 <svg
-                  className="mr-2 h-4 w-4"
+                  className="h-4 w-4"
                   aria-hidden="true"
                   focusable="false"
                   data-prefix="fab"
@@ -331,7 +329,7 @@ export default function LoginPage() {
                 <Button type="submit" disabled={forgotLoading}>
                   {forgotLoading ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <CircleNotch size={16} className="animate-spin" />
                       {t('login.forgot.sending')}
                     </>
                   ) : (
@@ -343,16 +341,16 @@ export default function LoginPage() {
           </DialogContent>
         </Dialog>
 
-        <CardFooter className="flex flex-col gap-3 text-sm text-muted-foreground">
+        <CardFooter className="flex flex-col gap-3 text-sm text-ink-muted">
           <p className="text-center">
             {t('login.form.noAccount')}{' '}
-            <Link href="/signup" className="text-primary hover:underline">
+            <Link href="/signup" className="text-brand hover:underline">
               {t('login.form.signUpNow')}
             </Link>
           </p>
           <Button variant="ghost" asChild>
             <Link href="/timer">
-              <ArrowLeft className="mr-2 h-4 w-4" />
+              <ArrowLeft size={16} />
               {t('login.form.backToApp')}
             </Link>
           </Button>

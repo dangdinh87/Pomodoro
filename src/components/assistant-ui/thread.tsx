@@ -17,17 +17,7 @@ import {
 	MessagePrimitive,
 	ThreadPrimitive,
 } from "@assistant-ui/react";
-import {
-	ArrowDownIcon,
-	ArrowUpIcon,
-	CheckIcon,
-	ChevronLeftIcon,
-	ChevronRightIcon,
-	CopyIcon,
-	DownloadIcon,
-	PencilIcon,
-	RefreshCwIcon,
-} from "lucide-react";
+import { ArrowDown, ArrowUp, Check, CaretLeft, CaretRight, Copy as CopyIcon, DownloadSimple, PencilSimple, ArrowsClockwise } from '@phosphor-icons/react/dist/ssr';
 import type { FC } from "react";
 import { useI18n } from "@/contexts/i18n-context";
 
@@ -68,7 +58,7 @@ const ThreadScrollToBottom: FC = () => {
 				variant="outline"
 				className="aui-thread-scroll-to-bottom -top-12 absolute z-10 self-center rounded-full p-4 disabled:invisible dark:bg-background dark:hover:bg-accent"
 			>
-				<ArrowDownIcon />
+				<ArrowDown size={24} />
 			</TooltipIconButton>
 		</ThreadPrimitive.ScrollToBottom>
 	);
@@ -202,7 +192,7 @@ const ComposerAction: FC = () => {
 						className="aui-composer-send size-8 rounded-full"
 						aria-label={t("chat.thread.sendMessage")}
 					>
-						<ArrowUpIcon className="aui-composer-send-icon size-4" />
+						<ArrowUp size={16} className="aui-composer-send-icon" />
 					</TooltipIconButton>
 				</ComposerPrimitive.Send>
 			</AssistantIf>
@@ -219,7 +209,7 @@ const ComposerAction: FC = () => {
 					aria-label={t("chat.thread.generating")}
 					disabled
 				>
-					<ArrowUpIcon className="aui-composer-send-icon size-4" />
+					<ArrowUp size={16} className="aui-composer-send-icon" />
 				</TooltipIconButton>
 			</AssistantIf>
 		</div>
@@ -274,21 +264,21 @@ const AssistantActionBar: FC = () => {
 			<ActionBarPrimitive.Copy asChild>
 				<TooltipIconButton tooltip={t("chat.thread.copy")}>
 					<AssistantIf condition={({ message }) => message.isCopied}>
-						<CheckIcon />
+						<Check size={24} />
 					</AssistantIf>
 					<AssistantIf condition={({ message }) => !message.isCopied}>
-						<CopyIcon />
+						<CopyIcon size={24} />
 					</AssistantIf>
 				</TooltipIconButton>
 			</ActionBarPrimitive.Copy>
 			<ActionBarPrimitive.ExportMarkdown asChild>
 				<TooltipIconButton tooltip={t("chat.thread.exportMarkdown")}>
-					<DownloadIcon />
+					<DownloadSimple size={24} />
 				</TooltipIconButton>
 			</ActionBarPrimitive.ExportMarkdown>
 			<ActionBarPrimitive.Reload asChild>
 				<TooltipIconButton tooltip={t("chat.thread.refresh")}>
-					<RefreshCwIcon />
+					<ArrowsClockwise size={24} />
 				</TooltipIconButton>
 			</ActionBarPrimitive.Reload>
 		</ActionBarPrimitive.Root>
@@ -327,7 +317,7 @@ const UserActionBar: FC = () => {
 		>
 			<ActionBarPrimitive.Edit asChild>
 				<TooltipIconButton tooltip={t("chat.thread.edit")} className="aui-user-action-edit p-4">
-					<PencilIcon />
+					<PencilSimple size={24} />
 				</TooltipIconButton>
 			</ActionBarPrimitive.Edit>
 		</ActionBarPrimitive.Root>
@@ -371,7 +361,7 @@ const BranchPicker: FC<BranchPickerPrimitive.Root.Props> = ({ className, ...rest
 		>
 			<BranchPickerPrimitive.Previous asChild>
 				<TooltipIconButton tooltip={t("chat.thread.previous")}>
-					<ChevronLeftIcon />
+					<CaretLeft size={24} />
 				</TooltipIconButton>
 			</BranchPickerPrimitive.Previous>
 			<span className="aui-branch-picker-state font-medium">
@@ -379,7 +369,7 @@ const BranchPicker: FC<BranchPickerPrimitive.Root.Props> = ({ className, ...rest
 			</span>
 			<BranchPickerPrimitive.Next asChild>
 				<TooltipIconButton tooltip={t("chat.thread.next")}>
-					<ChevronRightIcon />
+					<CaretRight size={24} />
 				</TooltipIconButton>
 			</BranchPickerPrimitive.Next>
 		</BranchPickerPrimitive.Root>

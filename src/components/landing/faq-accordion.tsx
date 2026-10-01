@@ -1,9 +1,8 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { CaretDown } from '@phosphor-icons/react/dist/ssr';
 import { useState } from 'react';
-import { cn } from '@/lib/utils';
 
 interface FAQItemProps {
   question: string;
@@ -14,17 +13,13 @@ function FAQItem({ question, answer }: FAQItemProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div
-      className={cn(
-        'border-b border-slate-200 dark:border-white/10 last:border-0',
-        'hover:bg-slate-50/50 dark:hover:bg-white/[0.02] transition-colors'
-      )}
-    >
+    <div>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full py-4 px-6 flex items-center justify-between text-left cursor-pointer group"
+        className="w-full px-5 py-4 flex items-center justify-between text-left cursor-pointer group"
+        aria-expanded={isOpen}
       >
-        <span className="font-medium text-slate-900 dark:text-white pr-8 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+        <span className="font-medium text-ink pr-8">
           {question}
         </span>
         <motion.div
@@ -32,7 +27,7 @@ function FAQItem({ question, answer }: FAQItemProps) {
           transition={{ duration: 0.2 }}
           className="flex-shrink-0"
         >
-          <ChevronDown className="w-5 h-5 text-slate-400 group-hover:text-blue-500 transition-colors" />
+          <CaretDown size={18} className="text-ink-muted" />
         </motion.div>
       </button>
       <motion.div
@@ -44,7 +39,7 @@ function FAQItem({ question, answer }: FAQItemProps) {
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         className="overflow-hidden"
       >
-        <p className="pb-6 px-6 text-slate-600 dark:text-slate-400 leading-relaxed">
+        <p className="px-5 pb-5 text-sm text-ink-secondary leading-relaxed">
           {answer}
         </p>
       </motion.div>
@@ -54,7 +49,7 @@ function FAQItem({ question, answer }: FAQItemProps) {
 
 export function FAQAccordion({ items }: { items: FAQItemProps[] }) {
   return (
-    <div className="rounded-3xl border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-white/5 backdrop-blur-sm overflow-hidden">
+    <div className="divide-y divide-border rounded-lg border border-border bg-surface overflow-hidden">
       {items.map((item, index) => (
         <FAQItem key={index} question={item.question} answer={item.answer} />
       ))}

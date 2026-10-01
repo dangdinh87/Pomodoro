@@ -1,10 +1,5 @@
 import type { ToolCallMessagePartComponent } from "@assistant-ui/react";
-import {
-  CheckIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-  XCircleIcon,
-} from "lucide-react";
+import { Check, CaretDown, CaretUp, XCircle } from '@phosphor-icons/react/dist/ssr';
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -35,9 +30,9 @@ export const ToolFallback: ToolCallMessagePartComponent = ({
     >
       <div className="aui-tool-fallback-header flex items-center gap-2 px-4">
         {isCancelled ? (
-          <XCircleIcon className="aui-tool-fallback-icon size-4 text-muted-foreground" />
+          <XCircle size={16} className="aui-tool-fallback-icon text-muted-foreground" />
         ) : (
-          <CheckIcon className="aui-tool-fallback-icon size-4" />
+          <Check size={16} className="aui-tool-fallback-icon" />
         )}
         <p
           className={cn(
@@ -49,7 +44,7 @@ export const ToolFallback: ToolCallMessagePartComponent = ({
           <b>{toolName}</b>
         </p>
         <Button onClick={() => setIsCollapsed(!isCollapsed)}>
-          {isCollapsed ? <ChevronUpIcon /> : <ChevronDownIcon />}
+          {isCollapsed ? <CaretUp size={24} /> : <CaretDown size={24} />}
         </Button>
       </div>
       {!isCollapsed && (
