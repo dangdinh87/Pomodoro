@@ -3,9 +3,12 @@
 import { useBackground } from '@/contexts/background-context';
 import { findImageById } from '@/data/background-packs';
 import { getBestImageUrl } from '@/lib/format-detection';
-import { useTheme } from 'next-themes';
+import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+
+// Scene shaders only download once a scene is actually selected.
+const SceneCanvas = dynamic(() => import('@/features/scenes/components/scene-canvas'), { ssr: false });
 
 /** Resolve background value (ID, sentinel, path, or data URL) to a displayable URL. */
 function resolveBackgroundUrl(value: string): string {
@@ -31,25 +34,11 @@ function resolveBackgroundUrl(value: string): string {
 
 export function BackgroundRenderer() {
   const { background, isLoading } = useBackground();
-  const { theme: currentTheme } = useTheme();
   const [loaded, setLoaded] = useState(false);
 
   const pathname = usePathname();
   // The timer stage lives on `/`; content pages keep the plain theme background.
   const isTimerPage = pathname === '/';
-
-  // Resolve theme (light/dark)
-  const resolvedTheme = useMemo<'light' | 'dark'>(() => {
-    if (currentTheme === 'dark') return 'dark';
-    if (currentTheme === 'light') return 'light';
-    if (
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches
-    ) {
-      return 'dark';
-    }
-    return 'light';
-  }, [currentTheme]);
 
   // Resolve media src (ID → best format URL)
   const resolvedSrc = useMemo(
@@ -119,6 +108,20 @@ export function BackgroundRenderer() {
   // If not on timer page, render nothing (or let default theme background show)
   if (!isTimerPage) {
     return null;
+  }
+
+  if (background.type === 'scene') {
+    return (
+      <div className="fixed inset-0 -z-10 overflow-hidden bg-black">
+        <SceneCanvas
+          key={background.value}
+          sceneId={background.value}
+          brightness={background.brightness ?? 100}
+          animate={background.motion !== false}
+          followMode={background.followMode !== false}
+        />
+      </div>
+    );
   }
 
   const imageFilter = `blur(${background.blur}px) brightness(${background.brightness ?? 100}%)`;

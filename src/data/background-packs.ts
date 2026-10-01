@@ -1,29 +1,25 @@
 /**
- * Pack-based background data model.
- * 7 packs, 31 items total. Images reference build-generated assets.
+ * Photo / video packs (the "Photos" group of the scene picker). Images reference build-generated assets.
+ * Animated procedural scenes live in features/scenes; the default "Pomodoro" scene is a solid tint.
  */
-
-import { City, FilmStrip, Gear, House, Planet, Sword } from '@phosphor-icons/react/dist/ssr';
-import type { Icon as PhosphorIcon } from '@phosphor-icons/react';
 
 export interface BackgroundImage {
   id: string;
   nameKey: string;
-  kind: 'system' | 'auto' | 'video' | 'image';
+  kind: 'video' | 'image';
   /** Thumbnail WebP path for picker (400w) */
   thumb?: string;
   /** Full-size sources (1920w) */
   sources?: { avif: string; webp: string };
-  /** Sentinel value for system/auto, or video path */
+  /** Video path */
   value?: string;
 }
 
 export interface BackgroundPack {
   id: string;
   nameKey: string;
-  /** Optional i18n key for pack description (shown under tab) */
+  /** i18n key for the pack description shown above the grid */
   descriptionKey?: string;
-  icon: PhosphorIcon;
   items: BackgroundImage[];
 }
 
@@ -43,25 +39,9 @@ function img(id: string, nameKey: string): BackgroundImage {
 
 export const backgroundPacks: BackgroundPack[] = [
   {
-    id: 'system',
-    nameKey: 'settings.background.packs.system',
-    descriptionKey: 'settings.background.packDescriptions.system',
-    icon: Gear,
-    items: [
-      {
-        id: 'system-auto-color',
-        nameKey: 'settings.background.presets.systemSolidColor',
-        kind: 'system',
-        value: 'system:auto-color',
-      },
-      img('night-light', 'settings.background.presets.nightLight'),
-    ],
-  },
-  {
     id: 'room',
     nameKey: 'settings.background.packs.room',
     descriptionKey: 'settings.background.packDescriptions.room',
-    icon: House,
     items: [
       img('cyberpunk-scene-1', 'settings.background.presets.sunlitStudyRoom'),
       img('anime-cozy-home-1', 'settings.background.presets.goldenHourHome'),
@@ -71,41 +51,24 @@ export const backgroundPacks: BackgroundPack[] = [
       img('beautiful-office-space-cartoon-style', 'settings.background.presets.beautifulOfficeSpace'),
       img('international-day-education-scene-with-fantasy-style', 'settings.background.presets.studyTogether'),
       img('work-team-digital-art', 'settings.background.presets.teamWorkspace'),
-    ],
-  },
-  {
-    id: 'space',
-    nameKey: 'settings.background.packs.space',
-    descriptionKey: 'settings.background.packDescriptions.space',
-    icon: Planet,
-    items: [
-      img('cityscape-anime-inspired-urban-area', 'settings.background.presets.cityscapeAnimeUrban'),
-      img('cityscape-anime-inspired-urban-area-1', 'settings.background.presets.cityscapeAnimeUrban1'),
-      img('fantasy-house-moon-illustration', 'settings.background.presets.fantasyHouseMoon'),
-      img('fantasy-house-moon-illustration-1', 'settings.background.presets.fantasyHouseMoon1'),
-      img('fantasy-house-moon-illustration-2', 'settings.background.presets.fantasyHouseMoon2'),
-      img('fantasy-house-moon-illustration-3', 'settings.background.presets.fantasyHouseMoon3'),
+      img('night-light', 'settings.background.presets.nightLight'),
     ],
   },
   {
     id: 'fantasy',
     nameKey: 'settings.background.packs.fantasy',
     descriptionKey: 'settings.background.packDescriptions.fantasy',
-    icon: Sword,
     items: [
       img('cyberpunk-scene-2', 'settings.background.presets.enchantedForest'),
       img('fantasy-adventurers-1', 'settings.background.presets.fantasyAdventurers'),
-      img('fantasy-adventurers-2', 'settings.background.presets.fantasyAdventurers1'),
-      img('fantasy-adventurers-3', 'settings.background.presets.fantasyAdventurers2'),
-      img('fantasy-adventurers-4', 'settings.background.presets.fantasyAdventurers3'),
-      img('fantasy-adventurers-5', 'settings.background.presets.fantasyAdventurers4'),
+      img('fantasy-house-moon-illustration', 'settings.background.presets.fantasyHouseMoon'),
+      img('cityscape-anime-inspired-urban-area', 'settings.background.presets.cityscapeAnimeUrban'),
     ],
   },
   {
     id: 'cyberpunk',
     nameKey: 'settings.background.packs.cyberpunk',
     descriptionKey: 'settings.background.packDescriptions.cyberpunk',
-    icon: City,
     items: [
       img('futuristic-city-abstract', 'settings.background.presets.abstractFuturisticCity'),
       img('cyber-city', 'settings.background.presets.cyberCity'),
@@ -116,7 +79,6 @@ export const backgroundPacks: BackgroundPack[] = [
     id: 'lofi-video',
     nameKey: 'settings.background.packs.lofiVideo',
     descriptionKey: 'settings.background.packDescriptions.lofiVideo',
-    icon: FilmStrip,
     items: [
       {
         id: 'day-chill',
