@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useQueryClient } from '@tanstack/react-query'
+import { useSessionRecorder } from '@/lib/timer/use-session-recorder'
 import { isPast, isToday } from 'date-fns'
 import { BookmarkSimple, CircleNotch, DotsThree, Tag } from '@phosphor-icons/react/dist/ssr'
 import { Task, TaskPriority, TaskStatus, useTasksStore } from '@/stores/task-store'
@@ -49,7 +49,7 @@ export function TaskManagement() {
   const { saveAsTemplate } = useTemplates()
   const { t } = useI18n()
   const router = useRouter()
-  const queryClient = useQueryClient()
+  const { record } = useSessionRecorder()
   const { activeTaskId, setActiveTask, viewMode, setViewMode } = useTasksStore()
 
   const [scope, setScope] = useState<TaskScope>('all')
@@ -85,28 +85,23 @@ export function TaskManagement() {
     })
   }, [tasks, scope, query])
 
-  const recordPartialSession = async (taskId: string) => {
-    const { mode, timeLeft, lastSessionTimeLeft } = useTimerStore.getState()
+  // Records the focus time since the last recorded segment for `taskId` and
+  // restarts the baseline, so the next record (or the phase completion) only
+  // counts new time.
+  const recordPartialSession = (taskId: string) => {
+    const { mode, timeLeft, lastSessionTimeLeft, setLastSessionTimeLeft } =
+      useTimerStore.getState()
+    if (mode !== 'work') return
     const durationSec = Math.max(0, lastSessionTimeLeft - timeLeft)
-    if (mode !== 'work' || durationSec <= 0) return
-    try {
-      await fetch('/api/tasks/session-complete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ taskId, durationSec, mode: 'work' }),
-      })
-      queryClient.invalidateQueries({ queryKey: ['stats'] })
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
-    } catch (e) {
-      console.error(e)
+    if (durationSec > 0) {
+      void record({ taskId, durationSec, mode: 'work' })
     }
+    setLastSessionTimeLeft(timeLeft)
   }
 
   const handleUpdateStatus = async (taskId: string, newStatus: TaskStatus) => {
     if (newStatus === 'done' && activeTaskId === taskId) {
-      await recordPartialSession(taskId)
-      const { mode, timeLeft, setLastSessionTimeLeft } = useTimerStore.getState()
-      if (mode === 'work') setLastSessionTimeLeft(timeLeft)
+      recordPartialSession(taskId)
       setActiveTask(null)
     }
 
@@ -125,14 +120,14 @@ export function TaskManagement() {
   const handleToggleStatus = (task: Task) => handleUpdateStatus(task.id, task.status === 'done' ? 'todo' : 'done')
 
   const handleStopFocus = (task: Task) => {
-    void recordPartialSession(task.id)
+    recordPartialSession(task.id)
     setActiveTask(null)
   }
 
   const handleFocus = (task: Task) => {
     if (activeTaskId !== task.id) {
-      if (activeTaskId) void recordPartialSession(activeTaskId)
-      useTimerStore.getState().setLastSessionTimeLeft(useTimerStore.getState().timeLeft)
+      if (activeTaskId) recordPartialSession(activeTaskId)
+      else useTimerStore.getState().setLastSessionTimeLeft(useTimerStore.getState().timeLeft)
       setActiveTask(task.id)
       if (task.status === 'todo') void updateTask({ id: task.id, input: { status: 'doing' } })
     }

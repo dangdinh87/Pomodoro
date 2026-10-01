@@ -19,6 +19,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { supabase } from '@/lib/supabase-client';
+import { toSafeRedirectPath } from '@/lib/safe-redirect';
 import { useAuthStore } from '@/stores/auth-store';
 import { useI18n } from '@/contexts/i18n-context';
 
@@ -32,8 +33,7 @@ function SignupRedirect() {
 
   useEffect(() => {
     if (!user) return;
-    const redirectUrl = searchParams.get('redirect') ?? '/timer';
-    router.replace(redirectUrl);
+    router.replace(toSafeRedirectPath(searchParams.get('redirect')));
   }, [user, router, searchParams]);
 
   return null;

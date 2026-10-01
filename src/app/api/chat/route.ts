@@ -1,31 +1,43 @@
+import { featureGate } from '@/config/feature-gate';
 import { createUIMessageStream, createUIMessageStreamResponse } from "ai";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase-server";
 import { BRO_AI_SYSTEM_PROMPT } from "@/lib/prompts/bro-ai-system";
-import { DEFAULT_CHAT_AI_MODEL, ALLOWED_CHAT_MODELS } from "@/config/constants";
+import { getMessageText, toUpstreamMessages } from "@/lib/chat/chat-request-guards";
+import { consumeRateLimit } from "@/lib/api/in-memory-rate-limiter";
+import {
+	DEFAULT_CHAT_AI_MODEL,
+	ALLOWED_CHAT_MODELS,
+	CHAT_MAX_MESSAGE_CHARS,
+	CHAT_MAX_OUTPUT_TOKENS,
+	CHAT_MAX_USER_MESSAGES_PER_HOUR,
+} from "@/config/constants";
 
 export const maxDuration = 60;
 
-// Convert assistant-ui message format to OpenAI format
-function convertMessages(messages: any[]) {
-	return messages.map((msg: any) => {
-		const safeRole = msg.role === "assistant" ? "assistant" : "user";
-		// If already has content string, return as-is
-		if (typeof msg.content === "string") {
-			return { role: safeRole, content: msg.content };
-		}
+const ONE_HOUR_MS = 60 * 60 * 1000;
+const UPSTREAM_ERROR_MESSAGE = "The AI service is unavailable right now. Please try again later.";
+const GENERIC_ERROR_MESSAGE = "Something went wrong while generating a reply. Please try again.";
 
-		// If has parts array (assistant-ui format), extract text
-		if (Array.isArray(msg.parts)) {
-			const textParts = msg.parts
-				.filter((p: any) => p.type === "text")
-				.map((p: any) => p.text)
-				.join("\n");
-			return { role: safeRole, content: textParts };
-		}
+/**
+ * Durable per-user quota: counts the user's own persisted messages in the last
+ * hour (the count survives across serverless instances, unlike in-memory state).
+ * Fails open on query errors — per-request caps still bound the cost.
+ */
+async function hasExceededHourlyQuota(supabase: SupabaseClient, userId: string) {
+	const since = new Date(Date.now() - ONE_HOUR_MS).toISOString();
+	const { count, error } = await supabase
+		.from("messages")
+		.select("id, conversations!inner(user_id)", { count: "exact", head: true })
+		.eq("conversations.user_id", userId)
+		.eq("role", "user")
+		.gte("created_at", since);
 
-		// Fallback
-		return { role: safeRole, content: msg.content || "" };
-	});
+	if (error) {
+		console.error("[Chat API] Quota check failed:", error);
+		return false;
+	}
+	return (count ?? 0) >= CHAT_MAX_USER_MESSAGES_PER_HOUR;
 }
 
 // Generate a conversation title using MegaLLM API
@@ -69,6 +81,9 @@ async function generateTitle(userMessage: string): Promise<string> {
 }
 
 export async function POST(req: Request) {
+  const gated = featureGate('chat');
+  if (gated) return gated;
+
 	const supabase = await createClient();
 	const {
 		data: { user },
@@ -79,7 +94,14 @@ export async function POST(req: Request) {
 		return new Response("Unauthorized", { status: 401 });
 	}
 
-	let { messages, model = DEFAULT_CHAT_AI_MODEL, conversationId } = await req.json();
+	let body: any;
+	try {
+		body = await req.json();
+	} catch {
+		return new Response("Invalid JSON body", { status: 400 });
+	}
+
+	let { messages, model = DEFAULT_CHAT_AI_MODEL, conversationId } = body ?? {};
 
 	// Validate model against whitelist
 	if (!ALLOWED_CHAT_MODELS.includes(model)) {
@@ -87,35 +109,60 @@ export async function POST(req: Request) {
 		model = DEFAULT_CHAT_AI_MODEL;
 	}
 
-	if (!Array.isArray(messages)) {
+	if (!Array.isArray(messages) || messages.length === 0) {
 		return new Response("Invalid messages format", { status: 400 });
+	}
+
+	if (conversationId !== undefined && conversationId !== null && typeof conversationId !== "string") {
+		return new Response("Invalid conversationId", { status: 400 });
+	}
+
+	// Convert messages to OpenAI format (role-sanitized, history and size capped)
+	const convertedMessages = toUpstreamMessages(messages);
+
+	// Every upstream call must be driven by a new user message: this is what the
+	// quota counts, so assistant-only payloads would otherwise bypass it.
+	if (convertedMessages[convertedMessages.length - 1]?.role !== "user") {
+		return new Response("The last message must be a non-empty user message", { status: 400 });
 	}
 
 	console.log("[Chat API] Received:", {
 		model,
-		messagesCount: messages?.length,
+		messagesCount: messages.length,
 		conversationId,
 		userId: user.id,
 	});
+
+	// Two layers: an in-memory burst limiter (catches concurrent requests the DB
+	// count cannot see yet) and the persisted-message count (survives instances).
+	// TODO(phase-02): a durable usage counter table — deleting a conversation
+	// currently removes its messages from the persisted count.
+	const burstLimit = consumeRateLimit(`chat:${user.id}`, CHAT_MAX_USER_MESSAGES_PER_HOUR, ONE_HOUR_MS);
+	if (!burstLimit.allowed || (await hasExceededHourlyQuota(supabase, user.id))) {
+		return new Response("Too many messages. Please try again later.", { status: 429 });
+	}
+
+	// An existing conversation must belong to the caller before we write into it
+	if (conversationId) {
+		const { data: ownedConversation, error: ownershipError } = await supabase
+			.from("conversations")
+			.select("id")
+			.eq("id", conversationId)
+			.eq("user_id", user.id)
+			.maybeSingle();
+
+		if (ownershipError || !ownedConversation) {
+			return new Response("Conversation not found", { status: 404 });
+		}
+	}
 
 	// Create conversation if it doesn't exist
 	let conversationTitle = "";
 	let isNewConversation = false;
 	if (user && !conversationId) {
 		// Extract text from the first user message
-		const firstUserMsg = messages.find((m: any) => m.role === "user");
-		let titleContent = "";
-
-		if (firstUserMsg) {
-			if (typeof firstUserMsg.content === "string") {
-				titleContent = firstUserMsg.content;
-			} else if (Array.isArray(firstUserMsg.parts)) {
-				titleContent = firstUserMsg.parts
-					.filter((p: any) => p.type === "text")
-					.map((p: any) => p.text)
-					.join(" ");
-			}
-		}
+		const firstUserMsg = messages.find((m: any) => m?.role === "user");
+		const titleContent = getMessageText(firstUserMsg, " ").slice(0, CHAT_MAX_MESSAGE_CHARS);
 
 		// Generate title using MegaLLM API
 		conversationTitle = await generateTitle(titleContent);
@@ -138,9 +185,6 @@ export async function POST(req: Request) {
 			// Proceed without ID (will fail persistence but maybe stream still works? prefer to fail gracefully)
 		}
 	}
-
-	// Convert messages to OpenAI format
-	const convertedMessages = convertMessages(messages);
 
 	// Add system prompt to restrict AI to app-related topics only
 	const systemPrompt = {
@@ -182,27 +226,21 @@ export async function POST(req: Request) {
 						body: JSON.stringify({
 							model,
 							messages: messagesWithSystem,
+							max_tokens: CHAT_MAX_OUTPUT_TOKENS,
 							stream: true,
 						}),
 					});
 
 					if (!response.ok) {
+						// Provider details stay in server logs; clients get a generic message
 						const errorText = await response.text();
 						console.error("[Chat API] MegaLLM error:", response.status, errorText);
-
-						let errorMessage = `Error ${response.status}: `;
-						try {
-							const errorJson = JSON.parse(errorText);
-							errorMessage += errorJson.error?.message || errorText;
-						} catch {
-							errorMessage += errorText;
-						}
 
 						writer.write({ type: "start", messageId });
 						writer.write({ type: "start-step" });
 						writer.write({
 							type: "error",
-							errorText: errorMessage,
+							errorText: UPSTREAM_ERROR_MESSAGE,
 						});
 						writer.write({ type: "finish-step" });
 						writer.write({ type: "finish" });
@@ -312,13 +350,14 @@ export async function POST(req: Request) {
 						await supabase
 							.from("conversations")
 							.update({ updated_at: new Date().toISOString() })
-							.eq("id", conversationId);
+							.eq("id", conversationId)
+							.eq("user_id", user.id);
 					}
 				} catch (error) {
 					console.error("[Chat API] Error:", error);
 					writer.write({
 						type: "error",
-						errorText: error instanceof Error ? error.message : "Unknown error",
+						errorText: GENERIC_ERROR_MESSAGE,
 					});
 				}
 			},

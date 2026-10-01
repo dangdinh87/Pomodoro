@@ -1,26 +1,21 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase-server';
-import { validateCreateTask, type CreateTaskPayload } from './task-schemas';
+import {
+  isValidTagFilter,
+  sanitizeSearchTerm,
+  validateCreateTask,
+  type CreateTaskPayload,
+} from './task-schemas';
+import { isTaskOwnedByUser } from './task-ownership';
 
-const API_ROUTE_TOKEN = process.env.API_ROUTE_TOKEN;
-
-function missingSupabaseResponse() {
-  return NextResponse.json(
-    { error: 'Supabase client is not configured' },
-    { status: 500 },
-  );
-}
+const DEFAULT_PAGE_SIZE = 10;
+const MAX_PAGE_SIZE = 100;
+// Far beyond any real task list; keeps the computed offset sane
+const MAX_PAGE = 10_000;
+const FILTERABLE_DATE_FIELDS = ['created_at', 'updated_at', 'due_date'] as const;
 
 function unauthorizedResponse() {
   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-}
-
-function isAuthorized(request: Request) {
-  if (!API_ROUTE_TOKEN) return true;
-  const header = request.headers.get('authorization') || '';
-  if (!header.startsWith('Bearer ')) return false;
-  const token = header.slice(7);
-  return token === API_ROUTE_TOKEN;
 }
 
 function validationErrorResponse(error: {
@@ -31,6 +26,20 @@ function validationErrorResponse(error: {
     { error: error.message, details: error.details },
     { status: 400 },
   );
+}
+
+function parsePositiveInt(value: string | null, fallback: number, max: number) {
+  const parsed = Number.parseInt(value ?? '', 10);
+  if (!Number.isFinite(parsed) || parsed < 1) return fallback;
+  return Math.min(parsed, max);
+}
+
+function parseDateField(value: string | null) {
+  return FILTERABLE_DATE_FIELDS.find((field) => field === value) ?? 'created_at';
+}
+
+function parseDateParam(value: string | null) {
+  return value && !Number.isNaN(Date.parse(value)) ? value : null;
 }
 
 function buildInsertPayload(userId: string, payload: CreateTaskPayload) {
@@ -73,18 +82,22 @@ export async function GET(request: Request) {
   const userId = user.id;
 
   const { searchParams } = new URL(request.url);
-  const limit = parseInt(searchParams.get('limit') || '10');
-  const page = parseInt(searchParams.get('page') || '1');
+  const limit = parsePositiveInt(searchParams.get('limit'), DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE);
+  const page = parsePositiveInt(searchParams.get('page'), 1, MAX_PAGE);
   const offset = (page - 1) * limit;
 
   // Filter parameters
-  const q = searchParams.get('q');
+  const q = sanitizeSearchTerm(searchParams.get('q'));
   const status = searchParams.get('status');
   const priority = searchParams.get('priority');
   const tag = searchParams.get('tag');
-  const from = searchParams.get('from');
-  const to = searchParams.get('to');
-  const dateField = searchParams.get('dateField') || 'created_at'; // Default to created_at
+  const from = parseDateParam(searchParams.get('from'));
+  const to = parseDateParam(searchParams.get('to'));
+  const dateField = parseDateField(searchParams.get('dateField'));
+
+  if (tag && tag !== 'all' && !isValidTagFilter(tag)) {
+    return validationErrorResponse({ message: 'Invalid tag filter' });
+  }
 
   // Simple query that works with or without new columns
   let query = supabase
@@ -147,25 +160,33 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    if (!isAuthorized(request)) {
-      return unauthorizedResponse();
-    }
-    // If authorized by token, we still need a user_id to create the task for.
-    // The current implementation relies on user.id.
-    // If we want to support token-based creation, we'd need to pass user_id in body.
-    // For now, I will keep the restriction that user MUST be present.
-    // The issue was that isAuthorized was running BEFORE checking for user session, potentially blocking valid users if they didn't have the token.
     return unauthorizedResponse();
   }
 
   const userId = user.id;
 
+  let body: unknown;
   try {
-    const body = await request.json();
+    body = await request.json();
+  } catch {
+    return validationErrorResponse({ message: 'Request body must be valid JSON' });
+  }
+
+  try {
     const parsed = validateCreateTask(body);
 
     if (!parsed.success) {
       return validationErrorResponse(parsed.error);
+    }
+
+    if (
+      parsed.data.parent_task_id &&
+      !(await isTaskOwnedByUser(supabase, parsed.data.parent_task_id, userId))
+    ) {
+      return validationErrorResponse({
+        message: 'Invalid task data',
+        details: { parent_task_id: ['Parent task not found'] },
+      });
     }
 
     const payload = buildInsertPayload(userId, parsed.data);
@@ -187,10 +208,7 @@ export async function POST(request: Request) {
         payload,
       });
       return NextResponse.json(
-        {
-          error: 'Failed to create task',
-          details: error.message,
-        },
+        { error: 'Failed to create task' },
         { status: 500 },
       );
     }

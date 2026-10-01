@@ -40,6 +40,32 @@ type ValidationResult<T> = ValidationSuccess<T> | ValidationFailure
 const isObject = (value: unknown): value is Record<string, any> =>
   !!value && typeof value === 'object' && !Array.isArray(value)
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+export const isUuid = (value: unknown): value is string =>
+  typeof value === 'string' && UUID_PATTERN.test(value)
+
+const isValidDateString = (value: unknown): value is string =>
+  typeof value === 'string' && !Number.isNaN(Date.parse(value))
+
+// Validates optional nullable fields that are stored as-is (ids, dates).
+// Records an issue and returns undefined when the value is present but invalid.
+function parseOptionalField(
+  value: unknown,
+  isValid: (value: unknown) => value is string,
+  field: string,
+  message: string,
+  issues: Record<string, string[]>,
+): string | null | undefined {
+  if (value === undefined) return undefined
+  if (value === null || value === '') return null
+  if (!isValid(value)) {
+    issues[field] = [message]
+    return undefined
+  }
+  return value
+}
+
 const normalizeDescription = (value: unknown): string | null => {
   if (typeof value !== 'string') return null
   const trimmed = value.trim()
@@ -85,6 +111,29 @@ const parseEstimate = (value: unknown): number => {
   return Math.min(64, Math.max(1, rounded))
 }
 
+const MAX_SEARCH_LENGTH = 100
+
+/**
+ * The search term is interpolated into a PostgREST `or=(...)` filter, where
+ * `,` `(` `)` separate clauses and `"` `\` quote values. Stripping them keeps
+ * user input from adding or altering filter clauses. `%` and `*` are LIKE
+ * wildcards and are stripped too, so a search is always a plain substring match.
+ */
+export function sanitizeSearchTerm(value: string | null): string {
+  if (!value) return ''
+  return value.replace(/[,()"\\%*]/g, ' ').trim().slice(0, MAX_SEARCH_LENGTH)
+}
+
+/**
+ * Tags are matched with `contains('tags', [tag])`, which supabase-js renders as
+ * an unquoted `cs.{tag}` array literal: `,` would split it into several tags and
+ * `{` `}` `"` `\` break the literal (500). Such tags can't be created through
+ * the UI, so reject them.
+ */
+export function isValidTagFilter(value: string): boolean {
+  return value.length > 0 && value.length <= 50 && !/[,{}"\\]/.test(value)
+}
+
 function formatError(message: string, details?: Record<string, string[]>) {
   return {
     success: false as const,
@@ -103,9 +152,16 @@ export function validateCreateTask(body: unknown): ValidationResult<CreateTaskPa
     issues.title = ['Title is required']
   }
 
-  if (body.title && body.title.trim().length > 200) {
+  if (typeof body.title === 'string' && body.title.trim().length > 200) {
     issues.title = ['Title must be shorter than 200 characters']
   }
+
+  const dueDate = parseOptionalField(
+    body.due_date, isValidDateString, 'due_date', 'Due date is invalid', issues,
+  )
+  const parentTaskId = parseOptionalField(
+    body.parent_task_id, isUuid, 'parent_task_id', 'Parent task id is invalid', issues,
+  )
 
   if (Object.keys(issues).length) {
     return formatError('Invalid task data', issues)
@@ -118,8 +174,8 @@ export function validateCreateTask(body: unknown): ValidationResult<CreateTaskPa
       priority: parsePriority(body.priority),
       estimate_pomodoros: parseEstimate(body.estimate_pomodoros),
       tags: normalizeTags(body.tags),
-      due_date: body.due_date ? String(body.due_date) : null,
-      parent_task_id: body.parent_task_id ? String(body.parent_task_id) : null,
+      due_date: dueDate ?? null,
+      parent_task_id: parentTaskId ?? null,
       is_template: Boolean(body.is_template),
     }
 
@@ -176,12 +232,18 @@ export function validateUpdateTask(body: unknown): ValidationResult<UpdateTaskPa
     }
   }
 
-  if (body.due_date !== undefined) {
-    normalized.due_date = body.due_date ? String(body.due_date) : null
+  const dueDate = parseOptionalField(
+    body.due_date, isValidDateString, 'due_date', 'Due date is invalid', issues,
+  )
+  if (dueDate !== undefined) {
+    normalized.due_date = dueDate
   }
 
-  if (body.parent_task_id !== undefined) {
-    normalized.parent_task_id = body.parent_task_id ? String(body.parent_task_id) : null
+  const parentTaskId = parseOptionalField(
+    body.parent_task_id, isUuid, 'parent_task_id', 'Parent task id is invalid', issues,
+  )
+  if (parentTaskId !== undefined) {
+    normalized.parent_task_id = parentTaskId
   }
 
   if (body.display_order !== undefined) {

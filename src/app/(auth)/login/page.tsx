@@ -26,6 +26,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { supabase } from '@/lib/supabase-client';
+import { toSafeRedirectPath } from '@/lib/safe-redirect';
 import { useAuthStore } from '@/stores/auth-store';
 import { useI18n } from '@/contexts/i18n-context';
 
@@ -48,8 +49,7 @@ function LoginRedirect() {
       try {
         const { data } = await supabase.auth.getSession();
         if (data.session?.user) {
-          const redirectUrl = searchParams.get('redirect') ?? '/timer';
-          router.replace(redirectUrl);
+          router.replace(toSafeRedirectPath(searchParams.get('redirect')));
         }
       } catch (error) {
         console.error('Session check failed:', error);

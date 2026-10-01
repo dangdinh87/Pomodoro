@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react';
-import { useTimerStore, TimerMode } from '@/stores/timer-store';
+import { useTimerStore, CATCH_UP_GRACE_MS } from '@/stores/timer-store';
+import { useAuthStore } from '@/stores/auth-store';
 import { useTasksStore } from '@/stores/task-store';
-import { useAudioStore } from '@/stores/audio-store';
-import { alarmSounds } from '@/lib/audio/sound-catalog';
-import { useQueryClient } from '@tanstack/react-query';
+import { useSessionRecorder } from '@/lib/timer/use-session-recorder';
+import { playAlarm } from '@/lib/timer/alarm';
+import { claimCompletion, completionKey } from '@/lib/timer/completion-claim';
+import { notifyPhaseComplete } from '@/lib/timer/notifications';
 import confetti from 'canvas-confetti';
 
 // Confetti celebration for work session completion
@@ -40,8 +42,10 @@ const fireWorkCompleteConfetti = () => {
 
 export function useTimerEngine() {
   const isRunning = useTimerStore((state) => state.isRunning);
+  // Re-arm the interval when only the deadline changes (pause/resume coalesced
+  // across tabs, or adopting another tab's state)
+  const storeDeadlineAt = useTimerStore((state) => state.deadlineAt);
   const mode = useTimerStore((state) => state.mode);
-  const settings = useTimerStore((state) => state.settings);
 
   // Actions only (stable refs usually)
   const setTimeLeft = useTimerStore((state) => state.setTimeLeft);
@@ -84,13 +88,53 @@ export function useTimerEngine() {
     timerEndRef.current = null;
   }, [mode]);
 
-  const queryClient = useQueryClient();
+  const { record, flush } = useSessionRecorder();
 
-  // Helper: Completion Logic (replicated from original to ensure engine handles auto-completion)
-  // NOTE: This logic is slightly duplicated in TimerControls for manual skip.
-  // Ideally, we'd extract this to a shared "SessionManager" helper class or hook.
-  // For this refactor, we focus on re-render, so keeping it inside the engine loop is safe.
-  const handleLoopComplete = () => {
+  // Retry sessions that failed to save (offline / 5xx): on mount and when back online
+  // and as soon as a user becomes available (auth resolves / login).
+  useEffect(() => {
+    void flush();
+    const onOnline = () => void flush();
+    window.addEventListener('online', onOnline);
+    const unsubAuth = useAuthStore.subscribe((state, prev) => {
+      if (state.user && state.user.id !== prev.user?.id) void flush();
+    });
+    return () => {
+      window.removeEventListener('online', onOnline);
+      unsubAuth();
+    };
+  }, [flush]);
+
+  // Cross-tab sync: adopt start/pause/mode changes made in another tab.
+  // Only these fields trigger a rehydrate (not timeLeft ticks) so two tabs
+  // can never ping-pong writes.
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== 'timer-storage' || !e.newValue) return;
+      try {
+        const next = JSON.parse(e.newValue)?.state;
+        const cur = useTimerStore.getState();
+        if (
+          next &&
+          (next.isRunning !== cur.isRunning ||
+            next.mode !== cur.mode ||
+            next.deadlineAt !== cur.deadlineAt)
+        ) {
+          void useTimerStore.persist.rehydrate();
+        }
+      } catch {
+        // Malformed storage payload: ignore
+      }
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
+  // Completion logic. NOTE: manual skip lives in TimerControls.
+  // `catchUp` = the deadline elapsed while the app was closed: no alarm/confetti
+  // and never auto-start. Recent (<= CATCH_UP_GRACE_MS) completions are still
+  // recorded; older ones just advance the phase without crediting anything.
+  const handleLoopComplete = (catchUp = false) => {
     // BUG-05 FIX: Prevent concurrent completion calls
     if (isCompletingRef.current) return;
     isCompletingRef.current = true;
@@ -101,95 +145,93 @@ export function useTimerEngine() {
         intervalRef.current = null;
       }
       timerEndRef.current = null;
+
+      // Several tabs run this engine on the same persisted state: exactly one
+      // may record + alarm + advance. The others adopt the winner's state.
+      const state = useTimerStore.getState();
+      if (!claimCompletion(completionKey(state.mode, state.deadlineAt))) {
+        void useTimerStore.persist.rehydrate();
+        return;
+      }
+
       setDeadlineAt(null);
       setIsRunning(false);
 
-    // Completion logic
-    const currentMode = useTimerStore.getState().mode; // Read fresh state
-    const currentSettings = useTimerStore.getState().settings;
-    const currentSessionCount = useTimerStore.getState().sessionCount;
+      const stale =
+        catchUp &&
+        state.deadlineAt !== null &&
+        Date.now() - state.deadlineAt > CATCH_UP_GRACE_MS;
 
-    try {
-      // Play alarm sound from user settings
-      const { alarmType, alarmVolume } = useAudioStore.getState().audioSettings
-      const alarmEntry = alarmSounds.find(a => a.id === alarmType)
-      const alarmUrl = alarmEntry?.url || '/sounds/alarms/bell.mp3' // Fallback to bell
-      const audio = new Audio(alarmUrl)
-      // Minimum 10% volume ensures alarm is always audible
-      audio.volume = Math.max(0.1, alarmVolume / 100)
-      audio.play().catch(() => {})
-    } catch {}
+      const currentMode = state.mode;
+      const currentSettings = state.settings;
+      const currentSessionCount = state.sessionCount;
 
-    // FIX: Calculate duration BEFORE using it in toast
-    const lastSessionTimeLeft = useTimerStore.getState().lastSessionTimeLeft;
-    const configDuration = (currentMode === 'work'
-      ? currentSettings.workDuration
-      : currentMode === 'shortBreak'
-        ? currentSettings.shortBreakDuration
-        : currentSettings.longBreakDuration) * 60;
-    const duration = lastSessionTimeLeft > 0 ? lastSessionTimeLeft : configDuration;
+      if (!catchUp) {
+        playAlarm();
+        notifyPhaseComplete(currentMode);
+      }
 
-    if (currentMode === 'work') {
-      // Fire confetti celebration (visual feedback is sufficient, no toast needed)
-      fireWorkCompleteConfetti();
-    }
+      // The unrecorded segment started at `lastSessionTimeLeft` remaining and
+      // the phase just ran to 0, so that is exactly the time focused since the
+      // last recorded segment (persisted, so it survives reloads).
+      const configDuration =
+        (currentMode === 'work'
+          ? currentSettings.workDuration
+          : currentMode === 'shortBreak'
+            ? currentSettings.shortBreakDuration
+            : currentSettings.longBreakDuration) * 60;
+      const duration =
+        state.lastSessionTimeLeft > 0
+          ? state.lastSessionTimeLeft
+          : configDuration;
 
-    if (currentMode === 'work') {
-      incrementCompletedSessions();
-      // Use imported store directly instead of dynamic import
-      const activeTaskId = useTasksStore.getState().activeTaskId;
-      fetch('/api/tasks/session-complete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          taskId: activeTaskId || null,
+      if (stale) {
+        // Too old to be a real session: no record, no counters, no streak
+      } else if (currentMode === 'work') {
+        if (!catchUp) fireWorkCompleteConfetti();
+        incrementCompletedSessions();
+        void record({
+          taskId: useTasksStore.getState().activeTaskId || null,
           durationSec: duration,
           mode: 'work',
-        }),
-      }).then(() => {
-        queryClient.invalidateQueries({ queryKey: ['stats'] });
-        queryClient.invalidateQueries({ queryKey: ['tasks'] });
-        queryClient.invalidateQueries({ queryKey: ['history'] });
-      }).catch((error) => {
-        console.error('Session record error', error);
-      });
-    } else {
-      // Break recording (non-blocking)
-      fetch('/api/tasks/session-complete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          taskId: null,
-          durationSec: duration,
-          mode: currentMode,
-        }),
-      }).catch(() => {});
-    }
-
-    // Auto-Transition
-    if (currentMode === 'work') {
-      const newCount = currentSessionCount + 1;
-      incrementSessionCount();
-      if (newCount % currentSettings.longBreakInterval === 0) {
-        setMode('longBreak');
-        const newDuration = currentSettings.longBreakDuration * 60;
-        setTimeLeft(newDuration);
-        useTimerStore.getState().setLastSessionTimeLeft(newDuration);
-        if (currentSettings.autoStartBreak) setIsRunning(true);
+        });
       } else {
-        setMode('shortBreak');
-        const newDuration = currentSettings.shortBreakDuration * 60;
+        void record({ taskId: null, durationSec: duration, mode: currentMode });
+      }
+
+      // Auto-Transition (new phase starts a fresh baseline)
+      const autoStart = !catchUp;
+      const next = (
+        nextMode: 'work' | 'shortBreak' | 'longBreak',
+        minutes: number,
+        shouldStart: boolean,
+      ) => {
+        setMode(nextMode);
+        const newDuration = minutes * 60;
         setTimeLeft(newDuration);
         useTimerStore.getState().setLastSessionTimeLeft(newDuration);
-        if (currentSettings.autoStartBreak) setIsRunning(true);
+        if (shouldStart && autoStart) setIsRunning(true);
+      };
+
+      if (currentMode === 'work') {
+        const newCount = stale ? currentSessionCount : currentSessionCount + 1;
+        if (!stale) incrementSessionCount();
+        if (!stale && newCount % currentSettings.longBreakInterval === 0) {
+          next(
+            'longBreak',
+            currentSettings.longBreakDuration,
+            currentSettings.autoStartBreak,
+          );
+        } else {
+          next(
+            'shortBreak',
+            currentSettings.shortBreakDuration,
+            currentSettings.autoStartBreak,
+          );
+        }
+      } else {
+        next('work', currentSettings.workDuration, currentSettings.autoStartWork);
       }
-    } else {
-      setMode('work');
-      const newDuration = currentSettings.workDuration * 60;
-      setTimeLeft(newDuration);
-      useTimerStore.getState().setLastSessionTimeLeft(newDuration);
-      if (currentSettings.autoStartWork) setIsRunning(true);
-    }
     } finally {
       // BUG-05 FIX: Always reset mutex
       isCompletingRef.current = false;
@@ -198,7 +240,9 @@ export function useTimerEngine() {
 
   // The Main Engine Loop
   useEffect(() => {
-    if (!isRunning) {
+    // Read the live store too: with StrictMode double effects the captured
+    // `isRunning` can be stale right after a catch-up completion paused it.
+    if (!isRunning || !useTimerStore.getState().isRunning) {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -208,8 +252,19 @@ export function useTimerEngine() {
       return;
     }
 
+    // Deadline elapsed while the app was closed (rehydrated as running at 0)
+    if (useTimerStore.getState().timeLeft <= 0) {
+      handleLoopComplete(true);
+      return;
+    }
+
     const deadlineAt = useTimerStore.getState().deadlineAt; // Check if deadline exists
-    if (!timerEndRef.current) {
+    // Also re-evaluate when the store holds a different deadline than we armed
+    // (adopted from another tab)
+    if (
+      !timerEndRef.current ||
+      (deadlineAt && deadlineAt !== timerEndRef.current)
+    ) {
       // Validate deadline matches expected remaining time (2s tolerance for drift)
       // This prevents stale deadlines from being reused after mode transitions
       const expectedDeadline = Date.now() + timeLeftRef.current * 1000;
@@ -244,9 +299,13 @@ export function useTimerEngine() {
         prevRemainingRef.current = remaining;
         timeLeftRef.current = remaining;
 
-        // CRITICAL: This updates the store, which triggers subscribers (ClockDisplay).
-        // But it DOES NOT trigger this hook unless dependencies change.
-        setTimeLeft(remaining);
+        // Completion owns the final state (and may belong to another tab), so
+        // do not persist a transient 0 here.
+        if (remaining > 0) {
+          // CRITICAL: This updates the store, which triggers subscribers (ClockDisplay).
+          // But it DOES NOT trigger this hook unless dependencies change.
+          setTimeLeft(remaining);
+        }
       }
 
       if (remaining <= 0) {
@@ -260,7 +319,7 @@ export function useTimerEngine() {
         intervalRef.current = null;
       }
     };
-  }, [isRunning, mode, setDeadlineAt, setTimeLeft, setTotalFocusTime, setMode]);
+  }, [isRunning, mode, storeDeadlineAt, setDeadlineAt, setTimeLeft, setTotalFocusTime, setMode]);
 
   // Return nothing. This hook is a pure engine.
 }

@@ -361,3 +361,26 @@ html[data-chrome-idle='true'] body {
   --accent-solid-hover: #155E75;
   --accent-edge: #164E63;
 }
+
+/* Reduced motion: neutralize decorative CSS animations (functional state changes stay).
+   .animate-spin is kept on purpose: loading spinners are a busy cue, and a slow
+   rotation is acceptable under reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse,
+  .animate-ping,
+  .animate-bounce,
+  [class*='animate-gradient'],
+  [class*='animate-pulse-'],
+  [class*='animate-spin-'],
+  [class*='animate-border-beam'],
+  [class*='animate-shimmer'],
+  [class*='animate-equalizer'],
+  [class*='animate-eq-'] {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+  .timer-pulse,
+  .timer-shake {
+    animation: none !important;
+  }
+}

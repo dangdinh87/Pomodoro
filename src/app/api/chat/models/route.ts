@@ -1,3 +1,4 @@
+import { featureGate } from '@/config/feature-gate';
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
 
@@ -116,6 +117,9 @@ function isTextModel(modelId: string): boolean {
 }
 
 export async function GET() {
+  const gated = featureGate('chat');
+  if (gated) return gated;
+
     try {
         const supabase = await createClient();
         const {

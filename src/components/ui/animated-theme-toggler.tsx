@@ -5,6 +5,7 @@ import { Moon, Sun } from '@phosphor-icons/react/dist/ssr';
 import { useTheme } from 'next-themes';
 
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/contexts/i18n-context';
 
 interface AnimatedThemeTogglerProps
   extends React.ComponentPropsWithoutRef<'button'> {
@@ -18,6 +19,7 @@ export const AnimatedThemeToggler = ({
   showLabel = false,
   ...props
 }: AnimatedThemeTogglerProps) => {
+  const { t } = useTranslation();
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -95,7 +97,7 @@ export const AnimatedThemeToggler = ({
           )}
         </>
       ) : null}
-      <span className="sr-only">Toggle theme</span>
+      <span className="sr-only">{t('tooltips.toggleTheme')}</span>
     </button>
   );
 };

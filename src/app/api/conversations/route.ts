@@ -1,8 +1,13 @@
+import { featureGate } from '@/config/feature-gate';
 import { createClient } from "@/lib/supabase-server";
 import { NextResponse } from "next/server";
 import { DEFAULT_CHAT_AI_MODEL } from "@/config/constants";
+import { validateConversationInput } from "./conversation-schema";
 
 export async function GET() {
+  const gated = featureGate('chat');
+  if (gated) return gated;
+
 	const supabase = await createClient();
 
 	try {
@@ -23,7 +28,7 @@ export async function GET() {
 
 		if (error) {
 			console.error("[Conversations API] Error:", error);
-			return NextResponse.json({ error: error.message }, { status: 500 });
+			return NextResponse.json({ error: "Failed to load conversations" }, { status: 500 });
 		}
 
 		return NextResponse.json({ conversations });
@@ -76,6 +81,9 @@ function generateRandomTitle(): string {
 }
 
 export async function POST(req: Request) {
+  const gated = featureGate('chat');
+  if (gated) return gated;
+
 	const supabase = await createClient();
 
 	try {
@@ -88,8 +96,18 @@ export async function POST(req: Request) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
 
-		const body = await req.json();
-		const { title, model } = body;
+		let body: unknown;
+		try {
+			body = await req.json();
+		} catch {
+			body = {};
+		}
+
+		const parsed = validateConversationInput(body);
+		if (!parsed.success) {
+			return NextResponse.json({ error: parsed.error }, { status: 400 });
+		}
+		const { title, model } = parsed.data;
 
 		// Generate a random productivity-themed title if none is provided
 		const finalTitle = title || generateRandomTitle();
@@ -106,7 +124,7 @@ export async function POST(req: Request) {
 
 		if (error) {
 			console.error("[Conversations API] Error creating:", error);
-			return NextResponse.json({ error: error.message }, { status: 500 });
+			return NextResponse.json({ error: "Failed to create conversation" }, { status: 500 });
 		}
 
 		return NextResponse.json({ conversation }, { status: 201 });

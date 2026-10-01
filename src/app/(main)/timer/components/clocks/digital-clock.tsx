@@ -48,6 +48,8 @@ export const DigitalClock = memo(
             (animConfig.state === 'urgent' || animConfig.state === 'critical') && 'animate-clock-pulse',
           )}
           style={{ color: animConfig.color }}
+          // role="timer" is not announced on every tick; TimerLiveAnnouncer
+          // speaks the meaningful changes (start/pause/phase end/milestones).
           role="timer"
           aria-live="off"
           aria-label={t('timer.aria.timeRemaining').replace('{time}', `${minutes}:${String(seconds).padStart(2, '0')}`)}

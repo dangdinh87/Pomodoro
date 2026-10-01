@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase-server'
+import { SESSION_MAX_TOTAL_SEC_PER_DAY } from '@/config/constants'
+import { isTaskOwnedByUser } from '../task-ownership'
+import { validateSessionCompletion } from './session-schemas'
+
+const ONE_DAY_MS = 24 * 60 * 60 * 1000
 
 export async function POST(request: Request) {
   const supabase = await createClient()
@@ -16,39 +21,54 @@ export async function POST(request: Request) {
     }
 
     const userId = user.id
-    const body = await request.json()
-    const {
-      taskId,
-      durationSec,
-      mode,
-    }: {
-      taskId?: string | null
-      durationSec: number
-      mode: 'work' | 'shortBreak' | 'longBreak'
-    } = body
 
-    const duration = Math.max(0, Math.round(durationSec))
-
-    // 2. Validate taskId if provided
-    let validatedTaskId: string | null = null
-
-    if (taskId) {
-      const { data: taskData, error: taskError } = await supabase
-        .from('tasks')
-        .select('id')
-        .eq('id', taskId)
-        .eq('user_id', userId)
-        .single()
-
-      if (taskError || !taskData) {
-        console.warn(`Invalid taskId ${taskId} for user ${userId}: ${taskError?.message || 'not found'}`)
-        validatedTaskId = null
-      } else {
-        validatedTaskId = taskId
-      }
+    let body: unknown
+    try {
+      body = await request.json()
+    } catch {
+      return NextResponse.json({ error: 'Request body must be valid JSON' }, { status: 400 })
     }
 
-    // 3. Record session
+    const parsed = validateSessionCompletion(body)
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error }, { status: 400 })
+    }
+
+    const { taskId, durationSec: duration, mode } = parsed.data
+
+    // 2. Plausibility guard: nobody can log more time than has elapsed in the
+    // last 24h. Blocks leaderboard/streak inflation via forged durations.
+    const since = new Date(Date.now() - ONE_DAY_MS).toISOString()
+    const { data: recentSessions, error: recentError } = await supabase
+      .from('sessions')
+      .select('duration')
+      .eq('user_id', userId)
+      .gte('created_at', since)
+
+    if (recentError) {
+      console.error('Error loading recent sessions', recentError)
+      return NextResponse.json(
+        { error: 'Failed to record session completion' },
+        { status: 500 },
+      )
+    }
+
+    const loggedLastDay = (recentSessions ?? []).reduce(
+      (total, session) => total + (Number(session.duration) || 0),
+      0,
+    )
+    if (loggedLastDay + duration > SESSION_MAX_TOTAL_SEC_PER_DAY) {
+      return NextResponse.json(
+        { error: 'Daily session limit exceeded' },
+        { status: 429 },
+      )
+    }
+
+    // 3. Keep taskId only if it belongs to the user
+    const validatedTaskId =
+      taskId && (await isTaskOwnedByUser(supabase, taskId, userId)) ? taskId : null
+
+    // 4. Record session
     const { data: sessionData, error: sessionError } = await supabase
       .from('sessions')
       .insert({
@@ -68,7 +88,7 @@ export async function POST(request: Request) {
       )
     }
 
-    // 4. Update Task progress (if applicable)
+    // 5. Update Task progress (if applicable)
     if (validatedTaskId && mode === 'work') {
       const { error: incError } = await supabase.rpc('increment_task_pomodoro', {
         task_id_input: validatedTaskId,
@@ -81,7 +101,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // 5. Update Streak (only for 'work' sessions)
+    // 6. Update Streak (only for 'work' sessions)
     if (mode === 'work') {
       // Fetch current streak
       const { data: streakData, error: streakFetchError } = await supabase

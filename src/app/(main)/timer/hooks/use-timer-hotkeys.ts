@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useTimerStore } from '@/stores/timer-store';
+import { requestNotificationPermission } from '@/lib/timer/notifications';
 
 export function useTimerHotkeys() {
     const isRunning = useTimerStore((state) => state.isRunning);
@@ -24,6 +25,7 @@ export function useTimerHotkeys() {
             if (e.code === 'Space') {
                 e.preventDefault();
                 if (!isRunning && timeLeft > 0) {
+                    requestNotificationPermission();
                     resumeTimer();
                 } else {
                     pauseTimer();

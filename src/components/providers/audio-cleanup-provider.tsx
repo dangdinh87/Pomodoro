@@ -15,7 +15,7 @@ export function AudioCleanupProvider() {
   useEffect(() => {
     // Only clean up orphaned audio elements (from previous sessions)
     // Don't use globalAudioCleanup() as it destroys AudioManager state
-    const orphanedAudios = document.querySelectorAll('audio:not([data-managed])');
+    const orphanedAudios = document.querySelectorAll<HTMLAudioElement>('audio:not([data-managed])');
     orphanedAudios.forEach(audio => {
       (audio as HTMLAudioElement).pause();
       audio.remove();
@@ -31,7 +31,7 @@ export function AudioCleanupProvider() {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         // Check if there are any orphaned audio elements and clean them up
-        const audioElements = document.querySelectorAll('audio:not([data-managed])');
+        const audioElements = document.querySelectorAll<HTMLAudioElement>('audio:not([data-managed])');
         if (audioElements.length > 0) {
           audioElements.forEach(audio => {
             audio.pause();

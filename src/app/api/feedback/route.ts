@@ -1,31 +1,41 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase-server';
+import { consumeRateLimit, getClientIp } from '@/lib/api/in-memory-rate-limiter';
+import { validateFeedback } from './feedback-schema';
+
+// Anonymous endpoint: throttle per client IP to limit spam.
+const FEEDBACK_LIMIT_PER_WINDOW = 5;
+const FEEDBACK_WINDOW_MS = 10 * 60 * 1000;
 
 export async function POST(req: Request) {
+    const rateLimit = consumeRateLimit(
+        `feedback:${getClientIp(req)}`,
+        FEEDBACK_LIMIT_PER_WINDOW,
+        FEEDBACK_WINDOW_MS,
+    );
+    if (!rateLimit.allowed) {
+        return NextResponse.json(
+            { error: 'Too many feedback submissions. Please try again later.' },
+            { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfterSec) } }
+        );
+    }
+
     try {
         const supabase = await createClient();
-        const body = await req.json();
-        const { name, email, type, message, rating } = body;
 
-        if (!message) {
+        let body: unknown;
+        try {
+            body = await req.json();
+        } catch {
             return NextResponse.json(
-                { error: 'Message is required' },
+                { error: 'Request body must be valid JSON' },
                 { status: 400 }
             );
         }
 
-        if (!type || !['feature', 'bug', 'question', 'other'].includes(type)) {
-            return NextResponse.json(
-                { error: 'Invalid feedback type' },
-                { status: 400 }
-            );
-        }
-
-        if (rating !== undefined && (rating < 1 || rating > 5)) {
-            return NextResponse.json(
-                { error: 'Rating must be between 1 and 5' },
-                { status: 400 }
-            );
+        const parsed = validateFeedback(body);
+        if (!parsed.success) {
+            return NextResponse.json({ error: parsed.error }, { status: 400 });
         }
 
         // Get authenticated user (optional - anonymous feedback allowed)
@@ -35,11 +45,7 @@ export async function POST(req: Request) {
             .from('feedbacks')
             .insert({
                 user_id: user?.id || null,
-                type,
-                message,
-                rating: rating || null,
-                name: name || null,
-                email: email || null,
+                ...parsed.data,
             });
 
         if (error) {

@@ -7,6 +7,7 @@ import { Kbd } from '@/components/ui/kbd';
 import { PageContainer } from '@/components/ui/page-header';
 import { ArrowRight } from '@phosphor-icons/react/dist/ssr';
 import { useI18n } from '@/contexts/i18n-context';
+import { isFeatureEnabled } from '@/config/feature-flags';
 
 const FEATURES = [
     { key: 'timer', href: '/timer' },
@@ -83,7 +84,7 @@ export default function GuidePage() {
                         <p className="text-ink-muted">{t('guide.howToUse.description')}</p>
                     </div>
                     <ul className="divide-y divide-border rounded-lg border border-border bg-surface">
-                        {FEATURES.map(({ key, href }) => (
+                        {FEATURES.filter((f) => f.key !== 'history' || isFeatureEnabled('history')).map(({ key, href }) => (
                             <li key={key}>
                                 <Link
                                     href={href}

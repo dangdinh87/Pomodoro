@@ -1,12 +1,20 @@
 'use client';
 
 import { Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import GATracker from '@/components/trackings/ga';
 import { AppProviders } from '@/components/providers/app-providers';
 import { AppTopBar } from '@/components/layout/app-top-bar';
 import { MobileTabBar } from '@/components/layout/mobile-tab-bar';
 import { useI18n } from '@/contexts/i18n-context';
+import { isFeatureEnabled } from '@/config/feature-flags';
+
+// Loaded lazily so the chat chunks never ship when the chat flag is off.
+const GlobalChat = dynamic(
+  () => import('@/components/chat/global-chat').then((m) => m.GlobalChat),
+  { ssr: false },
+);
 
 function SkipLink() {
   const { t } = useI18n();
@@ -42,6 +50,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           {children}
         </main>
         <MobileTabBar />
+        {isFeatureEnabled('chat') && <GlobalChat />}
       </div>
     </AppProviders>
   );

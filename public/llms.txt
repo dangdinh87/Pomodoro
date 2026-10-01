@@ -11,12 +11,10 @@ https://www.pomodoro-focus.site
 ## Features
 - Precision Pomodoro Timer with customizable intervals (25/5/15 min default)
 - Task Management with session linking
-- Performance Analytics and progress tracking
+- Focus history and progress tracking (login required)
 - Ambient Soundscapes for deep work (rain, cafe, fireplace, etc.)
 - Consistency Streaks and habit building
 - Light/Dark adaptive interface
-- AI-powered focus insights
-- Leaderboard for competitive focus sessions
 
 ## Tech Stack
 - Next.js 14 (App Router)
@@ -34,8 +32,7 @@ https://www.pomodoro-focus.site
 - / - Landing page with features overview
 - /timer - Main Pomodoro timer interface
 - /tasks - Task management
-- /progress - Analytics dashboard
-- /leaderboard - Global leaderboard
+- /history - Focus history and streaks (requires login)
 - /settings - User preferences
 - /guide - User guide and documentation
 - /feedback - Feedback form

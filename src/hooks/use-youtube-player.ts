@@ -9,6 +9,7 @@ import { fetchYouTubeOEmbed } from '@/lib/youtube-utils';
 export interface YouTubeSource {
   videoId?: string;
   listId?: string;
+  isChannel?: boolean;
 }
 
 export interface YouTubePlayerState {

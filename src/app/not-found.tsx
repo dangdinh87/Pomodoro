@@ -1,8 +1,9 @@
 /**
- * Not Found Page - uses static text (no i18n provider at root level)
+ * Not Found Page - server-translated (locale from the app.lang cookie)
  */
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { t } from '@/lib/server-translations';
 
 export default function NotFound() {
   return (
@@ -14,13 +15,11 @@ export default function NotFound() {
         </picture>
         <p className="font-heading text-sm font-bold tabular-nums text-ink-muted">404</p>
         <h1 className="mt-1 font-heading text-[1.75rem] font-bold leading-[1.1] tracking-[-0.02em] text-ink">
-          This page could not be found
+          {t('notFound.title')}
         </h1>
-        <p className="mt-3 text-sm text-ink-muted">
-          The page you&apos;re looking for doesn&apos;t exist or has been moved.
-        </p>
+        <p className="mt-3 text-sm text-ink-muted">{t('notFound.description')}</p>
         <Button asChild size="lg" className="mt-8">
-          <Link href="/timer">Back to timer</Link>
+          <Link href="/timer">{t('notFound.backToTimer')}</Link>
         </Button>
       </div>
     </main>
