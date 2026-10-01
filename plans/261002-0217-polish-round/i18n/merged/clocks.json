@@ -1,0 +1,47 @@
+{
+  "en": {
+    "clockStyles.flip3d": "Flip 3D",
+    "clockStyles.tomato": "Tomato",
+    "clockStyles.orbit": "Orbit",
+    "clockStyles.solid": "Solid",
+    "clockStyles.badge3d": "3D",
+    "clockStyles.webglNote": "3D styles use your graphics card. If it is not available, the timer shows the digital clock instead.",
+    "timerSettings.presets.title": "Presets",
+    "timerSettings.presets.label": "{focus} minutes focus, {rest} minutes break",
+    "timerSettings.presets.custom": "Custom",
+    "timerSettings.stepper.decrease": "Decrease {label}",
+    "timerSettings.stepper.increase": "Increase {label}",
+    "timerSettings.cycleSummary": "One full cycle: {sessions} focus sessions, about {total} min.",
+    "settingsUi.clockStyleHint": "How the countdown looks on the timer page. Previews are live."
+  },
+  "vi": {
+    "clockStyles.flip3d": "Lật 3D",
+    "clockStyles.tomato": "Quả cà chua",
+    "clockStyles.orbit": "Quỹ đạo",
+    "clockStyles.solid": "Khối nổi",
+    "clockStyles.badge3d": "3D",
+    "clockStyles.webglNote": "Kiểu 3D dùng card đồ hoạ của bạn. Nếu thiết bị không hỗ trợ, bộ đếm sẽ hiện đồng hồ số.",
+    "timerSettings.presets.title": "Mẫu có sẵn",
+    "timerSettings.presets.label": "{focus} phút tập trung, {rest} phút nghỉ",
+    "timerSettings.presets.custom": "Tuỳ chỉnh",
+    "timerSettings.stepper.decrease": "Giảm {label}",
+    "timerSettings.stepper.increase": "Tăng {label}",
+    "timerSettings.cycleSummary": "Một chu kỳ đầy đủ: {sessions} phiên tập trung, khoảng {total} phút.",
+    "settingsUi.clockStyleHint": "Kiểu hiển thị đồng hồ đếm ngược trên trang Pomodoro. Bản xem trước chạy trực tiếp."
+  },
+  "ja": {
+    "clockStyles.flip3d": "フリップ 3D",
+    "clockStyles.tomato": "トマト",
+    "clockStyles.orbit": "オービット",
+    "clockStyles.solid": "立体",
+    "clockStyles.badge3d": "3D",
+    "clockStyles.webglNote": "3Dスタイルはグラフィックスを使用します。利用できない場合はデジタル時計が表示されます。",
+    "timerSettings.presets.title": "プリセット",
+    "timerSettings.presets.label": "集中 {focus} 分、休憩 {rest} 分",
+    "timerSettings.presets.custom": "カスタム",
+    "timerSettings.stepper.decrease": "{label}を減らす",
+    "timerSettings.stepper.increase": "{label}を増やす",
+    "timerSettings.cycleSummary": "1サイクル：集中 {sessions} 回、約 {total} 分。",
+    "settingsUi.clockStyleHint": "タイマー画面でのカウントダウンの見た目です。プレビューはリアルタイムで動きます。"
+  }
+}

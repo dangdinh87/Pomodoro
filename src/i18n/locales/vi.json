@@ -1,16 +1,16 @@
 {
   "brand": {
-    "title": "StudyBro",
+    "title": "Study Bro",
     "subtitle": "Cùng nhau học tập"
   },
   "common": {
-    "loading": "Đang tải...",
+    "loading": "Đang tải…",
     "error": "Lỗi",
     "success": "Thành công",
-    "cancel": "Hủy",
+    "cancel": "Huỷ",
     "noResults": "Không tìm thấy kết quả",
     "save": "Lưu",
-    "delete": "Xóa",
+    "delete": "Xoá",
     "edit": "Chỉnh sửa",
     "add": "Thêm",
     "close": "Đóng",
@@ -25,10 +25,10 @@
     "search": "Tìm kiếm",
     "filter": "Lọc",
     "sort": "Sắp xếp",
-    "actions": "Hành động",
+    "actions": "Thao tác",
     "settings": "Cài đặt",
     "language": "Ngôn ngữ",
-    "total": "Tổng cộng",
+    "total": "Tổng",
     "item": "mục",
     "items": "mục"
   },
@@ -39,31 +39,31 @@
     "navigation": "Điều hướng",
     "system": "Hệ thống",
     "timer": "Tập trung",
-    "tasks": "Công việc",
+    "tasks": "Việc cần làm",
     "history": "Lịch sử",
     "chatAI": "Chat AI",
-    "entertainment": "Giải trí",
+    "entertainment": "Trò chơi",
     "settings": "Cài đặt",
     "guide": "Hướng dẫn",
-    "feedback": "Phản hồi",
+    "feedback": "Góp ý",
     "login": "Đăng nhập",
     "logout": "Đăng xuất",
     "loginNow": "Đăng nhập ngay",
-    "signInHint": "Đồng bộ công việc và thống kê giữa các thiết bị"
+    "signInHint": "Đồng bộ việc và thống kê giữa các thiết bị"
   },
   "auth": {
     "login": "Đăng nhập",
     "pleaseLogin": "Vui lòng đăng nhập để tiếp tục",
-    "signInToViewStats": "Vui lòng đăng nhập để xem thống kê",
+    "signInToViewStats": "Đăng nhập để xem thống kê",
     "signInButton": "Đăng nhập",
     "signOutSuccess": "Đã đăng xuất",
     "signOutError": "Không thể đăng xuất",
     "signOutConfirm": "Bạn có chắc muốn đăng xuất?",
-    "signOutUnexpectedError": "Có lỗi xảy ra khi đăng xuất"
+    "signOutUnexpectedError": "Đã xảy ra lỗi khi đăng xuất"
   },
   "timer": {
     "modes": {
-      "work": "Làm việc",
+      "work": "Tập trung",
       "shortBreak": "Nghỉ ngắn",
       "longBreak": "Nghỉ dài"
     },
@@ -83,11 +83,11 @@
       }
     },
     "toasts": {
-      "work_done": "Xong phiên làm việc! Tới giờ nghỉ rồi.",
-      "break_done": "Hết giờ nghỉ! Quay lại tập trung nào."
+      "work_done": "Đã xong phiên tập trung. Nghỉ một chút.",
+      "break_done": "Hết giờ nghỉ. Đến lúc tập trung."
     },
     "title_prefix": {
-      "work": "Làm việc",
+      "work": "Tập trung",
       "shortBreak": "Nghỉ",
       "longBreak": "Nghỉ dài"
     },
@@ -95,82 +95,42 @@
       "timeRemaining": "Thời gian còn lại: {time}"
     },
     "progress": {
-      "complete": "{percent}% Hoàn thành"
+      "complete": "Hoàn thành {percent}%"
     },
     "stats": {
       "today": "Hôm nay",
-      "poms": "poms",
+      "poms": "Pomodoro",
       "time": "Thời gian",
       "minutes": "phút"
     },
-    "focusMode": "Chế độ tập trung",
-    "skipped_not_recorded": "Đã bỏ qua phiên - không được ghi nhận",
+    "focusMode": "Chế độ toàn màn hình",
+    "skipped_not_recorded": "Đã bỏ qua phiên, không ghi nhận",
     "skip_confirm": {
       "title": "Bỏ qua phiên này?",
-      "description": "Bạn có chắc muốn bỏ qua phiên hiện tại? Tiến độ dưới 50% sẽ không được ghi nhận.",
+      "description": "Nếu tiến độ dưới 50%, phiên sẽ không được ghi nhận.",
       "confirm": "Vẫn bỏ qua"
     },
     "mode_switch_confirm": {
       "title": "Chuyển chế độ?",
-      "description": "Phiên này đã bắt đầu. Chuyển chế độ sẽ bỏ tiến độ của phiên.",
+      "description": "Phiên này đã bắt đầu. Chuyển chế độ sẽ làm mất tiến độ của phiên.",
       "confirm": "Vẫn chuyển"
     },
     "doneAt": "Xong lúc",
     "breakTask": "Tiếp theo"
   },
-  "timerGuide": {
-    "title": "Pomodoro hoạt động thế nào",
-    "subtitle": "Tập trung thông minh, không phải lâu hơn",
-    "modes": {
-      "title": "Chu kỳ làm việc",
-      "work": "Work",
-      "workDesc": "25 phút tập trung",
-      "shortBreak": "Short Break",
-      "shortBreakDesc": "5 phút nghỉ ngơi",
-      "longBreak": "Long Break",
-      "longBreakDesc": "15 phút (sau 4 phiên)"
-    },
-    "validSession": {
-      "title": "Phiên hợp lệ",
-      "subtitle": "Đừng làm cheat!",
-      "rule": "≥ 50% thời gian",
-      "ruleDesc": "mới được tính",
-      "skip": "Skip sớm",
-      "skipDesc": "không cộng streak",
-      "badge": "Hệ thống chống fake-focus"
-    },
-    "keyboard": {
-      "title": "Phím tắt",
-      "space": "Bắt đầu / Dừng",
-      "reset": "Đặt lại"
-    },
-    "task": {
-      "title": "Liên kết Task",
-      "select": "Chọn một task",
-      "auto": "Pomodoro tự động đồng bộ tiến độ"
-    },
-    "settings": {
-      "title": "Cài đặt",
-      "customize": "Tùy chỉnh thời gian",
-      "autoStart": "Tự động bắt đầu chế độ tiếp theo",
-      "openSettings": "Mở Cài đặt"
-    },
-    "dontShowAgain": "Không hiện lại",
-    "gotIt": "Bắt đầu tập trung"
-  },
   "timerSettings": {
-    "title": "Cài đặt Hẹn giờ",
+    "title": "Cài đặt hẹn giờ",
     "labels": {
       "workDuration": "Thời gian tập trung",
       "shortBreakDuration": "Nghỉ ngắn",
       "longBreakDuration": "Nghỉ dài",
       "longBreakInterval": "Số phiên trước khi nghỉ dài",
-      "autoStartBreaks": "Tự động bắt đầu nghỉ",
-      "autoStartWork": "Tự động bắt đầu làm việc",
+      "autoStartBreaks": "Tự bắt đầu giờ nghỉ",
+      "autoStartWork": "Tự bắt đầu phiên tập trung",
       "showClock": "Hiển thị đồng hồ",
       "clockType": "Kiểu đồng hồ",
       "selectClockType": "Chọn kiểu đồng hồ",
-      "digital": "Kỹ thuật số",
+      "digital": "Đồng hồ số",
       "analog": "Đồng hồ kim",
       "progress": "Tiến độ",
       "flip": "Lật",
@@ -180,63 +140,73 @@
       "small": "Nhỏ",
       "medium": "Trung bình",
       "large": "Lớn",
-      "timerDurations": "Thời lượng hẹn giờ",
-      "behavior": "Hành vi",
+      "timerDurations": "Thời lượng",
+      "behavior": "Tuỳ chọn",
       "clockDisplay": "Hiển thị đồng hồ",
       "clockStyle": "Kiểu đồng hồ",
       "preview": "Xem trước",
       "selectSize": "Chọn kích thước",
-      "lowTimeWarning": "Cảnh báo khi sắp hết giờ (dưới 10s)"
+      "lowTimeWarning": "Cảnh báo khi còn dưới 10 giây"
     },
     "actions": {
-      "resetDefaults": "Khôi phục mặc định",
-      "cancel": "Hủy",
+      "resetDefaults": "Đặt lại mặc định",
+      "cancel": "Huỷ",
       "save": "Lưu cài đặt",
       "saveChanges": "Lưu thay đổi"
     },
     "toasts": {
-      "saved": "Đã lưu cài đặt hẹn giờ!",
-      "reset": "Đã khôi phục cài đặt mặc định!"
-    }
+      "saved": "Đã lưu cài đặt hẹn giờ",
+      "reset": "Đã đặt lại cài đặt hẹn giờ về mặc định"
+    },
+    "presets": {
+      "title": "Preset",
+      "label": "{focus} phút tập trung, {rest} phút nghỉ",
+      "custom": "Tuỳ chỉnh"
+    },
+    "stepper": {
+      "decrease": "Giảm {label}",
+      "increase": "Tăng {label}"
+    },
+    "cycleSummary": "Một chu kỳ đầy đủ: {sessions} phiên tập trung, khoảng {total} phút."
   },
   "tasks": {
-    "title": "Quản lý công việc",
-    "subtitle": "Quản lý công việc và theo dõi tiến độ với phương pháp Pomodoro",
-    "addTask": "Thêm công việc mới",
-    "manageTags": "Quản lý tag",
-    "manageTagsDescription": "Tags chỉ dùng để sắp xếp. Xóa tag ở đây không ảnh hưởng đến công việc của bạn.",
-    "newTagPlaceholder": "Tag mới...",
-    "noTags": "Chưa có tag nào",
-    "tagsLimit": "tags",
-    "tag": "Tag",
-    "editTask": "Chỉnh sửa công việc",
-    "deleteTask": "Xóa công việc",
-    "noTasks": "Không tìm thấy công việc nào",
-    "noTasksDescription": "Bạn chưa có công việc nào. Hãy tạo một công việc để bắt đầu phiên tập trung.",
+    "title": "Việc cần làm",
+    "subtitle": "Lên kế hoạch và theo dõi tiến độ bằng Pomodoro",
+    "addTask": "Thêm việc",
+    "manageTags": "Quản lý thẻ",
+    "manageTagsDescription": "Thẻ chỉ dùng để sắp xếp. Xoá thẻ ở đây không ảnh hưởng đến việc của bạn.",
+    "newTagPlaceholder": "Thẻ mới…",
+    "noTags": "Chưa có thẻ nào",
+    "tagsLimit": "thẻ",
+    "tag": "Thẻ",
+    "editTask": "Sửa việc",
+    "deleteTask": "Xoá việc",
+    "noTasks": "Chưa có việc nào",
+    "noTasksDescription": "Tạo một việc để bắt đầu phiên tập trung đầu tiên.",
     "noResults": "Không tìm thấy kết quả",
-    "noResultsDescription": "Thử điều chỉnh tìm kiếm hoặc bộ lọc để tìm thấy công việc bạn cần.",
+    "noResultsDescription": "Thử đổi từ khoá hoặc bộ lọc.",
     "focusing": "Đang tập trung",
     "overdue": "Quá hạn",
     "tomorrow": "Ngày mai",
     "clone": "Nhân bản",
     "templateBadge": "Mẫu",
-    "createFirst": "Tạo công việc đầu tiên để bắt đầu",
+    "createFirst": "Tạo việc đầu tiên để bắt đầu",
     "fields": {
       "title": "Tiêu đề",
-      "priority": "Độ ưu tiên",
-      "dueDate": "Hạn chót",
-      "tags": "Tags",
+      "priority": "Ưu tiên",
+      "dueDate": "Hạn",
+      "tags": "Thẻ",
       "progress": "Tiến độ"
     },
-    "taskName": "Tên công việc",
+    "taskName": "Tên việc",
     "taskNamePlaceholder": "Bạn đang định làm gì?",
     "taskDescription": "Mô tả",
-    "taskDescriptionPlaceholder": "Thêm ghi chú...",
-    "priority": "Độ ưu tiên",
-    "dueDate": "Hạn chót",
+    "taskDescriptionPlaceholder": "Thêm ghi chú…",
+    "priority": "Ưu tiên",
+    "dueDate": "Hạn",
     "status": "Trạng thái",
-    "estimated": "Pomodoro dự kiến",
-    "estimatedHint": "Số phiên Pomodoro (~25 phút/phiên) bạn dự tính để hoàn thành công việc này.",
+    "estimated": "Ước lượng (số Pomodoro)",
+    "estimatedHint": "Số Pomodoro (khoảng 25 phút mỗi phiên) bạn ước lượng để hoàn thành việc này.",
     "actual": "Thực tế",
     "completed": "Hoàn thành",
     "progress": "Tiến độ",
@@ -252,9 +222,9 @@
       "done": "Hoàn thành"
     },
     "filters": {
-      "searchPlaceholder": "Tìm kiếm công việc...",
+      "searchPlaceholder": "Tìm việc…",
       "status": "Trạng thái",
-      "priority": "Độ ưu tiên",
+      "priority": "Ưu tiên",
       "dateRange": "Khoảng ngày",
       "today": "Hôm nay",
       "all": "Tất cả",
@@ -265,116 +235,114 @@
       "markIncomplete": "Đánh dấu chưa hoàn thành",
       "startFocus": "Tập trung vào việc này",
       "stopFocus": "Dừng tập trung",
-      "edit": "Sửa công việc",
-      "delete": "Xóa công việc",
-      "save": "Lưu công việc",
-      "create": "Tạo công việc",
-      "deleting": "Đang xóa...",
-      "clone": "Nhân bản",
-      "saveAsTemplate": "Lưu thành mẫu",
-      "deletePermanent": "Xóa vĩnh viễn"
+      "edit": "Sửa việc",
+      "delete": "Xoá việc",
+      "save": "Lưu việc",
+      "create": "Tạo việc",
+      "deleting": "Đang xoá…",
+      "clone": "Nhân bản việc",
+      "saveAsTemplate": "Lưu làm mẫu",
+      "deletePermanent": "Xoá vĩnh viễn"
     },
-    "count": "công việc",
+    "count": "việc",
     "confirmDelete": {
-      "title": "Bạn có chắc chắn?",
-      "description": "Hành động này không thể hoàn tác. Việc này sẽ xóa vĩnh viễn công việc và dữ liệu phiên liên quan.",
-      "action": "Xóa vĩnh viễn"
+      "title": "Xoá việc này?",
+      "description": "Việc này và lịch sử phiên của nó sẽ bị xoá vĩnh viễn. Không thể hoàn tác.",
+      "action": "Xoá việc"
     },
     "templates": {
-      "title": "Mẫu công việc",
+      "title": "Mẫu việc",
       "description": "Bắt đầu nhanh từ mẫu đã lưu",
       "useTemplate": "Dùng mẫu",
       "saveAsTemplate": "Lưu làm mẫu",
-      "removeTemplate": "Xóa mẫu",
+      "removeTemplate": "Xoá mẫu",
       "noTemplates": "Chưa có mẫu nào",
-      "createTemplateHint": "Lưu bất kỳ công việc nào làm mẫu để dùng lại sau",
+      "createTemplateHint": "Lưu bất kỳ việc nào làm mẫu để dùng lại sau",
       "empty": "Chưa có mẫu nào",
-      "emptyHint": "Mở menu thao tác khác của một công việc và chọn Lưu làm mẫu."
+      "emptyHint": "Mở menu thao tác khác của một việc và chọn Lưu làm mẫu."
     }
   },
   "history": {
-    "title": "Lịch sử & Thống kê",
-    "subtitle": "Xem lại hiệu suất tập trung của bạn theo thời gian",
-    "startNewSession": "Bắt đầu phiên mới",
-    "errorLoading": "Đã xảy ra lỗi khi tải dữ liệu",
+    "title": "Lịch sử và thống kê",
+    "subtitle": "Theo dõi mức độ tập trung của bạn theo thời gian",
+    "startNewSession": "Bắt đầu phiên tập trung",
+    "errorLoading": "Không thể tải dữ liệu",
     "noData": "Không có dữ liệu",
-    "noDataDescription": "Bắt đầu phiên Pomodoro đầu tiên để xem thống kê tại đây",
+    "noDataDescription": "Hoàn thành phiên tập trung đầu tiên để xem thống kê tại đây",
     "stats": {
       "totalFocusTime": "Tổng thời gian tập trung",
       "completedSessions": "Phiên đã hoàn thành",
-      "currentStreak": "Chuỗi hiện tại",
+      "currentStreak": "Chuỗi ngày hiện tại",
       "days": "ngày",
       "hours": "giờ",
       "minutes": "phút",
       "sessions": "phiên"
     },
     "charts": {
-      "focusOverview": "Tổng quan Thời gian Tập trung",
-      "distribution": "Phân bổ Phiên",
-      "sessionHistory": "Lịch sử Phiên",
-      "noTask": "Không có công việc"
+      "focusOverview": "Tổng quan thời gian tập trung",
+      "distribution": "Phân bổ phiên",
+      "sessionHistory": "Lịch sử phiên",
+      "noTask": "Không có việc"
     },
     "dateRange": {
       "today": "Hôm nay",
       "yesterday": "Hôm qua",
       "last7Days": "7 ngày qua",
       "last30Days": "30 ngày qua",
-      "custom": "Tùy chỉnh",
-      "selectDate": "Chọn khoảng thời gian"
+      "custom": "Tuỳ chỉnh",
+      "selectDate": "Chọn khoảng ngày"
     }
   },
   "settings": {
     "title": "Cài đặt",
-    "subtitle": "Quản lý tùy chọn, cài đặt hẹn giờ và giao diện.",
-    "tabs": {
-      "general": "Chung",
-      "timer": "Hẹn giờ",
-      "background": "Hình nền",
-      "audio": "Âm thanh"
-    },
     "account": {
       "tab": "Tài khoản",
       "title": "Tài khoản",
-      "subtitle": "Quản lý mật khẩu, xuất dữ liệu hoặc xóa tài khoản của bạn.",
+      "subtitle": "Xuất dữ liệu hoặc xoá tài khoản của bạn.",
       "guestPrompt": "Đăng nhập để quản lý tài khoản của bạn.",
       "guestLogin": "Đăng nhập",
       "export": {
-        "title": "Xuất dữ liệu của tôi",
-        "description": "Tải file JSON gồm tài khoản, việc, phiên tập trung và thẻ của bạn.",
-        "button": "Tải dữ liệu của tôi",
+        "title": "Xuất dữ liệu",
+        "description": "Tải về tệp JSON gồm tài khoản, việc, phiên tập trung và thẻ của bạn.",
+        "button": "Tải dữ liệu xuống",
         "success": "Dữ liệu của bạn đã sẵn sàng.",
-        "error": "Không thể xuất dữ liệu của bạn.",
-        "rateLimited": "Bạn xuất dữ liệu quá nhiều lần. Vui lòng thử lại sau."
+        "error": "Không thể xuất dữ liệu.",
+        "rateLimited": "Bạn đã xuất dữ liệu quá nhiều lần. Vui lòng thử lại sau."
       },
       "delete": {
-        "title": "Xóa tài khoản",
-        "description": "Xóa vĩnh viễn tài khoản và toàn bộ dữ liệu liên quan. Không thể hoàn tác.",
-        "button": "Xóa tài khoản của tôi",
-        "confirmTitle": "Xóa tài khoản của bạn?",
-        "confirmDescription": "Thao tác này xoá vĩnh viễn việc, phiên tập trung và thẻ của bạn. Để xác nhận, gõ {value} vào ô dưới.",
+        "title": "Xoá tài khoản",
+        "description": "Xoá vĩnh viễn tài khoản và toàn bộ dữ liệu liên quan. Không thể hoàn tác.",
+        "button": "Xoá tài khoản",
+        "confirmTitle": "Xoá tài khoản?",
+        "confirmDescription": "Thao tác này xoá vĩnh viễn việc, phiên tập trung và thẻ của bạn. Để xác nhận, nhập {value} vào ô bên dưới.",
         "confirmLabel": "Nhập để xác nhận",
-        "cancel": "Hủy",
-        "confirmButton": "Xóa vĩnh viễn",
-        "success": "Tài khoản của bạn đã được xóa.",
-        "error": "Không thể xóa tài khoản của bạn."
+        "cancel": "Huỷ",
+        "confirmButton": "Xoá vĩnh viễn",
+        "success": "Đã xoá tài khoản của bạn.",
+        "error": "Không thể xoá tài khoản của bạn."
+      },
+      "signOut": "Đăng xuất",
+      "signOutError": "Không thể đăng xuất. Hãy thử lại.",
+      "guest": {
+        "title": "Bạn đang dùng Study Bro với tư cách khách",
+        "description": "Đăng nhập để giữ việc và phiên tập trung trên mọi thiết bị. Những gì bạn đã làm khi là khách sẽ được giữ lại khi đăng nhập."
       }
     },
     "general": {
-      "title": "Cài đặt Chung",
+      "title": "Cài đặt chung",
       "appearance": "Giao diện",
       "language": {
         "title": "Ngôn ngữ hiển thị",
-        "description": "Chọn ngôn ngữ sử dụng.",
+        "description": "Chọn ngôn ngữ của ứng dụng.",
         "sectionTitle": "Ngôn ngữ",
         "selectPlaceholder": "Chọn ngôn ngữ",
-        "updated": "Đã cập nhật ngôn ngữ",
         "english": "Tiếng Anh",
         "vietnamese": "Tiếng Việt",
         "japanese": "Tiếng Nhật"
       },
       "theme": {
-        "title": "Giao diện",
-        "description": "Chọn chủ đề ứng dụng",
+        "title": "Chủ đề",
+        "description": "Chọn chủ đề cho ứng dụng",
         "mode": "Chế độ giao diện",
         "modeDescription": "Chọn chế độ hiển thị.",
         "colorTheme": "Bảng màu",
@@ -385,7 +353,7 @@
         "fontSize": "Cỡ chữ",
         "fontSizeDescription": "Điều chỉnh kích thước chữ hiển thị.",
         "selectModePlaceholder": "Chọn chế độ",
-        "selectColorPlaceholder": "Mặc định",
+        "selectColorPlaceholder": "Chọn màu",
         "selectFontPlaceholder": "Chọn phông chữ",
         "selectFontSizePlaceholder": "Chọn cỡ chữ",
         "fontChanged": "Đã đổi phông chữ thành {font}",
@@ -401,42 +369,42 @@
         "themes": {
           "recommended": "Khuyên dùng",
           "default": "Mặc định",
-          "blue": "Xanh Dương",
-          "rose": "Hoa Hồng",
-          "emerald": "Rừng Xanh",
-          "indigo": "Nửa Đêm",
-          "violet": "Oải Hương",
-          "amber": "Thu Vàng",
-          "cyan": "Bạc Hà",
-          "teal": "Đại Dương",
-          "pink": "Hoa Đào",
-          "mono": "Đơn Sắc"
+          "blue": "Xanh dương",
+          "rose": "Hoa hồng",
+          "emerald": "Rừng xanh",
+          "indigo": "Nửa đêm",
+          "violet": "Oải hương",
+          "amber": "Thu vàng",
+          "cyan": "Bạc hà",
+          "teal": "Đại dương",
+          "pink": "Hoa đào",
+          "mono": "Đơn sắc"
         },
         "themeDescriptions": {
-          "default": "Cà chua kinh điển",
+          "default": "Cà chua cổ điển",
           "blue": "Điềm tĩnh, tập trung",
-          "rose": "Lãng mạn, tình yêu",
+          "rose": "Lãng mạn",
           "emerald": "Thiên nhiên, thư thái",
-          "indigo": "Tập trung cao độ",
-          "violet": "Nhẹ nhàng, mơ màng",
-          "amber": "Ấm áp, vintage",
-          "cyan": "Tươi mát, trong lành",
-          "teal": "Rộng lớn, năng lượng",
-          "pink": "Nhẹ nhàng như mùa xuân",
-          "mono": "Tối giản, chuyên nghiệp"
+          "indigo": "Tập trung sâu",
+          "violet": "Nhẹ nhàng, êm dịu",
+          "amber": "Ấm, hoài cổ",
+          "cyan": "Tươi mát, sạch sẽ",
+          "teal": "Xanh biển sâu",
+          "pink": "Sắc xuân dịu nhẹ",
+          "mono": "Tối giản"
         }
       },
       "notifications": {
         "title": "Thông báo",
-        "description": "Quản lý tùy chọn thông báo",
+        "description": "Quản lý tuỳ chọn thông báo",
         "enable": "Bật thông báo",
         "sound": "Phát âm thanh khi hoàn thành"
       }
     },
     "background": {
-      "title": "Cài đặt Hình nền",
+      "title": "Cài đặt hình nền",
       "chooseBackground": "Chọn hình nền",
-      "uploadCustom": "Tải lên tùy chỉnh",
+      "uploadCustom": "Tải lên tuỳ chỉnh",
       "backgroundType": "Loại hình nền",
       "image": "Hình ảnh",
       "video": "Video",
@@ -455,31 +423,28 @@
       "images": "Hình ảnh",
       "sliderHint": "Kéo để xem trước. Nhấn Lưu để áp dụng.",
       "sliderDisabledHint": "Thanh kéo không khả dụng cho hình nền đơn sắc.",
-      "opacityDescription": "Mặc định: 80%. Thấp hơn = trong suốt hơn",
-      "brightnessDescription": "Mặc định: 100%. Cao hơn = sáng hơn, thấp hơn = tối hơn",
+      "opacityDescription": "Mặc định 80%. Càng thấp càng trong suốt.",
+      "brightnessDescription": "Mặc định 100%. Càng cao càng sáng, càng thấp càng tối.",
       "blur": "Độ mờ",
-      "blurDescription": "Mặc định: 0px. Cao hơn = mờ hơn",
+      "blurDescription": "Mặc định 0px. Càng cao càng mờ.",
       "packDescriptions": {
-        "system": "Dùng một màu đơn sắc từ theme hiện tại. Phù hợp giao diện tối giản và tiết kiệm pin.",
         "lofiVideo": "Video lo-fi lặp. Chọn một; có thể chỉnh độ trong suốt và độ sáng.",
         "cyberpunk": "Ảnh tĩnh cyberpunk và thành phố tương lai.",
         "room": "Phòng ấm cúng, góc học và không gian làm việc.",
-        "fantasy": "Ảnh tĩnh phiêu lưu giả tưởng.",
-        "space": "Ảnh tĩnh không gian, mặt trăng và thành phố sci-fi."
+        "fantasy": "Ảnh tĩnh phiêu lưu giả tưởng."
       },
       "presets": {
-        "systemSolidColor": "Đơn sắc theo theme",
         "lofiDay": "Lo-fi ban ngày",
         "lofiNight": "Lo-fi ban đêm",
         "nightLight": "Ánh đèn đêm",
-        "sunlitStudyRoom": "Góc học ánh nắng ☀️📚",
+        "sunlitStudyRoom": "Góc học ánh nắng",
         "enchantedForest": "Khu rừng bí ẩn",
         "abstractFuturisticCity": "Thành phố tương lai",
-        "goldenHourHome": "Nhà chiều vàng 🌤️",
-        "cozyLivingSpace": "Không gian sống ấm cúng 🛋️🌿",
+        "goldenHourHome": "Nhà chiều vàng",
+        "cozyLivingSpace": "Không gian sống ấm cúng",
         "cyberCity": "Thành phố cyber",
-        "quietNightBedroom": "Phòng ngủ đêm yên tĩnh 🌙🛏️",
-        "sunsetWorkspace": "Góc làm việc hoàng hôn 🌇💻",
+        "quietNightBedroom": "Phòng ngủ đêm yên tĩnh",
+        "sunsetWorkspace": "Góc làm việc hoàng hôn",
         "fantasyAdventurers": "Phiêu lưu giả tưởng 1",
         "fantasyAdventurers1": "Phiêu lưu giả tưởng 2",
         "fantasyAdventurers2": "Phiêu lưu giả tưởng 3",
@@ -498,19 +463,17 @@
       },
       "toasts": {
         "saved": "Đã lưu hình nền",
-        "resetInfo": "Đã tải mặc định, nhấn Lưu để áp dụng"
+        "resetInfo": "Đã khôi phục mặc định. Nhấn Lưu để áp dụng."
       },
       "packs": {
-        "system": "Hệ thống",
         "lofiVideo": "Video",
         "cyberpunk": "Cyberpunk",
         "room": "Phòng",
-        "fantasy": "Giả tưởng",
-        "space": "Không gian"
+        "fantasy": "Giả tưởng"
       },
       "topTabs": {
         "static": "Ảnh tĩnh",
-        "video": "Ảnh động",
+        "video": "Video",
         "myImages": "Ảnh của tôi"
       },
       "tabs": {
@@ -523,33 +486,52 @@
         "uploadFile": "Tải từ thiết bị",
         "addUrl": "Thêm từ URL",
         "or": "hoặc",
-        "delete": "Xóa",
-        "fileTooLarge": "File quá lớn. Kích thước tối đa là 2MB",
-        "invalidType": "Chỉ chấp nhận file ảnh",
-        "invalidUrl": "URL ảnh không hợp lệ",
-        "limitReached": "Chỉ được phép tối đa 5 ảnh tùy chỉnh",
-        "processingError": "Không thể xử lý ảnh",
-        "uploadSuccess": "Đã thêm ảnh thành công",
-        "deleteSuccess": "Đã xóa ảnh",
-        "urlPlaceholder": "Dán link ảnh...",
+        "delete": "Xoá",
+        "fileTooLarge": "Tệp quá lớn. Kích thước tối đa là 2 MB.",
+        "invalidType": "Chỉ chấp nhận tệp ảnh.",
+        "invalidUrl": "URL ảnh không hợp lệ.",
+        "limitReached": "Bạn chỉ có thể thêm tối đa 5 ảnh.",
+        "processingError": "Không thể xử lý ảnh.",
+        "uploadSuccess": "Đã thêm ảnh",
+        "deleteSuccess": "Đã xoá ảnh",
+        "urlPlaceholder": "Dán liên kết ảnh…",
         "limitInfo": "{current}/5 ảnh",
-        "empty": "Chưa có ảnh. Thêm ảnh của bạn!",
+        "empty": "Chưa có ảnh. Hãy thêm ảnh của bạn.",
         "current": "Hiện tại",
         "replaceNotice": "Tải ảnh mới sẽ thay thế ảnh hiện tại.",
-        "limit2MB": "Tối đa 2MB (JPEG, PNG, WebP)"
+        "limit2MB": "Tối đa 2 MB (JPEG, PNG, WebP)"
+      }
+    },
+    "saved": "Đã lưu",
+    "nav": {
+      "general": "Chung",
+      "appearance": "Giao diện",
+      "account": "Tài khoản"
+    },
+    "shortcuts": {
+      "title": "Hẹn giờ và không gian",
+      "timer": {
+        "label": "Hẹn giờ và đồng hồ",
+        "description": "Thời lượng tập trung và nghỉ, kiểu đồng hồ, cảnh báo.",
+        "button": "Mở cài đặt hẹn giờ"
+      },
+      "scene": {
+        "label": "Không gian",
+        "description": "Chọn không gian phía sau đồng hồ của bạn.",
+        "button": "Mở không gian"
       }
     }
   },
   "audio": {
-    "selectAudio": "Chọn Audio",
-    "title": "Cài đặt Âm thanh",
+    "selectAudio": "Chọn âm thanh",
+    "title": "Cài đặt âm thanh",
     "volume": "Âm lượng",
     "backgroundMusic": "Nhạc nền",
     "natureSounds": "Âm thanh thiên nhiên",
     "connectSpotify": "Kết nối Spotify",
     "connectYouTube": "Kết nối YouTube",
     "tabs": {
-      "ambient": "Môi trường",
+      "ambient": "Âm thanh nền",
       "youtube": "YouTube"
     },
     "ambient": {
@@ -559,35 +541,35 @@
       "active": "đang bật",
       "pausedAlert": {
         "title": "YouTube đang phát",
-        "description": "Âm thanh môi trường tạm dừng khi bạn phát YouTube để tránh chồng chéo âm thanh."
+        "description": "Âm thanh nền tạm dừng khi bạn phát YouTube để tránh chồng âm."
       }
     },
     "presets": {
       "library": "Thư viện",
-      "saveMix": "Lưu Preset",
-      "savePresetTitle": "Lưu Preset",
-      "savePresetDescription": "Tạo preset mới từ bản mix hiện tại của bạn ({{count}} âm thanh).",
+      "saveMix": "Lưu preset",
+      "savePresetTitle": "Lưu preset",
+      "savePresetDescription": "Tạo preset mới từ bản trộn âm thanh nền hiện tại ({{count}} âm thanh).",
       "icon": "Biểu tượng",
       "iconPlaceholder": "🎵 hoặc chữ",
-      "name": "Tên Preset",
+      "name": "Tên preset",
       "namePlaceholder": "Preset của tôi",
       "save": "Lưu",
-      "cancel": "Hủy",
-      "renameTitle": "Đổi tên Preset",
+      "cancel": "Huỷ",
+      "renameTitle": "Đổi tên preset",
       "newName": "Tên mới",
-      "newNamePlaceholder": "Tên Preset mới",
+      "newNamePlaceholder": "Tên preset mới",
       "rename": "Đổi tên",
-      "delete": "Xóa",
+      "delete": "Xoá",
       "builtIn": {
-        "cafe": "Quán Cafe",
+        "cafe": "Quán cà phê",
         "rain": "Mưa",
         "forest": "Rừng",
-        "ocean": "Đại Dương",
-        "train-ride": "Tàu Hỏa",
+        "ocean": "Đại dương",
+        "train-ride": "Tàu hoả",
         "night": "Đêm",
-        "library": "Thư Viện",
-        "cozy": "Ấm Cúng",
-        "deep-focus": "Tập Trung Sâu"
+        "library": "Thư viện",
+        "cozy": "Ấm cúng",
+        "deep-focus": "Tập trung sâu"
       }
     },
     "categories": {
@@ -603,27 +585,27 @@
     "youtube": {
       "library": "Thư viện",
       "random": "Ngẫu nhiên",
-      "close": "Đóng / Thay đổi link",
-      "channelLink": "Link kênh",
-      "playBackground": "Phát nền",
-      "placeholder": "Nhập link YouTube của bạn...",
-      "invalidLink": "Không tìm thấy video hợp lệ.",
-      "nowPlaying": "Đang Phát",
-      "soundSettings": "Cài Đặt Âm Thanh",
+      "close": "Đóng / đổi liên kết",
+      "channelLink": "Liên kết kênh",
+      "playBackground": "Phát ở nền",
+      "placeholder": "Dán liên kết YouTube…",
+      "invalidLink": "Liên kết video không hợp lệ.",
+      "nowPlaying": "Đang phát",
+      "soundSettings": "Cài đặt âm thanh",
       "status": {
         "playing": "Đang phát",
         "paused": "Tạm dừng"
       },
       "categories": {
-        "Lofi": "Lofi Hip Hop",
-        "Chill VN": "Nhạc Chill Việt",
-        "Cafe": "Quán Cà Phê",
-        "Piano": "Piano & Cổ điển",
-        "Ambient": "Không Gian",
-        "Nature": "Thiên Nhiên",
-        "Coding": "Lập Trình",
-        "Pomodoro": "Pomodoro",
-        "Brainwaves": "Sóng Não"
+        "Lofi": "Lo-fi hip hop",
+        "Chill VN": "Nhạc chill Việt",
+        "Cafe": "Quán cà phê",
+        "Piano": "Piano và cổ điển",
+        "Ambient": "Ambient",
+        "Nature": "Thiên nhiên",
+        "Coding": "Lập trình",
+        "Pomodoro": "Phiên Pomodoro",
+        "Brainwaves": "Sóng não"
       }
     },
     "sounds": {
@@ -646,17 +628,17 @@
       "pink-noise": "Tiếng ồn hồng",
       "library": "Thư viện",
       "coffee-shop": "Quán cà phê",
-      "coworking": "Văn phòng",
+      "coworking": "Văn phòng chung",
       "clock": "Đồng hồ",
       "singing-bowl": "Chuông xoay",
       "vinyl-effect": "Đĩa than",
       "wind-chimes": "Chuông gió",
-      "cat-purring": "Mèo kêu",
+      "cat-purring": "Mèo gừ gừ",
       "airplane": "Máy bay",
-      "inside-a-train": "Trong tàu hỏa",
+      "inside-a-train": "Trong tàu hoả",
       "submarine": "Tàu ngầm",
       "train": "Đường sắt",
-      "busy-street": "Phố xá",
+      "busy-street": "Đường phố",
       "crowd": "Đám đông",
       "traffic": "Xe cộ",
       "ceiling-fan": "Quạt trần",
@@ -664,336 +646,44 @@
       "typewriter": "Máy đánh chữ"
     }
   },
-  "guide": {
-    "title": "Hướng dẫn Sử dụng",
-    "subtitle": "Tìm hiểu về phương pháp Pomodoro và cách sử dụng Study Bro để tối ưu hóa năng suất học tập và làm việc của bạn",
-    "pomodoro": {
-      "badge": "Phương Pháp Pomodoro",
-      "title": "Pomodoro là gì?",
-      "description": "<strong>Pomodoro</strong> là phương pháp quản lý thời gian đơn giản giúp bạn làm việc và học tập hiệu quả bằng cách chia nhỏ công việc thành các phiên <strong>25 phút</strong> gọi là một Pomodoro. Trong mỗi phiên, bạn tập trung hoàn toàn vào một việc duy nhất. Sau đó, nghỉ ngơi <strong>5 phút</strong> để thư giãn và nạp lại năng lượng.",
-      "imageAlt": "Minh họa phương pháp Pomodoro"
-    },
-    "howToApply": {
-      "badge": "Cách Thực Hiện",
-      "title": "Cách áp dụng Pomodoro",
-      "steps": {
-        "step1": {
-          "title": "Chọn công việc & đặt hẹn giờ",
-          "description": "Chọn công việc cần làm và đặt hẹn giờ 25 phút để bắt đầu phiên Pomodoro."
-        },
-        "step2": {
-          "title": "Tập trung làm việc",
-          "description": "Tập trung làm việc đến khi đồng hồ báo hết giờ, không bị gián đoạn."
-        },
-        "step3": {
-          "title": "Nghỉ ngơi ngắn",
-          "description": "Nghỉ 5 phút, có thể đứng dậy vận động nhẹ hoặc thư giãn đầu óc."
-        },
-        "step4": {
-          "title": "Lặp lại & nghỉ dài",
-          "description": "Lặp lại chu trình. Sau 4 phiên Pomodoro, nghỉ dài hơn khoảng 15-30 phút."
-        }
-      }
-    },
-    "benefits": {
-      "badge": "Lợi Ích",
-      "title": "Tại sao nên dùng Pomodoro?",
-      "list": [
-        "Tăng sự tập trung và hiệu suất làm việc",
-        "Tránh bị quá tải khi làm việc lâu",
-        "Dễ đo lường và quản lý tiến độ công việc",
-        "Phù hợp với những ai hay bị mất tập trung",
-        "Giúp duy trì năng lượng và hiệu quả làm việc lâu dài"
-      ],
-      "tip": "💡 <strong>Mẹo:</strong> Bạn hoàn toàn có thể điều chỉnh thời gian làm việc và nghỉ ngơi cho phù hợp với bản thân, miễn sao giữ nguyên nguyên tắc \"chia nhỏ khoảng thời gian để tập trung và nghỉ ngơi đều đặn.\""
-    },
-    "howToUse": {
-      "badge": "Hướng Dẫn Website",
-      "title": "Cách sử dụng Study Bro",
-      "description": "Study Bro cung cấp các công cụ giúp bạn áp dụng phương pháp Pomodoro một cách hiệu quả.",
-      "features": {
-        "timer": {
-          "title": "Timer",
-          "subtitle": "Đồng hồ đếm ngược Pomodoro",
-          "description": "Trang Timer là trung tâm của ứng dụng, nơi bạn:",
-          "points": [
-            "Chế độ Làm việc, Nghỉ ngắn & Nghỉ dài",
-            "Liên kết task & đồng bộ tiến độ Pomodoro tự động",
-            "Quy tắc phiên hợp lệ: ≥50% thời gian mới tính",
-            "Space: Bắt đầu/Tạm dừng · R: Reset · Bỏ qua phiên"
-          ],
-          "cta": "Đi đến Timer"
-        },
-        "tasks": {
-          "title": "Tasks",
-          "subtitle": "Quản lý công việc của bạn",
-          "description": "Trang Tasks giúp bạn tổ chức công việc:",
-          "points": [
-            "Tạo, chỉnh sửa và xóa tasks",
-            "Đặt độ ưu tiên và thời hạn",
-            "Lọc tasks theo trạng thái, ngày",
-            "Ước tính số Pomodoro cần thiết"
-          ],
-          "cta": "Đi đến Tasks"
-        },
-        "history": {
-          "title": "History",
-          "subtitle": "Theo dõi tiến độ của bạn",
-          "description": "Trang History giúp bạn xem lại:",
-          "points": [
-            "Lịch sử các phiên Pomodoro",
-            "Thống kê theo ngày, tuần, tháng",
-            "Tổng thời gian đã làm việc",
-            "Biểu đồ năng suất"
-          ],
-          "cta": "Đi đến History"
-        },
-        "chatAI": {
-          "title": "Chat AI",
-          "subtitle": "Bro Chat – bạn đồng hành học tập",
-          "description": "Trò chuyện với trợ lý AI về:",
-          "points": [
-            "Phương pháp Pomodoro & mẹo học tập",
-            "Tư vấn quản lý thời gian",
-            "Hướng dẫn sử dụng app",
-            "Lịch sử hội thoại được lưu"
-          ],
-          "cta": "Mở Bro Chat"
-        },
-        "entertainment": {
-          "title": "Entertainment",
-          "subtitle": "Trò chơi nhỏ khi nghỉ giải lao",
-          "description": "Thư giãn trong giờ nghỉ với:",
-          "points": [
-            "Snake, 2048, Brick Breaker",
-            "Space Shooter, Memory Match",
-            "Tic Tac Toe đấu AI",
-            "Lưu điểm cao cục bộ"
-          ],
-          "cta": "Chơi Game"
-        },
-        "leaderboard": {
-          "title": "Leaderboard",
-          "subtitle": "Thi đua & giữ động lực",
-          "description": "Xem thứ hạng của bạn:",
-          "points": [
-            "Bảng xếp hạng Pomodoro toàn cầu",
-            "Biểu đồ tuần & tháng",
-            "Tạo động lực cạnh tranh lành mạnh"
-          ],
-          "cta": "Xem Leaderboard"
-        },
-        "focus": {
-          "title": "Focus Mode",
-          "subtitle": "Giao diện tối giản, ít phân tâm",
-          "description": "Chế độ focus giúp bạn:",
-          "points": [
-            "Ẩn sidebar để toàn màn hình",
-            "Theo dõi streak & động lực",
-            "Không gian làm việc tập trung"
-          ],
-          "cta": "Vào Focus Mode"
-        },
-        "feedback": {
-          "title": "Feedback",
-          "subtitle": "Giúp chúng tôi cải thiện",
-          "description": "Chia sẻ ý kiến của bạn:",
-          "points": [
-            "Báo lỗi",
-            "Đề xuất tính năng",
-            "Đánh giá trải nghiệm"
-          ],
-          "cta": "Gửi phản hồi"
-        },
-        "settings": {
-          "title": "Settings",
-          "subtitle": "Tùy chỉnh trải nghiệm",
-          "description": "Trang Settings cho phép bạn:",
-          "points": [
-            "Điều chỉnh thời gian Pomodoro & break",
-            "Chọn background & theme",
-            "Cài đặt âm thanh thông báo",
-            "Tùy chỉnh preferences cá nhân"
-          ],
-          "cta": "Đi đến Settings"
-        }
-      }
-    },
-    "getStarted": {
-      "badge": "Bắt Đầu Ngay",
-      "title": "Sẵn sàng bắt đầu chưa?",
-      "description": "Hãy bắt đầu hành trình làm việc hiệu quả với Study Bro!",
-      "steps": [
-        "Tạo task đầu tiên của bạn trong trang <link>Tasks</link>",
-        "Điều chỉnh Settings theo sở thích (tùy chọn)",
-        "Bật <link>Timer</link> và bắt đầu Pomodoro đầu tiên!"
-      ],
-      "cta": "Bắt đầu ngay"
-    }
-  },
   "feedback": {
-    "title": "Gửi ý kiến phản hồi",
-    "subtitle": "Giúp chúng tôi cải thiện ứng dụng bằng cách gửi báo cáo lỗi hoặc đề xuất tính năng mới.",
+    "title": "Gửi góp ý",
+    "subtitle": "Cho biết điều cần sửa hoặc tính năng bạn muốn có.",
     "form": {
-      "name": "Tên của bạn (Tùy chọn)",
-      "namePlaceholder": "Nhập tên...",
-      "email": "Email (Tùy chọn)",
-      "emailPlaceholder": "example@email.com",
-      "type": "Loại phản hồi",
+      "name": "Tên (không bắt buộc)",
+      "namePlaceholder": "Nhập tên…",
+      "email": "Email",
+      "emailPlaceholder": "name@example.com",
+      "type": "Loại góp ý",
       "typeOptions": {
-        "feature": "Tính năng",
-        "bug": "Lỗi",
+        "feature": "Đề xuất tính năng",
+        "bug": "Báo lỗi",
         "question": "Câu hỏi",
         "other": "Khác"
       },
-      "rating": "Đánh giá trải nghiệm của bạn? (Tùy chọn)",
-      "message": "Nội dung",
-      "messagePlaceholder": "Mô tả chi tiết ý kiến của bạn...",
+      "rating": "Bạn thấy Study Bro dùng thế nào?",
+      "message": "Nội dung góp ý",
+      "messagePlaceholder": "Mô tả góp ý của bạn…",
       "required": "*",
-      "submit": "Gửi phản hồi"
+      "submit": "Gửi góp ý",
+      "starLabel": "{n} trên 5 sao"
     },
     "success": {
       "title": "Cảm ơn bạn!",
-      "message": "Ý kiến đóng góp của bạn đã được ghi nhận. Chúng tôi sẽ xem xét và cải thiện ứng dụng tốt hơn.",
-      "cta": "Gửi ý kiến khác"
+      "message": "Góp ý của bạn đã được ghi nhận. Chúng tôi sẽ xem xét và tiếp tục cải thiện ứng dụng.",
+      "cta": "Gửi góp ý khác"
     },
     "errors": {
-      "submitFailed": "Có lỗi xảy ra. Vui lòng thử lại sau.",
-      "fieldRequired": "Trường này là bắt buộc"
+      "submitFailed": "Không gửi được góp ý. Hãy thử lại sau ít phút.",
+      "fieldRequired": "Trường này là bắt buộc",
+      "messageRequired": "Hãy nhập nội dung góp ý.",
+      "messageTooLong": "Vui lòng giữ dưới {max} ký tự.",
+      "emailInvalid": "Nhập email hợp lệ, hoặc để trống.",
+      "rateLimited": "Bạn vừa gửi khá nhiều góp ý. Hãy thử lại sau khoảng {minutes} phút."
     },
     "toast": {
-      "success": "Cảm ơn bạn đã đóng góp ý kiến!",
-      "error": "Có lỗi xảy ra. Vui lòng thử lại sau."
-    }
-  },
-  "entertainment": {
-    "title": "Khu Vui Chơi",
-    "subtitle": "Nghỉ ngơi và giải trí nào!",
-    "gamesCount": "{count} trò chơi",
-    "yourBest": "Kỷ lục",
-    "games": {
-      "spaceShooter": {
-        "title": "Bảo Vệ Không Gian",
-        "description": "Game bắn phi thuyền kinh điển với vô vàn kẻ thù",
-        "instructions": "Di chuyển phi thuyền bằng chuột/chạm để né địch và nhặt vật phẩm. Phi thuyền tự động bắn - hãy tập trung vào vị trí! Mỗi 1000 điểm mở khóa level mới với kẻ thù nhanh và thông minh hơn.",
-        "tips": "Ở gần trung tâm để di chuyển linh hoạt hơn"
-      },
-      "memoryMatch": {
-        "title": "Lật Thẻ",
-        "description": "Thử thách trí nhớ với game ghép thẻ kinh điển",
-        "instructions": "Lật 2 thẻ mỗi lượt để tìm cặp trùng nhau. Ghi nhớ vị trí thẻ để giảm số lượt! Điểm dựa trên ít lượt và thời gian nhanh. Tuyệt vời cho rèn luyện não bộ!",
-        "tips": "Bắt đầu từ các góc, đi vào trong",
-        "clicks": "Lượt",
-        "time": "Thời gian",
-        "moves": "lượt",
-        "win": "Xuất sắc!",
-        "reset": "Chơi lại"
-      },
-      "ticTacToe": {
-        "title": "Cờ Caro",
-        "description": "Thách đấu AI trong game chiến thuật kinh điển",
-        "instructions": "Đấu với AI thông minh! Chọn lưới 3x3 cho lối chơi cổ điển hoặc 4x4 cho thử thách cao hơn. AI sử dụng thuật toán Minimax - bạn có thể đánh bại nó không?",
-        "tips": "Chiếm trung tâm và các góc trước",
-        "mode3x3": "LƯỚI 3x3",
-        "mode3x3Desc": "Chế độ cổ điển - Dễ chơi",
-        "mode4x4": "LƯỚI 4x4",
-        "mode4x4Desc": "Hardcore - AI siêu tính toán",
-        "yourTurn": "Lượt của bạn",
-        "aiThinking": "Máy đang nghĩ...",
-        "gameOver": "Kết thúc",
-        "you": "Bạn",
-        "ai": "Máy",
-        "youWin": "Bạn thắng! Ghê đấy!",
-        "aiWins": "Máy thắng! Thử lại nào!",
-        "draw": "Hòa rồi!",
-        "newGame": "Ván mới"
-      },
-      "snake": {
-        "title": "Rắn Săn Mồi",
-        "description": "Điều khiển rắn và dài ra càng nhiều càng tốt",
-        "instructions": "Điều khiển rắn bằng phím mũi tên hoặc WASD (vuốt trên điện thoại). Ăn mồi phát sáng để dài ra. Mỗi level tăng tốc độ và thêm chướng ngại vật. Đừng đâm vào tường hoặc chính mình!",
-        "tips": "Lên kế hoạch trước 3-4 bước di chuyển",
-        "score": "Điểm",
-        "length": "Độ dài",
-        "level": "Level",
-        "speed": "Tốc độ",
-        "obstacles": "Chướng ngại"
-      },
-      "game2048": {
-        "title": "2048",
-        "description": "Trượt và ghép ô số để đạt 2048",
-        "instructions": "Dùng phím mũi tên hoặc vuốt để trượt tất cả ô. Khi hai ô cùng số chạm nhau, chúng sẽ ghép lại! Đạt 2048 để thắng, nhưng có thể chơi tiếp để đạt điểm cao hơn.",
-        "tips": "Giữ ô lớn nhất ở một góc",
-        "score": "Điểm",
-        "best": "Cao nhất",
-        "youWin": "Bạn Thắng!",
-        "keepGoing": "Bạn có thể đạt cao hơn không?",
-        "continue": "Tiếp tục",
-        "newGame": "Ván mới"
-      },
-      "brickBreaker": {
-        "title": "Phá Gạch",
-        "description": "Phá hết gạch với quả bóng nảy",
-        "instructions": "Di chuyển thanh đỡ bằng chuột/chạm hoặc phím mũi tên để bật bóng. Phá hết gạch để qua màn tiếp theo! Đánh nhiều gạch liên tiếp để nhận điểm thưởng combo.",
-        "tips": "Nhắm vào các góc để tạo phản ứng dây chuyền",
-        "start": "Bắt đầu",
-        "score": "Điểm",
-        "level": "Màn",
-        "lives": "Mạng",
-        "gameOver": "Thua rồi",
-        "finalScore": "Điểm cuối",
-        "reachedLevel": "Đạt đến màn",
-        "levelComplete": "Qua màn!",
-        "nextLevel": "Màn tiếp",
-        "playAgain": "Chơi lại"
-      }
-    },
-    "leaderboard": {
-      "title": "Bảng Xếp Hạng",
-      "comingSoon": "Sắp Ra Mắt",
-      "description": "Cạnh tranh với người chơi toàn cầu! Bảng xếp hạng sẽ sớm ra mắt.",
-      "features": {
-        "global": "Xếp Hạng Toàn Cầu",
-        "weekly": "Thử Thách Tuần",
-        "rewards": "Phần Thưởng Độc Quyền"
-      }
-    },
-    "playNow": "Chơi ngay",
-    "playAgain": "Chơi lại",
-    "gameOver": "Hết lượt chơi",
-    "backToList": "Quay lại danh sách",
-    "closeGame": "Đóng game",
-    "controls": {
-      "title": "Điều khiển",
-      "up": "Lên",
-      "down": "Xuống",
-      "left": "Trái",
-      "right": "Phải",
-      "restart": "Chơi lại",
-      "close": "Đóng game",
-      "delete": "Xóa",
-      "enter": "Nhập",
-      "back": "Quay lại"
-    },
-    "instructions": "Di chuyển chuột hoặc chạm tay để điều khiển phi thuyền. Bắn hạ kẻ thù và tránh va chạm!",
-    "loading": "Đang tải game...",
-    "highScore": "Điểm cao nhất",
-    "lastScore": "Điểm gần nhất",
-    "howToPlay": "Cách chơi",
-    "tips": "Mẹo Pro",
-    "startGame": "Bắt đầu",
-    "loadingStages": {
-      "initializing": "Khởi tạo",
-      "loadingAssets": "Tải tài nguyên",
-      "preparingGraphics": "Chuẩn bị đồ họa",
-      "settingUpControls": "Thiết lập điều khiển",
-      "almostReady": "Sắp xong",
-      "startingGame": "Khởi động game"
-    },
-    "controlTypes": {
-      "keyboard": "Bàn phím",
-      "mouse": "Chuột",
-      "touch": "Cảm ứng"
+      "success": "Cảm ơn góp ý của bạn",
+      "error": "Đã xảy ra lỗi. Vui lòng thử lại sau."
     }
   },
   "tooltips": {
@@ -1004,22 +694,22 @@
     "backgroundSetup": "Thiết lập hình nền",
     "backgroundSettings": "Cài đặt hình nền",
     "soundSettings": "Cài đặt âm thanh",
-    "focusAudio": "Nhạc tập trung / Âm thanh thiên nhiên",
-    "enterFocus": "Bật chế độ tập trung",
-    "exitFocus": "Thoát chế độ tập trung"
+    "focusAudio": "Nhạc tập trung / âm thanh thiên nhiên",
+    "enterFocus": "Bật chế độ toàn màn hình",
+    "exitFocus": "Thoát chế độ toàn màn hình"
   },
   "errors": {
     "generic": "Đã xảy ra lỗi",
     "network": "Lỗi mạng. Vui lòng kiểm tra kết nối của bạn.",
     "notFound": "Không tìm thấy",
-    "unauthorized": "Chưa được ủy quyền. Vui lòng đăng nhập.",
+    "unauthorized": "Chưa đăng nhập. Vui lòng đăng nhập.",
     "forbidden": "Bạn không có quyền truy cập tài nguyên này",
     "boundary": {
-      "title": "Đã có sự cố xảy ra",
+      "title": "Đã xảy ra sự cố",
       "description": "Có lỗi không mong muốn. Bạn có thể thử lại hoặc quay về trang trước.",
       "retry": "Thử lại",
       "goHome": "Về trang chủ",
-      "goTimer": "Đến bộ hẹn giờ",
+      "goTimer": "Về đồng hồ",
       "reference": "Mã tham chiếu: {digest}"
     }
   },
@@ -1041,34 +731,32 @@
   },
   "metadata": {
     "timer": {
-      "title": "Hẹn giờ • Study Bro App",
+      "title": "Hẹn giờ • Study Bro",
       "description": "Quản lý các phiên làm việc và nghỉ ngơi với hẹn giờ Pomodoro tinh tế và cài đặt thống nhất."
     },
     "tasks": {
-      "title": "Công việc • Study Bro App",
-      "description": "Tổ chức và quản lý công việc của bạn một cách hiệu quả với hệ thống quản lý công việc của chúng tôi."
+      "title": "Việc cần làm • Study Bro",
+      "description": "Tổ chức và quản lý việc của bạn một cách hiệu quả với hệ thống quản lý việc của chúng tôi."
     },
     "history": {
-      "title": "Lịch sử • Study Bro App",
+      "title": "Lịch sử • Study Bro",
       "description": "Xem lại hiệu suất tập trung và thống kê năng suất của bạn theo thời gian."
     },
     "guide": {
-      "title": "Hướng dẫn Sử dụng • Study Bro App",
+      "title": "Hướng dẫn sử dụng • Study Bro",
       "description": "Tìm hiểu về phương pháp Pomodoro và cách sử dụng các tính năng của Study Bro."
     }
   },
   "login": {
-    "title": "Đăng nhập với Study Bro",
+    "title": "Đăng nhập Study Bro",
     "description": "Nhận mã 6 số qua email để đăng nhập, không cần mật khẩu.",
     "form": {
       "email": "Email",
-      "emailPlaceholder": "email@example.com",
-      "passwordPlaceholder": "Nhập mật khẩu",
-      "signingIn": "Đang đăng nhập...",
+      "emailPlaceholder": "name@example.com",
+      "signingIn": "Đang đăng nhập…",
       "signIn": "Đăng nhập",
       "or": "hoặc",
       "continueWithGoogle": "Tiếp tục với Google",
-      "backToApp": "Quay lại ứng dụng",
       "sendCode": "Gửi mã",
       "sending": "Đang gửi…",
       "code": "Mã 6 số",
@@ -1086,127 +774,39 @@
   "notFound": {
     "title": "Không tìm thấy trang này",
     "description": "Trang bạn đang tìm không tồn tại hoặc đã được di chuyển.",
-    "backToTimer": "Quay lại Timer",
+    "backToTimer": "Về đồng hồ",
     "home": "Trang chủ",
     "goBack": "Quay lại"
   },
-  "progress": {
-    "comingSoon": "Tính năng sắp ra mắt",
-    "description": "Trang thống kê đang được hoàn thiện. Bạn sẽ sớm theo dõi tiến độ tập trung, chuỗi ngày, và thời gian làm việc.",
-    "features": {
-      "focusTime": {
-        "title": "Thời gian tập trung",
-        "description": "Theo ngày/tuần/tháng"
-      },
-      "pomodoroSessions": {
-        "title": "Pomodoro & phiên",
-        "description": "Số phiên, tỉ lệ hoàn thành"
-      },
-      "streaks": {
-        "title": "Chuỗi ngày",
-        "description": "Giữ streak, nhận huy hiệu"
-      }
-    },
-    "backToTimer": "Quay lại Timer"
-  },
-  "clockDemo": {
-    "title": "Demo Đồng hồ",
-    "subtitle": "Kiểm tra và so sánh tất cả các loại đồng hồ với hiệu ứng động",
-    "controls": {
-      "title": "Điều khiển Hẹn giờ",
-      "description": "Điều khiển hẹn giờ demo cho tất cả đồng hồ",
-      "pause": "Tạm dừng",
-      "start": "Bắt đầu",
-      "reset": "Đặt lại",
-      "timeProgress": "Thời gian: {time} | Tiến độ: {progress}%"
-    },
-    "modes": {
-      "work": "Làm việc",
-      "shortBreak": "Nghỉ ngắn",
-      "longBreak": "Nghỉ dài"
-    },
-    "tabs": {
-      "animated": "Động",
-      "digital": "Kỹ thuật số",
-      "analog": "Kim",
-      "progress": "Tiến độ",
-      "flip": "Lật"
-    },
-    "clockTypes": {
-      "digital": {
-        "title": "Đồng hồ Kỹ thuật số",
-        "description": "Hiển thị kỹ thuật số cổ điển với vòng tiến độ và cảnh báo thời gian thấp"
-      },
-      "analog": {
-        "title": "Đồng hồ Kim",
-        "description": "Mặt đồng hồ truyền thống với kim quét"
-      },
-      "progress": {
-        "title": "Đồng hồ Thanh Tiến độ",
-        "description": "Thanh tiến độ tuyến tính với hiển thị thời gian"
-      },
-      "flip": {
-        "title": "Đồng hồ Lật",
-        "description": "Hoạt ảnh đồng hồ kỹ thuật số kiểu lật cổ điển"
-      },
-      "animated": {
-        "title": "Đếm ngược Động",
-        "description": "Đếm ngược động hiện đại với chuyển cảnh mượt mà"
-      }
-    },
-    "animationFeatures": {
-      "title": "Tính năng Hoạt ảnh",
-      "breathing": {
-        "title": "Hiệu ứng Nhịp thở",
-        "description": "Hoạt ảnh nhịp nhàng tạo cảm giác bình yên"
-      },
-      "colorTransition": {
-        "title": "Chuyển Màu",
-        "description": "Chuyển màu mượt mà dựa trên thời gian còn lại và chế độ"
-      },
-      "progressRing": {
-        "title": "Vòng Tiến độ",
-        "description": "Chỉ báo tiến độ hình tròn xung quanh đồng hồ"
-      },
-      "glowEffect": {
-        "title": "Hiệu ứng Phát sáng",
-        "description": "Ánh sáng mờ tăng dần khi thời gian sắp hết"
-      },
-      "modeIndicator": {
-        "title": "Chỉ báo Chế độ",
-        "description": "Huy hiệu hiển thị loại phiên hiện tại (Tập trung/Nghỉ)"
-      }
-    }
-  },
   "timerComponents": {
     "taskSelector": {
-      "loginToSelect": "Đăng nhập để chọn công việc",
-      "selectToFocus": "Chọn công việc để tập trung",
-      "dialogTitle": "Chọn Công việc để Tập trung",
-      "dialogDescription": "Chọn công việc để làm trong phiên Pomodoro của bạn",
-      "pendingTasks": "Công việc chờ xử lý",
-      "noPendingTasks": "Không có công việc chờ xử lý",
-      "noPendingTasksToday": "Không có công việc chờ xử lý. Hãy tập trung vào mục tiêu của bạn!",
-      "createTaskPrompt": "Tạo công việc mới để bắt đầu",
-      "goToTaskList": "Đi đến danh sách công việc",
+      "loginToSelect": "Đăng nhập để chọn việc",
+      "selectToFocus": "Chọn việc để tập trung",
+      "dialogTitle": "Chọn việc để tập trung",
+      "dialogDescription": "Chọn việc để làm trong phiên tập trung",
+      "pendingTasks": "Việc chưa xong",
+      "noPendingTasks": "Không có việc nào chưa xong",
+      "noPendingTasksToday": "Không có việc nào chưa xong.",
+      "createTaskPrompt": "Tạo một việc để bắt đầu",
+      "goToTaskList": "Mở Việc cần làm",
       "startFocus": "Bắt đầu tập trung",
-      "stopFocus": "Ngừng tập trung",
+      "stopFocus": "Dừng tập trung",
       "switchConfirm": {
-        "title": "Đổi công việc?",
-        "description": "Bạn đang tập trung vào một công việc khác. Bạn có chắc muốn đổi không?"
+        "title": "Đổi việc?",
+        "description": "Bạn đang tập trung vào một việc khác. Đổi sang việc này?"
       }
     },
     "enhancedTimer": {
       "today": "Hôm nay",
-      "poms": "poms",
+      "poms": "Pomodoro",
       "time": "Thời gian",
       "minutes": "phút",
-      "focusMode": "Chế độ tập trung",
+      "focusMode": "Chế độ toàn màn hình",
       "soundSettings": "Cài đặt âm thanh",
-      "backgroundSettings": "Cài đặt hình nền",
+      "backgroundSettings": "Không gian",
       "timerSettings": "Cài đặt hẹn giờ",
-      "exitFocus": "Thoát chế độ tập trung",
-      "enterFocus": "Bật chế độ tập trung"
+      "exitFocus": "Thoát chế độ toàn màn hình",
+      "enterFocus": "Bật chế độ toàn màn hình"
     },
     "animatedCountdown": {
       "modes": {
@@ -1216,300 +816,18 @@
       }
     }
   },
-  "historyComponents": {
-    "dateRangePicker": {
-      "selectRange": "Chọn khoảng thời gian",
-      "presets": {
-        "today": "Hôm nay",
-        "last3Days": "3 ngày qua",
-        "last7Days": "7 ngày qua",
-        "last30Days": "30 ngày qua",
-        "thisMonth": "Tháng này"
-      }
-    },
-    "distributionChart": {
-      "title": "Phân bổ thời gian",
-      "time": "Thời gian",
-      "total": "Tổng cộng",
-      "minutes": "{minutes} phút"
-    },
-    "focusChart": {
-      "title": "Thời gian tập trung hàng ngày",
-      "minutes": "{minutes} phút"
-    },
-    "sessionHistory": {
-      "title": "Chi tiết các Phiên đã Hoàn thành",
-      "modes": {
-        "focus": "Tập trung",
-        "shortBreak": "Nghỉ ngắn",
-        "longBreak": "Nghỉ dài"
-      },
-      "tableHeaders": {
-        "task": "Công việc",
-        "sessionType": "Loại phiên",
-        "dateTime": "Ngày & Giờ",
-        "duration": "Thời lượng"
-      },
-      "noTask": "Không có công việc",
-      "minutes": "{minutes} phút",
-      "noData": "Chưa có dữ liệu phiên làm việc nào."
-    },
-    "statsCards": {
-      "totalFocusTime": "Tổng thời gian tập trung",
-      "timeFormat": "{hours} giờ {minutes} phút",
-      "completedSessions": "Số phiên hoàn thành",
-      "longestStreak": "Chuỗi ngày dài nhất",
-      "days": "{days} ngày",
-      "currentStreak": "Hiện tại: {current} ngày"
-    },
-    "statsEmpty": {
-      "title": "Chưa có dữ liệu",
-      "description": "Không có phiên tập trung nào được ghi nhận trong khoảng thời gian này. Hãy bắt đầu một phiên mới!",
-      "startFocus": "Bắt đầu tập trung"
-    }
-  },
   "landing": {
-    "nav": {
-      "features": "Tính Năng",
-      "testimonials": "Câu Chuyện Thành Công",
-      "contact": "Liên Hệ",
-      "pricing": "Bảng Giá",
-      "login": "Đăng Nhập",
-      "getStarted": "Bắt Đầu Ngay"
-    },
-    "hero": {
-      "badge": "Năng Suất Được Hỗ Trợ Bởi AI 🤖",
-      "focusMode": "Chế Độ Làm Việc Sâu",
-      "title": "Làm Chủ",
-      "titleHighlight": "Sự Tập Trung",
-      "subtitle": "Đồng hồ Pomodoro với liên kết task và theo dõi phiên hợp lệ. Bro Chat AI, game giải lao, bảng xếp hạng, chế độ focus và phân tích—tất cả trong một.",
-      "getStarted": "Bắt Đầu Miễn Phí",
-      "tryDemo": "Xem Demo",
-      "aiChat": "Mới: Trợ Lý Năng Suất AI",
-      "timer": "Phiên Tập Trung",
-      "stats": {
-        "focusSessions": "Phiên Tập Trung",
-        "moreProductive": "Tăng Hiệu Suất",
-        "focused": "Thời Gian Tập Trung"
-      },
-      "features": {
-        "ai": {
-          "title": "Thông Tin Thông Minh",
-          "desc": "Tóm tắt phiên & huấn luyện bởi AI."
-        },
-        "music": {
-          "title": "Môi Trường Tập Trung",
-          "desc": "Âm thanh môi trường được chọn lọc."
-        },
-        "tasks": {
-          "title": "Đồng Bộ Công Việc",
-          "desc": "Tích hợp mượt mà nhiệm vụ với phiên tập trung."
-        },
-        "skins": {
-          "title": "Tùy Biến Giao Diện",
-          "desc": "Giao diện Kỹ thuật số, Lật và Kim chuyên nghiệp."
-        }
-      }
-    },
     "footer": {
-      "madeWith": "Thiết kế bởi",
-      "for": "dành cho",
-      "focusedMinds": "những người chuyên nghiệp",
       "rightsReserved": "Mọi quyền được bảo lưu.",
       "links": {
-        "features": "Tính Năng",
-        "pricing": "Bảng Giá",
-        "privacy": "Chính Sách Quyền Riêng Tư",
-        "terms": "Điều Khoản Dịch Vụ"
-      }
-    },
-    "aiChatHighlight": {
-      "title": "Khai Phá Tiềm Năng Cùng AI",
-      "subtitle": "Nhận ngay hướng dẫn cá nhân hóa về chiến lược năng suất, phương pháp học tập và tối ưu hóa quy trình làm việc.",
-      "cta": "Tư Vấn Cùng AI"
-    },
-    "howItWorks": {
-      "badge": "Quy Trình",
-      "title": "Thành Thạo Trong",
-      "titleHighlight": "3 Bước",
-      "subtitle": "Khung làm việc đã kiểm chứng cho hiệu suất cao ổn định",
-      "steps": {
-        "step1": {
-          "title": "Xác Định Mục Tiêu",
-          "description": "Nhập nhiệm vụ và ước tính số lượng Pomodoro cần thiết để hoàn thành."
-        },
-        "step2": {
-          "title": "Thực Hiện Phiên",
-          "description": "Đắm mình vào các khoảng thời gian làm việc tập trung 25 phút."
-        },
-        "step3": {
-          "title": "Phân Tích & Tối Ưu",
-          "description": "Xem lại phân tích chi tiết để tinh chỉnh thói quen làm việc của bạn."
-        }
-      }
-    },
-    "socialProof": {
-      "stats": {
-        "activeUsers": "Chuyên Gia Đang Hoạt Động",
-        "focusHours": "Giờ Tập Trung Đã Ghi",
-        "tasksCompleted": "Nhiệm Vụ Hoàn Thành",
-        "userRating": "Đánh Giá Trung Bình"
-      },
-      "trustedBy": "Được tin dùng bởi những người dẫn đầu từ",
-      "highlight": {
-        "title": "Người dùng báo cáo tăng 40% năng suất",
-        "description": "Dựa trên chỉ số hiệu suất của 1,000+ người dùng tích cực sau 30 ngày",
-        "verified": "Dữ Liệu Đã Xác Minh"
+        "privacy": "Chính sách quyền riêng tư",
+        "terms": "Điều khoản sử dụng"
       }
     },
     "faq": {
-      "badge": "Câu Hỏi Thường Gặp",
-      "title": "Các Câu Hỏi",
-      "titleHighlight": "Phổ Biến",
-      "subtitle": "Mọi thứ bạn cần biết về hệ sinh thái Study Bro",
-      "stillHaveQuestions": "Cần hỗ trợ thêm?",
-      "sendMessage": "Liên Hệ Hỗ Trợ",
       "items": {
         "q1": {
-          "question": "Cơ sở khoa học của phương pháp này là gì?",
-          "answer": "Kỹ thuật Pomodoro tận dụng các khoảng thời gian cố định (thường là 25 phút) để tạo cảm giác cấp bách và duy trì hiệu suất nhận thức cao, sử dụng các khoảng nghỉ theo lịch trình để ngăn chặn sự mệt mỏi về tinh thần."
-        },
-        "q2": {
-          "question": "Nền tảng có miễn phí không?",
-          "answer": "Có. Toàn bộ tính năng đều miễn phí: đồng hồ Pomodoro với liên kết task, Bro Chat AI, game giải lao, bảng xếp hạng, chế độ focus, lịch sử và phân tích. Gói Chuyên Nghiệp có thể ra mắt sau cho người dùng nâng cao."
-        },
-        "q3": {
-          "question": "Tôi có thể điều chỉnh quy trình làm việc không?",
-          "answer": "Chắc chắn rồi. Bạn có toàn quyền kiểm soát thời lượng phiên, khoảng nghỉ ngắt quãng và tần suất nghỉ dài để phù hợp hoàn hảo với nhịp sinh học và phong cách làm việc của bạn."
-        },
-        "q4": {
-          "question": "Có hỗ trợ sử dụng ngoại tuyến không?",
-          "answer": "Có. Các chức năng hẹn giờ và công việc thiết yếu hoạt động cục bộ. Đồng bộ hóa dữ liệu diễn ra tự động ngay khi kết nối an toàn được thiết lập."
-        },
-        "q5": {
-          "question": "Dữ liệu của tôi được bảo mật như thế nào?",
-          "answer": "Chúng tôi tuân thủ các tiêu chuẩn quyền riêng tư nghiêm ngặt. Dữ liệu năng suất của bạn được mã hóa và lưu trữ an toàn. Bạn giữ toàn quyền sở hữu và có thể xuất hoặc xóa dữ liệu của mình bất cứ lúc nào."
-        },
-        "q6": {
-          "question": "Khả năng tương thích nền tảng?",
-          "answer": "Study Bro là một ứng dụng web tiến bộ (PWA) được tối ưu hóa cho tất cả các trình duyệt hiện đại trên máy tính để bàn, máy tính bảng và thiết bị di động. Các ứng dụng gốc đang được phát triển."
-        }
-      }
-    },
-    "cta": {
-      "badge": "Bắt Đầu Hành Trình Của Bạn 🚀",
-      "title": "Sẵn Sàng Đạt",
-      "titleHighlight": "Hiệu Suất Đỉnh Cao?",
-      "subtitle": "Tham gia cùng hàng nghìn chuyên gia đang làm chủ quy trình làm việc của họ ngay hôm nay.",
-      "getStarted": "Bắt Đầu Miễn Phí",
-      "tryDemo": "Xem Demo",
-      "trustedByMany": "Được tin dùng bởi các nhà lãnh đạo",
-      "rating": "Đánh giá trung bình 4.9/5"
-    },
-    "features": {
-      "badge": "Khả Năng Chính",
-      "title": "Hệ Sinh Thái Cho",
-      "titleHighlight": "Làm Việc Sâu",
-      "subtitle": "Một bộ công cụ toàn diện được thiết kế để tạo điều kiện cho trạng thái 'Flow' và tối đa hóa đầu ra sáng tạo.",
-      "items": {
-        "timer": {
-          "title": "Đồng Hồ Pomodoro",
-          "description": "Chế độ Làm việc, Nghỉ ngắn & Nghỉ dài. Liên kết task, quy tắc phiên hợp lệ (≥50%), phím tắt."
-        },
-        "tasks": {
-          "title": "Quản Lý Công Việc",
-          "description": "Tạo, ưu tiên và liên kết task với phiên Pomodoro. Lọc theo trạng thái và ngày."
-        },
-        "analytics": {
-          "title": "Lịch Sử & Phân Tích",
-          "description": "Lịch sử phiên, thống kê theo ngày/tuần/tháng, biểu đồ năng suất."
-        },
-        "entertainment": {
-          "title": "Game Giải Lao",
-          "description": "Snake, 2048, Brick Breaker, Space Shooter, Memory Match, Tic Tac Toe—chơi khi nghỉ."
-        },
-        "sounds": {
-          "title": "Âm Thanh Tập Trung",
-          "description": "Âm thanh thiên nhiên, Spotify & YouTube. Lo-fi và tiếng ồn trắng."
-        },
-        "streaks": {
-          "title": "Focus Mode & Streak",
-          "description": "Giao diện tối giản, theo dõi streak và động lực trong chế độ focus."
-        },
-        "themes": {
-          "title": "Giao Diện Thích Ứng",
-          "description": "Chế độ Sáng và Tối, background tùy chọn. Nhiều kiểu đồng hồ."
-        }
-      }
-    },
-    "chatAI": {
-      "indicator": "Trợ Lý Năng Suất AI",
-      "prompt": "Làm thế nào tôi có thể tối ưu hóa lịch trình..."
-    },
-    "pricing": {
-      "badge": "Giá Trị Mang Lại 💎",
-      "title": "Bảng Giá",
-      "titleHighlight": "Minh Bạch",
-      "subtitle": "Các gói linh hoạt được thiết kế để mở rộng theo nhu cầu năng suất của bạn.",
-      "forever": "mãi mãi",
-      "noCreditCard": "Không cần thẻ tín dụng",
-      "freeForever": "Gói Cơ Bản",
-      "cancelAnytime": "Hủy bất cứ lúc nào",
-      "free": {
-        "name": "Khởi Đầu",
-        "description": "Công cụ thiết yếu cho sự tập trung",
-        "cta": "Bắt Đầu Ngay",
-        "features": {
-          "timer": "Đồng hồ Pomodoro (Làm việc, Nghỉ, Liên kết task)",
-          "tasks": "Quản lý Task & Bộ lọc",
-          "history": "Lịch sử phiên & Phân tích",
-          "games": "Game giải lao (Snake, 2048, ...)",
-          "focus": "Focus Mode & Streak",
-          "themes": "Bộ màu & hình nền",
-          "sounds": "Âm thanh, Spotify & YouTube",
-          "stats": "Phân tích cốt lõi"
-        }
-      },
-      "pro": {
-        "name": "Chuyên Nghiệp",
-        "description": "Dành cho người hiệu suất cao",
-        "cta": "Tham Gia Danh Sách Chờ",
-        "comingSoon": "Sắp Ra Mắt",
-        "comingSoonText": "Đang Phát Triển",
-        "brewingTitle": "Tính Năng Nâng Cao",
-        "brewingSubtitle": "đang được xây dựng. Hãy đón chờ.",
-        "includesEverything": "Tất cả trong Khởi Đầu, cộng thêm:",
-        "features": {
-          "unlimited": "Quản Lý Nhiệm Vụ Không Giới Hạn",
-          "fullHistory": "Lưu Trữ Lịch Sử Không Giới Hạn",
-          "cloudSync": "Đồng Bộ Đám Mây Đa Thiết Bị",
-          "advanced": "Thông Tin Hiệu Suất Nâng Cao",
-          "priority": "Kênh Hỗ Trợ Ưu Tiên",
-          "sounds": "Thư Viện Âm Thanh Cao Cấp",
-          "themes": "Giao Diện Tùy Chỉnh"
-        }
-      }
-    },
-    "testimonials": {
-      "badge": "Câu Chuyện Thành Công",
-      "title": "Được Tin Dùng Bởi",
-      "titleHighlight": "Người Thành Đạt",
-      "subtitle": "Được hàng nghìn người tin dùng để nâng cao sự tập trung và hiệu quả công việc.",
-      "items": {
-        "item1": {
-          "name": "Sarah Chen",
-          "role": "Kỹ Sư Phần Mềm Senior",
-          "content": "Phân tích năng suất giúp tôi xác định giờ hiệu suất cao điểm. Bây giờ tôi triển khai mã nhanh hơn đáng kể."
-        },
-        "item2": {
-          "name": "Alex Rivera",
-          "role": "Nhà Thiết Kế Sản Phẩm",
-          "content": "Các cảnh quan âm thanh được chọn lọc rất cần thiết cho môi trường văn phòng mở của tôi. Độ sâu tập trung của tôi đã cải thiện đáng kể."
-        },
-        "item3": {
-          "name": "David Kim",
-          "role": "Nhà Sáng Lập Độc Lập",
-          "content": "Thanh lịch và hiệu quả. Sự tổng hợp giữa kỹ thuật Pomodoro với quản lý công việc cung cấp chính xác cấu trúc mà tôi còn thiếu."
+          "question": "Cơ sở khoa học của phương pháp này là gì?"
         }
       }
     }
@@ -1517,7 +835,7 @@
   "historyUi": {
     "title": "Lịch sử",
     "description": "Thời gian tập trung, chuỗi ngày và các phiên gần đây.",
-    "rangeLabel": "Khoảng thời gian",
+    "rangeLabel": "Khoảng ngày",
     "ranges": {
       "today": "Hôm nay",
       "week": "Tuần này",
@@ -1526,8 +844,8 @@
     "stats": {
       "focusTime": "Thời gian tập trung",
       "sessions": "Số phiên",
-      "currentStreak": "Chuỗi hiện tại",
-      "bestStreak": "Chuỗi dài nhất"
+      "currentStreak": "Chuỗi ngày hiện tại",
+      "bestStreak": "Chuỗi ngày dài nhất"
     },
     "hoursMinutes": "{hours} giờ {minutes} phút",
     "minutesOnly": "{minutes} phút",
@@ -1550,7 +868,7 @@
     "sessions": {
       "title": "Phiên gần đây",
       "none": "Chưa có phiên nào trong khoảng này.",
-      "noTask": "Không có công việc",
+      "noTask": "Không có việc",
       "modes": {
         "work": "Tập trung",
         "shortBreak": "Nghỉ ngắn",
@@ -1565,10 +883,10 @@
     "error": "Không tải được lịch sử."
   },
   "arcadeUi": {
-    "title": "Giải trí",
+    "title": "Trò chơi",
     "description": "Trò chơi ngắn cho giờ nghỉ.",
-    "runningNote": "Chơi game sẽ làm gián đoạn phiên tập trung. Hãy hoàn thành phiên trước.",
-    "best": "Cao nhất {score}"
+    "runningNote": "Chơi trò chơi sẽ làm gián đoạn phiên tập trung. Hãy hoàn thành phiên trước.",
+    "best": "Điểm cao nhất {score}"
   },
   "settingsUi": {
     "unitMin": "phút",
@@ -1576,22 +894,21 @@
     "autoStartBreakHint": "Bắt đầu giờ nghỉ ngay khi phiên làm việc kết thúc.",
     "autoStartWorkHint": "Bắt đầu phiên làm việc tiếp theo ngay khi giờ nghỉ kết thúc.",
     "lowTimeWarningHint": "Đồng hồ nhấp nháy trong 10 giây cuối.",
-    "clockStyleHint": "Kiểu hiển thị đếm ngược trên trang hẹn giờ.",
-    "clockSizeHint": "Điều chỉnh cỡ đồng hồ trên trang hẹn giờ.",
-    "livePreview": "Xem trước",
-    "adjust": "Tinh chỉnh",
+    "clockStyleHint": "Kiểu hiển thị của đồng hồ đếm ngược. Bản xem trước chạy trực tiếp.",
+    "clockSizeHint": "Điều chỉnh cỡ đồng hồ.",
+    "adjust": "Điều chỉnh",
     "selected": "Đã chọn"
   },
   "pagesUi": {
     "guide": {
       "figureCaption": "Một Pomodoro: một phiên tập trung, rồi nghỉ ngắn.",
-      "tip": "Bạn có thể đổi thời lượng làm việc và nghỉ trong Cài đặt, miễn là giữ nhịp tập trung theo từng khối nhỏ và nghỉ đều đặn.",
+      "tip": "Bạn có thể đổi thời lượng tập trung và nghỉ trong Cài đặt hẹn giờ, miễn là giữ nhịp tập trung theo từng khối nhỏ và nghỉ đều đặn.",
       "shortcutsTitle": "Phím tắt",
-      "shortcutsIntro": "Dùng được ở trang hẹn giờ khi bạn không đang gõ trong ô nhập.",
+      "shortcutsIntro": "Dùng được khi bạn không đang gõ trong ô nhập.",
       "colKey": "Phím",
       "colAction": "Thao tác",
       "keySpace": "Space",
-      "actionStartPause": "Bắt đầu hoặc tạm dừng đồng hồ",
+      "actionStartPause": "Bắt đầu hoặc tạm dừng hẹn giờ",
       "actionReset": "Đặt lại phiên hiện tại"
     },
     "feedback": {
@@ -1603,48 +920,48 @@
     }
   },
   "tasksUi": {
-    "summary": "{todo} cần làm, {doing} đang làm, {done} đã xong",
+    "summary": "{todo} cần làm, {doing} đang làm, {done} xong",
     "viewList": "Danh sách",
     "viewBoard": "Bảng",
-    "viewLabel": "Kiểu xem công việc",
-    "quickAddPlaceholder": "Thêm một công việc…",
-    "quickAddLabel": "Tên công việc mới",
+    "viewLabel": "Kiểu hiển thị",
+    "quickAddPlaceholder": "Thêm một việc…",
+    "quickAddLabel": "Tên việc mới",
     "add": "Thêm",
     "addDetails": "Thêm kèm chi tiết",
-    "estimateLabel": "Số pomodoro dự kiến",
-    "estimateShort": "Dự kiến",
-    "estimateDecrease": "Giảm pomodoro",
-    "estimateIncrease": "Tăng pomodoro",
-    "estimateValue": "{count} pomodoro",
-    "estimateValuePlural": "{count} pomodoro",
-    "priorityLabel": "Độ ưu tiên",
-    "filterLabel": "Lọc công việc",
+    "estimateLabel": "Ước lượng (số Pomodoro)",
+    "estimateShort": "Ước lượng",
+    "estimateDecrease": "Giảm số Pomodoro",
+    "estimateIncrease": "Tăng số Pomodoro",
+    "estimateValue": "{count} Pomodoro",
+    "estimateValuePlural": "{count} Pomodoro",
+    "priorityLabel": "Ưu tiên",
+    "filterLabel": "Lọc việc",
     "filterAll": "Tất cả",
     "filterToday": "Hôm nay",
     "filterTodo": "Cần làm",
     "filterDoing": "Đang làm",
-    "filterDone": "Đã xong",
-    "searchOpen": "Tìm công việc",
+    "filterDone": "Xong",
+    "searchOpen": "Tìm việc",
     "searchClose": "Đóng tìm kiếm",
     "searchPlaceholder": "Tìm theo tên hoặc thẻ",
-    "showCompleted": "Hiện {count} công việc đã xong",
-    "hideCompleted": "Ẩn công việc đã xong",
+    "showCompleted": "Hiện {count} việc đã xong",
+    "hideCompleted": "Ẩn việc đã xong",
     "focus": "Tập trung",
     "stopFocus": "Dừng tập trung",
     "focusingBadge": "Đang tập trung",
     "edit": "Sửa",
-    "more": "Thêm thao tác",
+    "more": "Thao tác khác",
     "duplicate": "Nhân bản",
     "saveAsTemplate": "Lưu làm mẫu",
     "delete": "Xoá",
     "dueToday": "Hạn hôm nay",
     "dueTomorrow": "Hạn ngày mai",
     "overdue": "Quá hạn",
-    "pomodoroProgress": "{done}/{total} pomodoro",
-    "emptyTitle": "Chưa có công việc nào",
-    "emptyAction": "Thêm công việc đầu tiên",
-    "emptyDescription": "Thêm công việc đầu tiên ở trên, rồi bấm Tập trung để bắt đầu phiên làm việc.",
-    "noMatchTitle": "Không có công việc phù hợp",
+    "pomodoroProgress": "{done}/{total} Pomodoro",
+    "emptyTitle": "Chưa có việc nào",
+    "emptyAction": "Thêm việc đầu tiên",
+    "emptyDescription": "Thêm việc đầu tiên ở trên, rồi bấm Tập trung để bắt đầu phiên.",
+    "noMatchTitle": "Không có việc phù hợp",
     "noMatchDescription": "Thử đổi bộ lọc hoặc từ khoá khác.",
     "clearFilters": "Xoá bộ lọc",
     "boardEmpty": "Chưa có gì",
@@ -1652,63 +969,14 @@
     "manage": "Quản lý thẻ và mẫu",
     "page": "Trang {page} / {total}",
     "pickDate": "Chọn ngày",
-    "clearDate": "Xóa ngày",
-    "estimateMin": "Nhập ít nhất 1 pomodoro",
-    "tagsLabel": "Tag",
-    "tagsPlaceholder": "Thêm tag",
+    "clearDate": "Xoá ngày",
+    "estimateMin": "Nhập ít nhất 1 Pomodoro",
+    "tagsLabel": "Thẻ",
+    "tagsPlaceholder": "Thêm thẻ",
     "tagSuggestions": "Gợi ý",
-    "noTagsHint": "Thêm tag ở trên để nhóm các công việc liên quan.",
-    "tagsUsed": "Đã dùng {count}/{max} tag",
-    "templatesDescription": "Các thiết lập công việc đã lưu, dùng lại khi tạo công việc mới."
-  },
-  "landingUi": {
-    "hero": {
-      "title": "Đồng hồ Pomodoro giúp bạn giữ nhịp tập trung",
-      "lead": "Làm việc theo từng khối tập trung, nghỉ đúng lúc, và giữ công việc cùng lịch sử ở một nơi. Miễn phí, không cần tài khoản để bắt đầu.",
-      "start": "Bắt đầu tập trung",
-      "login": "Đăng nhập"
-    },
-    "timer": {
-      "modeGroup": "Chế độ đồng hồ",
-      "work": "Làm việc",
-      "shortBreak": "Nghỉ ngắn",
-      "longBreak": "Nghỉ dài",
-      "start": "Bắt đầu",
-      "pause": "Tạm dừng",
-      "restart": "Bắt đầu lại",
-      "reset": "Đặt lại",
-      "openApp": "Mở ứng dụng đầy đủ"
-    },
-    "features": {
-      "title": "Mọi thứ một phiên tập trung cần",
-      "timer": "Chế độ làm việc, nghỉ ngắn và nghỉ dài, có phím tắt.",
-      "tasks": "Gắn công việc vào phiên và lọc theo trạng thái, ngày.",
-      "analytics": "Lịch sử phiên và thống kê theo ngày, tuần, tháng.",
-      "sounds": "Âm thanh thiên nhiên, lo-fi, tiếng ồn trắng, hoặc Spotify và YouTube của bạn.",
-      "entertainment": "Snake, 2048 và nhiều trò khác cho lúc đồng hồ báo nghỉ."
-    },
-    "how": {
-      "title": "Một phiên diễn ra thế nào",
-      "step1": {
-        "title": "Chọn một việc",
-        "description": "Thêm việc bạn đang làm và ước lượng cần bao nhiêu Pomodoro."
-      },
-      "step2": {
-        "title": "Tập trung 25 phút",
-        "description": "Bấm bắt đầu và chỉ làm đúng việc đó cho đến khi chuông reo."
-      },
-      "step3": {
-        "title": "Nghỉ rồi xem lại",
-        "description": "Nghỉ ngắn một chút. Lịch sử và thống kê cho bạn thấy ngày hôm nay ra sao."
-      }
-    },
-    "pricing": {
-      "title": "Dùng miễn phí, bản Pro sẽ đến sau",
-      "subtitle": "Mọi thứ trong gói Starter đều miễn phí, không cần thẻ tín dụng. Bản Pro vẫn đang được phát triển."
-    },
-    "faq": {
-      "title": "Câu hỏi thường gặp"
-    }
+    "noTagsHint": "Thêm thẻ ở trên để nhóm các việc liên quan.",
+    "tagsUsed": "Đã dùng {count}/{max} thẻ",
+    "templatesDescription": "Các mẫu việc đã lưu, dùng lại khi tạo việc mới."
   },
   "timerUi": {
     "soundOff": "Tắt",
@@ -1731,25 +999,25 @@
     "todaySummaryOne": "Hôm nay: {count} phiên · {time}",
     "timeHm": "{h} giờ {m} phút",
     "timeM": "{m} phút",
-    "activeTasks": "Nhiệm vụ đang làm",
-    "noActiveTasks": "Chưa có nhiệm vụ nào. Thêm một nhiệm vụ bên dưới.",
+    "activeTasks": "Việc đang làm",
+    "noActiveTasks": "Chưa có việc nào đang làm. Thêm một việc bên dưới.",
     "addTaskPlaceholder": "Bạn đang làm gì?",
-    "addTask": "Thêm nhiệm vụ",
-    "manageTasks": "Quản lý nhiệm vụ",
+    "addTask": "Thêm việc",
+    "manageTasks": "Quản lý việc",
     "filterAll": "Tất cả",
     "dock": {
       "sounds": "Âm thanh",
-      "scene": "Hình nền",
+      "scene": "Không gian",
       "timer": "Hẹn giờ",
-      "focus": "Chế độ tập trung",
-      "exitFocus": "Thoát chế độ tập trung",
+      "focus": "Chế độ toàn màn hình",
+      "exitFocus": "Thoát chế độ toàn màn hình",
       "moreAmbient": "+ {count} âm thanh nền",
       "ambientPlaying": "Đang phát âm thanh nền",
-      "ambientMix": "Trộn âm thanh nền ({count} âm)"
+      "ambientMix": "Âm thanh nền kết hợp ({count} âm)"
     }
   },
   "shell": {
-    "dock": "Bảng điều khiển",
+    "dock": "Các bảng chức năng",
     "openTimer": "Mở đồng hồ",
     "streak": "Chuỗi {count} ngày",
     "panels": {
@@ -1758,13 +1026,13 @@
       "scene": "Không gian",
       "timer": "Hẹn giờ",
       "stats": "Thống kê",
-      "arcade": "Giải trí",
+      "arcade": "Trò chơi",
       "settings": "Cài đặt",
       "feedback": "Góp ý",
       "login": "Đăng nhập"
     },
     "palette": {
-      "open": "Tìm lệnh",
+      "open": "Mở bảng lệnh",
       "short": "Tìm",
       "placeholder": "Gõ lệnh hoặc tìm…",
       "empty": "Không có lệnh phù hợp.",
@@ -1779,6 +1047,582 @@
       "reset": "Đặt lại hẹn giờ",
       "switchTo": "Chuyển sang {mode}",
       "guide": "Hướng dẫn Pomodoro"
+    }
+  },
+  "clockStyles": {
+    "flip3d": "Lật 3D",
+    "tomato": "Quả cà chua",
+    "orbit": "Quỹ đạo",
+    "solid": "Khối nổi",
+    "badge3d": "3D",
+    "webglNote": "Kiểu 3D dùng GPU của thiết bị. Nếu không khả dụng, đồng hồ số sẽ hiển thị thay thế."
+  },
+  "site": {
+    "meta": {
+      "guide": {
+        "title": "Hướng dẫn kỹ thuật Pomodoro • Study Bro",
+        "description": "Kỹ thuật Pomodoro hoạt động thế nào, cách chạy một phiên tập trung, chọn 25/5, 50/10 hay 52/17, xử lý gián đoạn, ước lượng việc và phím tắt."
+      },
+      "privacy": {
+        "title": "Chính sách quyền riêng tư • Study Bro",
+        "description": "Study Bro lưu những gì, gì chỉ nằm trên thiết bị của bạn, dịch vụ nào xử lý dữ liệu, và cách xuất hoặc xoá dữ liệu."
+      },
+      "terms": {
+        "title": "Điều khoản sử dụng • Study Bro",
+        "description": "Điều khoản khi dùng Study Bro, đồng hồ Pomodoro miễn phí có việc và âm thanh tập trung."
+      }
+    },
+    "header": {
+      "nav": "Trang web"
+    },
+    "notFound": {
+      "guide": "Đọc hướng dẫn"
+    },
+    "footer": {
+      "tagline": "Đồng hồ Pomodoro miễn phí có việc, lịch sử tập trung, âm thanh nền và trò chơi giờ nghỉ. Dùng được không cần tài khoản.",
+      "product": "Sản phẩm",
+      "timer": "Đồng hồ",
+      "learn": "Tìm hiểu",
+      "guide": "Hướng dẫn Pomodoro",
+      "shortcuts": "Phím tắt",
+      "legal": "Pháp lý"
+    },
+    "features": {
+      "title": "Trong ứng dụng có gì",
+      "lead": "Một trang gồm đồng hồ, danh sách việc và lịch sử của bạn. Mọi thứ dưới đây đều có sẵn trong ứng dụng.",
+      "timer": {
+        "title": "Tập trung, nghỉ ngắn và nghỉ dài",
+        "desc": "Ba chế độ với thời lượng tuỳ chỉnh (tập trung tối đa 60 phút), nghỉ dài sau một số phiên, tự chuyển bước tiếp theo nếu bạn muốn và nhiều kiểu đồng hồ."
+      },
+      "tasks": {
+        "title": "Việc gắn với phiên",
+        "desc": "Thêm việc với mức ưu tiên, trạng thái, thẻ và số Pomodoro ước lượng, rồi gắn vào phiên đang chạy."
+      },
+      "stats": {
+        "title": "Lịch sử tập trung và chuỗi ngày",
+        "desc": "Mỗi phiên hoàn thành đều được ghi lại. Xem thời gian tập trung theo ngày, tuần, tháng và giữ chuỗi ngày liên tiếp."
+      },
+      "sound": {
+        "title": "Âm thanh nền và YouTube",
+        "desc": "Tiếng thiên nhiên, lo-fi, white noise, hoặc phát liên kết YouTube của riêng bạn khi làm việc."
+      },
+      "scene": {
+        "title": "Không gian",
+        "desc": "Chọn một không gian làm nền hoặc dùng ảnh của bạn."
+      },
+      "arcade": {
+        "title": "Trò chơi giờ nghỉ",
+        "desc": "Snake, 2048 và vài trò chơi nhỏ cho lúc đồng hồ báo nghỉ."
+      },
+      "account": {
+        "title": "Dùng được không cần tài khoản",
+        "desc": "Vào dùng ngay với tư cách khách. Đăng nhập bằng mã gửi qua email hoặc Google để giữ dữ liệu giữa các thiết bị, và xuất hoặc xoá bất cứ lúc nào."
+      }
+    },
+    "how": {
+      "title": "Một chu kỳ Pomodoro diễn ra thế nào",
+      "lead": "Làm việc theo khối thời gian cố định, nghỉ giữa các khối và nghỉ dài hơn sau vài vòng. Đây là nhịp mặc định; mọi thời lượng đều đổi được.",
+      "cycleLabel": "Một chu kỳ đầy đủ",
+      "cycleUnit": "Đơn vị: phút. Nghỉ dài mặc định 15 phút; khoảng thường dùng là 15 đến 30.",
+      "focus": {
+        "title": "Tập trung",
+        "duration": "25 phút",
+        "desc": "Một việc, không chuyển đổi. Bắt đầu đếm và ở lại với việc đó đến khi chuông reo."
+      },
+      "shortBreak": {
+        "title": "Nghỉ ngắn",
+        "duration": "5 phút",
+        "desc": "Đứng dậy, uống nước, rời mắt khỏi màn hình. Đừng lướt mạng xã hội."
+      },
+      "longBreak": {
+        "title": "Nghỉ dài",
+        "duration": "15–30 phút",
+        "desc": "Sau bốn phiên tập trung, rời bàn lâu hơn rồi bắt đầu chu kỳ mới."
+      },
+      "defaults": "Mặc định: 25 / 5 / 15 phút, nghỉ dài sau mỗi 4 phiên. Đổi trong Cài đặt hẹn giờ."
+    },
+    "why": {
+      "title": "Vì sao kỹ thuật này hiệu quả",
+      "p1": "Khối thời gian cố định cho việc một điểm bắt đầu và một điểm kết thúc rõ ràng, nên bắt tay vào việc đỡ nặng nề và khó bị cuốn đi chỗ khác. Giờ nghỉ được lên lịch giúp bạn không làm đến lúc kiệt sức.",
+      "p2": "Đếm số phiên đã xong còn cho bạn dữ liệu: sau một tuần bạn biết một việc thật sự cần bao nhiêu Pomodoro và ước lượng chuẩn hơn. Đây là một phương pháp chứ không phải lời đảm bảo, nên hãy chỉnh thời lượng cho hợp với việc của bạn.",
+      "source": "Nguồn: Francesco Cirillo, The Pomodoro Technique (Currency, 2018)."
+    },
+    "faq": {
+      "title": "Câu hỏi thường gặp",
+      "still": "Còn điều gì chưa có ở đây?",
+      "contact": "Gửi góp ý",
+      "q1": {
+        "q": "Study Bro có miễn phí không, và tôi có cần tài khoản không?",
+        "a": "Ứng dụng miễn phí và bạn không cần tài khoản. Có thể bấm bắt đầu ngay với tư cách khách. Đăng nhập là tuỳ chọn, giúp bạn giữ việc và lịch sử giữa các thiết bị; những gì đã làm khi là khách sẽ chuyển vào tài khoản khi bạn đăng nhập."
+      },
+      "q2": {
+        "q": "Kỹ thuật Pomodoro là gì?",
+        "a": "Một phương pháp quản lý thời gian của Francesco Cirillo. Bạn làm việc theo một khối cố định (thường là 25 phút), nghỉ 5 phút, và sau bốn khối thì nghỉ dài 15 đến 30 phút. Trang hướng dẫn Pomodoro giải thích cách áp dụng."
+      },
+      "q3": {
+        "q": "Tôi có đổi được thời lượng không?",
+        "a": "Có. Trong cài đặt hẹn giờ, bạn đặt tập trung từ 1 đến 60 phút, nghỉ ngắn từ 1 đến 30, nghỉ dài từ 1 đến 60 và số phiên trước mỗi lần nghỉ dài (2 đến 10). Bạn cũng bật hoặc tắt tự chạy bước tiếp theo cho giờ nghỉ và phiên tập trung."
+      },
+      "q4": {
+        "q": "Việc hoạt động cùng đồng hồ thế nào?",
+        "a": "Thêm việc với mức ưu tiên, thẻ và số Pomodoro ước lượng, rồi gắn vào phiên đang chạy. Các phiên hoàn thành được ghi vào việc đó, nên bạn có thể so ước lượng với thực tế."
+      },
+      "q5": {
+        "q": "Có những âm thanh và nền nào?",
+        "a": "Âm thanh nền như tiếng thiên nhiên, lo-fi, white noise, cùng liên kết YouTube của riêng bạn. Về nền, bạn chọn một không gian hoặc ảnh của mình, và chọn đồng hồ số, kim, lật hoặc thanh tiến độ."
+      },
+      "q6": {
+        "q": "Đăng nhập hoạt động thế nào, và dữ liệu của tôi ra sao?",
+        "a": "Bạn đăng nhập bằng mã dùng một lần gửi qua email, hoặc bằng Google. Trong Cài đặt, mục Tài khoản, bạn có thể xuất dữ liệu ra tệp JSON hoặc xoá tài khoản cùng việc, phiên và thẻ. Xem Chính sách quyền riêng tư để biết chi tiết."
+      },
+      "q7": {
+        "q": "Ứng dụng hỗ trợ những ngôn ngữ nào?",
+        "a": "Tiếng Anh, tiếng Việt và tiếng Nhật. Đổi ngôn ngữ bằng bộ chọn ở chân trang."
+      },
+      "q8": {
+        "q": "Có phím tắt không?",
+        "a": "Có: Space bắt đầu hoặc tạm dừng, R đặt lại, T mở việc, S âm thanh, B không gian, C cài đặt hẹn giờ, H thống kê và G trò chơi. Nhấn Ctrl K (⌘ K trên Mac) để tìm mọi lệnh."
+      }
+    }
+  },
+  "legal": {
+    "updated": "Cập nhật lần cuối: 02/10/2026"
+  },
+  "guide2": {
+    "title": "Kỹ thuật Pomodoro: hướng dẫn thực hành",
+    "lead": "Pomodoro là gì, cách chạy một phiên, chọn thời lượng nào, và dùng Study Bro để thực hiện.",
+    "toc": "Trong trang này",
+    "what": {
+      "title": "Kỹ thuật Pomodoro là gì",
+      "p1": "Kỹ thuật Pomodoro là phương pháp quản lý thời gian do Francesco Cirillo phát triển vào cuối thập niên 1980. Bạn làm việc theo các khối ngắn, cố định, thường là 25 phút, xen kẽ những quãng nghỉ ngắn. Mỗi khối là một **pomodoro**, tiếng Ý nghĩa là quả cà chua, theo chiếc đồng hồ bếp hình quả cà chua mà Cirillo dùng hồi còn là sinh viên.",
+      "p2": "Điểm mấu chốt không phải con số 25. Khối thời gian cố định cho bạn một điểm bắt đầu, một điểm kết thúc và một việc duy nhất để làm. Nhờ vậy dễ bắt đầu hơn và khó bị phân tán hơn. Sau bốn khối bạn nghỉ dài hơn.",
+      "p3": "Study Bro là đồng hồ Pomodoro xây quanh vòng lặp đó: chế độ toàn màn hình, nghỉ ngắn, nghỉ dài, việc gắn được vào phiên và lịch sử những gì bạn đã hoàn thành."
+    },
+    "session": {
+      "title": "Cách chạy một phiên tập trung",
+      "intro": "Một vòng mất khoảng nửa giờ. Làm theo các bước sau:",
+      "steps": {
+        "1": "**Chọn một việc.** Chọn bước cụ thể tiếp theo, ví dụ \"lập dàn ý mục 2\", không phải một dự án mơ hồ như \"luận văn\".",
+        "2": "**Gắn vào phiên.** Chọn việc trong Việc cần làm (T) để phiên được ghi vào việc đó.",
+        "3": "**Bắt đầu đếm giờ tập trung.** Nhấn Space. Mặc định là 25 phút.",
+        "4": "**Chỉ làm việc đó.** Nếu nảy ra ý khác, hãy ghi lại rồi quay về làm tiếp.",
+        "5": "**Nghỉ ngắn.** Năm phút rời màn hình. Đừng bắt đầu việc mới.",
+        "6": "**Lặp lại, và nghỉ dài sau bốn phiên.** Sau bốn phiên tập trung, nghỉ dài (mặc định 15 phút, thường tới 30), rồi bắt đầu chu kỳ mới."
+      },
+      "note": "Mặc định Study Bro tự chuyển sang bước tiếp theo. Nếu bạn thích tự bấm bắt đầu, hãy tắt tự chạy trong Cài đặt hẹn giờ (C)."
+    },
+    "rhythm": {
+      "title": "Chọn 25/5, 50/10, 52/17 hay khối dài hơn",
+      "intro": "Không có nhịp nào hợp với tất cả mọi người. Đây là những nhịp phổ biến:",
+      "colName": "Nhịp",
+      "colTimes": "Tập trung / nghỉ (phút)",
+      "colFor": "Phù hợp với",
+      "classic": {
+        "name": "Cổ điển",
+        "times": "25 / 5",
+        "for": "Mới bắt đầu, việc bạn cứ trì hoãn, buổi học ngắn."
+      },
+      "extended": {
+        "name": "Kéo dài",
+        "times": "50 / 10",
+        "for": "Việc cần thời gian khởi động: viết lách, lập trình, làm bài tập."
+      },
+      "ratio": {
+        "name": "52 / 17",
+        "times": "52 / 17",
+        "for": "Tỷ lệ được biết đến rộng rãi từ năm 2014, dựa trên phân tích dữ liệu người dùng của một công ty theo dõi thời gian. Hãy xem đây là một lựa chọn, không phải quy tắc."
+      },
+      "deep": {
+        "name": "Khối làm việc sâu (deep work)",
+        "times": "60–90 / 15–20",
+        "for": "Việc đòi hỏi cao, cần được bảo vệ khỏi gián đoạn. Con số 90 phút mượn từ ý tưởng nhịp ultradian, và bằng chứng về nó còn trái chiều."
+      },
+      "how": "Cách chọn: dùng 25/5 trong một tuần. Nếu đồng hồ reo đúng lúc bạn vừa vào guồng, chuyển sang 50/10. Nếu bạn khó bắt đầu, rút ngắn khối lại. Dù chọn gì, hãy giữ giờ nghỉ.",
+      "limits": "Trong Cài đặt hẹn giờ (C), tập trung từ 1 đến 60 phút, nghỉ ngắn 1 đến 30, nghỉ dài 1 đến 60, và nghỉ dài có thể đến sau mỗi 2 đến 10 phiên. Với khối 90 phút, hãy chạy hai phiên liền nhau và giữ quãng nghỉ giữa chúng thật ngắn."
+    },
+    "interruptions": {
+      "title": "Xử lý gián đoạn",
+      "intro": "Cirillo chia gián đoạn thành hai loại, mỗi loại cần cách xử lý riêng.",
+      "list": {
+        "1": "**Từ bên trong** (bạn nhớ ra một email, muốn xem điện thoại): ghi ra giấy hoặc thêm thành một việc rồi quay lại. Làm sau tốn ít công hơn so với chuyển việc ngay.",
+        "2": "**Từ bên ngoài** (đồng nghiệp, tin nhắn): lời khuyên của Cirillo là báo cho người kia biết bạn đang bận, thống nhất một thời điểm, đặt lịch và gọi lại.",
+        "3": "**Gián đoạn dài:** theo quy tắc của Cirillo, một pomodoro không chia nhỏ được. Nếu buộc phải dừng thật sự, hãy đặt lại đồng hồ (R) và bắt đầu khối mới thay vì coi khối bị ngắt là có tính."
+      },
+      "outro": "Tắt thông báo trong suốt một khối sẽ loại bỏ phần lớn cả hai loại gián đoạn."
+    },
+    "tasks": {
+      "title": "Dùng việc và ước lượng",
+      "intro": "Hãy ước lượng bằng số Pomodoro thay vì giờ. Trước khi làm, đoán xem việc cần bao nhiêu khối; xong rồi thì so sánh. Ước lượng của bạn sẽ chuẩn dần rất nhanh.",
+      "list": {
+        "1": "Chia nhỏ việc có vẻ lớn hơn khoảng năm đến bảy Pomodoro (gợi ý của Cirillo). Gộp các việc rất nhỏ vào một khối.",
+        "2": "Đặt cho mỗi việc một ước lượng theo Pomodoro, mức ưu tiên và, nếu muốn, thẻ như môn học hay dự án.",
+        "3": "Gắn việc đang làm vào phiên đang chạy để lịch sử cho thấy mỗi phiên dành cho việc gì.",
+        "4": "Chuyển việc sang Đang làm khi bắt đầu và Xong khi hoàn tất, và lọc danh sách theo trạng thái hoặc ngày."
+      }
+    },
+    "breaks": {
+      "title": "Nghỉ giải lao cho đúng",
+      "intro": "Giờ nghỉ chỉ có ích khi nó giúp sự chú ý của bạn hồi phục.",
+      "list": {
+        "1": "Đứng dậy đi lại, dù chỉ một phút.",
+        "2": "Uống nước và nhìn ra xa để mắt được nghỉ.",
+        "3": "Tránh lướt bảng tin, nhắn tin và mọi thứ mở ra một dòng suy nghĩ mới.",
+        "4": "Nếu muốn giải trí, phần Trò chơi có vài trò chơi ngắn (G). Dừng lại khi hết giờ nghỉ."
+      },
+      "outro": "Quãng nghỉ dài sau bốn phiên dành cho việc đổi không gian thật sự: đi dạo, ăn nhẹ, giãn cơ."
+    },
+    "tools": {
+      "title": "Âm thanh, không gian và lịch sử",
+      "list": {
+        "1": "**Âm thanh (S):** tiếng thiên nhiên, lo-fi, white noise, hoặc liên kết YouTube của bạn. Thử ở âm lượng nhỏ; im lặng cũng là một lựa chọn.",
+        "2": "**Không gian (B):** đổi nền và kiểu đồng hồ (số, kim, lật hoặc thanh tiến độ).",
+        "3": "**Thống kê (H):** thời gian tập trung theo ngày, tuần, tháng và chuỗi ngày. Dùng để thấy nhịp thật của bạn, không phải để chạy theo con số.",
+        "4": "**Không cần tài khoản:** mọi thứ dùng được với tư cách khách. Đăng nhập để giữ dữ liệu giữa các thiết bị."
+      }
+    },
+    "shortcuts": {
+      "title": "Phím tắt",
+      "intro": "Phím tắt hoạt động khi không có ô nhập liệu nào đang được chọn.",
+      "space": "Bắt đầu hoặc tạm dừng đồng hồ",
+      "reset": "Đặt lại phiên hiện tại",
+      "tasks": "Mở Việc cần làm",
+      "sound": "Mở Âm thanh",
+      "scene": "Mở Không gian",
+      "timer": "Mở Cài đặt hẹn giờ",
+      "stats": "Mở Thống kê",
+      "arcade": "Mở Trò chơi",
+      "palette": "Tìm và chạy mọi lệnh"
+    },
+    "cta": {
+      "title": "Sẵn sàng cho khối đầu tiên?",
+      "text": "Mở đồng hồ, thêm một việc và bắt đầu phiên 25 phút. Bạn không cần tài khoản.",
+      "button": "Mở đồng hồ"
+    }
+  },
+  "privacy": {
+    "title": "Chính sách quyền riêng tư",
+    "lead": "Study Bro là đồng hồ Pomodoro miễn phí. Trang này giải thích ứng dụng xử lý những dữ liệu nào, lưu ở đâu và bạn kiểm soát chúng ra sao.",
+    "scope": {
+      "title": "Phạm vi áp dụng",
+      "intro": "Chính sách này áp dụng cho website và ứng dụng Study Bro tại pomodoro-focus.site, gồm cả trang hướng dẫn và các trang pháp lý. Nếu có thắc mắc, hãy dùng mục Góp ý trong ứng dụng."
+    },
+    "collect": {
+      "title": "Dữ liệu lưu trên máy chủ",
+      "intro": "Study Bro chỉ lưu những gì cần thiết để chạy ứng dụng:",
+      "list": {
+        "1": "**Thông tin tài khoản:** nếu đăng nhập bằng Google thì gồm tên, địa chỉ email và ảnh hồ sơ; nếu đăng nhập bằng mã qua email thì là địa chỉ email.",
+        "2": "**Việc:** tiêu đề, mô tả, mức ưu tiên, trạng thái, thẻ, hạn và số Pomodoro ước lượng.",
+        "3": "**Phiên tập trung:** chế độ (tập trung, nghỉ ngắn hoặc nghỉ dài), thời lượng, thời điểm, và việc được gắn nếu có.",
+        "4": "**Phiên đăng nhập:** một bản ghi cho mỗi trình duyệt đã đăng nhập, gồm địa chỉ IP và user agent, cùng các bộ đếm ngắn hạn dùng để hạn chế lạm dụng.",
+        "5": "**Dữ liệu của khách:** khi bạn dùng ứng dụng mà không đăng nhập, một phiên khách được tạo để lưu việc và phiên của bạn. Phiên này không có địa chỉ email. Nếu sau đó bạn đăng nhập, dữ liệu ấy được chuyển vào tài khoản.",
+        "6": "**Góp ý:** nội dung và loại góp ý bạn gửi, điểm đánh giá tuỳ chọn, cùng tên và email nếu bạn tự nhập. Nếu đã đăng nhập, góp ý được liên kết với tài khoản của bạn."
+      },
+      "outro": "Chúng tôi không yêu cầu thông tin thanh toán và ứng dụng không có quảng cáo."
+    },
+    "device": {
+      "title": "Dữ liệu chỉ nằm trên thiết bị của bạn",
+      "intro": "Một số thứ được lưu trong trình duyệt và không được gửi cho chúng tôi dưới dạng nội dung:",
+      "list": {
+        "1": "Tuỳ chọn như cài đặt hẹn giờ, kiểu đồng hồ, không gian, lựa chọn và âm lượng âm thanh, lưu trong local storage của trình duyệt.",
+        "2": "Một cookie ghi nhớ ngôn ngữ của bạn.",
+        "3": "Một cookie giữ trạng thái đăng nhập, dù bạn là khách hay có tài khoản."
+      }
+    },
+    "partners": {
+      "title": "Dịch vụ xử lý dữ liệu giúp chúng tôi",
+      "intro": "Study Bro dựa vào các nhà cung cấp sau. Mỗi bên chỉ xử lý phần cần cho vai trò của mình:",
+      "list": {
+        "1": "**Vercel:** lưu trữ website và API, đồng thời cung cấp thống kê lượt xem trang thân thiện với quyền riêng tư.",
+        "2": "**Neon:** lưu trữ cơ sở dữ liệu PostgreSQL chứa dữ liệu tài khoản, việc, phiên và góp ý.",
+        "3": "**Resend:** gửi mã đăng nhập dùng một lần đến email của bạn.",
+        "4": "**Google:** nếu bạn chọn đăng nhập bằng Google, Google chia sẻ tên, email và ảnh hồ sơ của bạn với chúng tôi. Google Analytics chỉ được dùng ở bản triển khai có cấu hình nó.",
+        "5": "**YouTube:** nếu bạn phát một liên kết YouTube, video được nhúng từ YouTube, nơi có thể đặt cookie riêng theo chính sách của họ."
+      },
+      "outro": "Chúng tôi không bán dữ liệu của bạn và không chia sẻ cho mục đích quảng cáo."
+    },
+    "use": {
+      "title": "Chúng tôi dùng dữ liệu để làm gì",
+      "intro": "Dữ liệu được dùng để:",
+      "list": {
+        "1": "chạy đồng hồ, việc, lịch sử và chuỗi ngày, đồng bộ giữa các thiết bị khi bạn đã đăng nhập;",
+        "2": "gửi mã đăng nhập và giữ phiên của bạn an toàn;",
+        "3": "đọc góp ý để cải thiện ứng dụng, và hiểu mức độ sử dụng chung qua thống kê."
+      }
+    },
+    "choices": {
+      "title": "Lựa chọn của bạn",
+      "intro": "Bạn nắm quyền kiểm soát dữ liệu của mình:",
+      "list": {
+        "1": "**Xuất dữ liệu:** trong Cài đặt, mục Tài khoản, tải tài khoản, việc, phiên và thẻ của bạn về dưới dạng tệp JSON.",
+        "2": "**Xoá:** cũng ở đó, bạn có thể xoá tài khoản. Thao tác này xoá vĩnh viễn việc, phiên tập trung, thẻ và bản ghi đăng nhập. Góp ý đã gửi được giữ lại nhưng không còn liên kết với bạn. Khách xoá dữ liệu khách theo cách tương tự.",
+        "3": "**Xoá dữ liệu cục bộ:** xoá dữ liệu trang web trong trình duyệt sẽ gỡ các tuỳ chọn lưu trên thiết bị."
+      },
+      "outro": "Mã đăng nhập qua email hết hạn sau 10 phút."
+    },
+    "children": {
+      "title": "Trẻ em",
+      "intro": "Study Bro không hướng đến trẻ em dưới 13 tuổi và chúng tôi không chủ ý thu thập dữ liệu của các em. Nếu bạn cho rằng một trẻ em đã đăng ký, hãy báo qua mục Góp ý và chúng tôi sẽ xoá tài khoản đó."
+    },
+    "changes": {
+      "title": "Thay đổi chính sách",
+      "intro": "Nếu cách Study Bro xử lý dữ liệu thay đổi, trang này sẽ được cập nhật và ngày ở đầu trang đổi theo."
+    }
+  },
+  "terms": {
+    "title": "Điều khoản sử dụng",
+    "lead": "Các điều khoản này áp dụng khi bạn dùng Study Bro, đồng hồ Pomodoro miễn phí có việc, lịch sử tập trung và âm thanh nền. Khi dùng ứng dụng, bạn đồng ý với các điều khoản này.",
+    "service": {
+      "title": "Dịch vụ",
+      "intro": "Study Bro được cung cấp miễn phí. Bạn có thể dùng với tư cách khách hoặc có tài khoản. Tính năng có thể được thêm, thay đổi hoặc gỡ bỏ theo thời gian."
+    },
+    "use": {
+      "title": "Cách sử dụng Study Bro",
+      "intro": "Hãy dùng ứng dụng một cách thiện chí. Cụ thể:",
+      "list": {
+        "1": "Giữ an toàn cách đăng nhập của bạn; bạn chịu trách nhiệm cho hoạt động trên tài khoản.",
+        "2": "Không tấn công, làm quá tải hay dò quét dịch vụ, hoặc lách các giới hạn của nó như giới hạn tần suất.",
+        "3": "Không dùng biểu mẫu góp ý để gửi nội dung trái pháp luật, lăng mạ hoặc độc hại.",
+        "4": "Không truy cập dữ liệu hay tài khoản của người khác."
+      }
+    },
+    "content": {
+      "title": "Nội dung của bạn",
+      "intro": "Việc, ghi chú và thẻ bạn tạo thuộc về bạn. Chúng tôi chỉ lưu và xử lý chúng để cung cấp ứng dụng cho bạn, như mô tả trong Chính sách quyền riêng tư. Bạn có thể xuất hoặc xoá bất cứ lúc nào."
+    },
+    "thirdParty": {
+      "title": "Nội dung của bên thứ ba",
+      "intro": "Nếu bạn phát một liên kết YouTube, nội dung đó và việc phát lại do điều khoản của YouTube chi phối. Study Bro không sở hữu hay kiểm soát nội dung của bên thứ ba."
+    },
+    "availability": {
+      "title": "Tính sẵn sàng và sao lưu",
+      "intro": "Chúng tôi cố gắng giữ ứng dụng hoạt động nhưng không cam kết dịch vụ không gián đoạn. Hãy thỉnh thoảng xuất dữ liệu nếu nó quan trọng với bạn."
+    },
+    "liability": {
+      "title": "Miễn trừ và trách nhiệm",
+      "intro": "Đồng hồ Pomodoro là công cụ hỗ trợ năng suất, không phải lời khuyên chuyên môn.",
+      "list": {
+        "1": "Study Bro được cung cấp \"nguyên trạng\", không kèm bảo đảm dưới bất kỳ hình thức nào, trong phạm vi pháp luật cho phép.",
+        "2": "Trong phạm vi pháp luật cho phép, chúng tôi không chịu trách nhiệm cho thiệt hại gián tiếp hoặc hệ quả, hay việc mất dữ liệu, mất thời gian học tập hoặc làm việc phát sinh từ việc dùng ứng dụng."
+      }
+    },
+    "ending": {
+      "title": "Ngừng sử dụng",
+      "intro": "Bạn có thể ngừng dùng Study Bro và xoá tài khoản bất cứ lúc nào trong Cài đặt. Chúng tôi có thể tạm khoá hoặc xoá các tài khoản vi phạm điều khoản này hoặc gây hại cho dịch vụ."
+    },
+    "changes": {
+      "title": "Thay đổi và liên hệ",
+      "intro": "Chúng tôi có thể cập nhật các điều khoản này; ngày ở đầu trang cho biết phiên bản mới nhất, và việc tiếp tục dùng ứng dụng nghĩa là bạn chấp nhận bản cập nhật. Mọi câu hỏi có thể gửi qua mục Góp ý trong ứng dụng."
+    }
+  },
+  "scenes": {
+    "title": "Không gian",
+    "tabs": {
+      "scenes": "Không gian",
+      "photos": "Ảnh"
+    },
+    "categories": {
+      "label": "Không khí",
+      "all": "Tất cả",
+      "calm": "Yên tĩnh",
+      "nature": "Thiên nhiên",
+      "space": "Vũ trụ",
+      "cozy": "Ấm cúng",
+      "minimal": "Tối giản"
+    },
+    "names": {
+      "pomodoro": "Pomodoro",
+      "aurora": "Cực quang",
+      "rain": "Cửa sổ mưa",
+      "nebula": "Tinh vân",
+      "sunset": "Hoàng hôn lo-fi",
+      "ocean": "Biển đêm",
+      "fireflies": "Đom đóm",
+      "grain": "Hạt mịn",
+      "snow": "Tuyết rơi",
+      "planet": "Hành tinh xa"
+    },
+    "followsTimer": "Theo đồng hồ",
+    "defaultHint": "Pomodoro là màu đơn sắc đổi theo chế độ đồng hồ. Chọn một không gian để tinh chỉnh.",
+    "brightnessHint": "Giảm xuống nếu bạn khó đọc chữ.",
+    "animate": "Chuyển động",
+    "animateHint": "Tắt để chỉ vẽ một khung hình tĩnh, đỡ tốn pin.",
+    "reducedMotionNote": "Thiết bị của bạn đang bật giảm chuyển động nên các không gian đứng yên.",
+    "followMode": "Đổi màu theo đồng hồ",
+    "followModeHint": "Màu chuyển giữa lúc tập trung và lúc nghỉ.",
+    "followModeUnsupported": "Không gian này giữ màu riêng."
+  },
+  "arcadeKit": {
+    "subtitle": "Trò chơi ngắn cho giờ nghỉ của bạn.",
+    "breakNote": "Làm cho giờ nghỉ 2 đến 5 phút: chơi một ván rồi quay lại việc. Không cần cày level, không có gì phải hoàn thành.",
+    "filterLabel": "Lọc trò chơi",
+    "category": {
+      "all": "Tất cả",
+      "action": "Hành động",
+      "puzzle": "Giải đố",
+      "skill": "Kỹ năng"
+    },
+    "minutes": "~{min} phút",
+    "control": {
+      "keyboard": "Bàn phím",
+      "mouse": "Chuột",
+      "touch": "Cảm ứng"
+    },
+    "controls": "Điều khiển",
+    "howToPlay": "Cách chơi",
+    "tip": "Mẹo",
+    "play": "Chơi",
+    "start": "Bắt đầu",
+    "yourBest": "Điểm cao nhất của bạn: {score}",
+    "loading": "Đang tải trò chơi…",
+    "score": "Điểm",
+    "best": "Cao nhất",
+    "bestIs": "Điểm cao nhất: {score}",
+    "newBest": "Điểm cao nhất mới!",
+    "time": "Thời gian",
+    "moves": "Lượt",
+    "level": "Level",
+    "lives": "Mạng",
+    "combo": "Combo",
+    "difficulty": "Độ khó",
+    "pause": "Tạm dừng",
+    "resume": "Tiếp tục",
+    "restart": "Chơi lại từ đầu",
+    "close": "Đóng trò chơi",
+    "paused": "Đã tạm dừng",
+    "pausedHint": "Esc cũng tạm dừng và tiếp tục. Trò chơi tự dừng khi bạn chuyển tab.",
+    "gameOver": "Hết lượt",
+    "playAgain": "Chơi lại",
+    "backToGames": "Về danh sách trò chơi"
+  },
+  "arcadeGames": {
+    "snake": {
+      "title": "Rắn săn mồi",
+      "description": "Ăn mồi, dài ra và đừng tự cắn mình.",
+      "instructions": "Điều khiển bằng phím mũi tên hoặc WASD, hoặc vuốt trên màn hình cảm ứng. Ăn chấm đỏ để dài ra và được 10 điểm. Rắn càng dài càng nhanh, đụng tường hoặc thân mình là kết thúc.",
+      "tip": "Bám sát tường lúc đầu và luôn chừa khoảng trống phía trước đầu rắn.",
+      "hint": "Mũi tên / WASD hoặc vuốt · Esc để tạm dừng",
+      "length": "Độ dài",
+      "summary": "Độ dài cuối: {length}"
+    },
+    "game2048": {
+      "title": "2048",
+      "description": "Trượt và gộp ô số để đạt 2048.",
+      "instructions": "Trượt tất cả ô bằng phím mũi tên, WASD hoặc vuốt. Hai ô giống nhau chạm nhau sẽ gộp thành một và cộng điểm. Đạt 2048 là thắng, sau đó bạn vẫn chơi tiếp được. Ván kết thúc khi bàn đầy và không còn ô nào gộp được.",
+      "tip": "Giữ ô lớn nhất ở một góc và xếp dãy số giảm dần dọc một cạnh.",
+      "hint": "Mũi tên / WASD hoặc vuốt · Esc để tạm dừng",
+      "reached": "Bạn đã đạt 2048!",
+      "reachedHint": "Chơi tiếp để lấy điểm cao hơn, hoặc dừng tại đây.",
+      "keepGoing": "Chơi tiếp",
+      "finish": "Kết thúc",
+      "highestTile": "Ô cao nhất: {tile}"
+    },
+    "minesweeper": {
+      "title": "Dò mìn",
+      "description": "Mở hết ô an toàn mà không chạm mìn.",
+      "instructions": "Chạm vào ô để mở. Con số cho biết có bao nhiêu mìn trong 8 ô xung quanh. Cắm cờ vào ô bạn nghĩ có mìn (chuột phải, giữ lâu, hoặc bật chế độ cắm cờ). Mở hết ô an toàn là thắng; lượt chạm đầu tiên luôn an toàn.",
+      "tip": "Chạm vào số đã đủ cờ xung quanh để mở nhanh các ô còn lại quanh nó.",
+      "hint": "Bấm để mở · chuột phải hoặc giữ lâu để cắm cờ · Esc để tạm dừng",
+      "easy": "Dễ",
+      "medium": "Vừa",
+      "hard": "Khó",
+      "mines": "Mìn",
+      "flagMode": "Chế độ cắm cờ",
+      "boom": "Nổ rồi!",
+      "cleared": "Đã dọn xong!",
+      "cellHidden": "Ô {n}, chưa mở",
+      "cellFlag": "Ô {n}, đã cắm cờ",
+      "cellOpen": "Ô {n}, {count} mìn xung quanh"
+    },
+    "stack": {
+      "title": "Xếp tháp",
+      "description": "Thả khối đang trượt để xây tháp 3D.",
+      "instructions": "Một khối trượt qua lại phía trên tháp. Chạm, bấm hoặc nhấn Space để thả. Phần thừa ra ngoài sẽ bị cắt, nên mỗi lần lệch tháp lại hẹp hơn. Thả gần như khớp hoàn toàn với khối bên dưới để được lượt hoàn hảo và giữ nguyên kích thước.",
+      "tip": "Nhìn mép khối thay vì giữa khối, và thả đúng lúc hai mép thẳng hàng.",
+      "hint": "Chạm, bấm hoặc Space để thả · Esc để tạm dừng",
+      "floors": "Tầng",
+      "perfect": "Hoàn hảo!",
+      "perfectCombo": "Hoàn hảo x{n}!",
+      "summary": "Chiều cao tháp: {floors} tầng"
+    },
+    "typingSprint": {
+      "title": "Gõ phím nhanh",
+      "description": "Gõ được càng nhiều từ càng tốt trong 60 giây.",
+      "instructions": "Gõ từ tiếng Anh đang được tô sáng rồi nhấn Space hoặc Enter để gửi. Từ đúng được điểm bằng độ dài của nó, từ sai không có điểm. Bạn có 60 giây. Tốc độ hiển thị theo số từ mỗi phút (5 ký tự = 1 từ).",
+      "tip": "Nhìn trước từ kế tiếp trong khi tay đang gõ nốt từ hiện tại.",
+      "hint": "Space hoặc Enter để gửi từ · Esc để tạm dừng",
+      "points": "Điểm",
+      "wpm": "WPM",
+      "accuracy": "Độ chính xác",
+      "words": "Từ",
+      "timeUp": "Hết giờ!",
+      "inputLabel": "Gõ từ đang được tô sáng",
+      "placeholder": "Bắt đầu gõ…"
+    },
+    "aimTrainer": {
+      "title": "Luyện phản xạ",
+      "description": "Bấm trúng mục tiêu trước khi chúng thu nhỏ biến mất.",
+      "instructions": "Mỗi lần xuất hiện một mục tiêu. Bấm hoặc chạm vào nó trước khi vòng tròn thu nhỏ hết. Bấm càng nhanh và combo càng dài thì điểm càng cao. Bấm trượt hoặc để mục tiêu biến mất sẽ mất combo. Mỗi ván kéo dài 30 giây và mục tiêu nhanh dần.",
+      "tip": "Giữ con trỏ gần giữa màn hình để mục tiêu nào cũng ở gần.",
+      "hint": "Bấm hoặc chạm vào mục tiêu · Esc để tạm dừng",
+      "target": "Mục tiêu",
+      "timeUp": "Hết giờ!",
+      "hits": "Số lần trúng",
+      "accuracy": "Độ chính xác",
+      "reaction": "Phản xạ TB"
+    },
+    "brickBreaker": {
+      "title": "Phá gạch",
+      "description": "Đỡ bóng nảy và phá hết gạch.",
+      "instructions": "Di chuyển thanh đỡ bằng chuột, phím mũi tên hoặc kéo ngón tay. Chạm, bấm hoặc nhấn Space để phóng bóng. Phá hết gạch để qua level mới. Phá liên tiếp nhiều gạch mà bóng chưa chạm thanh đỡ sẽ có thưởng combo. Bạn có 3 mạng.",
+      "tip": "Đỡ bóng bằng mép thanh để lái bóng vào các góc.",
+      "hint": "Chuột, ← → hoặc kéo · Space hoặc chạm để phóng · Esc để tạm dừng",
+      "launch": "Chạm hoặc nhấn Space để phóng",
+      "summary": "Đạt level {level}"
+    },
+    "spaceShooter": {
+      "title": "Bắn tàu vũ trụ",
+      "description": "Né, bắn và nhặt vật phẩm hỗ trợ.",
+      "instructions": "Tàu tự động bắn, bạn chỉ cần di chuyển: kéo bằng chuột hoặc ngón tay, hoặc dùng phím mũi tên hay WASD. Bắn địch để lấy điểm và tránh đạn của chúng. Thỉnh thoảng có vật phẩm rơi: R là bắn nhanh, 3 là bắn ba tia, S là khiên chặn một lần va chạm. Bạn có 3 mạng và cứ mỗi 400 điểm, địch lại dày hơn.",
+      "tip": "Ở nửa dưới màn hình để có thời gian phản ứng.",
+      "hint": "Kéo, mũi tên hoặc WASD để di chuyển · Esc để tạm dừng",
+      "summary": "Đạt level {level}"
+    },
+    "memoryMatch": {
+      "title": "Lật thẻ ghi nhớ",
+      "description": "Tìm hết các cặp giống nhau với ít lượt nhất.",
+      "instructions": "Mỗi lượt lật hai thẻ để tìm cặp giống nhau. Cặp đúng được giữ mở, cặp sai úp lại nên hãy nhớ vị trí. Điểm giảm theo mỗi lượt thừa và mỗi giây, nên hãy chơi nhanh và gọn.",
+      "tip": "Lúc đầu hãy lật theo thứ tự cố định để mỗi lần lật đều có thông tin.",
+      "hint": "Bấm hoặc chạm vào thẻ · Esc để tạm dừng",
+      "easy": "6 cặp",
+      "medium": "8 cặp",
+      "hard": "10 cặp",
+      "cleared": "Đã tìm đủ các cặp!",
+      "cardBack": "Thẻ đang úp",
+      "cardFace": "Thẻ hiện biểu tượng {n}"
+    },
+    "ticTacToe": {
+      "title": "Cờ ca-rô",
+      "description": "Năm ván đấu với máy.",
+      "instructions": "Chơi năm ván với máy, bạn cầm X. Xếp đủ ba ô liên tiếp trên bàn 3 × 3, hoặc bốn ô trên bàn 4 × 4. Thắng được 3 điểm, hoà được 1 điểm; chế độ Khó và bàn 4 × 4 mỗi cái nhân đôi điểm. Bạn và máy luân phiên đi trước.",
+      "tip": "Chiếm ô giữa hoặc góc trước; ở chế độ Khó, hoà đã là kết quả tốt.",
+      "hint": "Bấm hoặc chạm vào ô · Esc để tạm dừng",
+      "easy": "Dễ",
+      "hard": "Khó",
+      "board": "Bàn cờ",
+      "round": "Ván",
+      "yourTurn": "Đến lượt bạn",
+      "aiThinking": "Máy đang nghĩ…",
+      "youWin": "Bạn thắng ván này!",
+      "aiWins": "Máy thắng ván này.",
+      "draw": "Hoà.",
+      "nextRound": "Ván tiếp theo",
+      "finish": "Xem kết quả",
+      "points": "{points} điểm",
+      "matchOver": "Kết thúc trận",
+      "wins": "Thắng",
+      "draws": "Hoà",
+      "losses": "Thua",
+      "emptyCell": "Ô trống {n}"
     }
   }
 }
