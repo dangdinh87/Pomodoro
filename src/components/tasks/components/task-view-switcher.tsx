@@ -2,7 +2,7 @@
 
 import { TaskViewMode, useTasksStore } from '@/stores/task-store'
 import { Button } from '@/components/ui/button'
-import { LayoutGrid, Table, ChevronDown, Check } from 'lucide-react'
+import { SquaresFour, Table, CaretDown, Check } from '@phosphor-icons/react/dist/ssr';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +13,7 @@ import { useI18n } from '@/contexts/i18n-context'
 
 const viewOptions: { value: TaskViewMode; label: string; icon: typeof Table }[] = [
   { value: 'table', label: 'List', icon: Table },
-  { value: 'kanban', label: 'Kanban', icon: LayoutGrid },
+  { value: 'kanban', label: 'Kanban', icon: SquaresFour },
 ]
 
 export function TaskViewSwitcher() {
@@ -29,7 +29,7 @@ export function TaskViewSwitcher() {
         <Button variant="outline" size="sm" className="h-9 gap-2 px-3">
           <CurrentIcon className="h-4 w-4" />
           <span className="text-sm font-medium">{current.label}</span>
-          <ChevronDown className="h-3.5 w-3.5 opacity-50" />
+          <CaretDown size={14} className="opacity-50" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -43,7 +43,7 @@ export function TaskViewSwitcher() {
               <Icon className="h-4 w-4 mr-2" />
               {option.label}
               {viewMode === option.value && (
-                <Check className="h-4 w-4 ml-auto" />
+                <Check size={16} className="ml-auto" />
               )}
             </DropdownMenuItem>
           )

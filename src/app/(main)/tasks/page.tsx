@@ -1,11 +1,12 @@
 "use client"
 
+import { useRouter } from 'next/navigation'
+import { CircleNotch } from '@phosphor-icons/react/dist/ssr'
 import { TaskManagement } from '@/components/tasks/task-management'
+import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
-import { useAuth } from "@/hooks/use-auth"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Loader2 } from "lucide-react"
+import { PageContainer, PageHeader } from '@/components/ui/page-header'
+import { useAuth } from '@/hooks/use-auth'
 import { useI18n } from '@/contexts/i18n-context'
 
 export default function TasksPage() {
@@ -15,41 +16,28 @@ export default function TasksPage() {
 
   if (isLoading) {
     return (
-      <main
-        className="container mx-auto px-4 py-12 min-h-full flex flex-col w-full items-center justify-center"
-        aria-label="Tasks management page"
-      >
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </main>
+      <PageContainer size="narrow" className="flex min-h-[50vh] items-center justify-center">
+        <CircleNotch size={28} className="animate-spin text-ink-faint" aria-label={t('common.loading')} />
+      </PageContainer>
     )
   }
 
   if (!isAuthenticated) {
     return (
-      <main
-        className="container mx-auto px-4 py-12 min-h-full flex flex-col items-center justify-center"
-        aria-label="Tasks management page"
-      >
+      <PageContainer size="narrow">
+        <PageHeader title={t('tasks.title')} />
         <EmptyState
           title={t('auth.signInToManageTasks')}
-          action={
-            <Button onClick={() => router.push('/login?redirect=/tasks')}>
-              {t('auth.signInButton')}
-            </Button>
-          }
+          description={t('tasksUi.signedOutDescription')}
+          action={<Button onClick={() => router.push('/login?redirect=/tasks')}>{t('auth.signInButton')}</Button>}
         />
-      </main>
+      </PageContainer>
     )
   }
 
   return (
-    <main
-      className="w-full h-full p-4 md:py-2 md:px-8"
-      aria-label="Tasks management page"
-    >
-      <div className="max-w-5xl mx-auto space-y-6 pb-8">
-        <TaskManagement />
-      </div>
-    </main>
+    <PageContainer size="narrow">
+      <TaskManagement />
+    </PageContainer>
   )
 }

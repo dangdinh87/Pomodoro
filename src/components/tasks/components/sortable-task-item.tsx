@@ -1,88 +1,52 @@
 "use client"
 
 import React from 'react'
-
-
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { DotsSixVertical } from '@phosphor-icons/react/dist/ssr'
 import { Task } from '@/stores/task-store'
-import { TaskItem } from './task-item'
-import { GripVertical } from 'lucide-react'
+import { useI18n } from '@/contexts/i18n-context'
 import { cn } from '@/lib/utils'
+import { TaskRow, TaskRowHandlers } from './task-row'
 
-interface SortableTaskItemProps {
+interface SortableTaskItemProps extends TaskRowHandlers {
   task: Task
   isActive: boolean
   isDragging?: boolean
-  onToggleStatus: (task: Task) => void
-  onEdit: (task: Task) => void
-  onDelete: (id: string) => void
-  onClone?: (id: string) => void
-  onSaveAsTemplate?: (id: string) => void
-  togglingTaskIds?: Set<string>
 }
 
 export const SortableTaskItem = React.memo(function SortableTaskItem({
   task,
   isActive,
   isDragging,
-  onToggleStatus,
-  onEdit,
-  onDelete,
-  onClone,
-  onSaveAsTemplate,
-  togglingTaskIds,
+  ...handlers
 }: SortableTaskItemProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging: isSortableDragging,
-  } = useSortable({ id: task.id })
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  }
+  const { t } = useI18n()
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging: isSortableDragging } = useSortable({ id: task.id })
 
   return (
     <div
       ref={setNodeRef}
-      style={style}
-      className={cn(
-        'relative',
-        (isDragging || isSortableDragging) && 'opacity-50 z-50'
-      )}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      className={cn('relative', (isDragging || isSortableDragging) && 'z-50 opacity-50')}
     >
-      <div className="relative group/drag">
-        {/* Drag Handle */}
-        <button
-          {...attributes}
-          {...listeners}
-          className={cn(
-            'absolute left-0 top-1/2 -translate-y-1/2 -translate-x-8 z-10',
-            'opacity-0 group-hover/drag:opacity-100 transition-opacity',
-            'p-1 hover:bg-muted rounded cursor-grab active:cursor-grabbing',
-            'touch-none' // Prevent touch scrolling on drag handle
-          )}
-          aria-label="Drag to reorder"
-        >
-          <GripVertical className="h-4 w-4 text-muted-foreground" />
-        </button>
-
-        <TaskItem
-          task={task}
-          isActive={isActive}
-          onToggleStatus={onToggleStatus}
-          onEdit={onEdit}
-          onDelete={onDelete}
-          onClone={onClone}
-          onSaveAsTemplate={onSaveAsTemplate}
-          togglingTaskIds={togglingTaskIds}
-        />
-      </div>
+      <TaskRow
+        task={task}
+        isActive={isActive}
+        variant="card"
+        dragHandle={
+          <button
+            type="button"
+            {...attributes}
+            {...listeners}
+            className="absolute left-1 top-3 z-10 cursor-grab touch-none rounded p-1 text-ink-muted transition-colors hover:bg-surface-raised hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand active:cursor-grabbing"
+            aria-label={t('tasksUi.dragHandle')}
+          >
+            <DotsSixVertical size={16} />
+          </button>
+        }
+        {...handlers}
+      />
     </div>
   )
 })

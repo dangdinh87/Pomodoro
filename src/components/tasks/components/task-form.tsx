@@ -36,10 +36,10 @@ export function TaskForm({
   }
 
   return (
-    <section className="rounded-xl border bg-card/70 backdrop-blur p-4 md:p-6 space-y-4">
+    <section className="rounded-lg border border-border bg-surface p-4 md:p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-ink-muted">
             {editingTask ? 'Update selected task' : 'Create a new task to get started'}
           </p>
           <h2 className="text-lg font-semibold">

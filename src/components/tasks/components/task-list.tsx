@@ -6,7 +6,7 @@ import { TaskItem } from './task-item'
 import { AnimatedListItem } from '@/components/ui/animated-list'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Skeleton } from '@/components/ui/skeleton'
-import { LayoutList, FilterX } from 'lucide-react'
+import { Rows, FunnelX } from '@phosphor-icons/react/dist/ssr';
 import { useI18n } from '@/contexts/i18n-context'
 import { AnimatePresence } from 'motion/react'
 import { DndContext, closestCenter, DragOverlay } from '@dnd-kit/core'
@@ -90,7 +90,7 @@ export function TaskList({
       <EmptyState
         title={t('tasks.noTasks')}
         description={t('tasks.noTasksDescription')}
-        className="py-20 px-4 bg-muted/10 border border-dashed border-muted/50 rounded-2xl"
+        className="py-20 px-4 border border-dashed border-border-strong rounded-lg"
       />
     )
   }
@@ -107,7 +107,7 @@ export function TaskList({
       onDragCancel={dndProps.handleDragCancel}
     >
       <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
-        <div className="grid gap-3">
+        <div className="grid gap-2">
           <AnimatePresence mode="popLayout" initial={false}>
             {tasks.map((task) => (
               <AnimatedListItem key={task.id}>

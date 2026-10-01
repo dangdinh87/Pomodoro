@@ -4,7 +4,7 @@ import { Task } from '@/stores/task-store'
 import { TaskItem } from './task-item'
 import { AnimatedListItem } from '@/components/ui/animated-list'
 import { AnimatePresence } from 'motion/react'
-import { ChevronDown, ChevronRight } from 'lucide-react'
+import { CaretDown, CaretRight } from '@phosphor-icons/react/dist/ssr';
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 
@@ -45,12 +45,12 @@ export function SubtaskList({
     <div className="mt-2">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mb-2 ml-4"
+        className="flex items-center gap-1.5 text-xs text-ink-muted hover:text-ink transition-colors mb-2 ml-4"
       >
         {isExpanded ? (
-          <ChevronDown className="h-3.5 w-3.5" />
+          <CaretDown size={14} />
         ) : (
-          <ChevronRight className="h-3.5 w-3.5" />
+          <CaretRight size={14} />
         )}
         <span className="font-medium">
           Subtasks ({progress?.completed}/{progress?.total})
@@ -59,7 +59,7 @@ export function SubtaskList({
 
       <AnimatePresence mode="popLayout" initial={false}>
         {isExpanded && (
-          <div className="ml-6 pl-4 border-l-2 border-muted/50 space-y-2">
+          <div className="ml-6 pl-4 border-l-2 border-border space-y-2">
             {subtasks.map((subtask) => (
               <AnimatedListItem key={subtask.id}>
                 <div className={cn("transform scale-[0.95] origin-left")}>
