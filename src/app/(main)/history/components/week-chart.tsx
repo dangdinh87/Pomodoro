@@ -43,7 +43,7 @@ export function WeekChart({ data }: WeekChartProps) {
                         </span>
                         <div className="flex items-end border-b border-border-strong" style={{ height: CHART_HEIGHT }}>
                             <div
-                                className="w-6 rounded-t-[4px] transition-[height] duration-500 ease-out motion-reduce:transition-none sm:w-9"
+                                className="w-6 rounded-t-sm transition-[height] duration-500 ease-out motion-reduce:transition-none sm:w-9"
                                 style={{
                                     height,
                                     background: isToday

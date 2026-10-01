@@ -70,7 +70,7 @@ export function TemplatePicker({ onSelect }: TemplatePickerProps) {
                 onClick={() => handleSelect(template)}
                 className={cn(
                   "w-full text-left p-3 rounded-lg transition-colors overflow-hidden",
-                  "hover:bg-surface-hover focus:bg-surface-hover focus:outline-none",
+                  "hover:bg-surface-hover focus:bg-surface-hover focus:outline-hidden",
                   "border border-transparent hover:border-border"
                 )}
               >

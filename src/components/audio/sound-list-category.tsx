@@ -66,7 +66,7 @@ export const SoundListCategory = memo(function SoundListCategory({
                                 aria-pressed={isActive}
                                 aria-label={label}
                                 className={cn(
-                                    'flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-surface-raised transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand',
+                                    'flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-surface-raised transition-colors hover:text-ink focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand',
                                     isActive ? 'text-brand' : 'text-ink-secondary'
                                 )}
                             >
@@ -98,7 +98,7 @@ export const SoundListCategory = memo(function SoundListCategory({
                                 }}
                                 className={cn(
                                     'min-w-[60px] flex-1',
-                                    !isActive && 'opacity-50 [&_[role=slider]]:border-border-strong [&_[role=slider]]:bg-surface-raised'
+                                    !isActive && 'opacity-50 **:[[role=slider]]:border-border-strong **:[[role=slider]]:bg-surface-raised'
                                 )}
                             />
 

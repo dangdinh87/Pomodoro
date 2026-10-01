@@ -59,7 +59,7 @@ const NowPlayingCompact = ({
           </div>
         )}
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/60 opacity-0 transition-opacity group-hover:opacity-100">
-          <span className="text-[0.6875rem] font-semibold uppercase tracking-[0.05em] text-white">{t('common.edit')}</span>
+          <span className="text-[0.6875rem] font-semibold uppercase tracking-wider text-white">{t('common.edit')}</span>
         </div>
       </div>
 
@@ -69,7 +69,7 @@ const NowPlayingCompact = ({
         <div className="flex items-center gap-2 mb-0.5">
           <span
             className={cn(
-              "flex items-center gap-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.05em]",
+              "flex items-center gap-1.5 text-[0.6875rem] font-semibold uppercase tracking-wider",
               isPlaying ? "text-brand" : "text-ink-muted"
             )}
           >
@@ -172,7 +172,7 @@ export const YouTubeInputSection = memo(({
   return (
     <div className="flex flex-col">
       <div className={cn(
-        'relative rounded-lg overflow-hidden border bg-surface transition-all duration-300 ease-in-out focus-within:outline-none focus-within:ring-0',
+        'relative rounded-lg overflow-hidden border bg-surface transition-all duration-300 ease-in-out focus-within:outline-hidden focus-within:ring-0',
         PLAYER_HEIGHT,
         isPlaying
           ? "border-[color-mix(in_srgb,var(--accent)_50%,var(--border))]"
@@ -211,7 +211,7 @@ export const YouTubeInputSection = memo(({
                   value={youtubeUrl}
                   onChange={(e) => onUrlChange(e.target.value)}
                   disabled={isBuffering}
-                  className="w-full h-full text-sm border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none focus:ring-0 focus:border-0 px-3 bg-transparent shadow-none"
+                  className="w-full h-full text-sm border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-hidden focus:ring-0 focus:border-0 px-3 bg-transparent shadow-none"
                 />
               </div>
 

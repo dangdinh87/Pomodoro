@@ -257,7 +257,7 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                                     aria-checked={selected}
                                     onClick={() => setLocalSettings({ ...localSettings, clockType: value })}
                                     className={cn(
-                                        'flex flex-col items-center gap-2 rounded-lg border bg-surface px-3 pb-2.5 pt-3 text-[0.8125rem] transition-[border-color,box-shadow] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand',
+                                        'flex flex-col items-center gap-2 rounded-lg border bg-surface px-3 pb-2.5 pt-3 text-[0.8125rem] transition-[border-color,box-shadow] duration-150 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand',
                                         selected ? 'border-transparent ring-2 ring-brand' : 'border-border hover:border-border-strong',
                                     )}
                                 >
@@ -291,7 +291,7 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
             </SettingsSection>
 
             <section className="space-y-3">
-                <h2 className="font-body text-[0.6875rem] font-semibold uppercase tracking-[0.05em] text-ink-muted">{t('settingsUi.livePreview')}</h2>
+                <h2 className="font-body text-[0.6875rem] font-semibold uppercase tracking-wider text-ink-muted">{t('settingsUi.livePreview')}</h2>
                 <div className="flex min-h-[200px] items-center justify-center rounded-lg border border-border bg-surface-raised p-6">
                     {(localSettings.clockType === 'digital' || localSettings.clockType === 'progress') && (
                         <div className="flex flex-col items-center gap-4">

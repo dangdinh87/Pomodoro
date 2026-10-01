@@ -16,7 +16,7 @@ export async function HeroSSR() {
         <LiveTimer className="lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center" />
 
         <div className="flex flex-col gap-8 lg:self-start">
-          <p className="max-w-[34rem] text-lg leading-relaxed text-ink-secondary">{t('landingUi.hero.lead')}</p>
+          <p className="max-w-136 text-lg leading-relaxed text-ink-secondary">{t('landingUi.hero.lead')}</p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Button size="lg" asChild>
               <Link href="/timer">

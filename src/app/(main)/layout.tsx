@@ -37,7 +37,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <main
           id="main-content"
           tabIndex={-1}
-          className="flex flex-1 flex-col pb-[calc(64px+env(safe-area-inset-bottom))] focus:outline-none md:pb-0"
+          className="flex flex-1 flex-col pb-[calc(64px+env(safe-area-inset-bottom))] focus:outline-hidden md:pb-0"
         >
           {children}
         </main>

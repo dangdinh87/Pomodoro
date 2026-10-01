@@ -88,7 +88,7 @@ export default function GuidePage() {
                             <li key={key}>
                                 <Link
                                     href={href}
-                                    className="group flex items-center justify-between gap-4 px-5 py-4 transition-colors duration-150 hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"
+                                    className="group flex items-center justify-between gap-4 px-5 py-4 transition-colors duration-150 hover:bg-surface-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"
                                 >
                                     <span className="min-w-0 space-y-0.5">
                                         <span className="block text-[0.9375rem] font-semibold text-ink">{t(`guide.howToUse.features.${key}.title`)}</span>
@@ -108,7 +108,7 @@ export default function GuidePage() {
                     </div>
                     <div className="overflow-hidden rounded-lg border border-border">
                         <table className="w-full text-left text-sm">
-                            <thead className="bg-surface-raised text-[0.6875rem] font-semibold uppercase tracking-[0.05em] text-ink-muted">
+                            <thead className="bg-surface-raised text-[0.6875rem] font-semibold uppercase tracking-wider text-ink-muted">
                                 <tr>
                                     <th scope="col" className="w-32 px-5 py-2.5">{t('pagesUi.guide.colKey')}</th>
                                     <th scope="col" className="px-5 py-2.5">{t('pagesUi.guide.colAction')}</th>

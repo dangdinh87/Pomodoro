@@ -108,7 +108,7 @@ export function LiveTimer({ className }: { className?: string }) {
         aria-valuenow={Math.round(progress)}
         className="mt-8 h-[3px] w-full overflow-hidden rounded-full bg-border"
       >
-        <div className="h-full bg-brand transition-[width] duration-[600ms] ease-linear" style={{ width: `${progress}%` }} />
+        <div className="h-full bg-brand transition-[width] duration-600 ease-linear" style={{ width: `${progress}%` }} />
       </div>
 
       <div className="mt-6 flex items-center justify-center gap-2">

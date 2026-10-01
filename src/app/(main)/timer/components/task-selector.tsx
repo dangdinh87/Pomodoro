@@ -22,7 +22,7 @@ import { useI18n } from '@/contexts/i18n-context';
 import { useTimerStore } from '@/stores/timer-store';
 
 const PILL =
-  'inline-flex h-10 max-w-[min(88vw,320px)] items-center gap-2 rounded-full border border-border bg-surface/60 px-4 backdrop-blur-md transition-colors hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand';
+  'inline-flex h-10 max-w-[min(88vw,320px)] items-center gap-2 rounded-full border border-border bg-surface/60 px-4 backdrop-blur-md transition-colors hover:bg-surface-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand';
 
 interface TaskSelectorProps {
   className?: string;
@@ -163,7 +163,7 @@ export function TaskSelector({ className }: TaskSelectorProps) {
                           aria-pressed={isActive}
                           onClick={() => handleSelectTask(task.id)}
                           className={cn(
-                            'flex w-full items-center gap-3 px-4 py-2.5 text-start transition-colors hover:bg-surface-hover focus-visible:bg-surface-hover focus-visible:outline-none',
+                            'flex w-full items-center gap-3 px-4 py-2.5 text-start transition-colors hover:bg-surface-hover focus-visible:bg-surface-hover focus-visible:outline-hidden',
                             isActive && 'bg-surface-raised',
                           )}
                         >
@@ -171,7 +171,7 @@ export function TaskSelector({ className }: TaskSelectorProps) {
                             <span className="block truncate text-sm font-medium text-ink">{task.title}</span>
                             <span className="mt-1.5 flex items-center gap-2">
                               <span className="h-1 w-14 overflow-hidden rounded-full bg-border" aria-hidden="true">
-                                <span className="block h-full bg-primary transition-[width] duration-[600ms]" style={{ width: `${progress}%` }} />
+                                <span className="block h-full bg-primary transition-[width] duration-600" style={{ width: `${progress}%` }} />
                               </span>
                               <span className="text-xs tabular-nums text-ink-muted">
                                 {task.actualPomodoros}/{task.estimatePomodoros}

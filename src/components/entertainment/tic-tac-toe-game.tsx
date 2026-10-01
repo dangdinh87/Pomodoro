@@ -248,7 +248,7 @@ export const TicTacToeGame = memo(function TicTacToeGame({
         }}
       >
         <div
-          className="rounded-lg border border-white/10 bg-white/[0.05] p-8 text-center max-w-md w-full"
+          className="rounded-lg border border-white/10 bg-white/5 p-8 text-center max-w-md w-full"
         >
           <h1
             className="font-heading text-3xl font-bold mb-2 text-white"
@@ -301,7 +301,7 @@ export const TicTacToeGame = memo(function TicTacToeGame({
       }}
     >
       <div
-        className={cn("rounded-lg border border-white/10 bg-white/[0.05] p-6 md:p-8 text-center max-w-md w-full", fullscreen && "mt-12")}
+        className={cn("rounded-lg border border-white/10 bg-white/5 p-6 md:p-8 text-center max-w-md w-full", fullscreen && "mt-12")}
         
       >
         {/* Header */}

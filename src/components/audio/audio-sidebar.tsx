@@ -61,7 +61,7 @@ export function AudioSidebar({ open, onOpenChange }: AudioSidebarProps) {
         side="right"
         className={cn(
           'w-full sm:max-w-[450px] p-0 flex flex-col gap-0',
-          'bg-surface focus:outline-none'
+          'bg-surface focus:outline-hidden'
         )}
         onOpenAutoFocus={(e) => {
           e.preventDefault()

@@ -25,7 +25,7 @@ function FAQItem({ question, answer }: FAQItemProps) {
         <motion.div
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
-          className="flex-shrink-0"
+          className="shrink-0"
         >
           <CaretDown size={18} className="text-ink-muted" />
         </motion.div>

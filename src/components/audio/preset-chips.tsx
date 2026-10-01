@@ -184,13 +184,13 @@ export const PresetChips = memo(function PresetChips() {
                 : preset.name
 
               return (
-                <div key={preset.id} className="flex-shrink-0 flex items-center gap-1">
+                <div key={preset.id} className="shrink-0 flex items-center gap-1">
                   <button
                     type="button"
                     aria-pressed={isActive}
                     onClick={() => handleLoadPreset(preset)}
                     className={cn(
-                      'inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-full border px-3 text-sm outline-none transition-colors duration-[140ms] focus-visible:ring-2 focus-visible:ring-brand',
+                      'inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-full border px-3 text-sm outline-hidden transition-colors duration-140 focus-visible:ring-2 focus-visible:ring-brand',
                       isActive
                         ? 'border-transparent bg-primary font-semibold text-white'
                         : 'border-border text-ink-secondary hover:bg-surface-hover',

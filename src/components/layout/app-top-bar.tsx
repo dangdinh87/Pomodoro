@@ -25,7 +25,7 @@ export function AppTopBar({ overlay = false }: { overlay?: boolean }) {
       <div className="mx-auto flex h-full max-w-[1180px] items-center gap-8 px-[clamp(16px,4vw,32px)]">
         <Link
           href="/timer"
-          className="flex shrink-0 items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+          className="flex shrink-0 items-center gap-2 rounded-md focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand"
         >
           <Image src="/images/logo.png" alt="" width={26} height={26} className="size-[26px]" priority />
           <span className="font-heading text-[0.9375rem] font-bold tracking-[-0.02em] text-ink">
@@ -42,7 +42,7 @@ export function AppTopBar({ overlay = false }: { overlay?: boolean }) {
                 href={href}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'relative flex items-center gap-2 px-3 text-sm transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand',
+                  'relative flex items-center gap-2 px-3 text-sm transition-colors duration-150 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand',
                   active ? 'font-semibold text-ink' : 'font-medium text-ink-muted hover:text-ink',
                 )}
               >
@@ -59,7 +59,7 @@ export function AppTopBar({ overlay = false }: { overlay?: boolean }) {
             href="/settings"
             aria-label={t('nav.settings')}
             aria-current={isNavActive(pathname, '/settings') ? 'page' : undefined}
-            className="flex size-9 items-center justify-center rounded-full text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand aria-[current=page]:text-ink"
+            className="flex size-9 items-center justify-center rounded-full text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand aria-[current=page]:text-ink"
           >
             <Gear size={19} />
           </Link>

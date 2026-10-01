@@ -67,12 +67,12 @@ export function FloatingPlayerBar({
                       <div className="h-3 w-4 text-brand">
                         <MusicVisualizer isPlaying barCount={4} />
                       </div>
-                      <span className="text-[0.6875rem] font-semibold uppercase tracking-[0.05em] text-brand">
+                      <span className="text-[0.6875rem] font-semibold uppercase tracking-wider text-brand">
                         Now Playing
                       </span>
                     </>
                   ) : (
-                    <span className="text-[0.6875rem] font-semibold uppercase tracking-[0.05em] text-ink-muted">
+                    <span className="text-[0.6875rem] font-semibold uppercase tracking-wider text-ink-muted">
                       Paused
                     </span>
                   )}

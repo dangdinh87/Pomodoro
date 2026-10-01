@@ -274,7 +274,7 @@ function GameInstructionPopup({ game, highScore, onStart, onClose }: GameInstruc
           <button
             onClick={onClose}
             aria-label="Close"
-            className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 rounded-md hover:bg-surface-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-strong"
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 rounded-md hover:bg-surface-hover transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-border-strong"
           >
             <X size={20} className="text-ink-muted" />
           </button>
@@ -355,7 +355,7 @@ function GameInstructionPopup({ game, highScore, onStart, onClose }: GameInstruc
           <Button
             onClick={onStart}
             size="lg"
-            className="w-full gap-2 mt-2"
+            className="w-full gap-2"
           >
             <Play size={18} weight="fill" />
             <span suppressHydrationWarning>{t('entertainment.startGame')}</span>
@@ -431,7 +431,7 @@ function GameCard({ game, highScore, onClick }: GameCardProps) {
       className={cn(
         'flex h-full flex-col items-start gap-3 rounded-lg border border-border bg-surface p-4 text-left sm:p-5',
         'transition-colors duration-150 hover:border-border-strong hover:bg-surface-hover',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface-page'
+        'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface-page'
       )}
     >
       <Icon size={28} className="text-ink-secondary" />

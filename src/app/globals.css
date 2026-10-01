@@ -1,6 +1,219 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Design tokens live as plain CSS variables further down (:root + [data-theme='dark']).
+   `inline` makes utilities reference those variables directly, so a runtime colour
+   preset (src/config/themes.ts) re-skins every utility, and opacity modifiers
+   (bg-brand/10) still work through Tailwind's own color-mix. */
+@theme inline {
+  --font-heading: var(--font-heading);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+  --font-space-grotesk: var(--font-heading);
+
+  /* shadcn/ui names */
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--border);
+  --color-ring: var(--accent);
+  --color-background: var(--surface-page);
+  --color-foreground: var(--ink);
+  --color-primary: var(--accent-solid);
+  --color-primary-foreground: #fff;
+  --color-secondary: var(--surface-raised);
+  --color-secondary-foreground: var(--ink);
+  --color-destructive: var(--rose-solid);
+  --color-destructive-foreground: #fff;
+  --color-muted: var(--surface-raised);
+  --color-muted-foreground: var(--ink-muted);
+  --color-accent: var(--surface-hover);
+  --color-accent-foreground: var(--ink);
+  --color-popover: var(--surface);
+  --color-popover-foreground: var(--ink);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--ink);
+
+  /* Design-system tokens */
+  --color-ink: var(--ink);
+  --color-ink-secondary: var(--ink-secondary);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-surface: var(--surface);
+  --color-surface-page: var(--surface-page);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-hover: var(--surface-hover);
+  --color-brand: var(--accent);
+  --color-brand-hover: var(--accent-hover);
+  --color-brand-soft: var(--accent-soft);
+  --color-brand-ink: var(--accent-ink);
+  --color-brand-solid: var(--accent-solid);
+  --color-brand-edge: var(--accent-edge);
+
+  /* Semantic tones — pick by meaning, never for decoration (docs/design-system.md §4.2) */
+  --color-success: var(--green-solid);
+  --color-success-bg: var(--green-bg);
+  --color-success-ink: var(--green-ink);
+  --color-warning: var(--amber-solid);
+  --color-warning-bg: var(--amber-bg);
+  --color-warning-ink: var(--amber-ink);
+  --color-danger: var(--rose-solid);
+  --color-danger-bg: var(--rose-bg);
+  --color-danger-ink: var(--rose-ink);
+  --color-info: var(--blue-solid);
+  --color-info-bg: var(--blue-bg);
+  --color-info-ink: var(--blue-ink);
+  --color-ai: var(--purple-solid);
+  --color-ai-bg: var(--purple-bg);
+  --color-ai-ink: var(--purple-ink);
+  --color-gold: var(--gold);
+  --color-timer: var(--timer-foreground);
+
+  /* `rounded` / `rounded-md` = inputs, chips (8px); `rounded-lg` = cards (12px) */
+  --radius: var(--radius);
+  --radius-sm: 4px;
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius-lg);
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-fade-in: fade-in 0.5s ease-out;
+  --animate-slide-in-from-top: slide-in-from-top 0.3s ease-out;
+  --animate-slide-in-from-bottom: slide-in-from-bottom 0.3s ease-out;
+  --animate-pulse-ring: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-clock-pulse: clock-pulse 1s ease-in-out infinite;
+  --animate-clock-dot-pulse: clock-dot-pulse 2s ease-in-out infinite;
+
+  @keyframes accordion-down {
+    from { height: 0; }
+    to { height: var(--radix-accordion-content-height); }
+  }
+  @keyframes accordion-up {
+    from { height: var(--radix-accordion-content-height); }
+    to { height: 0; }
+  }
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slide-in-from-top {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+  }
+  @keyframes slide-in-from-bottom {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  @keyframes pulse-ring {
+    0%, 100% { transform: scale(0.95); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.5; }
+  }
+  @keyframes clock-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+  }
+  @keyframes clock-dot-pulse {
+    0%, 100% { opacity: 0; r: 6; }
+    50% { opacity: 0.4; r: 10; }
+  }
+}
+
+/* Only the legal pages use it; keeps v3's centred, capped container. */
+@utility container {
+  margin-inline: auto;
+  padding-inline: 2rem;
+  @media (width >= 1400px) {
+    max-width: 1400px;
+  }
+}
+
+/* v4 preflight dropped the pointer cursor on buttons; the app relies on it. */
+@layer base {
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/* ═══ Button — docs/design-system.md §7.1. Primary/secondary/danger carry a 3D bottom edge. ═══ */
+@layer components {
+  .btn {
+    --btn-edge: 3px;
+    --btn-press-dist: 2px;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font-family: var(--font-body);
+    font-weight: 650;
+    line-height: 1;
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.1s ease, transform 0.1s ease, filter 0.15s ease;
+  }
+  .btn:focus-visible { outline: 2px solid var(--accent-solid); outline-offset: 2px; }
+  /* !important: the dark primary rule below is more specific and would bring the 3D edge back on a disabled button */
+  .btn:disabled { cursor: not-allowed; pointer-events: none; box-shadow: none !important; transform: none !important; }
+  .btn svg { flex-shrink: 0; pointer-events: none; }
+
+  .btn--sm { --btn-edge: 2px; --btn-press-dist: 1.5px; height: 32px; padding: 0 12px; font-size: 0.8125rem; font-weight: 600; border-radius: 8px; }
+  .btn--md { height: 38px; padding: 0 16px; font-size: 0.875rem; font-weight: 650; border-radius: 10px; }
+  .btn--lg { height: 44px; padding: 0 20px; font-size: 0.9375rem; font-weight: 700; border-radius: 11px; }
+  .btn--icon { --btn-edge: 2px; --btn-press-dist: 1.5px; height: 36px; width: 36px; padding: 0; border-radius: 10px; }
+
+  .btn--primary {
+    background: var(--accent-solid); color: #fff; border-color: rgba(255, 255, 255, 0.16);
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.25), 0 var(--btn-edge) 0 0 var(--accent-edge);
+  }
+  [data-theme='dark'] .btn--primary {
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.22), 0 var(--btn-edge) 0 0 var(--accent-edge);
+  }
+  .btn--primary:hover:not(:disabled) { background: var(--accent-solid-hover); filter: brightness(1.04); }
+  [data-theme='dark'] .btn--primary:hover:not(:disabled) { filter: brightness(1.08); }
+  .btn--primary:active:not(:disabled) {
+    transform: translateY(var(--btn-press-dist));
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.2), 0 calc(var(--btn-edge) - var(--btn-press-dist)) 0 0 var(--accent-edge);
+  }
+  .btn--primary:disabled { background: color-mix(in srgb, var(--accent-solid) 35%, var(--surface-raised)); color: rgba(255, 255, 255, 0.5); border-color: transparent; }
+  [data-theme='dark'] .btn--primary:disabled { background: color-mix(in srgb, var(--accent-solid) 24%, var(--surface)); color: rgba(255, 255, 255, 0.45); border-color: rgba(255, 255, 255, 0.06); }
+
+  .btn--secondary {
+    background: var(--surface); color: var(--ink); border-color: var(--border-strong);
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7), 0 var(--btn-edge) 0 0 var(--border-strong);
+  }
+  [data-theme='dark'] .btn--secondary {
+    background: #1e222b; color: #fff; border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06), 0 var(--btn-edge) 0 0 #0f1218;
+  }
+  .btn--secondary:hover:not(:disabled) { background: var(--surface-hover); color: var(--ink); }
+  [data-theme='dark'] .btn--secondary:hover:not(:disabled) { background: #252b37; color: #fff; border-color: rgba(255, 255, 255, 0.14); }
+  .btn--secondary:active:not(:disabled) { transform: translateY(var(--btn-press-dist)); }
+  .btn--secondary:disabled { color: var(--ink-faint); border-color: var(--border); opacity: 0.55; }
+
+  .btn--ghost { background: transparent; color: var(--ink-secondary); font-weight: 600; box-shadow: none; }
+  .btn--ghost:hover:not(:disabled) { background: var(--surface-hover); color: var(--ink); }
+  .btn--ghost:active:not(:disabled) { transform: scale(0.98); }
+  .btn--ghost:disabled { color: var(--ink-faint); opacity: 0.45; }
+
+  .btn--link { height: auto; padding: 0; gap: 6px; background: transparent; color: var(--ink-secondary); font-weight: 500; box-shadow: none; border-radius: 0; }
+  .btn--link:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
+
+  .btn--danger {
+    background: var(--rose-solid); color: #fff; border-color: rgba(255, 255, 255, 0.16);
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.25), 0 var(--btn-edge) 0 0 #9f1239;
+  }
+  [data-theme='dark'] .btn--danger { box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.22), 0 var(--btn-edge) 0 0 #881337; }
+  .btn--danger:hover:not(:disabled) { filter: brightness(1.08); }
+  .btn--danger:active:not(:disabled) { transform: translateY(var(--btn-press-dist)); }
+  .btn--danger:disabled { background: color-mix(in srgb, var(--rose-solid) 35%, var(--surface-raised)); color: rgba(255, 255, 255, 0.5); border-color: transparent; }
+}
 
 /*
  * Design tokens — see docs/design-system.md.
@@ -119,221 +332,132 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+@layer utilities {
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  /* macOS-like scrollbar with dark mode improvements */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
   }
-}
-
-/* macOS-like scrollbar with dark mode improvements */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
-}
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 9999px;
-  border: 2px solid transparent;
-  background-clip: padding-box;
-  transition: background-color 0.2s ease;
-}
-[data-theme='dark'] ::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.3);
-}
-::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(0, 0, 0, 0.4);
-}
-[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.5);
-}
-
-/* Clock state animations */
-@keyframes clock-pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-}
-
-@keyframes clock-dot-pulse {
-  0%, 100% { opacity: 0; r: 6; }
-  50% { opacity: 0.4; r: 10; }
-}
-
-/* Smooth color transition for clock state changes */
-.clock-color-transition {
-  transition: color 1.5s ease-in-out;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-clock-pulse,
-  .animate-clock-dot-pulse {
-    animation: none;
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
   }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    transition: background-color 0.2s ease;
+  }
+  [data-theme='dark'] ::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+  [data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* Smooth color transition for clock state changes */
   .clock-color-transition {
-    transition: none;
+    transition: color 1.5s ease-in-out;
   }
-}
 
-.timer-state-transition {
-  transition:
-    opacity 0.2s ease-in-out,
-    transform 0.2s ease-in-out;
-}
+  @media (prefers-reduced-motion: reduce) {
+    .animate-clock-pulse,
+    .animate-clock-dot-pulse {
+      animation: none;
+    }
+    .clock-color-transition {
+      transition: none;
+    }
+  }
 
-/* Hide scrollbar while keeping scroll functionality */
-.scrollbar-hide {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
+  .timer-state-transition {
+    transition:
+      opacity 0.2s ease-in-out,
+      transform 0.2s ease-in-out;
+  }
 
-/* Custom macOS-style scrollbar for audio modal - visible & scrollable */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
-}
+  /* Hide scrollbar while keeping scroll functionality */
+  .scrollbar-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
+  /* Custom macOS-style scrollbar for audio modal - visible & scrollable */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.25);
-  border-radius: 10px;
-  transition: background-color 0.2s ease;
-}
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
 
-[data-theme='dark'] .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.35);
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(0, 0, 0, 0.4);
-}
-
-[data-theme='dark'] .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.4);
-}
-
-/* Firefox scrollbar */
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
-}
-
-[data-theme='dark'] .custom-scrollbar {
-  scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
-}
-
-/* Safe area utilities for notched devices (iOS, Android) */
-.pb-safe {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-.pt-safe {
-  padding-top: env(safe-area-inset-top, 0px);
-}
-
-.pl-safe {
-  padding-left: env(safe-area-inset-left, 0px);
-}
-
-.pr-safe {
-  padding-right: env(safe-area-inset-right, 0px);
-}
-
-/* ═══ Button — docs/design-system.md §7.1. Primary/secondary/danger carry a 3D bottom edge. ═══ */
-@layer components {
-  .btn {
-    --btn-edge: 3px;
-    --btn-press-dist: 2px;
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    border: 1px solid transparent;
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.25);
     border-radius: 10px;
-    font-family: var(--font-body);
-    font-weight: 650;
-    line-height: 1;
-    white-space: nowrap;
-    text-decoration: none;
-    cursor: pointer;
-    user-select: none;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.1s ease, transform 0.1s ease, filter 0.15s ease;
+    transition: background-color 0.2s ease;
   }
-  .btn:focus-visible { outline: 2px solid var(--accent-solid); outline-offset: 2px; }
-  /* !important: the dark primary rule below is more specific and would bring the 3D edge back on a disabled button */
-  .btn:disabled { cursor: not-allowed; pointer-events: none; box-shadow: none !important; transform: none !important; }
-  .btn svg { flex-shrink: 0; pointer-events: none; }
 
-  .btn--sm { --btn-edge: 2px; --btn-press-dist: 1.5px; height: 32px; padding: 0 12px; font-size: 0.8125rem; font-weight: 600; border-radius: 8px; }
-  .btn--md { height: 38px; padding: 0 16px; font-size: 0.875rem; font-weight: 650; border-radius: 10px; }
-  .btn--lg { height: 44px; padding: 0 20px; font-size: 0.9375rem; font-weight: 700; border-radius: 11px; }
-  .btn--icon { --btn-edge: 2px; --btn-press-dist: 1.5px; height: 36px; width: 36px; padding: 0; border-radius: 10px; }
+  [data-theme='dark'] .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.35);
+  }
 
-  .btn--primary {
-    background: var(--accent-solid); color: #fff; border-color: rgba(255, 255, 255, 0.16);
-    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.25), 0 var(--btn-edge) 0 0 var(--accent-edge);
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.4);
   }
-  [data-theme='dark'] .btn--primary {
-    border-color: rgba(255, 255, 255, 0.15);
-    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.22), 0 var(--btn-edge) 0 0 var(--accent-edge);
-  }
-  .btn--primary:hover:not(:disabled) { background: var(--accent-solid-hover); filter: brightness(1.04); }
-  [data-theme='dark'] .btn--primary:hover:not(:disabled) { filter: brightness(1.08); }
-  .btn--primary:active:not(:disabled) {
-    transform: translateY(var(--btn-press-dist));
-    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.2), 0 calc(var(--btn-edge) - var(--btn-press-dist)) 0 0 var(--accent-edge);
-  }
-  .btn--primary:disabled { background: color-mix(in srgb, var(--accent-solid) 35%, var(--surface-raised)); color: rgba(255, 255, 255, 0.5); border-color: transparent; }
-  [data-theme='dark'] .btn--primary:disabled { background: color-mix(in srgb, var(--accent-solid) 24%, var(--surface)); color: rgba(255, 255, 255, 0.45); border-color: rgba(255, 255, 255, 0.06); }
 
-  .btn--secondary {
-    background: var(--surface); color: var(--ink); border-color: var(--border-strong);
-    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7), 0 var(--btn-edge) 0 0 var(--border-strong);
+  [data-theme='dark'] .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.4);
   }
-  [data-theme='dark'] .btn--secondary {
-    background: #1e222b; color: #fff; border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06), 0 var(--btn-edge) 0 0 #0f1218;
+
+  /* Firefox scrollbar */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
   }
-  .btn--secondary:hover:not(:disabled) { background: var(--surface-hover); color: var(--ink); }
-  [data-theme='dark'] .btn--secondary:hover:not(:disabled) { background: #252b37; color: #fff; border-color: rgba(255, 255, 255, 0.14); }
-  .btn--secondary:active:not(:disabled) { transform: translateY(var(--btn-press-dist)); }
-  .btn--secondary:disabled { color: var(--ink-faint); border-color: var(--border); opacity: 0.55; }
 
-  .btn--ghost { background: transparent; color: var(--ink-secondary); font-weight: 600; box-shadow: none; }
-  .btn--ghost:hover:not(:disabled) { background: var(--surface-hover); color: var(--ink); }
-  .btn--ghost:active:not(:disabled) { transform: scale(0.98); }
-  .btn--ghost:disabled { color: var(--ink-faint); opacity: 0.45; }
-
-  .btn--link { height: auto; padding: 0; gap: 6px; background: transparent; color: var(--ink-secondary); font-weight: 500; box-shadow: none; border-radius: 0; }
-  .btn--link:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
-
-  .btn--danger {
-    background: var(--rose-solid); color: #fff; border-color: rgba(255, 255, 255, 0.16);
-    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.25), 0 var(--btn-edge) 0 0 #9f1239;
+  [data-theme='dark'] .custom-scrollbar {
+    scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
   }
-  [data-theme='dark'] .btn--danger { box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.22), 0 var(--btn-edge) 0 0 #881337; }
-  .btn--danger:hover:not(:disabled) { filter: brightness(1.08); }
-  .btn--danger:active:not(:disabled) { transform: translateY(var(--btn-press-dist)); }
-  .btn--danger:disabled { background: color-mix(in srgb, var(--rose-solid) 35%, var(--surface-raised)); color: rgba(255, 255, 255, 0.5); border-color: transparent; }
+
+  /* Safe area utilities for notched devices (iOS, Android) */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .pl-safe {
+    padding-left: env(safe-area-inset-left, 0px);
+  }
+
+  .pr-safe {
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+
 }
 
 /* ═══ Timer: chrome fades while a session runs and the pointer is idle (hooks/use-chrome-idle.ts) ═══ */

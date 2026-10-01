@@ -34,7 +34,7 @@ export function SessionList({ sessions }: SessionListProps) {
                 >
                     <time
                         dateTime={session.date}
-                        className="order-4 text-right text-xs tabular-nums text-ink-muted sm:order-none sm:text-left sm:text-[0.8125rem]"
+                        className="order-4 text-right text-xs tabular-nums text-ink-muted sm:order-0 sm:text-left sm:text-[0.8125rem]"
                     >
                         {new Date(session.date).toLocaleString(INTL_LOCALE[lang], {
                             month: 'short',
@@ -45,16 +45,16 @@ export function SessionList({ sessions }: SessionListProps) {
                     </time>
                     <span
                         className={cn(
-                            'order-1 min-w-0 truncate text-sm sm:order-none',
+                            'order-1 min-w-0 truncate text-sm sm:order-0',
                             session.taskName ? 'font-medium text-ink' : 'text-ink-muted',
                         )}
                     >
                         {session.taskName ?? t('historyUi.sessions.noTask')}
                     </span>
-                    <Badge variant={MODE_VARIANT[session.mode]} className="order-3 justify-self-start sm:order-none sm:justify-self-auto">
+                    <Badge variant={MODE_VARIANT[session.mode]} className="order-3 justify-self-start sm:order-0 sm:justify-self-auto">
                         {t(`historyUi.sessions.modes.${session.mode}`)}
                     </Badge>
-                    <span className="order-2 text-right text-sm tabular-nums text-ink-secondary sm:order-none">
+                    <span className="order-2 text-right text-sm tabular-nums text-ink-secondary sm:order-0">
                         {t('historyUi.minutesShort', { minutes: Math.round(session.duration / 60) })}
                     </span>
                 </li>

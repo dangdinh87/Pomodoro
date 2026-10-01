@@ -55,7 +55,7 @@ export function TaskListView({ tasks, isLoading, activeTaskId, forceShowDone, ..
                     type="button"
                     aria-expanded={expanded}
                     onClick={() => setDoneOpen((open) => !open)}
-                    className="rounded text-[0.8125rem] font-medium text-brand transition-colors hover:text-brand-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                    className="rounded text-[0.8125rem] font-medium text-brand transition-colors hover:text-brand-ink focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand"
                   >
                     {expanded ? t('tasksUi.hideCompleted') : t('tasksUi.showCompleted', { count: group.length })}
                   </button>

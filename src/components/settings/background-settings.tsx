@@ -446,7 +446,7 @@ function PackThumbnail({
     <button
       type="button"
       aria-pressed={selected}
-      className={`relative aspect-video w-full overflow-hidden rounded-lg border transition-shadow duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
+      className={`relative aspect-video w-full overflow-hidden rounded-lg border transition-shadow duration-150 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand ${
         selected ? 'border-transparent ring-2 ring-brand' : 'border-border hover:border-border-strong'
       }`}
       onClick={() => onSelect(value)}
@@ -476,7 +476,7 @@ function ThumbnailContent({ item, label }: { item: BackgroundImage; label: strin
       return (
         <div className="absolute inset-0 flex items-center justify-center bg-surface-raised">
           <div
-            className="w-10 h-10 rounded-full border-2 shadow-sm"
+            className="w-10 h-10 rounded-full border-2 shadow-xs"
             style={{
               backgroundColor: 'var(--surface-page)',
               borderColor: 'var(--border)',

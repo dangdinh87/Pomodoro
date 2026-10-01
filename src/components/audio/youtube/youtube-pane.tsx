@@ -297,7 +297,7 @@ const YouTubePane = memo(() => {
                       aria-pressed={isActive}
                       onClick={() => setSelectedCategory(cat)}
                       className={cn(
-                        "inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-3 text-sm outline-none transition-colors duration-[140ms] focus-visible:ring-2 focus-visible:ring-brand",
+                        "inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-3 text-sm outline-hidden transition-colors duration-140 focus-visible:ring-2 focus-visible:ring-brand",
                         isActive
                           ? "border-transparent bg-primary font-semibold text-white"
                           : "border-border text-ink-secondary hover:bg-surface-hover"

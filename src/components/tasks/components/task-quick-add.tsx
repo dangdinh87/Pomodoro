@@ -50,7 +50,7 @@ export const TaskQuickAdd = forwardRef<HTMLInputElement, TaskQuickAddProps>(func
         placeholder={t('tasksUi.quickAddPlaceholder')}
         aria-label={t('tasksUi.quickAddLabel')}
         maxLength={200}
-        className="h-8 min-w-0 flex-1 basis-[calc(100%-2rem)] bg-transparent px-2 text-[0.9375rem] text-ink outline-none placeholder:text-ink-faint sm:basis-0"
+        className="h-8 min-w-0 flex-1 basis-[calc(100%-2rem)] bg-transparent px-2 text-[0.9375rem] text-ink outline-hidden placeholder:text-ink-faint sm:basis-0"
       />
 
       <div className="flex w-full items-center gap-1 sm:w-auto">
@@ -71,7 +71,7 @@ export const TaskQuickAdd = forwardRef<HTMLInputElement, TaskQuickAddProps>(func
             <Minus size={13} />
           </Button>
           <span
-            className="inline-flex min-w-[5.5rem] items-center justify-center gap-1.5 whitespace-nowrap tabular-nums"
+            className="inline-flex min-w-22 items-center justify-center gap-1.5 whitespace-nowrap tabular-nums"
           >
             <Timer size={14} className="text-ink-muted" aria-hidden />
             {t(estimate === 1 ? 'tasksUi.estimateValue' : 'tasksUi.estimateValuePlural', { count: estimate })}

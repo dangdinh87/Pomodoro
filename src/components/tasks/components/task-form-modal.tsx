@@ -335,7 +335,7 @@ export function TaskFormModal({
                     <button
                       type="button"
                       onClick={() => removeTag(tag)}
-                      className="rounded-full p-0.5 transition-colors hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                      className="rounded-full p-0.5 transition-colors hover:bg-surface-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand"
                       aria-label={`${t('common.delete')} ${tag}`}
                     >
                       <X size={10} />
@@ -380,7 +380,7 @@ export function TaskFormModal({
                     key={tag}
                     type="button"
                     onClick={() => handleAddTag(tag)}
-                    className="rounded-full border border-border px-2.5 py-0.5 text-xs text-ink-secondary transition-colors hover:border-border-strong hover:bg-surface-raised focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                    className="rounded-full border border-border px-2.5 py-0.5 text-xs text-ink-secondary transition-colors hover:border-border-strong hover:bg-surface-raised focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand"
                   >
                     {tag}
                   </button>

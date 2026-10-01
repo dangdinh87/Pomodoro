@@ -125,7 +125,7 @@ export const TaskRow = React.memo(function TaskRow({
       <div className="min-w-0 flex-1 space-y-1.5">
         <h3
           className={cn(
-            'line-clamp-3 break-words text-[0.9375rem] font-medium leading-snug text-ink',
+            'line-clamp-3 wrap-break-word text-[0.9375rem] font-medium leading-snug text-ink',
             variant === 'list' && 'md:line-clamp-1',
             isDone && 'text-ink-muted line-through',
           )}

@@ -25,14 +25,14 @@ export default async function LandingLayout({
         <div className="min-h-screen relative bg-surface-page text-ink">
           <a
             href="#main-content"
-            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-3 focus:z-[100] focus:rounded-md focus:bg-surface focus:px-3 focus:py-2 focus:text-sm focus:font-semibold focus:text-ink focus:ring-2 focus:ring-brand"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-3 focus:z-100 focus:rounded-md focus:bg-surface focus:px-3 focus:py-2 focus:text-sm focus:font-semibold focus:text-ink focus:ring-2 focus:ring-brand"
           >
             {t('skipLink.label')}
           </a>
           <main
             id="main-content"
             tabIndex={-1}
-            className="relative z-10 focus:outline-none"
+            className="relative z-10 focus:outline-hidden"
           >
             {children}
           </main>

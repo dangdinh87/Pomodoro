@@ -378,7 +378,7 @@ export const Game2048 = memo(function Game2048({
               variant="ghost"
               size="icon"
               onClick={initGame}
-              className="border border-white/10 bg-white/[0.06] text-white hover:bg-white/10 hover:text-white rounded-md w-9 h-9"
+              className="border border-white/10 bg-white/6 text-white hover:bg-white/10 hover:text-white rounded-md w-9 h-9"
               aria-label={t('entertainment.controls.restart')}
             >
               <ArrowCounterClockwise size={16} />

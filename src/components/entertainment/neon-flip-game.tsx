@@ -230,7 +230,7 @@ export const NeonFlipGame = memo(function MemoryMatchGame({
                 onClick={() => handleCardClick(index)}
                 className={cn(
                   "relative w-full h-full cursor-pointer transition-transform duration-300",
-                  card.isFlipped || card.isMatched ? "[transform:rotateY(180deg)]" : ""
+                  card.isFlipped || card.isMatched ? "transform-[rotateY(180deg)]" : ""
                 )}
                 style={{
                   transformStyle: 'preserve-3d',
