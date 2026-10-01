@@ -1,9 +1,9 @@
 'use client';
 
 import { memo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'motion/react';
 import { Button } from '@/components/ui/button';
-import { Music, Wallpaper, Clock, Maximize2, Minimize2 } from 'lucide-react';
+import { MusicNotes, ImageSquare, Clock, ArrowsOut, ArrowsIn } from '@phosphor-icons/react/dist/ssr';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useSystemStore } from '@/stores/system-store';
@@ -18,15 +18,17 @@ import {
 import { TimerSettingsModal } from '@/components/settings/timer-settings-modal';
 import { AudioSidebar } from '@/components/audio/audio-sidebar';
 import BackgroundSettingsModal from '@/components/settings/background-settings-modal';
-import { useSidebar } from '@/components/ui/sidebar';
+
+const DOCK_BUTTON =
+    'h-10 w-10 rounded-full border border-border bg-surface/60 text-ink-secondary backdrop-blur-md hover:bg-surface-hover hover:text-ink focus-visible:ring-2 focus-visible:ring-brand';
 
 export const TimerSettingsDock = memo(function TimerSettingsDock() {
     const { t } = useTranslation();
+    const reduceMotion = useReducedMotion();
     const { isFocusMode, setFocusMode, isTimerSettingsOpen, setTimerSettingsOpen } = useSystemStore();
     const [isFullscreen, setIsFullscreen] = useState(false);
 
     // Store access
-    const { setOpen: setSidebarOpen } = useSidebar();
     const currentlyPlaying = useAudioStore((state) => state.currentlyPlaying);
     const activeAmbientSounds = useAudioStore((state) => state.activeAmbientSounds);
     const activeAmbientWithVolume = activeAmbientSounds.filter(s => s.volume > 0);
@@ -42,7 +44,6 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
             document.documentElement.requestFullscreen().then(() => {
                 setIsFullscreen(true);
                 setFocusMode(true);
-                setSidebarOpen(false);
             }).catch((err) => {
                 console.error(`Error attempting to enable fullscreen: ${err.message}`);
             });
@@ -51,7 +52,6 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                 document.exitFullscreen().then(() => {
                     setIsFullscreen(false);
                     setFocusMode(false);
-                    setSidebarOpen(true);
                 });
             }
         }
@@ -59,26 +59,20 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
 
     return (
         <>
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 flex gap-2 items-center">
+            <div data-chrome className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2">
                 <TooltipProvider>
                     {!isFocusMode && (
                         <>
                             {/* Music Button */}
-                            <Tooltip side="bottom">
+                            <Tooltip side="top">
                                 <TooltipTrigger asChild>
                                     <Button
                                         variant="ghost"
                                         size="icon"
                                         aria-label={t('timerComponents.enhancedTimer.soundSettings')}
                                         className={cn(
-                                            "h-10 w-10 rounded-full backdrop-blur-sm border transition-all relative overflow-visible",
-                                            hasActiveAudio
-                                                ? currentlyPlaying?.type === 'youtube'
-                                                    ? isAudioPlaying
-                                                        ? "bg-red-500/90 border-red-500/50 text-white hover:bg-red-500 shadow-lg shadow-red-500/25 pulse-red"
-                                                        : "bg-red-500/60 border-red-500/40 text-white hover:bg-red-500/80 shadow-md shadow-red-500/20"
-                                                    : "bg-gradient-to-br from-primary/80 to-primary border-primary/50 text-primary-foreground hover:from-primary hover:to-primary/90 shadow-lg shadow-primary/25"
-                                                : "bg-background/20 hover:bg-background/40 border-white/10 text-foreground"
+                                            DOCK_BUTTON,
+                                            hasActiveAudio && "border-transparent bg-primary text-white hover:bg-primary/90"
                                         )}
                                         onClick={() => setAudioSettingsOpen(true)}
                                     >
@@ -86,30 +80,15 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                             <div className="flex items-center justify-center relative w-full h-full">
                                                 {currentlyPlaying?.type === 'youtube' ? (
                                                     <>
-                                                        {/* Ripple/Glow Effect - Only when playing */}
-                                                        {isAudioPlaying && (
-                                                            <motion.div
-                                                                className="absolute inset-0 rounded-full border-2 border-white/80"
-                                                                animate={{
-                                                                    scale: [1, 1.3, 1],
-                                                                    opacity: [0.8, 0, 0.8],
-                                                                }}
-                                                                transition={{
-                                                                    duration: 1.2,
-                                                                    repeat: Infinity,
-                                                                    ease: "easeInOut",
-                                                                }}
-                                                            />
-                                                        )}
                                                         {/* Icon - Animated only when playing */}
                                                         <motion.svg
-                                                            className="h-5 w-5 text-white fill-current relative z-10"
+                                                            className="relative z-10 h-5 w-5 fill-current text-white"
                                                             viewBox="0 0 24 24"
                                                             aria-hidden="true"
-                                                            animate={isAudioPlaying ? {
-                                                                scale: [1, 1.2, 1],
+                                                            animate={isAudioPlaying && !reduceMotion ? {
+                                                                scale: [1, 1.15, 1],
                                                             } : undefined}
-                                                            transition={isAudioPlaying ? {
+                                                            transition={isAudioPlaying && !reduceMotion ? {
                                                                 duration: 1.2,
                                                                 repeat: Infinity,
                                                                 ease: "easeInOut",
@@ -119,11 +98,11 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                                         </motion.svg>
                                                     </>
                                                 ) : (
-                                                    <AudioLines size={20} animate={isAudioPlaying} className="text-background" aria-hidden="true" />
+                                                    <AudioLines size={20} animate={isAudioPlaying && !reduceMotion} className="text-white" aria-hidden="true" />
                                                 )}
                                             </div>
                                         ) : (
-                                            <Music className="h-5 w-5" aria-hidden="true" />
+                                            <MusicNotes size={20} aria-hidden="true" />
                                         )}
                                     </Button>
                                 </TooltipTrigger>
@@ -131,7 +110,7 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                     {hasActiveAudio && currentlyPlaying ? (
                                         <div className="flex items-center gap-2">
                                             {currentlyPlaying.type === 'youtube' ? (
-                                                <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="#ff0000">
+                                                <svg className="h-4 w-4 shrink-0 text-danger" viewBox="0 0 24 24" fill="currentColor">
                                                     <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
                                                 </svg>
                                             ) : (
@@ -140,8 +119,8 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                             <div className="flex flex-col min-w-0">
                                                 <span className="max-w-[180px] truncate">{currentlyPlaying.name}</span>
                                                 {activeAmbientWithVolume.length > 0 && currentlyPlaying.type !== 'ambient' && (
-                                                    <span className="text-[10px] text-muted-foreground font-medium">
-                                                        + {activeAmbientWithVolume.length} ambient sound{activeAmbientWithVolume.length > 1 ? 's' : ''}
+                                                    <span className="text-[0.6875rem] font-medium text-ink-muted">
+                                                        {t('timerUi.dock.moreAmbient').replace('{count}', String(activeAmbientWithVolume.length))}
                                                     </span>
                                                 )}
                                             </div>
@@ -151,73 +130,73 @@ export const TimerSettingsDock = memo(function TimerSettingsDock() {
                                             <AudioLines size={16} className="shrink-0" animate={true} />
                                             <span className="max-w-[180px] truncate">
                                                 {activeAmbientWithVolume.length === 1
-                                                    ? "Ambient Sound Playing"
-                                                    : `Mixed Ambient (${activeAmbientWithVolume.length} sounds)`}
+                                                    ? t('timerUi.dock.ambientPlaying')
+                                                    : t('timerUi.dock.ambientMix').replace('{count}', String(activeAmbientWithVolume.length))}
                                             </span>
                                         </div>
                                     ) : (
-                                        <p>{t('timerComponents.enhancedTimer.soundSettings')}</p>
+                                        <p>{t('timerUi.dock.sounds')}</p>
                                     )}
                                 </TooltipContent>
                             </Tooltip>
 
-                            {/* Settings Button */}
-                            <Tooltip side="bottom">
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        aria-label={t('timerComponents.enhancedTimer.timerSettings')}
-                                        className="h-10 w-10 rounded-full bg-background/20 backdrop-blur-sm hover:bg-background/40 border border-white/10 text-foreground"
-                                        onClick={() => setTimerSettingsOpen(true)}
-                                    >
-                                        <Clock className="h-5 w-5" aria-hidden="true" />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>{t('timerComponents.enhancedTimer.timerSettings')}</p>
-                                </TooltipContent>
-                            </Tooltip>
-
                             {/* Background Button */}
-                            <Tooltip side="bottom">
+                            <Tooltip side="top">
                                 <TooltipTrigger asChild>
                                     <Button
                                         variant="ghost"
                                         size="icon"
                                         aria-label={t('timerComponents.enhancedTimer.backgroundSettings')}
-                                        className="h-10 w-10 rounded-full bg-background/20 backdrop-blur-sm hover:bg-background/40 border border-white/10 text-foreground"
+                                        className={DOCK_BUTTON}
                                         onClick={() => setBackgroundSettingsOpen(true)}
                                     >
-                                        <Wallpaper className="h-5 w-5" aria-hidden="true" />
+                                        <ImageSquare size={20} aria-hidden="true" />
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p>{t('timerComponents.enhancedTimer.backgroundSettings')}</p>
+                                    <p>{t('timerUi.dock.scene')}</p>
+                                </TooltipContent>
+                            </Tooltip>
+
+                            {/* Settings Button */}
+                            <Tooltip side="top">
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        aria-label={t('timerComponents.enhancedTimer.timerSettings')}
+                                        className={DOCK_BUTTON}
+                                        onClick={() => setTimerSettingsOpen(true)}
+                                    >
+                                        <Clock size={20} aria-hidden="true" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>{t('timerUi.dock.timer')}</p>
                                 </TooltipContent>
                             </Tooltip>
                         </>
                     )}
 
                     {/* Fullscreen Button */}
-                    <Tooltip side="bottom">
+                    <Tooltip side="top">
                         <TooltipTrigger asChild>
                             <Button
                                 variant="ghost"
                                 size="icon"
                                 aria-label={isFullscreen ? t('timerComponents.enhancedTimer.exitFocus') : t('timerComponents.enhancedTimer.enterFocus')}
-                                className="h-10 w-10 rounded-full bg-background/20 backdrop-blur-sm hover:bg-background/40 border border-white/10 text-foreground"
+                                className={DOCK_BUTTON}
                                 onClick={toggleFullscreen}
                             >
                                 {isFullscreen ? (
-                                    <Minimize2 className="h-5 w-5" aria-hidden="true" />
+                                    <ArrowsIn size={20} aria-hidden="true" />
                                 ) : (
-                                    <Maximize2 className="h-5 w-5" aria-hidden="true" />
+                                    <ArrowsOut size={20} aria-hidden="true" />
                                 )}
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>{isFullscreen ? t('timerComponents.enhancedTimer.exitFocus') : t('timerComponents.enhancedTimer.enterFocus')}</p>
+                            <p>{isFullscreen ? t('timerUi.dock.exitFocus') : t('timerUi.dock.focus')}</p>
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>

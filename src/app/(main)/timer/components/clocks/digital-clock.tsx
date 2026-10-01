@@ -3,6 +3,7 @@
 import { memo } from 'react';
 import NumberFlow from '@number-flow/react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useAnalogClockState } from './use-analog-clock-state';
 
 export type DigitalClockProps = {
@@ -14,9 +15,9 @@ export type DigitalClockProps = {
 };
 
 const sizeClasses = {
-  small: 'text-[clamp(3rem,9vmin,6rem)]',
-  medium: 'text-[clamp(4rem,13vmin,9rem)]',
-  large: 'text-[clamp(5rem,16vmin,12rem)]',
+  small: 'text-[clamp(64px,10vw,128px)]',
+  medium: 'text-[clamp(88px,15vw,196px)]',
+  large: 'text-[clamp(104px,18vw,240px)]',
 };
 
 const numberFlowTiming = {
@@ -31,6 +32,7 @@ export const DigitalClock = memo(
     timeLeft,
     clockSize = 'medium',
   }: DigitalClockProps) => {
+    const { t } = useTranslation();
     const animConfig = useAnalogClockState({ timeLeft, isRunning });
 
     const minutes = Math.floor(timeLeft / 60);
@@ -41,12 +43,14 @@ export const DigitalClock = memo(
         <div
           className={cn(
             sizeClasses[clockSize],
-            'font-space-grotesk font-bold tabular-nums mb-4',
+            'font-heading font-bold leading-none tabular-nums',
             'clock-color-transition',
             (animConfig.state === 'urgent' || animConfig.state === 'critical') && 'animate-clock-pulse',
           )}
           style={{ color: animConfig.color }}
-          aria-live="polite"
+          role="timer"
+          aria-live="off"
+          aria-label={t('timer.aria.timeRemaining').replace('{time}', `${minutes}:${String(seconds).padStart(2, '0')}`)}
         >
           <div className="flex items-center">
             <NumberFlow

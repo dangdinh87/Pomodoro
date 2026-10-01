@@ -142,7 +142,7 @@ export const AnalogClock = memo(
             <div
               className={cn(
                 size.text,
-                'font-space-grotesk font-bold tabular-nums',
+                'font-heading font-bold tabular-nums',
                 'clock-color-transition',
               )}
               style={{ color: animConfig.color }}

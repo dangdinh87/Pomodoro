@@ -2,16 +2,10 @@
 
 import { memo, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-    Pause,
-    Play,
-    RotateCcw,
-    SkipForwardIcon,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Pause, Play, ArrowCounterClockwise, SkipForward } from '@phosphor-icons/react/dist/ssr';
+import { Kbd } from '@/components/ui/kbd';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useTimerStore } from '@/stores/timer-store';
-import { useAnalogClockState } from './clocks/use-analog-clock-state';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -54,9 +48,6 @@ export const TimerControls = memo(function TimerControls() {
     const setTimeLeft = useTimerStore((state) => state.setTimeLeft);
     const setDeadlineAt = useTimerStore((state) => state.setDeadlineAt);
     const sessionCount = useTimerStore((state) => state.sessionCount);
-
-    // Clock state for color sync
-    const clockState = useAnalogClockState({ timeLeft, isRunning });
 
     // Local state
     const [skipConfirmOpen, setSkipConfirmOpen] = useState(false);
@@ -210,55 +201,67 @@ export const TimerControls = memo(function TimerControls() {
         }
     };
 
+    const hasProgress = timeLeft < (getTotalTimeForMode() ?? 0);
+    const primaryLabel = isRunning
+        ? t('timer.controls.pause')
+        : hasProgress
+          ? t('timerUi.resume')
+          : mode === 'work'
+            ? t('timerUi.startFocus')
+            : t('timerUi.startBreak');
+    const hintKey = isRunning ? 'timerUi.hintPause' : hasProgress ? 'timerUi.hintResume' : 'timerUi.hintStart';
+    const [hintBefore, hintAfter = ''] = t(hintKey).split('{key}');
+
     return (
         <>
-            <div className="flex items-center justify-center gap-3">
-                <Button
-                    onClick={resetTimer}
-                    disabled={isProcessing}
-                    aria-label={t('timer.controls.aria.reset')}
-                    title={t('timer.controls.reset_hint')}
-                    variant="ghost"
-                    size="icon"
-                    className="h-10 w-10 rounded-full opacity-70 hover:opacity-100 transition-all"
-                    style={{ color: clockState.color }}
-                >
-                    <RotateCcw size={16} aria-hidden="true" />
-                </Button>
+            <div className="flex flex-col items-center gap-3">
+                <div className="flex items-center justify-center gap-3">
+                    <Button
+                        onClick={resetTimer}
+                        disabled={isProcessing}
+                        aria-label={t('timer.controls.aria.reset')}
+                        title={t('timer.controls.reset_hint')}
+                        variant="ghost"
+                        size="icon"
+                        className="h-10 w-10 rounded-full text-ink-secondary hover:text-ink"
+                    >
+                        <ArrowCounterClockwise size={16} aria-hidden="true" />
+                    </Button>
 
-                <Button
-                    onClick={toggleTimer}
-                    disabled={isProcessing}
-                    aria-label={isRunning ? t('timer.controls.aria.pause') : t('timer.controls.aria.start')}
-                    title={isRunning ? t('timer.controls.pause_hint') : t('timer.controls.start_hint')}
-                    className={cn(
-                        "h-12 min-w-[120px] px-6 rounded-full text-sm font-semibold shadow-md transition-all hover:scale-105 active:scale-95 hover:brightness-110",
-                    )}
-                    style={{ backgroundColor: 'hsl(var(--foreground))', color: 'hsl(var(--background))' }}
-                >
-                    {isRunning ? (
-                        <span className="inline-flex items-center gap-1.5">
-                            <Pause size={16} fill="currentColor" aria-hidden="true" /> {t('timer.controls.pause')}
+                    <Button
+                        onClick={toggleTimer}
+                        disabled={isProcessing}
+                        title={isRunning ? t('timer.controls.pause_hint') : t('timer.controls.start_hint')}
+                        size="lg"
+                        className="min-w-[168px]"
+                    >
+                        <span className="inline-flex items-center gap-2">
+                            {isRunning ? (
+                                <Pause size={16} weight="fill" aria-hidden="true" />
+                            ) : (
+                                <Play size={16} weight="fill" aria-hidden="true" />
+                            )}
+                            {primaryLabel}
                         </span>
-                    ) : (
-                        <span className="inline-flex items-center gap-1.5">
-                            <Play size={16} fill="currentColor" aria-hidden="true" /> {t('timer.controls.start').toUpperCase()}
-                        </span>
-                    )}
-                </Button>
+                    </Button>
 
-                <Button
-                    onClick={handleSkipClick}
-                    disabled={isProcessing}
-                    variant="ghost"
-                    size="icon"
-                    aria-label={t('timer.controls.skip_hint')}
-                    title={t('timer.controls.skip_hint')}
-                    className="h-10 w-10 rounded-full opacity-70 hover:opacity-100 transition-all"
-                    style={{ color: clockState.color }}
-                >
-                    <SkipForwardIcon size={16} aria-hidden="true" />
-                </Button>
+                    <Button
+                        onClick={handleSkipClick}
+                        disabled={isProcessing}
+                        variant="ghost"
+                        size="icon"
+                        aria-label={t('timer.controls.skip_hint')}
+                        title={t('timer.controls.skip_hint')}
+                        className="h-10 w-10 rounded-full text-ink-secondary hover:text-ink"
+                    >
+                        <SkipForward size={16} aria-hidden="true" />
+                    </Button>
+                </div>
+                <p data-chrome className="flex items-center gap-1.5 text-xs text-ink-faint [@media(hover:none)]:hidden">
+                    {hintBefore}
+                    <Kbd>{t('timerUi.spaceKey')}</Kbd>
+                    {hintAfter}
+                </p>
             </div>
 
             <AlertDialog open={skipConfirmOpen} onOpenChange={setSkipConfirmOpen}>

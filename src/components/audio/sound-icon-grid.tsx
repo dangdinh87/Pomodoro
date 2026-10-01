@@ -1,7 +1,7 @@
 'use client'
 
 import { memo, useState } from 'react'
-import { ChevronDown } from 'lucide-react'
+import { CaretDown } from '@phosphor-icons/react/dist/ssr';
 import { cn } from '@/lib/utils'
 import { useAudioStore } from '@/stores/audio-store'
 import type { SoundItem } from '@/lib/audio/sound-catalog'
@@ -36,18 +36,18 @@ export const SoundIconGrid = memo(function SoundIconGrid({
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-1.5 w-full py-1.5 text-left group"
       >
-        <ChevronDown
+        <CaretDown
           className={cn(
-            'h-3.5 w-3.5 text-muted-foreground transition-transform',
+            'h-3.5 w-3.5 text-ink-muted transition-transform',
             !isOpen && '-rotate-90'
           )}
         />
-        <span className="text-sm font-medium text-foreground uppercase tracking-wider">
+        <span className="text-sm font-medium text-ink uppercase tracking-wider">
           {categoryLabel}
         </span>
-        <span className="text-xs text-foreground/80">({sounds.length})</span>
+        <span className="text-xs text-ink-secondary">({sounds.length})</span>
         {activeCount > 0 && (
-          <span className="ml-auto text-xs font-medium text-primary">
+          <span className="ml-auto text-xs font-medium text-brand">
             {activeCount} active
           </span>
         )}
@@ -66,8 +66,8 @@ export const SoundIconGrid = memo(function SoundIconGrid({
                     className={cn(
                       'h-10 w-full rounded-lg border text-lg transition-all flex items-center justify-center',
                       active
-                        ? 'border-primary bg-primary/15 shadow-sm scale-105'
-                        : 'border-border/40 bg-background/50 hover:border-border hover:bg-muted/50'
+                        ? 'border-brand bg-brand-soft'
+                        : 'border-border bg-surface hover:bg-surface-hover'
                     )}
                   >
                     {sound.icon}
@@ -75,7 +75,7 @@ export const SoundIconGrid = memo(function SoundIconGrid({
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="text-sm">
                   {sound.label}
-                  {sound.vn && <span className="text-foreground/90 ml-1">({sound.vn})</span>}
+                  {sound.vn && <span className="text-ink-secondary ml-1">({sound.vn})</span>}
                 </TooltipContent>
               </Tooltip>
             )

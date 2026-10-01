@@ -1,7 +1,7 @@
 'use client'
 
 import { memo } from 'react'
-import { X } from 'lucide-react'
+import { X } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { useAudioStore } from '@/stores/audio-store'
@@ -23,7 +23,7 @@ export const ActiveSoundCard = memo(function ActiveSoundCard({
   const stopAmbient = useAudioStore((s) => s.stopAmbient)
 
   return (
-    <div className="flex items-center gap-2 rounded-lg border border-border/50 bg-muted/30 px-3 py-2">
+    <div className="flex items-center gap-2 rounded-lg bg-surface-raised px-3 py-2">
       {/* Icon */}
       <span className="text-base shrink-0 w-6 text-center" title={t(`audio.sounds.${soundItem.id}`)}>
         {soundItem.icon}
@@ -45,7 +45,7 @@ export const ActiveSoundCard = memo(function ActiveSoundCard({
       />
 
       {/* Volume % */}
-      <span className="text-xs text-foreground/90 w-7 text-right tabular-nums">
+      <span className="text-xs text-ink-secondary w-7 text-right tabular-nums">
         {soundState.volume}%
       </span>
 
@@ -53,10 +53,10 @@ export const ActiveSoundCard = memo(function ActiveSoundCard({
       <Button
         variant="ghost"
         size="icon"
-        className="h-6 w-6 shrink-0 text-muted-foreground hover:text-destructive"
+        className="h-6 w-6 shrink-0 text-ink-muted hover:text-danger"
         onClick={() => stopAmbient(soundState.id)}
       >
-        <X className="h-3.5 w-3.5" />
+        <X size={14} />
       </Button>
     </div>
   )

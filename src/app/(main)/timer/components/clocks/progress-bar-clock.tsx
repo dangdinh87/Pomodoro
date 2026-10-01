@@ -24,20 +24,20 @@ export const ProgressBarClock = memo(
     return (
       <div className="text-center max-w-2xl mx-auto">
         <div className={size.spacing}>
-          <div className={cn(size.time, 'font-bold timer-state-transition tabular-nums')}>
+          <div className={cn(size.time, 'font-heading font-bold timer-state-transition tabular-nums')}>
             {formattedTime}
           </div>
         </div>
-        <div className={cn('w-full bg-white/15 backdrop-blur-sm rounded-full border border-white/10', size.bar, size.spacing)}>
+        <div className={cn('w-full rounded-full border border-border bg-surface/60 backdrop-blur-md', size.bar, size.spacing)}>
           <div
             className={cn(size.bar, 'rounded-full transition-all duration-1000')}
             style={{
               width: `${progressPercent}%`,
-              backgroundColor: 'hsl(var(--timer-foreground))',
+              backgroundColor: 'var(--timer-foreground)',
             }}
           />
         </div>
-        <div className="text-sm text-white/70">
+        <div className="text-sm text-ink-secondary">
           {t('timer.progress.complete', { percent: Math.round(progressPercent) })}
         </div>
       </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { memo, useState, useEffect } from 'react';
+import { useReducedMotion } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { useAnalogClockState } from './use-analog-clock-state';
 
@@ -18,6 +19,7 @@ const sizeClasses = {
 };
 
 const FlipDigit = memo(({ value, color }: { value: string; color: string }) => {
+  const reduceMotion = useReducedMotion();
   const [currentVal, setCurrentVal] = useState(value);
   const [prevVal, setPrevVal] = useState(value);
   const [isFlipping, setIsFlipping] = useState(false);
@@ -26,7 +28,7 @@ const FlipDigit = memo(({ value, color }: { value: string; color: string }) => {
   if (value !== currentVal) {
     setPrevVal(currentVal);
     setCurrentVal(value);
-    setIsFlipping(true);
+    setIsFlipping(!reduceMotion);
     setFlipId((id) => id + 1);
   }
 
@@ -41,12 +43,12 @@ const FlipDigit = memo(({ value, color }: { value: string; color: string }) => {
 
   return (
     <div 
-      className="relative inline-flex flex-col w-[0.82em] h-[1.3em] font-bold select-none text-center" 
+      className="relative inline-flex flex-col w-[0.82em] h-[1.3em] font-heading font-bold tabular-nums select-none text-center" 
       style={{ perspective: '400px', transformStyle: 'preserve-3d' }}
     >
       {/* STATIC TOP HALF (displays current new value) */}
       <div 
-        className="absolute top-0 left-0 right-0 h-1/2 overflow-hidden bg-neutral-900 dark:bg-black rounded-t-xl border-t border-x border-neutral-800/80 dark:border-zinc-800/60 shadow-sm"
+        className="absolute top-0 left-0 right-0 h-1/2 overflow-hidden bg-surface rounded-t-md border-t border-x border-border"
         style={{ backfaceVisibility: 'hidden' }}
       >
         <span 
@@ -64,7 +66,7 @@ const FlipDigit = memo(({ value, color }: { value: string; color: string }) => {
 
       {/* STATIC BOTTOM HALF (displays new value normally, old value only during active flip) */}
       <div 
-        className="absolute bottom-0 left-0 right-0 h-1/2 overflow-hidden bg-neutral-900 dark:bg-black rounded-b-xl border-b border-x border-neutral-800/80 dark:border-zinc-800/60 shadow-sm"
+        className="absolute bottom-0 left-0 right-0 h-1/2 overflow-hidden bg-surface rounded-b-md border-b border-x border-border"
         style={{ backfaceVisibility: 'hidden' }}
       >
         <span 
@@ -84,7 +86,7 @@ const FlipDigit = memo(({ value, color }: { value: string; color: string }) => {
       {isFlipping && (
         <div 
           key={`top-${flipId}`}
-          className="absolute top-0 left-0 right-0 h-1/2 overflow-hidden bg-neutral-900 dark:bg-black rounded-t-xl border-t border-x border-neutral-800/80 dark:border-zinc-800/60 flip-panel-top-anim"
+          className="absolute top-0 left-0 right-0 h-1/2 overflow-hidden bg-surface rounded-t-md border-t border-x border-border flip-panel-top-anim"
           style={{ 
             transformOrigin: 'bottom',
             backfaceVisibility: 'hidden',
@@ -110,7 +112,7 @@ const FlipDigit = memo(({ value, color }: { value: string; color: string }) => {
       {isFlipping && (
         <div 
           key={`bottom-${flipId}`}
-          className="absolute bottom-0 left-0 right-0 h-1/2 overflow-hidden bg-neutral-900 dark:bg-black rounded-b-xl border-b border-x border-neutral-800/80 dark:border-zinc-800/60 flip-panel-bottom-anim"
+          className="absolute bottom-0 left-0 right-0 h-1/2 overflow-hidden bg-surface rounded-b-md border-b border-x border-border flip-panel-bottom-anim"
           style={{ 
             transformOrigin: 'top',
             backfaceVisibility: 'hidden',
@@ -135,7 +137,7 @@ const FlipDigit = memo(({ value, color }: { value: string; color: string }) => {
 
       {/* Center divide line */}
       <div 
-        className="absolute top-1/2 left-0 right-0 h-[1.5px] z-10 bg-black/40 border-t border-white/5"
+        className="absolute top-1/2 left-0 right-0 h-[1.5px] z-10 bg-border-strong"
       />
     </div>
   );
@@ -204,7 +206,7 @@ export const FlipClock = memo(
 
           {/* Separator */}
           <div 
-            className={cn(size.separator, 'font-bold flex items-center justify-center h-[1.3em] select-none')}
+            className={cn(size.separator, 'font-heading font-bold flex items-center justify-center h-[1.3em] select-none')}
             style={{ color: animConfig.color }}
           >
             :

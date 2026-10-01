@@ -34,7 +34,7 @@ interface BackgroundContextType {
 
 const defaultBackground: BackgroundSettings = {
   type: 'solid',
-  value: 'hsl(var(--background))',
+  value: 'var(--surface-page)',
   opacity: 1,
   blur: 0,
   brightness: 100,
@@ -68,7 +68,7 @@ const migrateBackground = (bg: BackgroundSettings): BackgroundSettings => {
     return {
       ...bg,
       type: 'solid',
-      value: 'hsl(var(--background))',
+      value: 'var(--surface-page)',
       opacity: 1,
       blur: 0,
       brightness: 100,
@@ -79,7 +79,7 @@ const migrateBackground = (bg: BackgroundSettings): BackgroundSettings => {
     return {
       ...bg,
       type: 'solid',
-      value: 'hsl(var(--background))',
+      value: 'var(--surface-page)',
       opacity: bg.opacity ?? 1,
       blur: bg.blur ?? 0,
       brightness: bg.brightness ?? 100,
@@ -92,7 +92,7 @@ const migrateBackground = (bg: BackgroundSettings): BackgroundSettings => {
       return {
         ...bg,
         type: 'solid',
-        value: 'hsl(var(--background))',
+        value: 'var(--surface-page)',
         opacity: 1,
         blur: 0,
         brightness: 100,
@@ -147,7 +147,7 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
           ? {
             showDottedMap: false,
             type: 'solid' as const,
-            value: 'hsl(var(--background))',
+            value: 'var(--surface-page)',
             opacity: 1,
             blur: 0,
             brightness: 100,

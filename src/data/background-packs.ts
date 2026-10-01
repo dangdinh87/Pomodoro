@@ -3,6 +3,9 @@
  * 7 packs, 31 items total. Images reference build-generated assets.
  */
 
+import { City, FilmStrip, Gear, House, Planet, Sword } from '@phosphor-icons/react/dist/ssr';
+import type { Icon as PhosphorIcon } from '@phosphor-icons/react';
+
 export interface BackgroundImage {
   id: string;
   nameKey: string;
@@ -20,7 +23,7 @@ export interface BackgroundPack {
   nameKey: string;
   /** Optional i18n key for pack description (shown under tab) */
   descriptionKey?: string;
-  icon: string;
+  icon: PhosphorIcon;
   items: BackgroundImage[];
 }
 
@@ -43,7 +46,7 @@ export const backgroundPacks: BackgroundPack[] = [
     id: 'system',
     nameKey: 'settings.background.packs.system',
     descriptionKey: 'settings.background.packDescriptions.system',
-    icon: '⚙️',
+    icon: Gear,
     items: [
       {
         id: 'system-auto-color',
@@ -58,7 +61,7 @@ export const backgroundPacks: BackgroundPack[] = [
     id: 'room',
     nameKey: 'settings.background.packs.room',
     descriptionKey: 'settings.background.packDescriptions.room',
-    icon: '🏠',
+    icon: House,
     items: [
       img('cyberpunk-scene-1', 'settings.background.presets.sunlitStudyRoom'),
       img('anime-cozy-home-1', 'settings.background.presets.goldenHourHome'),
@@ -74,7 +77,7 @@ export const backgroundPacks: BackgroundPack[] = [
     id: 'space',
     nameKey: 'settings.background.packs.space',
     descriptionKey: 'settings.background.packDescriptions.space',
-    icon: '🌌',
+    icon: Planet,
     items: [
       img('cityscape-anime-inspired-urban-area', 'settings.background.presets.cityscapeAnimeUrban'),
       img('cityscape-anime-inspired-urban-area-1', 'settings.background.presets.cityscapeAnimeUrban1'),
@@ -88,7 +91,7 @@ export const backgroundPacks: BackgroundPack[] = [
     id: 'fantasy',
     nameKey: 'settings.background.packs.fantasy',
     descriptionKey: 'settings.background.packDescriptions.fantasy',
-    icon: '⚔️',
+    icon: Sword,
     items: [
       img('cyberpunk-scene-2', 'settings.background.presets.enchantedForest'),
       img('fantasy-adventurers-1', 'settings.background.presets.fantasyAdventurers'),
@@ -102,7 +105,7 @@ export const backgroundPacks: BackgroundPack[] = [
     id: 'cyberpunk',
     nameKey: 'settings.background.packs.cyberpunk',
     descriptionKey: 'settings.background.packDescriptions.cyberpunk',
-    icon: '🌃',
+    icon: City,
     items: [
       img('futuristic-city-abstract', 'settings.background.presets.abstractFuturisticCity'),
       img('cyber-city', 'settings.background.presets.cyberCity'),
@@ -113,7 +116,7 @@ export const backgroundPacks: BackgroundPack[] = [
     id: 'lofi-video',
     nameKey: 'settings.background.packs.lofiVideo',
     descriptionKey: 'settings.background.packDescriptions.lofiVideo',
-    icon: '🎬',
+    icon: FilmStrip,
     items: [
       {
         id: 'day-chill',

@@ -29,12 +29,12 @@ export function getClockState(timeLeft: number, isRunning: boolean): ClockAnimat
     case 'idle':
     case 'running':
     case 'complete':
-      return { state, color: 'hsl(var(--foreground))' };
+      return { state, color: 'var(--ink)' };
 
     case 'urgent':
-      return { state, color: 'hsl(30, 95%, 55%)' };
+      return { state, color: 'var(--amber-meter)' };
 
     case 'critical':
-      return { state, color: 'hsl(0, 85%, 55%)' };
+      return { state, color: 'var(--rose-solid)' };
   }
 }

@@ -1,9 +1,10 @@
 'use client';
 
 import { memo, useMemo } from 'react';
+import { cn } from '@/lib/utils';
 import { useTimerStore } from '@/stores/timer-store';
-import { useSystemStore } from '@/stores/system-store';
-import { useTranslation } from '@/contexts/i18n-context';
+import { useReducedMotion } from 'motion/react';
+import { SessionCycle } from './session-cycle';
 import {
     AnalogClock,
     DigitalClock,
@@ -11,12 +12,11 @@ import {
 } from './clocks';
 
 export const TimerClockDisplay = memo(function TimerClockDisplay() {
-    const { t } = useTranslation();
+    const reduceMotion = useReducedMotion();
     const timeLeft = useTimerStore((state) => state.timeLeft);
     const settings = useTimerStore((state) => state.settings);
     const mode = useTimerStore((state) => state.mode);
     const isRunning = useTimerStore((state) => state.isRunning);
-    const setTimerSettingsOpen = useSystemStore((state) => state.setTimerSettingsOpen);
 
     const totalTimeForMode = useMemo(() => {
         switch (mode) {
@@ -86,21 +86,22 @@ export const TimerClockDisplay = memo(function TimerClockDisplay() {
             break;
     }
 
+    const showProgressLine = settings.clockType !== 'analog';
+
     return (
-        <div 
-            onClick={() => setTimerSettingsOpen(true)}
-            className="cursor-pointer inline-block transition-transform hover:scale-[1.02] active:scale-[0.98]"
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setTimerSettingsOpen(true);
-                }
-            }}
-            title={t('timerComponents.enhancedTimer.timerSettings')}
-        >
-            {clockContent}
+        <div className="flex w-full flex-col items-center gap-4">
+            <div className="flex w-fit max-w-full flex-col items-center gap-3">
+                {clockContent}
+                {showProgressLine && (
+                    <div className="h-[3px] w-full overflow-hidden rounded-full bg-border" aria-hidden="true">
+                        <div
+                            className={cn('h-full rounded-full bg-primary', !reduceMotion && 'transition-[width] duration-1000 ease-linear')}
+                            style={{ width: `${Math.min(100, Math.max(0, progressPercent))}%` }}
+                        />
+                    </div>
+                )}
+            </div>
+            <SessionCycle />
         </div>
     );
 });

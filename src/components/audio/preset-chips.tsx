@@ -1,7 +1,7 @@
 'use client'
 
 import { memo, useState, useRef, useCallback, useEffect } from 'react'
-import { Plus, Trash2, Edit2, MoreVertical, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Plus, Trash, PencilSimple, DotsThreeVertical, CaretLeft, CaretRight } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -24,6 +24,7 @@ import { builtInPresets } from '@/data/sound-presets'
 import type { SoundPreset } from '@/stores/audio-store'
 import { cn } from '@/lib/utils'
 import { useTranslation } from '@/contexts/i18n-context'
+import { getPresetIcon } from './sound-icons'
 
 function useScrollArrows() {
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -60,6 +61,11 @@ function useScrollArrows() {
   return { scrollRef, canScrollLeft, canScrollRight, scrollLeft, scrollRight }
 }
 
+function PresetIcon({ preset }: { preset: SoundPreset }) {
+  const Icon = getPresetIcon(preset.id)
+  return <Icon size={16} aria-hidden="true" />
+}
+
 export const PresetChips = memo(function PresetChips() {
   const { t } = useTranslation()
   const activeAmbientSounds = useAudioStore((s) => s.activeAmbientSounds)
@@ -74,14 +80,12 @@ export const PresetChips = memo(function PresetChips() {
 
   const [saveDialogOpen, setSaveDialogOpen] = useState(false)
   const [presetName, setPresetName] = useState('')
-  const [presetIcon, setPresetIcon] = useState('🎵')
 
   const [renameDialogOpen, setRenameDialogOpen] = useState(false)
   const [renamingPreset, setRenamingPreset] = useState<SoundPreset | null>(null)
   const [newPresetName, setNewPresetName] = useState('')
 
   // Combine built-in + user presets
-
 
   // Filter only sounds with volume > 0 for comparison
   const activeAmbientWithVolume = activeAmbientSounds.filter(s => s.volume > 0)
@@ -105,9 +109,8 @@ export const PresetChips = memo(function PresetChips() {
 
   const handleSavePreset = () => {
     if (!presetName.trim()) return
-    savePreset(presetName.trim(), presetIcon)
+    savePreset(presetName.trim())
     setPresetName('')
-    setPresetIcon('🎵')
     setSaveDialogOpen(false)
   }
 
@@ -136,12 +139,12 @@ export const PresetChips = memo(function PresetChips() {
   return (
     <>
       {/* Unified presets card */}
-      <div className="bg-background/40 border rounded-lg overflow-hidden">
+      <div className="bg-surface border border-border rounded-lg overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-2.5 py-1.5 border-b bg-background/60">
+        <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-border">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-bold text-foreground/90">{t('audio.presets.library')}</h3>
-            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-semibold">
+            <h3 className="text-sm font-bold text-ink-secondary">{t('audio.presets.library')}</h3>
+            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-surface-raised text-ink-secondary font-semibold tabular-nums">
               {allPresets.length}
             </span>
           </div>
@@ -150,9 +153,9 @@ export const PresetChips = memo(function PresetChips() {
             size="sm"
             onClick={() => setSaveDialogOpen(true)}
             disabled={activeAmbientWithVolume.length === 0 || userPresets.length >= 10 || isAnyPresetActive}
-            className="h-6 gap-1 text-[10px] font-semibold hover:bg-primary/10 hover:text-primary px-2"
+            className="h-6 gap-1 text-[10px] font-semibold px-2"
           >
-            <Plus className="h-3 w-3" />
+            <Plus size={12} />
             {t('audio.presets.saveMix')}
           </Button>
         </div>
@@ -160,14 +163,14 @@ export const PresetChips = memo(function PresetChips() {
         <div className="relative">
           {builtInScroll.canScrollLeft && (
             <Button variant="ghost" size="icon" onClick={builtInScroll.scrollLeft}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-background/80 hover:bg-background shadow-sm">
-              <ChevronLeft className="h-4 w-4" />
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-surface hover:bg-surface-hover border border-border">
+              <CaretLeft size={16} />
             </Button>
           )}
           {builtInScroll.canScrollRight && (
             <Button variant="ghost" size="icon" onClick={builtInScroll.scrollRight}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-background/80 hover:bg-background shadow-sm">
-              <ChevronRight className="h-4 w-4" />
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-surface hover:bg-surface-hover border border-border">
+              <CaretRight size={16} />
             </Button>
           )}
           <div ref={builtInScroll.scrollRef} className="flex gap-2 overflow-x-auto p-1.5 scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}>
@@ -181,24 +184,24 @@ export const PresetChips = memo(function PresetChips() {
 
               return (
                 <div key={preset.id} className="flex-shrink-0 flex items-center gap-1">
-                  <Button
-                    variant="outline"
-                    size="sm"
+                  <button
+                    type="button"
+                    aria-pressed={isActive}
                     onClick={() => handleLoadPreset(preset)}
                     className={cn(
-                      'h-8 px-3 text-sm font-medium whitespace-nowrap transition-all border',
+                      'inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-full border px-3 text-sm outline-none transition-colors duration-[140ms] focus-visible:ring-2 focus-visible:ring-brand',
                       isActive
-                        ? 'bg-primary text-primary-foreground hover:bg-primary/90 border-primary shadow-md'
-                        : 'hover:bg-accent hover:text-accent-foreground border-input',
-                      isUserPreset && !isActive && 'border-dashed border-primary/30'
+                        ? 'border-transparent bg-primary font-semibold text-white'
+                        : 'border-border text-ink-secondary hover:bg-surface-hover',
+                      isUserPreset && !isActive && 'border-dashed border-border-strong'
                     )}
                   >
-                    {preset.icon && <span>{preset.icon}</span>}
+                    <PresetIcon preset={preset} />
                     {displayName}
                     {isUserPreset && (
-                      <span className="ml-1 w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0" />
+                      <span className={cn('h-1.5 w-1.5 shrink-0 rounded-full', isActive ? 'bg-white' : 'bg-brand')} />
                     )}
-                  </Button>
+                  </button>
 
                   {/* User preset actions dropdown */}
                   {isUserPreset && (
@@ -207,21 +210,21 @@ export const PresetChips = memo(function PresetChips() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-6 w-6 shrink-0 text-muted-foreground hover:text-foreground"
+                          className="h-6 w-6 shrink-0 text-ink-muted hover:text-ink"
                         >
-                          <MoreVertical className="h-3.5 w-3.5" />
+                          <DotsThreeVertical size={14} />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => handleOpenRenameDialog(preset)}>
-                          <Edit2 className="mr-2 h-4 w-4" />
+                          <PencilSimple size={16} className="mr-2" />
                           {t('audio.presets.rename')}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleDeletePreset(preset.id)}
-                          className="text-destructive focus:text-destructive"
+                          className="text-danger focus:text-danger"
                         >
-                          <Trash2 className="mr-2 h-4 w-4" />
+                          <Trash size={16} className="mr-2" />
                           {t('audio.presets.delete')}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -247,17 +250,6 @@ export const PresetChips = memo(function PresetChips() {
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="preset-icon">{t('audio.presets.icon')}</Label>
-              <Input
-                id="preset-icon"
-                value={presetIcon}
-                onChange={(e) => setPresetIcon(e.target.value)}
-                placeholder={t('audio.presets.iconPlaceholder')}
-                maxLength={10}
-                className="text-base w-full"
-              />
-            </div>
             <div className="grid gap-2">
               <Label htmlFor="preset-name">{t('audio.presets.name')}</Label>
               <Input

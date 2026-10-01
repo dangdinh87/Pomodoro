@@ -1,7 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { motion, useReducedMotion } from 'motion/react';
 
 interface MusicVisualizerProps {
   isPlaying: boolean;
@@ -10,24 +9,14 @@ interface MusicVisualizerProps {
 }
 
 export function MusicVisualizer({ isPlaying, barCount = 5, className = '' }: MusicVisualizerProps) {
-  const [shouldAnimate, setShouldAnimate] = useState(true);
-
-  // Respect prefers-reduced-motion
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setShouldAnimate(!mediaQuery.matches);
-
-    const handleChange = () => setShouldAnimate(!mediaQuery.matches);
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
+  const shouldAnimate = !useReducedMotion();
 
   return (
     <div className={`flex items-center justify-center gap-0.5 h-full ${className}`}>
       {Array.from({ length: barCount }).map((_, i) => (
         <motion.div
           key={i}
-          className="w-0.5 bg-gradient-to-t from-primary via-primary/80 to-primary/40 rounded-full"
+          className="w-0.5 bg-current rounded-full"
           initial={{ height: '20%' }}
           animate={
             isPlaying && shouldAnimate
@@ -55,15 +44,7 @@ interface WaveformVisualizerProps {
 }
 
 export function WaveformVisualizer({ isPlaying, className = '' }: WaveformVisualizerProps) {
-  const [shouldAnimate, setShouldAnimate] = useState(true);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setShouldAnimate(!mediaQuery.matches);
-    const handleChange = () => setShouldAnimate(!mediaQuery.matches);
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
+  const shouldAnimate = !useReducedMotion();
 
   const bars = Array.from({ length: 40 });
 
@@ -77,7 +58,7 @@ export function WaveformVisualizer({ isPlaying, className = '' }: WaveformVisual
         return (
           <motion.div
             key={i}
-            className="w-[2px] bg-gradient-to-t from-primary/40 via-primary to-primary/60 rounded-full"
+            className="w-[2px] bg-current rounded-full"
             initial={{ height: '30%' }}
             animate={
               isPlaying && shouldAnimate

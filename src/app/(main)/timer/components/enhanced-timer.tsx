@@ -1,8 +1,8 @@
 'use client';
 
 import { memo, useState, useEffect } from 'react';
-import { CardContent } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import { useTimerStore } from '@/stores/timer-store';
+import { useChromeIdle } from '@/hooks/use-chrome-idle';
 import { useTimerEngine } from '../hooks/use-timer-engine';
 import { useTimerHotkeys } from '../hooks/use-timer-hotkeys';
 import { usePageTitle } from '../hooks/use-page-title';
@@ -25,6 +25,9 @@ export function EnhancedTimer() {
     useTimerEngine();
 
     // 2. Initialize Helpers
+    const mode = useTimerStore((state) => state.mode);
+    const isRunning = useTimerStore((state) => state.isRunning);
+    useChromeIdle(isRunning);
     useTimerHotkeys();
     usePageTitle();
 
@@ -48,33 +51,28 @@ export function EnhancedTimer() {
         setShowGuide(false);
     };
 
-    // 4. Render dumb layout
-    // Note: No subscription to 'timeLeft' or 'isRunning' here.
     return (
         <>
-            <div className="dark w-full min-h-[calc(100vh-6rem)] relative flex flex-col justify-center">
-                <div className="w-full max-w-xl mx-auto z-10">
-                    <div className={cn('bg-transparent border-0')}>
-                        <div className="text-center relative">
-                            <TimerModeSelector />
-
-                            <div className="pb-6 pt-2">
-                                <TimerClockDisplay />
-                            </div>
-                        </div>
-
-                        <CardContent className="space-y-5">
-                            <TimerControls />
-                            <DailyProgress />
-                        </CardContent>
+            <div
+                data-theme="dark"
+                data-timer
+                data-mode={mode === 'work' ? 'work' : 'break'}
+                className="relative flex min-h-[calc(100dvh-56px-64px-env(safe-area-inset-bottom))] w-full flex-col items-center justify-center px-[clamp(16px,4vw,32px)] pb-20 pt-6 md:min-h-[calc(100dvh-56px)]"
+            >
+                <div className="z-10 flex w-full max-w-xl flex-col items-center">
+                    <div data-chrome>
+                        <TimerModeSelector />
+                    </div>
+                    <TimerClockDisplay />
+                    <div className="mt-8 flex flex-col items-center gap-8">
+                        <TimerControls />
+                        <DailyProgress />
                     </div>
                 </div>
 
-                {/* Bottom Left Settings Controls */}
                 <TimerSettingsDock />
             </div>
 
-            {/* Timer Guide Dialog - shows on first visit */}
             <TimerGuideDialog open={showGuide} onClose={handleCloseGuide} />
         </>
     );

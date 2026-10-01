@@ -1,11 +1,10 @@
 import StreakTracker from '@/components/focus/streak-tracker'
+import { PageContainer } from '@/components/ui/page-header'
 
 export default function FocusPage() {
   return (
-    <div className="h-full flex items-center justify-center">
-      <div className="w-full">
-        <StreakTracker />
-      </div>
-    </div>
+    <PageContainer size="narrow">
+      <StreakTracker />
+    </PageContainer>
   )
 }

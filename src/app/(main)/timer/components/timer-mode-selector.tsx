@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useState } from 'react';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { FilterChip, FilterChipGroup } from '@/components/ui/filter-chip';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useTimerStore, TimerMode } from '@/stores/timer-store';
 import {
@@ -14,6 +14,12 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+
+const MODES: { value: TimerMode; labelKey: string }[] = [
+    { value: 'work', labelKey: 'timerUi.mode.work' },
+    { value: 'shortBreak', labelKey: 'timerUi.mode.shortBreak' },
+    { value: 'longBreak', labelKey: 'timerUi.mode.longBreak' },
+];
 
 export const TimerModeSelector = memo(function TimerModeSelector() {
     const { t } = useTranslation();
@@ -87,34 +93,18 @@ export const TimerModeSelector = memo(function TimerModeSelector() {
 
     return (
         <>
-            <div className="mb-8 flex justify-center">
-                <Tabs
-                    value={mode}
-                    onValueChange={(val) => handleModeChange(val as TimerMode)}
-                    className="w-fit"
-                >
-                    <TabsList className="bg-background/80 dark:bg-background/60 backdrop-blur-md border-border/50 rounded-full shadow-sm overflow-hidden">
-                        <TabsTrigger
-                            value="work"
-                            className="rounded-full px-6 py-2 text-sm font-medium text-foreground/60 data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=active]:shadow-md"
-                        >
-                            {t('timer.modes.work')}
-                        </TabsTrigger>
-                        <TabsTrigger
-                            value="shortBreak"
-                            className="rounded-full px-6 py-2 text-sm font-medium text-foreground/60 data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=active]:shadow-md"
-                        >
-                            {t('timer.modes.shortBreak')}
-                        </TabsTrigger>
-                        <TabsTrigger
-                            value="longBreak"
-                            className="rounded-full px-6 py-2 text-sm font-medium text-foreground/60 data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=active]:shadow-md"
-                        >
-                            {t('timer.modes.longBreak')}
-                        </TabsTrigger>
-                    </TabsList>
-                </Tabs>
-            </div>
+            <FilterChipGroup label={t('timerUi.modeGroup')} className="mb-8 justify-center">
+                {MODES.map(({ value, labelKey }) => (
+                    <FilterChip
+                        key={value}
+                        active={mode === value}
+                        onClick={() => handleModeChange(value)}
+                        className="h-9 px-4 text-sm"
+                    >
+                        {t(labelKey)}
+                    </FilterChip>
+                ))}
+            </FilterChipGroup>
 
             {/* Mode Switch Confirmation Dialog */}
             <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
@@ -132,7 +122,7 @@ export const TimerModeSelector = memo(function TimerModeSelector() {
                         <AlertDialogCancel onClick={handleCancelSwitch}>
                             {t('common.cancel') || 'Cancel'}
                         </AlertDialogCancel>
-                        <AlertDialogAction onClick={handleConfirmedSwitch}>
+                        <AlertDialogAction variant="destructive" onClick={handleConfirmedSwitch}>
                             {t('timer.mode_switch_confirm.confirm') || 'Switch anyway'}
                         </AlertDialogAction>
                     </AlertDialogFooter>

@@ -1,7 +1,7 @@
 'use client'
 
 import { memo } from 'react'
-import { Bell, Play } from 'lucide-react'
+import { Bell, Play } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import {
@@ -30,7 +30,7 @@ export const AlarmSettings = memo(function AlarmSettings() {
 
   return (
     <div className="flex items-center gap-3">
-      <Bell className="h-4 w-4 text-muted-foreground shrink-0" />
+      <Bell size={16} className="text-ink-muted shrink-0" />
       <Select
         value={alarmType}
         onValueChange={(v) => updateSettings({ alarmType: v })}
@@ -54,7 +54,7 @@ export const AlarmSettings = memo(function AlarmSettings() {
         onValueChange={([v]) => updateSettings({ alarmVolume: v })}
         className="flex-1"
       />
-      <span className="text-xs text-muted-foreground w-8 text-right tabular-nums">
+      <span className="text-xs text-ink-muted w-8 text-right tabular-nums">
         {alarmVolume}%
       </span>
       <Button
@@ -64,7 +64,7 @@ export const AlarmSettings = memo(function AlarmSettings() {
         onClick={previewAlarm}
         title="Preview alarm"
       >
-        <Play className="h-3.5 w-3.5" />
+        <Play size={14} />
       </Button>
     </div>
   )

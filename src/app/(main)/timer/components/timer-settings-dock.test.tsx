@@ -24,12 +24,6 @@ jest.mock('@/stores/audio-store', () => ({
   }),
 }));
 
-jest.mock('@/components/ui/sidebar', () => ({
-  useSidebar: () => ({
-    setOpen: jest.fn(),
-  }),
-}));
-
 // Mock components to avoid rendering full modals
 jest.mock('@/components/settings/timer-settings-modal', () => ({
   TimerSettingsModal: () => <div data-testid="timer-settings-modal" />,

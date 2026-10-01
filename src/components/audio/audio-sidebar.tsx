@@ -4,11 +4,13 @@ import { useEffect } from 'react'
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
+  SheetTitle,
 } from '@/components/ui/sheet'
-import { Volume2, VolumeX } from 'lucide-react'
+import { SpeakerHigh, SpeakerX } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
-import { Tabs, TabsList, TabsTrigger } from '@/components/animate-ui/components/animate/tabs'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useAudioStore } from '@/stores/audio-store'
 
 import { AmbientMixer } from './ambient-mixer'
@@ -59,8 +61,12 @@ export function AudioSidebar({ open, onOpenChange }: AudioSidebarProps) {
         side="right"
         className={cn(
           'w-full sm:max-w-[450px] p-0 flex flex-col gap-0',
-          'bg-background/95 backdrop-blur-md'
+          'bg-surface focus:outline-none'
         )}
+        onOpenAutoFocus={(e) => {
+          e.preventDefault()
+          ;(e.currentTarget as HTMLElement).focus()
+        }}
       >
         {/* Tabs with header in one row */}
         <Tabs
@@ -68,19 +74,17 @@ export function AudioSidebar({ open, onOpenChange }: AudioSidebarProps) {
           onValueChange={(v) => setActiveSource(v as 'ambient' | 'youtube')}
           className="flex-1 flex flex-col overflow-hidden"
         >
-          {/* Header with label and TabsList */}
-          <div className="px-4 pt-3 pb-2 shrink-0 flex items-center gap-3">
-            <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide shrink-0">
-              {t('audio.selectAudio')}
-            </h2>
-            <TabsList className="w-fit h-9">
-              <TabsTrigger value="ambient" className="text-sm px-3 py-1.5">
-                {t('audio.tabs.ambient')}
-              </TabsTrigger>
-              <TabsTrigger value="youtube" className="text-sm px-3 py-1.5 flex items-center gap-2">
+          <div className="shrink-0 px-4 pt-4">
+            <SheetTitle className="pe-8 font-heading text-[1.0625rem] font-bold tracking-[-0.01em] text-ink">
+              {t('timerUi.dock.sounds')}
+            </SheetTitle>
+            <SheetDescription className="sr-only">{t('audio.selectAudio')}</SheetDescription>
+            <TabsList className="mt-3">
+              <TabsTrigger value="ambient">{t('audio.tabs.ambient')}</TabsTrigger>
+              <TabsTrigger value="youtube">
                 <YouTubeIcon className={cn(
                   "h-4 w-4 transition-colors",
-                  currentTab === 'youtube' ? "text-red-500" : "text-muted-foreground"
+                  currentTab === 'youtube' ? "text-danger" : "text-ink-muted"
                 )} />
                 {t('audio.tabs.youtube')}
               </TabsTrigger>
@@ -115,7 +119,7 @@ export function AudioSidebar({ open, onOpenChange }: AudioSidebarProps) {
         </Tabs>
 
         {/* Fixed footer: master volume */}
-        <div className="border-t px-4 py-3 shrink-0">
+        <div className="border-t border-border px-4 py-3 shrink-0">
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
@@ -124,9 +128,9 @@ export function AudioSidebar({ open, onOpenChange }: AudioSidebarProps) {
               onClick={toggleMute}
             >
               {audioSettings.isMuted ? (
-                <VolumeX className="h-4 w-4 text-muted-foreground" />
+                <SpeakerX size={16} className="text-ink-muted" />
               ) : (
-                <Volume2 className="h-4 w-4" />
+                <SpeakerHigh size={16} />
               )}
             </Button>
             <Slider
@@ -142,7 +146,7 @@ export function AudioSidebar({ open, onOpenChange }: AudioSidebarProps) {
               }}
               className="flex-1"
             />
-            <span className="text-xs text-muted-foreground w-8 text-right tabular-nums">
+            <span className="text-xs text-ink-muted w-8 text-right tabular-nums">
               {audioSettings.isMuted ? 0 : audioSettings.masterVolume}%
             </span>
           </div>

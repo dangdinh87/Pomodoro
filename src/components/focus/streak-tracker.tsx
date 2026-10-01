@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
-import { Flame, CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Flame, CalendarDots, CaretLeft, CaretRight } from '@phosphor-icons/react/dist/ssr';
 import { cn } from '@/lib/utils'
 import {
   format,
@@ -218,8 +218,8 @@ export default function StreakTracker() {
   if (!loaded) {
     return (
       <div className="w-full max-w-3xl mx-auto px-4">
-        <Card className="bg-background/50 backdrop-blur-sm border-border/20">
-          <CardContent className="py-8 text-center text-sm text-muted-foreground">
+        <Card>
+          <CardContent className="py-8 text-center text-sm text-ink-muted">
             Loading...
           </CardContent>
         </Card>
@@ -229,10 +229,10 @@ export default function StreakTracker() {
 
   return (
     <div className="w-full max-w-3xl mx-auto px-4">
-      <Card className="bg-background/70 backdrop-blur-md border-white/20 dark:border-white/10 shadow-xl">
+      <Card>
         <CardHeader className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <Flame className="h-6 w-6 text-[hsl(var(--primary))]" />
+            <Flame size={24} className="text-brand" />
             Streak Calendar
           </CardTitle>
           <div className="flex items-center gap-2">
@@ -241,9 +241,9 @@ export default function StreakTracker() {
               size="icon"
               onClick={handlePrevMonth}
               aria-label="Tháng trước"
-              className="hover:bg-muted"
+              className="hover:bg-surface-hover"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <CaretLeft size={16} />
             </Button>
             <div className="text-sm font-medium">{monthLabel}</div>
             <Button
@@ -251,9 +251,9 @@ export default function StreakTracker() {
               size="icon"
               onClick={handleNextMonth}
               aria-label="Tháng sau"
-              className="hover:bg-muted"
+              className="hover:bg-surface-hover"
             >
-              <ChevronRight className="h-4 w-4" />
+              <CaretRight size={16} />
             </Button>
           </div>
         </CardHeader>
@@ -270,19 +270,19 @@ export default function StreakTracker() {
             >
               + Đánh dấu hôm nay
             </Button>
-            <div className="text-xs text-muted-foreground">
+            <div className="text-xs text-ink-muted">
               {hasMarkedToday ? 'Đã đánh dấu hôm nay' : 'Đánh dấu một ngày tập trung'}
             </div>
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <CalendarDays className="h-4 w-4 text-[hsl(var(--primary))]" />
+              <CalendarDots size={16} className="text-brand" />
               <Label>Lịch tháng</Label>
             </div>
 
             {/* Weekday headers */}
-            <div className="grid grid-cols-7 gap-1 text-[11px] text-muted-foreground">
+            <div className="grid grid-cols-7 gap-1 text-[11px] text-ink-muted">
               {weekdays.map((wd) => (
                 <div key={wd} className="h-7 flex items-center justify-center">
                   {wd}
@@ -301,9 +301,9 @@ export default function StreakTracker() {
                     className={cn(
                       'h-9 rounded-md border flex items-center justify-center text-[12px]',
                       d.focused
-                        ? 'bg-primary/80 border-primary text-primary-foreground'
-                        : 'bg-muted border-border text-muted-foreground',
-                      d.today ? 'ring-2 ring-primary' : '',
+                        ? 'bg-primary border-primary text-white'
+                        : 'bg-surface-raised border-border text-ink-muted',
+                      d.today ? 'ring-2 ring-brand' : '',
                       !d.inMonth ? 'opacity-40' : ''
                     )}
                   >
@@ -315,22 +315,22 @@ export default function StreakTracker() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-3 rounded-lg border bg-muted/40">
-              <div className="text-sm text-muted-foreground">
-                Chuỗi hiện tại: <span className="font-semibold text-foreground">{currentStreak} ngày</span>
+            <div className="rounded-lg bg-surface-raised p-3">
+              <div className="text-sm text-ink-muted">
+                Chuỗi hiện tại: <span className="font-semibold text-ink">{currentStreak} ngày</span>
               </div>
-              <div className="text-xs text-muted-foreground mt-1">
+              <div className="text-xs text-ink-muted mt-1">
                 {milestoneNext
                   ? <>Còn <span className="font-semibold">{milestoneNext - currentStreak}</span> ngày đến mốc <span className="font-semibold">{milestoneNext}</span>.</>
                   : <>Bạn đã vượt qua tất cả các mốc lớn! Tiếp tục giữ phong độ.</>}
               </div>
             </div>
 
-            <div className="p-3 rounded-lg border bg-muted/40">
-              <div className="text-sm text-muted-foreground">
-                Đã đánh dấu tháng này: <span className="font-semibold text-foreground">{monthFocusedCount}</span> ngày
+            <div className="rounded-lg bg-surface-raised p-3">
+              <div className="text-sm text-ink-muted">
+                Đã đánh dấu tháng này: <span className="font-semibold text-ink">{monthFocusedCount}</span> ngày
               </div>
-              <div className="text-xs text-muted-foreground mt-1">
+              <div className="text-xs text-ink-muted mt-1">
                 Mẹo: Giữ lịch đơn giản, đều đặn mỗi ngày.
               </div>
             </div>

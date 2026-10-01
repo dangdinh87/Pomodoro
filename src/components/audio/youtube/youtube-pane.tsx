@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo, memo, useEffect, useRef } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'motion/react';
 import { useAudioStore } from '@/stores/audio-store';
 import { useYouTubePlayer, parseYouTubeUrl } from '@/hooks/use-youtube-player';
 import { fetchYouTubeOEmbed, YouTubeOEmbedResponse } from '@/lib/youtube-utils';
@@ -15,7 +15,8 @@ import {
 import { YouTubeInputSection } from './youtube-input-section';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Play, Pause, Dice3, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Play, Pause, DiceThree, CircleNotch, CaretLeft, CaretRight, Flag, Headphones, Coffee, PianoKeys, Planet, Leaf, Code, Timer, Brain, Folder } from '@phosphor-icons/react/dist/ssr';
+import type { Icon } from '@phosphor-icons/react';
 import { MusicVisualizer } from './music-visualizer';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/contexts/i18n-context';
@@ -32,16 +33,22 @@ const YouTubeIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const categoryLabels: Record<string, { icon: string }> = {
-  'Chill VN': { icon: '🇻🇳' },
-  'Lofi': { icon: '🎧' },
-  'Cafe': { icon: '☕' },
-  'Piano': { icon: '🎹' },
-  'Ambient': { icon: '🌌' },
-  'Nature': { icon: '🌿' },
-  'Coding': { icon: '💻' },
-  'Pomodoro': { icon: '⏱️' },
-  'Brainwaves': { icon: '🧠' },
+const categoryIcons: Record<string, Icon> = {
+  'Chill VN': Flag,
+  'Lofi': Headphones,
+  'Cafe': Coffee,
+  'Piano': PianoKeys,
+  'Ambient': Planet,
+  'Nature': Leaf,
+  'Coding': Code,
+  'Pomodoro': Timer,
+  'Brainwaves': Brain,
+};
+
+const stripTrailingEmoji = (text: string) => {
+  const chars = Array.from(text);
+  while (chars.length && (chars[chars.length - 1] === ' ' || chars[chars.length - 1].codePointAt(0)! >= 0x2190)) chars.pop();
+  return chars.join('');
 };
 
 const YouTubePane = memo(() => {
@@ -233,12 +240,12 @@ const YouTubePane = memo(() => {
         />
 
         {/* Library Card - Preset Style */}
-        <div className="bg-background/40 border rounded-lg overflow-hidden">
+        <div className="bg-surface border border-border rounded-lg overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between px-2.5 py-1.5 border-b bg-background/60">
+          <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-border">
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-bold text-foreground/90">{t('audio.youtube.library')}</h3>
-              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-semibold">
+              <h3 className="text-sm font-bold text-ink-secondary">{t('audio.youtube.library')}</h3>
+              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-surface-raised text-ink-secondary font-semibold tabular-nums">
                 {youtubeSuggestions.length}
               </span>
             </div>
@@ -246,9 +253,9 @@ const YouTubePane = memo(() => {
               variant="ghost"
               size="sm"
               onClick={handlePickRandomSuggestion}
-              className="h-6 gap-1 text-[10px] font-semibold hover:bg-primary/10 hover:text-primary px-2"
+              className="h-6 gap-1 text-[10px] font-semibold px-2"
             >
-              <Dice3 className="h-3 w-3" />
+              <DiceThree size={12} />
               {t('audio.youtube.random')}
             </Button>
           </div>
@@ -259,9 +266,9 @@ const YouTubePane = memo(() => {
                 variant="ghost"
                 size="icon"
                 onClick={scrollLeft}
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-background/80 hover:bg-background shadow-sm"
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-surface hover:bg-surface-hover border border-border"
               >
-                <ChevronLeft className="h-4 w-4" />
+                <CaretLeft size={16} />
               </Button>
             )}
             {canScrollRight && (
@@ -269,9 +276,9 @@ const YouTubePane = memo(() => {
                 variant="ghost"
                 size="icon"
                 onClick={scrollRight}
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-background/80 hover:bg-background shadow-sm"
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-surface hover:bg-surface-hover border border-border"
               >
-                <ChevronRight className="h-4 w-4" />
+                <CaretRight size={16} />
               </Button>
             )}
             <div
@@ -281,24 +288,24 @@ const YouTubePane = memo(() => {
             >
               <div className="flex gap-2">
                 {categories.map((cat) => {
-                  const catInfo = categoryLabels[cat] || { icon: '📁' };
+                  const CatIcon = categoryIcons[cat] || Folder;
                   const isActive = selectedCategory === cat;
                   return (
-                    <Button
+                    <button
                       key={cat}
-                      variant="outline"
-                      size="sm"
+                      type="button"
+                      aria-pressed={isActive}
                       onClick={() => setSelectedCategory(cat)}
                       className={cn(
-                        "h-8 px-3 text-sm font-medium whitespace-nowrap transition-all border shrink-0",
+                        "inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-3 text-sm outline-none transition-colors duration-[140ms] focus-visible:ring-2 focus-visible:ring-brand",
                         isActive
-                          ? "bg-primary text-primary-foreground hover:bg-primary/90 border-primary shadow-md"
-                          : "hover:bg-accent hover:text-accent-foreground border-input"
+                          ? "border-transparent bg-primary font-semibold text-white"
+                          : "border-border text-ink-secondary hover:bg-surface-hover"
                       )}
                     >
-                      <span>{catInfo.icon}</span>
+                      <CatIcon size={16} aria-hidden="true" />
                       <span>{t(`audio.youtube.categories.${cat}`)}</span>
-                    </Button>
+                    </button>
                   );
                 })}
               </div>
@@ -314,7 +321,7 @@ const YouTubePane = memo(() => {
             cat === selectedCategory && (
               <TabsContent key={cat} value={cat} className="h-full min-h-0 m-0 p-0 flex flex-col">
                 <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden custom-scrollbar min-h-[120px]">
-                  <div className="grid grid-cols-1 gap-1.5 p-2">
+                  <div className="m-2 overflow-hidden rounded-lg border border-border bg-surface divide-y divide-border">
                     {filteredSuggestions.map((item, index) => {
                       const isMatch = isSuggestionPlaying(item.url);
                       const isPlaying = isMatch && playerState.status === 'playing';
@@ -327,18 +334,15 @@ const YouTubePane = memo(() => {
                           key={item.url}
                           onClick={() => handlePlaySuggestion(item)}
                           className={cn(
-                            "flex items-center gap-2 p-2 rounded-lg border cursor-pointer group relative overflow-hidden",
+                            "flex items-center gap-2 px-2 py-2 cursor-pointer group relative overflow-hidden",
                             "transition-colors duration-150",
-                            isMatch
-                              ? "bg-primary/10 border-primary/30 shadow-md"
-                              : "bg-background/40 border-border/30 hover:bg-background/60 hover:border-primary/20 hover:shadow-sm"
+                            isMatch ? "bg-surface-raised" : "hover:bg-surface-hover"
                           )}
                         >
                           {/* Thumbnail */}
                           <div className={cn(
-                            "relative w-16 h-9 shrink-0 rounded overflow-hidden bg-black/40 flex items-center justify-center",
-                            "transition-colors duration-150",
-                            isMatch ? "ring-2 ring-primary/40 shadow-lg" : "group-hover:ring-1 group-hover:ring-primary/20"
+                            "relative w-16 h-9 shrink-0 rounded-md overflow-hidden bg-surface-raised flex items-center justify-center",
+                            isMatch && "ring-2 ring-brand"
                           )}>
                             {thumbnailUrl ? (
                               <img
@@ -347,12 +351,12 @@ const YouTubePane = memo(() => {
                                 className="w-full h-full object-cover"
                               />
                             ) : (
-                              <span className="text-[8px] font-mono text-muted-foreground/40">YT</span>
+                              <span className="text-[8px] font-mono text-ink-faint">YT</span>
                             )}
 
                             {/* Animated overlay when playing */}
                             {isPlaying && (
-                              <div className="absolute inset-0 z-10 bg-black/20 pointer-events-none">
+                              <div className="absolute inset-0 z-10 bg-black/30 pointer-events-none text-white">
                                 <MusicVisualizer
                                   isPlaying={true}
                                   barCount={3}
@@ -362,8 +366,8 @@ const YouTubePane = memo(() => {
                             )}
 
                             {isBuffering && (
-                              <div className="absolute inset-0 bg-primary/20 flex items-center justify-center backdrop-blur-sm">
-                                <Loader2 className="h-4 w-4 text-white animate-spin" />
+                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                <CircleNotch size={16} className="text-white animate-spin" />
                               </div>
                             )}
                           </div>
@@ -372,12 +376,12 @@ const YouTubePane = memo(() => {
                           <div className="flex-1 min-w-0">
                             <p className={cn(
                               "text-sm font-medium truncate leading-tight transition-colors duration-200",
-                              isMatch ? "text-primary" : "text-foreground/90 group-hover:text-foreground"
+                              isMatch ? "text-ink font-semibold" : "text-ink-secondary group-hover:text-ink"
                             )}>
                               {item.label}
                             </p>
-                            <p className="text-[11px] text-muted-foreground/70 truncate">
-                              {item.description}
+                            <p className="text-[11px] text-ink-faint truncate">
+                              {stripTrailingEmoji(item.description)}
                             </p>
                           </div>
 
@@ -387,16 +391,16 @@ const YouTubePane = memo(() => {
                               "flex items-center justify-center w-6 h-6 rounded-full shrink-0",
                               "transition-colors duration-150",
                               isMatch
-                                ? "bg-primary text-primary-foreground shadow-md"
-                                : "bg-transparent opacity-0 group-hover:opacity-100 group-hover:bg-primary/10"
+                                ? "bg-primary text-white"
+                                : "opacity-0 group-hover:opacity-100 bg-surface-raised text-ink-secondary"
                             )}
                           >
                             {isBuffering ? (
-                              <Loader2 className="h-3 w-3 animate-spin" />
+                              <CircleNotch size={12} className="animate-spin" />
                             ) : isPlaying ? (
-                              <Pause className="h-3 w-3 fill-current" />
+                              <Pause size={12} weight="fill" />
                             ) : (
-                              <Play className="h-3 w-3 fill-current" />
+                              <Play size={12} weight="fill" />
                             )}
                           </div>
                         </div>

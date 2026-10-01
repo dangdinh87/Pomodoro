@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { X, Plus, Shield, Eye, EyeOff } from 'lucide-react'
+import { X, Plus, Shield, Eye, EyeSlash } from '@phosphor-icons/react/dist/ssr';
 
 interface BlockedSite {
   id: string
@@ -138,10 +138,10 @@ export function FocusMode() {
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6">
-      <Card className="bg-background/80 backdrop-blur-sm border-white/20">
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5" />
+            <Shield size={20} />
             Focus Mode Settings
           </CardTitle>
         </CardHeader>
@@ -149,7 +149,7 @@ export function FocusMode() {
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="focus-mode">Enable Focus Mode</Label>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-ink-muted">
                 Block distracting websites during work sessions
               </p>
             </div>
@@ -166,7 +166,7 @@ export function FocusMode() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="strict-mode">Strict Mode</Label>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-ink-muted">
                   Prevent disabling focus mode during active sessions
                 </p>
               </div>
@@ -181,7 +181,7 @@ export function FocusMode() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="motivational-quotes">Show Motivational Quotes</Label>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-ink-muted">
                   Display inspiring quotes during focus sessions
                 </p>
               </div>
@@ -204,8 +204,8 @@ export function FocusMode() {
                 onChange={(e) => setNewSiteUrl(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && addBlockedSite()}
               />
-              <Button onClick={addBlockedSite} size="icon" variant="transparent" aria-label="Add website to blocklist">
-                <Plus className="h-4 w-4" aria-hidden="true" />
+              <Button onClick={addBlockedSite} size="icon" variant="ghost" aria-label="Add website to blocklist">
+                <Plus size={16} aria-hidden="true" />
               </Button>
             </div>
             
@@ -215,10 +215,10 @@ export function FocusMode() {
                   {site.url}
                   <button
                     onClick={() => removeBlockedSite(site.id)}
-                    className="ml-1 hover:text-destructive"
+                    className="ml-1 hover:text-danger"
                     aria-label={`Remove ${site.url} from blocklist`}
                   >
-                    <X className="h-3 w-3" aria-hidden="true" />
+                    <X size={12} aria-hidden="true" />
                   </button>
                 </Badge>
               ))}
@@ -228,8 +228,8 @@ export function FocusMode() {
           {settings.showMotivationalQuotes && currentQuote && (
             <>
               <Separator />
-              <div className="p-4 bg-muted rounded-lg">
-                <p className="text-center italic text-muted-foreground">
+              <div className="rounded-lg bg-surface-raised p-4">
+                <p className="text-center italic text-ink-muted">
                   &quot;{currentQuote}&quot;
                 </p>
               </div>
@@ -239,20 +239,20 @@ export function FocusMode() {
       </Card>
 
       {isBlockingActive && (
-        <Card className="border-green-500 bg-green-50/80 dark:bg-green-950/20 backdrop-blur-sm">
+        <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Eye className="h-5 w-5 text-green-600" />
-                <span className="font-medium text-green-800 dark:text-green-200">
+                <Eye size={20} className="text-ink-faint" />
+                <span className="font-medium text-ink">
                   Focus Mode Active
                 </span>
               </div>
-              <Badge variant="outline" className="text-green-600 border-green-600">
+              <Badge variant="success">
                 {settings.blockedSites.length} sites blocked
               </Badge>
             </div>
-            <p className="text-sm text-green-700 dark:text-green-300 mt-2">
+            <p className="mt-2 text-sm text-ink-muted">
               Distractions are being blocked. Stay focused on your work!
             </p>
           </CardContent>

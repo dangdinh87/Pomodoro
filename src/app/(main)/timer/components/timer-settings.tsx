@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
-import { Clock, Timer, Activity, Zap } from 'lucide-react'
+import { Clock, Timer, Pulse, Lightning } from '@phosphor-icons/react/dist/ssr';
 import { toast } from 'sonner'
 import { addMinutes, format, startOfDay } from 'date-fns'
 import { useI18n } from '@/contexts/i18n-context'
@@ -75,7 +75,7 @@ export function TimerSettings({ isOpen, onClose, settings, onSettingsChange }: T
       <DialogContent className="sm:max-w-[425px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Timer className="h-5 w-5" />
+            <Timer size={20} />
             {t('timerSettings.title')}
           </DialogTitle>
         </DialogHeader>
@@ -173,19 +173,19 @@ export function TimerSettings({ isOpen, onClose, settings, onSettingsChange }: T
               <SelectContent>
                 <SelectItem value="digital">
                   <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
+                    <Clock size={16} />
                     {t('timerSettings.labels.digital')}
                   </div>
                 </SelectItem>
                 <SelectItem value="analog">
                   <div className="flex items-center gap-2">
-                    <Timer className="h-4 w-4" />
+                    <Timer size={16} />
                     {t('timerSettings.labels.analog')}
                   </div>
                 </SelectItem>
                 <SelectItem value="flip">
                   <div className="flex items-center gap-2">
-                    <Zap className="h-4 w-4" />
+                    <Lightning size={16} />
                     {t('timerSettings.labels.flip')}
                   </div>
                 </SelectItem>
@@ -197,11 +197,11 @@ export function TimerSettings({ isOpen, onClose, settings, onSettingsChange }: T
           {localSettings.showClock && (
             <div className="mt-6 pt-6 border-t">
               <Label className="text-base font-medium mb-4 block">{t('timerSettings.labels.clockPreview')}</Label>
-              <div className="bg-background/50 backdrop-blur-sm rounded-lg p-6 border flex flex-col items-center gap-2">
-                <div className="text-6xl font-bold text-center">
+              <div className="rounded-lg border border-border bg-surface-raised p-6 flex flex-col items-center gap-2">
+                <div className="font-heading text-6xl font-bold tabular-nums text-center text-ink">
                   {clockPreviewTime}
                 </div>
-                <div className="text-xs text-muted-foreground">
+                <div className="text-xs text-ink-muted">
                   {t('timerSettings.labels.endsAround', { time: endTimePreview })}
                 </div>
               </div>
