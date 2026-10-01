@@ -28,7 +28,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { TemplateManager } from './components/template-manager'
 import { useTimerStore } from '@/stores/timer-store'
-import { useQueryClient } from '@tanstack/react-query'
+import { useSessionRecorder } from '@/lib/timer/use-session-recorder'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -78,7 +78,7 @@ export function TaskManagement() {
     () => (editingId ? tasks.find((task) => task.id === editingId) ?? null : null),
     [editingId, tasks],
   )
-  const queryClient = useQueryClient()
+  const { record } = useSessionRecorder()
 
   const handleFormSubmit = async (payload: any) => {
     try {
@@ -94,79 +94,24 @@ export function TaskManagement() {
     }
   }
 
-  const handleToggleStatus = async (task: Task) => {
-    const isNowDone = task.status !== 'done'
-    const newStatus: TaskStatus = isNowDone ? 'done' : 'todo'
-
-    // Auto-unfocus logic
-    if (isNowDone && activeTaskId === task.id) {
-      // Record partial session before unfocusing for accuracy
-      const { mode, timeLeft, lastSessionTimeLeft, setLastSessionTimeLeft } = useTimerStore.getState()
-      if (mode === 'work') {
-        const durationSec = Math.max(0, lastSessionTimeLeft - timeLeft)
-        if (durationSec > 0) {
-          try {
-            await fetch('/api/tasks/session-complete', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                taskId: task.id,
-                durationSec,
-                mode: 'work',
-              }),
-            })
-            queryClient.invalidateQueries({ queryKey: ['stats'] })
-            queryClient.invalidateQueries({ queryKey: ['tasks'] })
-          } catch (e) { console.error(e) }
-        }
-        // Reset baseline for the next task
-        setLastSessionTimeLeft(timeLeft)
-      }
-      setActiveTask(null)
+  // Records the focus time since the last recorded segment for `taskId` and
+  // restarts the baseline, so the next record (or the phase completion) only
+  // counts new time.
+  const recordPartialSession = (taskId: string) => {
+    const { mode, timeLeft, lastSessionTimeLeft, setLastSessionTimeLeft } =
+      useTimerStore.getState()
+    if (mode !== 'work') return
+    const durationSec = Math.max(0, lastSessionTimeLeft - timeLeft)
+    if (durationSec > 0) {
+      void record({ taskId, durationSec, mode: 'work' })
     }
-
-    setTogglingTaskIds(prev => new Set(prev).add(task.id))
-    try {
-      await updateTask({ id: task.id, input: { status: newStatus } })
-    } finally {
-      setTogglingTaskIds(prev => {
-        const next = new Set(prev)
-        next.delete(task.id)
-        return next
-      })
-    }
+    setLastSessionTimeLeft(timeLeft)
   }
 
-  const handleUpdateStatus = async (taskId: string, newStatus: TaskStatus) => {
-    const isNowDone = newStatus === 'done'
-
-    if (isNowDone && activeTaskId === taskId) {
-      const { mode, timeLeft, lastSessionTimeLeft, setLastSessionTimeLeft } = useTimerStore.getState()
-      if (mode === 'work') {
-        const durationSec = Math.max(0, lastSessionTimeLeft - timeLeft)
-        if (durationSec > 0) {
-          try {
-            await fetch('/api/tasks/session-complete', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                taskId,
-                durationSec,
-                mode: 'work',
-              }),
-            })
-            queryClient.invalidateQueries({ queryKey: ['stats'] })
-            queryClient.invalidateQueries({ queryKey: ['tasks'] })
-          } catch (e) { console.error(e) }
-        }
-        setLastSessionTimeLeft(timeLeft)
-      }
-      setActiveTask(null)
-    }
-
+  const withToggling = async (taskId: string, run: () => Promise<unknown>) => {
     setTogglingTaskIds(prev => new Set(prev).add(taskId))
     try {
-      await updateTask({ id: taskId, input: { status: newStatus } })
+      await run()
     } finally {
       setTogglingTaskIds(prev => {
         const next = new Set(prev)
@@ -176,55 +121,46 @@ export function TaskManagement() {
     }
   }
 
-  const handleToggleActive = (task: Task) => {
-    const { timeLeft, setLastSessionTimeLeft } = useTimerStore.getState()
+  const handleToggleStatus = async (task: Task) => {
+    const isNowDone = task.status !== 'done'
+    const newStatus: TaskStatus = isNowDone ? 'done' : 'todo'
 
+    // Auto-unfocus logic
+    if (isNowDone && activeTaskId === task.id) {
+      recordPartialSession(task.id)
+      setActiveTask(null)
+    }
+
+    await withToggling(task.id, () =>
+      updateTask({ id: task.id, input: { status: newStatus } }),
+    )
+  }
+
+  const handleUpdateStatus = async (taskId: string, newStatus: TaskStatus) => {
+    if (newStatus === 'done' && activeTaskId === taskId) {
+      recordPartialSession(taskId)
+      setActiveTask(null)
+    }
+
+    await withToggling(taskId, () =>
+      updateTask({ id: taskId, input: { status: newStatus } }),
+    )
+  }
+
+  const handleToggleActive = (task: Task) => {
     if (activeTaskId === task.id) {
-      // Recording when manual unfocus too for accuracy
-      const { mode, lastSessionTimeLeft } = useTimerStore.getState()
-      if (mode === 'work') {
-        const durationSec = Math.max(0, lastSessionTimeLeft - timeLeft)
-        if (durationSec > 0) {
-          fetch('/api/tasks/session-complete', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              taskId: task.id,
-              durationSec,
-              mode: 'work',
-            }),
-          }).then(() => {
-            queryClient.invalidateQueries({ queryKey: ['stats'] })
-            queryClient.invalidateQueries({ queryKey: ['tasks'] })
-          }).catch(console.error)
-        }
-      }
+      // Manual unfocus: record for accuracy
+      recordPartialSession(task.id)
       setActiveTask(null)
     } else {
-      // Record time for the PREVIOUS active task if any
+      // Record time for the PREVIOUS active task (if any), then start a new
+      // baseline for this task
       if (activeTaskId) {
-        const { mode, lastSessionTimeLeft } = useTimerStore.getState()
-        if (mode === 'work') {
-          const durationSec = Math.max(0, lastSessionTimeLeft - timeLeft)
-          if (durationSec > 0) {
-            fetch('/api/tasks/session-complete', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                taskId: activeTaskId,
-                durationSec,
-                mode: 'work',
-              }),
-            }).then(() => {
-              queryClient.invalidateQueries({ queryKey: ['stats'] })
-              queryClient.invalidateQueries({ queryKey: ['tasks'] })
-            }).catch(console.error)
-          }
-        }
+        recordPartialSession(activeTaskId)
+      } else {
+        const { timeLeft, setLastSessionTimeLeft } = useTimerStore.getState()
+        setLastSessionTimeLeft(timeLeft)
       }
-
-      // Start new baseline for this task
-      setLastSessionTimeLeft(timeLeft)
       setActiveTask(task.id)
 
       // If task is todo, move it to doing

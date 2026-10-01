@@ -23,7 +23,9 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import { useQueryClient } from '@tanstack/react-query';
+import { useSessionRecorder } from '@/lib/timer/use-session-recorder';
+import { playAlarm } from '@/lib/timer/alarm';
+import { requestNotificationPermission } from '@/lib/timer/notifications';
 import { useConfetti } from '@/hooks/use-confetti';
 import { useTasksStore } from '@/stores/task-store';
 
@@ -32,7 +34,7 @@ const MINIMUM_COMPLETION_PERCENT = 50;
 
 export const TimerControls = memo(function TimerControls() {
     const { t } = useTranslation();
-    const queryClient = useQueryClient();
+    const { record } = useSessionRecorder();
     const { fireWorkComplete } = useConfetti();
 
     // ATOMIC SUBSCRIPTION
@@ -86,18 +88,6 @@ export const TimerControls = memo(function TimerControls() {
         }
     }, [timeLeft, skipConfirmOpen]);
 
-    const playNotificationSound = () => {
-        // NOTE: We might want to move this to a shared sound utility or store later
-        // For now, simple reimplementation or prop passing is tricky without context
-        try {
-            const audio = new Audio('/sounds/alarm.mp3');
-            // Assuming volume 0.5 default if not accessible, or we can fetch system store
-            // Ideally sound logic belongs in the engine or a sound hook, but controls trigger skip sound
-            audio.volume = 0.5;
-            audio.play().catch(() => { });
-        } catch { }
-    };
-
     const handleSessionComplete = (skipWithoutRecording: boolean = false) => {
         if (isProcessing) return;
         setIsProcessing(true);
@@ -115,31 +105,25 @@ export const TimerControls = memo(function TimerControls() {
                 incrementCompletedSessions();
                 // Fire confetti celebration
                 fireWorkComplete();
-                playNotificationSound();
+                playAlarm();
 
-                // Record session in background (non-blocking)
-                const activeTaskId = useTasksStore.getState().activeTaskId;
-                fetch('/api/tasks/session-complete', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        taskId: activeTaskId || null,
-                        durationSec: completedDuration,
-                        mode: 'work',
-                    }),
-                }).then(() => {
-                    queryClient.invalidateQueries({ queryKey: ['stats'] });
-                    queryClient.invalidateQueries({ queryKey: ['tasks'] });
-                    queryClient.invalidateQueries({ queryKey: ['history'] });
-                }).catch((error) => {
-                    console.error('Failed to record session:', error);
+                // Record only the focus time since the last recorded segment
+                // (partial sessions may already have been posted for this phase)
+                const { lastSessionTimeLeft } = useTimerStore.getState();
+                const segmentDuration = lastSessionTimeLeft > 0
+                    ? Math.max(0, lastSessionTimeLeft - timeLeft)
+                    : completedDuration;
+                void record({
+                    taskId: useTasksStore.getState().activeTaskId || null,
+                    durationSec: segmentDuration,
+                    mode: 'work',
                 });
             } else {
                 toast.info(t('timer.skipped_not_recorded') || 'Session skipped - not recorded');
             }
         } else {
-            // Break session recording logic...
-            playNotificationSound();
+            // Breaks are not recorded on manual skip
+            playAlarm();
         }
 
         // Transition Logic - use requestAnimationFrame to let UI settle first
@@ -204,7 +188,11 @@ export const TimerControls = memo(function TimerControls() {
     const toggleTimer = () => {
         if (isProcessing) return;
         if (!isRunning) {
-            if (timeLeft > 0) resumeTimer();
+            if (timeLeft > 0) {
+                // First user gesture: the only place we may ask for permission
+                requestNotificationPermission();
+                resumeTimer();
+            }
         } else {
             pauseTimer();
         }

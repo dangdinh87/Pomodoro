@@ -78,6 +78,110 @@ const defaultSettings: TimerSettings = {
   lowTimeWarningEnabled: true,
 };
 
+const TIMER_STORE_VERSION = 1;
+
+/**
+ * How late a phase may have finished (tab closed/crashed/reloaded) and still
+ * count as a real session. Within this window the engine records it as if it
+ * had just completed; beyond it the timer silently moves to the next phase
+ * without crediting a session, so reopening the app days later cannot mint
+ * sessions or streak days.
+ */
+export const CATCH_UP_GRACE_MS = 15 * 60 * 1000;
+
+/** Full length (seconds) of the phase described by the given state. */
+function phaseSeconds(
+  state: Pick<
+    TimerState,
+    'mode' | 'settings' | 'usePlan' | 'plan' | 'currentStepIndex'
+  >,
+): number {
+  if (state.usePlan && state.plan.length > 0) {
+    const idx = Math.max(
+      0,
+      Math.min(state.currentStepIndex, state.plan.length - 1),
+    );
+    return state.plan[idx].minutes * 60;
+  }
+  const { mode, settings } = state;
+  if (mode === 'work') return settings.workDuration * 60;
+  if (mode === 'shortBreak') return settings.shortBreakDuration * 60;
+  return settings.longBreakDuration * 60;
+}
+
+/**
+ * Builds the in-memory state from whatever is in storage (any version).
+ * Fills defaults for fields that older versions did not persist and
+ * recomputes timeLeft from the deadline.
+ *
+ * If the deadline already elapsed while the app was closed we deliberately
+ * keep `isRunning: true` with `timeLeft: 0` and the stale `deadlineAt`: the
+ * timer engine then records the finished phase exactly once and moves on to
+ * the next mode (see use-timer-engine). Resetting to "paused at 00:00" would
+ * leave the user stuck, because Start is a no-op at 0.
+ */
+export function mergePersistedTimerState(
+  persisted: unknown,
+  current: TimerState,
+  now: number = Date.now(),
+): TimerState {
+  const p = (persisted ?? {}) as Partial<TimerState>;
+  const merged: TimerState = {
+    ...current,
+    ...p,
+    settings: { ...defaultSettings, ...(p.settings ?? {}) },
+    usePlan: typeof p.usePlan === 'boolean' ? p.usePlan : false,
+    plan: Array.isArray(p.plan) ? p.plan : [],
+    currentStepIndex:
+      typeof p.currentStepIndex === 'number' ? p.currentStepIndex : 0,
+    repeatPlan: typeof p.repeatPlan === 'boolean' ? p.repeatPlan : true,
+  };
+
+  if (merged.isRunning && merged.deadlineAt) {
+    merged.timeLeft = Math.ceil(Math.max(0, merged.deadlineAt - now) / 1000);
+    // Recently elapsed work phase: credit the seconds that were still on the
+    // clock at the last tick, which no tick will ever count now. Keeps
+    // totalFocusTime consistent with the session the engine is about to record.
+    if (
+      merged.timeLeft === 0 &&
+      merged.mode === 'work' &&
+      now - merged.deadlineAt <= CATCH_UP_GRACE_MS &&
+      typeof p.timeLeft === 'number' &&
+      p.timeLeft > 0
+    ) {
+      merged.totalFocusTime = (merged.totalFocusTime || 0) + p.timeLeft;
+    }
+  } else if (!Number.isFinite(merged.timeLeft) || merged.timeLeft <= 0) {
+    // Fallback: derive timeLeft from plan (if enabled) or from mode/settings
+    if (merged.usePlan && merged.plan.length > 0) {
+      const idx = Math.max(
+        0,
+        Math.min(merged.currentStepIndex, merged.plan.length - 1),
+      );
+      merged.mode = merged.plan[idx].type;
+    }
+    merged.timeLeft = phaseSeconds(merged);
+    merged.isRunning = false;
+    merged.deadlineAt = null;
+  }
+
+  // Baseline must be a sane number >= timeLeft; older versions never persisted
+  // it, so fall back to the full phase length (the previous behaviour).
+  // (read from `persisted`, not `merged`, so a stale in-memory value is never reused)
+  const baseline = p.lastSessionTimeLeft;
+  if (
+    typeof baseline !== 'number' ||
+    !Number.isFinite(baseline) ||
+    baseline < merged.timeLeft
+  ) {
+    merged.lastSessionTimeLeft = Math.max(
+      merged.timeLeft,
+      phaseSeconds(merged),
+    );
+  }
+  return merged;
+}
+
 export const useTimerStore = create<TimerState>()(
   persist(
     (
@@ -200,6 +304,7 @@ export const useTimerStore = create<TimerState>()(
           set({
             mode: step.type,
             timeLeft: step.minutes * 60,
+            lastSessionTimeLeft: step.minutes * 60,
             isRunning: false,
             deadlineAt: null,
           });
@@ -217,6 +322,8 @@ export const useTimerStore = create<TimerState>()(
 
         set({
           timeLeft: newTimeLeft,
+          // Fresh phase: the unrecorded segment starts from the full length
+          lastSessionTimeLeft: newTimeLeft,
           isRunning: false,
           deadlineAt: null,
         });
@@ -231,6 +338,7 @@ export const useTimerStore = create<TimerState>()(
             const step = state.plan[state.currentStepIndex] ?? state.plan[0];
             next.mode = step.type;
             next.timeLeft = step.minutes * 60;
+            next.lastSessionTimeLeft = step.minutes * 60;
           }
           return next;
         }),
@@ -246,6 +354,7 @@ export const useTimerStore = create<TimerState>()(
             const step = state.plan[idx];
             next.mode = step.type;
             next.timeLeft = step.minutes * 60;
+            next.lastSessionTimeLeft = step.minutes * 60;
           }
           return next;
         }),
@@ -266,6 +375,7 @@ export const useTimerStore = create<TimerState>()(
             currentStepIndex: idx,
             mode: step.type,
             timeLeft: step.minutes * 60,
+            lastSessionTimeLeft: step.minutes * 60,
             // Clear deadline to prevent stale deadline reuse on next start
             deadlineAt: null,
           };
@@ -292,6 +402,13 @@ export const useTimerStore = create<TimerState>()(
     }),
     {
       name: 'timer-storage',
+      version: TIMER_STORE_VERSION,
+      // v0 -> v1: lastSessionTimeLeft is now persisted. Nothing to rewrite
+      // here: mode/settings/deadlineAt/isRunning are kept as-is and missing
+      // fields are defaulted in mergePersistedTimerState.
+      migrate: (persistedState: unknown) => persistedState as TimerState,
+      merge: (persisted: unknown, current: TimerState) =>
+        mergePersistedTimerState(persisted, current),
       partialize: (state: TimerState) => ({
         // Persist current timer state across reloads
         mode: state.mode,
@@ -302,6 +419,8 @@ export const useTimerStore = create<TimerState>()(
         settings: state.settings,
         completedSessions: state.completedSessions,
         totalFocusTime: state.totalFocusTime,
+        // Start of the current unrecorded focus segment (survives reload)
+        lastSessionTimeLeft: state.lastSessionTimeLeft,
 
         // Plan fields
         usePlan: state.usePlan,
@@ -309,58 +428,6 @@ export const useTimerStore = create<TimerState>()(
         currentStepIndex: state.currentStepIndex,
         repeatPlan: state.repeatPlan,
       }),
-      onRehydrateStorage: () => (state: TimerState | undefined) => {
-        // Restore persisted timer state; if running and deadline exists, recompute remaining
-        if (state) {
-          // Backward-compatible defaults for new fields
-          // @ts-ignore - handle possibly missing fields from older persisted versions
-          if (typeof (state as any).usePlan === 'undefined')
-            (state as any).usePlan = false;
-          // @ts-ignore
-          if (!Array.isArray((state as any).plan)) (state as any).plan = [];
-          // @ts-ignore
-          if (typeof (state as any).currentStepIndex !== 'number')
-            (state as any).currentStepIndex = 0;
-          // @ts-ignore
-          if (typeof (state as any).repeatPlan === 'undefined')
-            (state as any).repeatPlan = true;
-
-          const now = Date.now();
-          if (state.isRunning && state.deadlineAt) {
-            const remainingMs = Math.max(0, state.deadlineAt - now);
-            const remaining = Math.ceil(remainingMs / 1000);
-            state.timeLeft = remaining;
-            // BUG-02 FIX: If deadline already elapsed, reset isRunning to prevent stuck state
-            if (remaining <= 0) {
-              state.isRunning = false;
-              state.deadlineAt = null;
-            }
-          } else if (
-            typeof state.timeLeft !== 'number' ||
-            state.timeLeft <= 0
-          ) {
-            // Fallback: derive timeLeft from plan (if enabled) or from mode and settings
-            if (state.usePlan && state.plan.length > 0) {
-              const idx = Math.max(
-                0,
-                Math.min(state.currentStepIndex, state.plan.length - 1),
-              );
-              const step = state.plan[idx];
-              state.mode = step.type;
-              state.timeLeft = step.minutes * 60;
-            } else {
-              const { mode, settings } = state;
-              if (mode === 'work') {
-                state.timeLeft = settings.workDuration * 60;
-              } else if (mode === 'shortBreak') {
-                state.timeLeft = settings.shortBreakDuration * 60;
-              } else {
-                state.timeLeft = settings.longBreakDuration * 60;
-              }
-            }
-          }
-        }
-      },
     },
   ),
 );
