@@ -54,22 +54,17 @@ describe('TimerSettingsDock', () => {
   it('should have accessible buttons', () => {
     render(<TimerSettingsDock />);
 
-    // Check buttons via finding icon or class or index.
-    // They are icon-only buttons.
-    // We can query by role 'button'
-    const buttons = screen.getAllByRole('button');
+    // Four icon-only buttons; `t` is mocked to echo keys, so each must be
+    // reachable by its i18n label regardless of DOM order.
+    expect(screen.getAllByRole('button')).toHaveLength(4);
 
-    // Expect 4 buttons: Music, Background, Settings, Fullscreen
-    expect(buttons).toHaveLength(4);
-
-    // Check for aria-labels
-    // Music
-    expect(buttons[0]).toHaveAttribute('aria-label', 'timerComponents.enhancedTimer.soundSettings');
-    // Background
-    expect(buttons[1]).toHaveAttribute('aria-label', 'timerComponents.enhancedTimer.backgroundSettings');
-    // Settings
-    expect(buttons[2]).toHaveAttribute('aria-label', 'timerComponents.enhancedTimer.timerSettings');
-    // Fullscreen
-    expect(buttons[3]).toHaveAttribute('aria-label', 'timerComponents.enhancedTimer.enterFocus');
+    [
+      'timerComponents.enhancedTimer.soundSettings',
+      'timerComponents.enhancedTimer.timerSettings',
+      'timerComponents.enhancedTimer.backgroundSettings',
+      'timerComponents.enhancedTimer.enterFocus',
+    ].forEach((label) => {
+      expect(screen.getByRole('button', { name: label })).toBeInTheDocument();
+    });
   });
 });

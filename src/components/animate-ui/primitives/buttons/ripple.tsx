@@ -38,7 +38,7 @@ function RippleButton({
 }: RippleButtonProps) {
   const [ripples, setRipples] = React.useState<Ripple[]>([]);
   const buttonRef = React.useRef<HTMLButtonElement>(null);
-  React.useImperativeHandle(ref, () => buttonRef.current as HTMLButtonElement);
+  React.useImperativeHandle(ref as React.Ref<HTMLButtonElement>, () => buttonRef.current as HTMLButtonElement);
 
   const createRipple = React.useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {

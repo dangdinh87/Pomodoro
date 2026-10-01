@@ -12,6 +12,15 @@ const customJestConfig = {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   testEnvironment: 'jest-environment-jsdom',
+  // Ignore build output and sibling worktrees (duplicate test copies)
+  testPathIgnorePatterns: ['/node_modules/', '/.kilo/', '/.claude/', '/.next/'],
+  modulePathIgnorePatterns: ['/.kilo/', '/.claude/', '/.next/'],
+  collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts', '!src/**/*.test.{ts,tsx}'],
+  // Ratchet: set to measured values; raise as coverage grows
+  coverageThreshold: {
+    // Ratchet: set just below the measured coverage; raise it as tests are added.
+    global: { statements: 14, branches: 13, functions: 11, lines: 14 },
+  },
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

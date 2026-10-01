@@ -110,7 +110,7 @@ export function useCustomBackgrounds(): UseCustomBackgroundsReturn {
 
     // Add image from URL
     const addImageByUrl = useCallback(
-        async (url: string): Promise<{ success: boolean; error?: string }> => {
+        async (url: string): Promise<{ success: boolean; error?: string; image?: CustomImage }> => {
             // Check limit (Skipped for replacement mode)
             // if (images.length >= MAX_IMAGES) { return { success: false, error: 'limitReached' }; }
 

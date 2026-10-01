@@ -67,7 +67,6 @@ export function SubtaskList({
                     task={subtask}
                     isActive={activeTaskId === subtask.id}
                     onToggleStatus={onToggleStatus}
-                    onToggleActive={onToggleActive}
                     onEdit={onEdit}
                     onDelete={onDelete}
                     onClone={onClone}
