@@ -1,50 +1,25 @@
-# Study Bro - Pomodoro Focus App
+# Study Bro
 
-> AI-powered Pomodoro timer for maximum focus and productivity.
-
-## Description
-Study Bro is a comprehensive Pomodoro Timer web application featuring AI-powered insights, task management, ambient sounds, and detailed analytics for focus enhancement and productivity tracking.
+> Free Pomodoro timer for studying and focused work, in one page: focus sessions with short and long breaks, tasks linked to sessions, focus history and streaks, ambient sounds, animated scenes and short break games. Works without an account. Available in English, Vietnamese and Japanese.
 
 ## Website
-https://www.pomodoro-focus.site
+https://pomodorostudy.online
 
-## Features
-- Precision Pomodoro Timer with customizable intervals (25/5/15 min default)
-- Task Management with session linking
-- Focus history and progress tracking (login required)
-- Ambient Soundscapes for deep work (rain, cafe, fireplace, etc.)
-- Consistency Streaks and habit building
-- Light/Dark adaptive interface
-
-## Tech Stack
-- Next.js 14 (App Router)
-- React 18
-- TypeScript
-- Tailwind CSS
-- Supabase (Auth + Database)
-- Framer Motion (Animations)
-
-## Pricing
-- Free tier: Core timer, 5 active tasks, 7-day history
-- Pro tier: Coming soon (unlimited tasks, cloud sync, advanced analytics)
+## What it does
+- Pomodoro timer: focus, short break and long break; presets 25/5, 50/10, 52/17, 90/20 or custom lengths; automatic switching between focus and breaks (optional)
+- Tasks: estimates in Pomodoros, priority, tags, due dates; pick a task before a focus session and its completed Pomodoros are counted
+- Stats: focus time, sessions per day, current and best streak, recent sessions
+- Sounds: ambient sounds that can be mixed, plus YouTube playback
+- Scenes: animated backgrounds and photos behind the timer; clock styles in 2D and 3D
+- Break games: short games meant for a 2–5 minute break
+- Keyboard: Space start/pause, R reset, T tasks, S sounds, B scene, C timer settings, H stats, G games, Cmd/Ctrl+K command menu
+- Accounts are optional: guests can start right away; signing in (email code or Google) keeps tasks and history across devices; data can be exported or deleted from Settings
 
 ## Pages
-- / - Landing page with features overview
-- /timer - Main Pomodoro timer interface
-- /tasks - Task management
-- /history - Focus history and streaks (requires login)
-- /settings - User preferences
-- /guide - User guide and documentation
-- /feedback - Feedback form
-
-## API
-- REST API at /api/*
-- Authentication via Supabase
-- Real-time updates for timer sync
+- / — the app (everything opens as a panel on this page, e.g. /?panel=tasks)
+- /guide — how to use the Pomodoro technique and the app
+- /privacy — privacy policy
+- /terms — terms of use
 
 ## Contact
-- Feedback: https://www.pomodoro-focus.site/feedback
-- GitHub: https://github.com/dangdinh87
-
-## License
-Proprietary - All rights reserved
+- Feedback: https://pomodorostudy.online/?panel=feedback

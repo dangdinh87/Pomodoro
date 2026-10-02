@@ -1,11 +1,12 @@
 import { MetadataRoute } from 'next';
+import { SITE_URL } from '@/config/site';
 
 // Static generation at build time; lastModified = build time
 export const dynamic = 'force-static';
 
 // Indexable pages only; app panels live on `/` and are not separate pages.
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://www.pomodoro-focus.site';
+  const baseUrl = SITE_URL;
   const lastModified = new Date();
 
   return [

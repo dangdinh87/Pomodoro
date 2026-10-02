@@ -1,4 +1,5 @@
 import 'server-only';
+import { SITE_HOST } from '@/config/site';
 
 const RESEND_ENDPOINT = 'https://api.resend.com/emails';
 
@@ -15,7 +16,7 @@ export async function sendOtpEmail(email: string, otp: string): Promise<void> {
     method: 'POST',
     headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      from: process.env.EMAIL_FROM ?? 'Study Bro <no-reply@pomodoro-focus.site>',
+      from: process.env.EMAIL_FROM ?? `Study Bro <no-reply@${SITE_HOST}>`,
       to: email,
       subject: `${otp} là mã đăng nhập Study Bro`,
       text: [

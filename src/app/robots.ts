@@ -1,8 +1,7 @@
 import { MetadataRoute } from 'next';
+import { SITE_URL } from '@/config/site';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = 'https://www.pomodoro-focus.site';
-
   return {
     rules: [
       {
@@ -14,6 +13,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/api/', '/auth/'],
       },
     ],
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }

@@ -6,6 +6,7 @@
 import type { Metadata, Viewport } from 'next';
 import { cookies } from 'next/headers';
 import { InitialLangProvider } from '@/contexts/i18n-context';
+import { SITE_URL } from '@/config/site';
 import { LOCALE_COOKIE, normalizeLang } from '@/lib/i18n/negotiate-locale';
 import { Be_Vietnam_Pro, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
 import Script from 'next/script';
@@ -38,7 +39,7 @@ export const metadata: Metadata = {
   description:
     'Free Pomodoro timer with task management, focus sounds, break mini games and focus history. No signup required.',
   manifest: '/manifest.json',
-  metadataBase: new URL('https://www.pomodoro-focus.site'),
+  metadataBase: new URL(SITE_URL),
   // No root canonical: each indexable page declares its own (see page metadata)
   icons: {
     icon: [
@@ -66,7 +67,7 @@ export const metadata: Metadata = {
     siteName: 'Study Bro',
     images: [
       {
-        url: 'https://www.pomodoro-focus.site/card.jpg',
+        url: `${SITE_URL}/card.jpg`,
         width: 1280,
         height: 664,
         alt: 'Study Bro - Pomodoro Timer App',
@@ -80,7 +81,7 @@ export const metadata: Metadata = {
     title: 'Study Bro - Free Pomodoro Timer & Focus Tools',
     description:
       'Free Pomodoro timer with task management, focus sounds and break mini games.',
-    images: ['https://www.pomodoro-focus.site/card.jpg'],
+    images: [`${SITE_URL}/card.jpg`],
   },
 };
 
@@ -120,7 +121,7 @@ export default async function RootLayout(
               alternateName: 'Study Bro Pomodoro Timer',
               description:
                 'Free online Pomodoro timer with task management, focus sounds, break mini games and focus history.',
-              url: 'https://www.pomodoro-focus.site',
+              url: SITE_URL,
               applicationCategory: 'ProductivityApplication',
               operatingSystem: 'Web Browser',
               inLanguage: ['en', 'vi', 'ja'],

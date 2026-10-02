@@ -64,6 +64,14 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // Domain move: the old domain and www both 301 to the canonical apex (src/config/site.ts).
+      // Works while the old domain stays attached to this Vercel project.
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: '(?:(?:www\\.)?pomodoro-focus\\.site|www\\.pomodorostudy\\.online)' }],
+        destination: 'https://pomodorostudy.online/:path*',
+        permanent: true,
+      },
       // One-page app: former pages open as panels on `/` (see src/features/app-shell).
       { source: '/timer', destination: '/', permanent: true },
       { source: '/tasks', destination: '/?panel=tasks', permanent: true },
