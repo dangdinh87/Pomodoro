@@ -120,9 +120,9 @@ Huy chương tính từ dữ liệu đã xác thực, có hiệu ứng ăn mừn
 - Bảng bạn bè (mời bằng mã/link) luôn có. Bảng toàn cầu chỉ ở `/bang-xep-hang`, chỉ hiện người **chọn công khai**.
 
 ### 5.6 Chống gian lận — server là nguồn sự thật
-1. `POST /api/focus/start` → server tạo `focus_session` (id, giờ bắt đầu theo giờ server, thời lượng đặt). Mỗi người chỉ có **một phiên đang chạy**; mở phiên mới sẽ đóng phiên cũ (khoá nhiều tab/thiết bị).
-2. Client gửi **heartbeat mỗi 30 s** (tab ẩn vẫn gửi; trình duyệt có thể giãn ra 60 s). Server cộng thời gian theo khoảng cách giữa hai heartbeat, mỗi khoảng tối đa 75 s; khoảng dài hơn (máy ngủ, mất mạng) không được cộng.
-3. `POST /api/focus/finish` (có idempotency key): phút xác thực = `min(tổng đã cộng, thời gian thực theo giờ server, thời lượng đặt × 1,1)`. Không bao giờ dùng giờ của client.
+1. `POST /api/focus/start` → server trả **token ký HMAC** (giờ bắt đầu theo giờ server, thời lượng đặt). **Không ghi DB lúc đang chạy** — trạng thái phiên nằm trong token, server chỉ kiểm chữ ký.
+2. Client gửi **beat mỗi ~60 s** (tab ẩn có thể giãn); server cộng thời gian theo khoảng cách giữa hai beat, mỗi khoảng tối đa 75 s (máy ngủ, mất mạng không được cộng) và trả token mới — vẫn không ghi DB.
+3. `POST /api/focus/finish`: phút xác thực = `min(tổng đã cộng, thời gian thực theo giờ server, thời lượng đặt × 1,1)`; **một lần ghi DB** (unique theo id phiên → gửi lại không cộng hai lần); phiên chồng thời gian với phiên đã ghi bị từ chối. Không bao giờ dùng giờ của client.
 4. XP ghi vào **sổ cái chỉ ghi thêm** (`xp_ledger`), khoá duy nhất theo `(nguồn, id nguồn, loại)` → gửi lại không cộng hai lần. Sửa sai bằng bút toán đảo, không xoá.
 5. Giới hạn tần suất API; cờ bất thường (> 14 giờ/ngày, phiên chồng nhau) đưa vào hàng chờ xem xét, không tự trừ điểm.
 6. Phiên offline/khách: vẫn ghi vào thống kê cá nhân với nhãn "chưa xác thực", **không** cộng XP hay xếp hạng. Khi đăng ký, lịch sử khách được nhập vào dưới dạng chưa xác thực.

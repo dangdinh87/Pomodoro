@@ -81,14 +81,6 @@ export const verification = pgTable(
   (t) => [index('verification_identifier_idx').on(t.identifier)],
 );
 
-// Database-backed so the OTP send limit holds across serverless instances.
-export const rateLimit = pgTable('rate_limit', {
-  id: text('id').primaryKey(),
-  key: text('key').notNull().unique(),
-  count: integer('count').notNull(),
-  lastRequest: bigint('last_request', { mode: 'number' }).notNull(),
-});
-
 // ── App ──
 
 export const tasks = pgTable(

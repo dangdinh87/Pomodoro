@@ -19,10 +19,12 @@ export const auth = betterAuth({
     updateAge: 60 * 60 * 24,
     cookieCache: { enabled: true, maxAge: 5 * 60 },
   },
+  // In memory, per server instance: the limiter checks every auth request
+  // (get-session included), and a database store would turn each page load
+  // into a write. Fluid compute reuses instances, so the limits still bite.
   rateLimit: {
     enabled: true,
-    storage: 'database',
-    modelName: 'rateLimit',
+    storage: 'memory',
     // Every guest sign-in creates a user row; a real visitor needs one.
     customRules: { '/sign-in/anonymous': { window: 10 * 60, max: 5 } },
   },
