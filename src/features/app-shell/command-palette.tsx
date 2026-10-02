@@ -52,7 +52,7 @@ export function CommandPalette() {
 
   return (
     <Dialog open={open} onOpenChange={setPaletteOpen}>
-      <DialogContent className="top-[20%] max-w-lg translate-y-0 overflow-hidden p-0 data-[state=closed]:slide-out-to-top-0 data-[state=open]:slide-in-from-top-0" overlayClassName="bg-black/40">
+      <DialogContent className="top-[20%] max-w-lg translate-y-0 overflow-hidden p-0" overlayClassName="bg-black/40">
         <DialogTitle className="sr-only">{t('shell.palette.open')}</DialogTitle>
         <Command loop>
           <CommandInput placeholder={t('shell.palette.placeholder')} />

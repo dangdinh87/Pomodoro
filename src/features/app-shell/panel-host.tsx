@@ -1,6 +1,5 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import type { ReactNode } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
@@ -10,15 +9,12 @@ import { TimerSettingsModal } from '@/components/settings/timer-settings-modal';
 import { LoginForm } from '@/components/auth/login-form';
 import { useI18n } from '@/contexts/i18n-context';
 import { cn } from '@/lib/utils';
+import { LAZY_PANELS } from './panel-loaders';
 import { PANELS } from './panel-registry';
 import { closePanel, usePanelStore, type PanelId } from './panel-store';
 
-// Loaded on first open so the timer page only ships the timer.
-const TasksPanel = dynamic(() => import('@/features/panels/tasks-panel'));
-const StatsPanel = dynamic(() => import('@/features/panels/stats-panel'));
-const ArcadePanel = dynamic(() => import('@/features/panels/arcade-panel'));
-const SettingsPanel = dynamic(() => import('@/features/panels/settings-panel'));
-const FeedbackPanel = dynamic(() => import('@/features/panels/feedback-panel'));
+const { tasks: TasksPanel, stats: StatsPanel, arcade: ArcadePanel, settings: SettingsPanel, feedback: FeedbackPanel } =
+  LAZY_PANELS;
 
 const onOpenChange = (open: boolean) => {
   if (!open) closePanel();
@@ -77,7 +73,7 @@ export function PanelHost({ googleEnabled }: { googleEnabled: boolean }) {
         <StatsPanel />
       </SheetPanel>
 
-      <DialogPanel id="settings" className="max-w-3xl">
+      <DialogPanel id="settings" className="max-w-3xl sm:h-[min(640px,90dvh)]">
         <SettingsPanel />
       </DialogPanel>
       <DialogPanel id="feedback">
@@ -86,7 +82,7 @@ export function PanelHost({ googleEnabled }: { googleEnabled: boolean }) {
       {/* Full viewport and untransformed: games position their overlays with `fixed`. */}
       <DialogPanel
         id="arcade"
-        className="inset-0 left-0 top-0 h-dvh max-h-none w-screen max-w-none translate-x-0 translate-y-0 rounded-none border-0 data-[state=closed]:slide-out-to-left-0 data-[state=closed]:slide-out-to-top-0 data-[state=open]:slide-in-from-left-0 data-[state=open]:slide-in-from-top-0 sm:rounded-none"
+        className="inset-0 left-0 top-0 h-dvh max-h-none w-screen max-w-none translate-x-0 translate-y-0 rounded-none border-0 sm:rounded-none"
       >
         <ArcadePanel />
       </DialogPanel>

@@ -106,7 +106,8 @@ export default function SceneCanvas({ sceneId, brightness, animate, followMode }
       stop();
       fit();
       draw();
-      if (live.current.animate && !reducedMotion.matches && !document.hidden) {
+      // A panel open over the stage (html[data-panel-open]) pauses on the last frame.
+      if (live.current.animate && !reducedMotion.matches && !document.hidden && !root.hasAttribute('data-panel-open')) {
         last = performance.now();
         raf = requestAnimationFrame(tick);
       }
@@ -134,8 +135,11 @@ export default function SceneCanvas({ sceneId, brightness, animate, followMode }
       if (!raf) draw();
     });
     resize.observe(canvas);
-    const mode = new MutationObserver(onModeChange);
-    mode.observe(root, { attributes: true, attributeFilter: ['data-timer-mode'] });
+    const mode = new MutationObserver((records) => {
+      if (records.some((r) => r.attributeName === 'data-panel-open')) start();
+      else onModeChange();
+    });
+    mode.observe(root, { attributes: true, attributeFilter: ['data-timer-mode', 'data-panel-open'] });
     document.addEventListener('visibilitychange', start);
     reducedMotion.addEventListener('change', start);
     canvas.addEventListener('webglcontextlost', onLost);

@@ -71,6 +71,21 @@ function useInView<T extends Element>() {
   return [ref, seen] as const;
 }
 
+// 3D previews mount one by one: each creates a WebGL context and compiles shaders,
+// and doing all four in one frame stutters the modal. The first waits out the open animation.
+let nextMountAt = 0;
+function useStaggeredMount(active: boolean) {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    if (!active || ready) return;
+    const now = performance.now();
+    nextMountAt = Math.max(now + 250, nextMountAt + 180);
+    const id = window.setTimeout(() => setReady(true), nextMountAt - now);
+    return () => window.clearTimeout(id);
+  }, [active, ready]);
+  return ready;
+}
+
 /** The real clock component at thumbnail size, on a dark tile like the timer stage. */
 export function ClockPreview({
   type,
@@ -83,13 +98,14 @@ export function ClockPreview({
 }) {
   const mode = useTimerStore((s) => s.mode);
   const [ref, seen] = useInView<HTMLDivElement>();
+  const mount3d = useStaggeredMount(seen && Boolean(CLOCK_STYLES.find((c) => c.id === type)?.is3d));
   const total = Math.max(1, workMinutes) * 60;
   const timeLeft = Math.round(total * 0.72);
   const meta = CLOCK_STYLES.find((c) => c.id === type);
 
   let content: ReactNode = null;
   if (meta?.is3d) {
-    content = seen ? (
+    content = mount3d ? (
       <div className="absolute inset-0 flex items-center justify-center">
         <ThreeClock
           scene={type as 'flip3d' | 'tomato' | 'orbit' | 'solid'}

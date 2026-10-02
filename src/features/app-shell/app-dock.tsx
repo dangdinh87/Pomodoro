@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { useAudioStore } from '@/stores/audio-store';
 import { useSystemStore } from '@/stores/system-store';
 import { DOCK_PANELS, PANELS } from './panel-registry';
+import { preloadPanel } from './panel-loaders';
 import { togglePanel, usePanelStore, type PanelId } from './panel-store';
 
 const DOCK_BUTTON =
@@ -75,6 +76,8 @@ function DockButton({ id }: { id: PanelId }) {
           aria-pressed={isOpen}
           className={cn(DOCK_BUTTON, highlighted && 'border-transparent bg-primary text-white hover:bg-primary/90')}
           onClick={() => togglePanel(id)}
+          onPointerEnter={() => preloadPanel(id)}
+          onFocus={() => preloadPanel(id)}
         >
           {id === 'sound' ? <SoundIcon /> : <Icon size={20} aria-hidden="true" />}
         </Button>

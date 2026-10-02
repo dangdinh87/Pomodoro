@@ -7,7 +7,8 @@ import { AppDock } from './app-dock';
 import { AppStatusBar } from './app-status-bar';
 import { CommandPalette } from './command-palette';
 import { PanelHost } from './panel-host';
-import { syncPanelFromUrl } from './panel-store';
+import { preloadPanelsWhenIdle } from './panel-loaders';
+import { syncPanelFromUrl, usePanelStore } from './panel-store';
 import { usePanelHotkeys } from './use-panel-hotkeys';
 
 /** The whole app on one screen: the timer stage, with everything else opened as a panel over it. */
@@ -19,6 +20,15 @@ export default function AppHome({ googleEnabled }: { googleEnabled: boolean }) {
   useEffect(() => {
     document.documentElement.dataset.timerMode = mode;
   }, [mode]);
+
+  // While a panel covers the stage, the animated scene pauses (see SceneCanvas):
+  // it is hidden or dimmed anyway, and the freed GPU keeps panel animations smooth.
+  const panelOpen = usePanelStore((state) => state.active !== null);
+  useEffect(() => {
+    document.documentElement.toggleAttribute('data-panel-open', panelOpen);
+  }, [panelOpen]);
+
+  useEffect(() => preloadPanelsWhenIdle(), []);
 
   useEffect(() => {
     syncPanelFromUrl();

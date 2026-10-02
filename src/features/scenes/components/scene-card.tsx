@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Check, CircleNotch, Timer } from '@phosphor-icons/react/dist/ssr';
 import { cn } from '@/lib/utils';
 import { getSceneThumbnail } from '../lib/scene-thumbnails';
@@ -61,17 +61,18 @@ interface SceneCardProps {
   onSelect: (scene: SceneMeta) => void;
 }
 
-/** Still preview rendered once from the scene's own shader, so no preview images ship with the app. */
+/**
+ * Static preview from public/scenes (pre-rendered from each scene's own shader).
+ * Rendering previews at runtime compiled a shader per card on the main thread and
+ * stuttered the picker; the live render is kept only as a fallback.
+ */
 export function SceneCard({ scene, label, followsLabel, selected, onSelect }: SceneCardProps) {
-  const [thumb, setThumb] = useState<string | null>(null);
+  const [thumb, setThumb] = useState<string | null>(`/scenes/${scene.id}.webp`);
 
-  useEffect(() => {
-    let cancelled = false;
-    getSceneThumbnail(scene).then((url) => !cancelled && setThumb(url));
-    return () => {
-      cancelled = true;
-    };
-  }, [scene]);
+  const renderFallback = () => {
+    setThumb(null);
+    void getSceneThumbnail(scene).then(setThumb);
+  };
 
   return (
     <GalleryCard
@@ -82,8 +83,14 @@ export function SceneCard({ scene, label, followsLabel, selected, onSelect }: Sc
     >
       <span className="absolute inset-0" style={{ background: scene.swatch }} />
       {thumb && (
-        // eslint-disable-next-line @next/next/no-img-element -- generated data URL, nothing for next/image to optimise
-        <img src={thumb} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        // eslint-disable-next-line @next/next/no-img-element -- 480px webp (or a generated object URL); nothing for next/image to optimise
+        <img
+          src={thumb}
+          alt=""
+          decoding="async"
+          onError={thumb.startsWith('/scenes/') ? renderFallback : undefined}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
       )}
     </GalleryCard>
   );
