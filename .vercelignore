@@ -1,0 +1,21 @@
+# With a .vercelignore present the CLI no longer reads .gitignore, so list everything here.
+node_modules
+.next
+.pglite
+.vercel
+.env
+.env*.local
+coverage
+*.log
+*.tsbuildinfo
+# Agent/tooling folders and planning notes are not part of the app.
+plans
+.claude
+.kilo
+.agent
+.shared
+.gemini
+.cursor
+.jules
+.Jules
+.swc
