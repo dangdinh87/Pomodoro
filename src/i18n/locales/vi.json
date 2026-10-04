@@ -177,7 +177,7 @@
       "reset": "Đã đặt lại cài đặt hẹn giờ về mặc định"
     },
     "presets": {
-      "title": "Preset",
+      "title": "Mẫu có sẵn",
       "label": "{focus} phút tập trung, {rest} phút nghỉ",
       "custom": "Tuỳ chỉnh"
     },
@@ -193,7 +193,7 @@
       "sounds": {
         "bell": "Chuông",
         "chime": "Chuông nhẹ",
-        "gong": "Chuông đồng",
+        "gong": "Chiêng",
         "digital": "Kỹ thuật số",
         "soft": "Nhẹ nhàng",
         "none": "Tắt chuông"
@@ -334,7 +334,7 @@
       "focusOverview": "Tổng quan thời gian tập trung",
       "distribution": "Phân bổ phiên",
       "sessionHistory": "Lịch sử phiên",
-      "noTask": "Không có việc"
+      "noTask": "Không gắn việc"
     },
     "dateRange": {
       "today": "Hôm nay",
@@ -426,7 +426,7 @@
           "mint": "Bạc hà",
           "butter": "Bơ",
           "lavender": "Oải hương",
-          "sky": "Trời",
+          "sky": "Bầu trời",
           "peach": "Đào"
         },
         "themeDescriptions": {
@@ -750,10 +750,10 @@
   },
   "errors": {
     "generic": "Đã xảy ra lỗi",
-    "network": "Lỗi mạng. Vui lòng kiểm tra kết nối của bạn.",
+    "network": "Lỗi mạng. Bạn hãy kiểm tra kết nối rồi thử lại nhé.",
     "notFound": "Không tìm thấy",
-    "unauthorized": "Chưa đăng nhập. Vui lòng đăng nhập.",
-    "forbidden": "Bạn không có quyền truy cập tài nguyên này",
+    "unauthorized": "Bạn chưa đăng nhập. Hãy đăng nhập để tiếp tục.",
+    "forbidden": "Bạn không có quyền truy cập nội dung này",
     "fieldRequired": "Vui lòng nhập thông tin này",
     "tooManyRequests": "Hiện có quá nhiều yêu cầu. Bạn hãy đợi vài phút rồi thử lại nhé.",
     "boundary": {
@@ -784,7 +784,7 @@
   "metadata": {
     "timer": {
       "title": "Hẹn giờ • Study Bro",
-      "description": "Quản lý các phiên làm việc và nghỉ ngơi với hẹn giờ Pomodoro tinh tế và cài đặt thống nhất."
+      "description": "Quản lý phiên tập trung và giờ nghỉ với hẹn giờ Pomodoro tinh tế và cài đặt thống nhất."
     },
     "tasks": {
       "title": "Việc cần làm • Study Bro",
@@ -922,12 +922,12 @@
       "less": "Ít",
       "more": "Nhiều",
       "cell": "{date}: tập trung {minutes} phút",
-      "cellNone": "{date}: không tập trung"
+      "cellNone": "{date}: chưa có phút tập trung nào"
     },
     "sessions": {
       "title": "Phiên gần đây",
       "none": "Chưa có phiên nào trong khoảng này.",
-      "noTask": "Không có việc",
+      "noTask": "Không gắn việc",
       "modes": {
         "work": "Tập trung",
         "shortBreak": "Nghỉ ngắn",
@@ -950,7 +950,7 @@
   "settingsUi": {
     "unitMin": "phút",
     "unitSessions": "phiên",
-    "autoStartBreakHint": "Bắt đầu giờ nghỉ ngay khi phiên làm việc kết thúc.",
+    "autoStartBreakHint": "Bắt đầu giờ nghỉ ngay khi phiên tập trung kết thúc.",
     "autoStartWorkHint": "Bắt đầu phiên tập trung tiếp theo ngay khi giờ nghỉ kết thúc. Vẫn sẽ chờ sau giờ nghỉ dài, hoặc khi bạn đã rời máy.",
     "lowTimeWarningHint": "Đồng hồ nhấp nháy trong 10 giây cuối.",
     "clockStyleHint": "Kiểu hiển thị của đồng hồ đếm ngược. Bản xem trước chạy trực tiếp.",

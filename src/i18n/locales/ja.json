@@ -187,8 +187,8 @@
     },
     "cycleSummary": "1サイクル：集中セッション{sessions}回、約{total}分。",
     "bell": {
-      "title": "チャイムと通知",
-      "sound": "チャイム音",
+      "title": "アラームと通知",
+      "sound": "アラーム音",
       "soundHint": "集中セッションや休憩が終わったときに鳴ります。",
       "sounds": {
         "bell": "ベル",
@@ -200,13 +200,13 @@
       },
       "volume": "音量",
       "previewLabel": "試し聴き",
-      "previewHint": "この音量でチャイムを確認できます。",
+      "previewHint": "この音量でアラーム音を確認できます。",
       "preview": "再生",
       "notifications": "ブラウザ通知",
-      "notificationsHint": "タブがバックグラウンドにあるとき、セッション終了を通知でお知らせします。",
+      "notificationsHint": "タブがバックグラウンドにあるとき、セッションが終わるとシステム通知でお知らせします。",
       "notificationsTurnOn": "オンにする",
       "notificationsOn": "オン",
-      "notificationsOnHint": "タブがバックグラウンドにあるとき、セッション終了を通知でお知らせします。",
+      "notificationsOnHint": "タブがバックグラウンドにあるとき、セッションが終わるとシステム通知でお知らせします。",
       "notificationsDenied": "ブロック中",
       "notificationsDeniedHint": "このサイトの通知はブラウザでブロックされています。アドレスバー横のアイコンからサイトの設定で許可し、ページを再読み込みしてください。",
       "notificationsUnsupported": "非対応",
@@ -755,7 +755,7 @@
     "unauthorized": "認証されていません。ログインしてください。",
     "forbidden": "このリソースにアクセスする権限がありません",
     "fieldRequired": "この項目を入力してください",
-    "tooManyRequests": "リクエストが集中しています。数分待ってからもう一度お試しください。",
+    "tooManyRequests": "リクエストが多すぎます。数分待ってからもう一度お試しください。",
     "boundary": {
       "title": "問題が発生しました",
       "description": "予期しないエラーが発生しました。もう一度お試しいただくか、前のページに戻ってください。",
@@ -784,7 +784,7 @@
   "metadata": {
     "timer": {
       "title": "タイマー • Study Bro",
-      "description": "洗練されたポモドーロタイマーと統合設定で作業と休憩セッションを管理。"
+      "description": "洗練されたポモドーロタイマーと統合設定で集中セッションと休憩を管理。"
     },
     "tasks": {
       "title": "タスク • Study Bro",
@@ -877,7 +877,7 @@
   },
   "landing": {
     "footer": {
-      "rightsReserved": "All rights reserved.",
+      "rightsReserved": "すべての権利を保有します。",
       "links": {
         "privacy": "プライバシーポリシー",
         "terms": "利用規約"
@@ -950,7 +950,7 @@
   "settingsUi": {
     "unitMin": "分",
     "unitSessions": "回",
-    "autoStartBreakHint": "作業セッションが終わったらすぐに休憩を始めます。",
+    "autoStartBreakHint": "集中セッションが終わったらすぐに休憩を始めます。",
     "autoStartWorkHint": "休憩が終わったらすぐに次の集中セッションを始めます。長い休憩のあとや、席を外しているときは待機します。",
     "lowTimeWarningHint": "残り10秒で時計が点滅します。",
     "clockStyleHint": "カウントダウンの見た目です。プレビューはリアルタイムで動きます。",
