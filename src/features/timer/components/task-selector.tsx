@@ -19,6 +19,7 @@ import {
 import { openPanel } from '@/features/app-shell/panel-store';
 import { useI18n } from '@/contexts/i18n-context';
 import { useTimerStore } from '@/stores/timer-store';
+import { useSessionRecorder } from '@/lib/timer/use-session-recorder';
 
 const PILL =
   'inline-flex h-10 max-w-[min(88vw,320px)] items-center gap-2 rounded-full border border-border bg-surface/60 px-4 backdrop-blur-md transition-colors hover:bg-surface-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand';
@@ -36,7 +37,10 @@ export function TaskSelector({ className }: TaskSelectorProps) {
     limit: 50,
   });
 
-  const { activeTaskId, setActiveTask } = useTasksStore();
+  const { activeTaskId } = useTasksStore();
+  // Every change of the active task goes through here so the running segment
+  // is recorded for the previous task first
+  const { switchActiveTask } = useSessionRecorder();
   const timerMode = useTimerStore((state) => state.mode);
   const isTimerRunning = useTimerStore((state) => state.isRunning);
   const sessionStarted = useTimerStore((state) => state.timeLeft < state.settings.workDuration * 60);
@@ -66,15 +70,15 @@ export function TaskSelector({ className }: TaskSelectorProps) {
         completedTaskRef.current = fullTask;
         setTaskCompleteOpen(true);
       } else {
-        setActiveTask(null);
+        switchActiveTask(null);
       }
     }
-  }, [activeTaskId, pendingTasks, tasks, isLoading, setActiveTask]);
+  }, [activeTaskId, pendingTasks, tasks, isLoading, switchActiveTask]);
 
   const handleSelectTask = (taskId: string) => {
     // If clicking the current active task -> deselect (un-focus)
     if (activeTaskId === taskId) {
-      setActiveTask(null);
+      switchActiveTask(null);
       return;
     }
 
@@ -89,7 +93,7 @@ export function TaskSelector({ className }: TaskSelectorProps) {
   };
 
   const selectTask = (taskId: string) => {
-    setActiveTask(taskId);
+    switchActiveTask(taskId);
     const task = tasks.find((t) => t.id === taskId);
     if (task && task.status === 'todo') {
       updateTask({ id: taskId, input: { status: 'doing' } });
@@ -104,7 +108,7 @@ export function TaskSelector({ className }: TaskSelectorProps) {
     if (!title || isCreating) return;
     const created = await createTask({ title, estimatePomodoros: 1 });
     setDraft('');
-    if (!activeTaskId && created?.id) setActiveTask(created.id);
+    if (!activeTaskId && created?.id) switchActiveTask(created.id);
   };
 
   return (
@@ -229,7 +233,7 @@ export function TaskSelector({ className }: TaskSelectorProps) {
       <AlertDialog open={taskCompleteOpen} onOpenChange={(open) => {
         if (!open) {
           setTaskCompleteOpen(false);
-          setActiveTask(null);
+          switchActiveTask(null);
           completedTaskRef.current = null;
         }
       }}>
@@ -252,7 +256,7 @@ export function TaskSelector({ className }: TaskSelectorProps) {
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => {
               setTaskCompleteOpen(false);
-              setActiveTask(null);
+              switchActiveTask(null);
               completedTaskRef.current = null;
             }}>
               {t('timerComponents.taskSelector.taskComplete.skip') || 'Skip'}
@@ -262,7 +266,7 @@ export function TaskSelector({ className }: TaskSelectorProps) {
                 updateTask({ id: completedTaskRef.current.id, input: { status: 'done' } });
               }
               setTaskCompleteOpen(false);
-              setActiveTask(null);
+              switchActiveTask(null);
               completedTaskRef.current = null;
             }}>
               <CheckCircle size={16} className="mr-1.5" />

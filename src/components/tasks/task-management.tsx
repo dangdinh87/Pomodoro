@@ -6,7 +6,6 @@ import { closePanel } from '@/features/app-shell/panel-store'
 import { isPast, isToday } from 'date-fns'
 import { BookmarkSimple, CircleNotch, DotsThree, Tag } from '@phosphor-icons/react/dist/ssr'
 import { Task, TaskPriority, TaskStatus, useTasksStore } from '@/stores/task-store'
-import { useTimerStore } from '@/stores/timer-store'
 import { useTasks } from '@/hooks/use-tasks'
 import { useTags } from '@/hooks/use-tags'
 import { useTemplates } from '@/hooks/use-templates'
@@ -48,8 +47,8 @@ export function TaskManagement() {
     useTasks(TASK_QUERY)
   const { saveAsTemplate } = useTemplates()
   const { t } = useI18n()
-  const { record } = useSessionRecorder()
-  const { activeTaskId, setActiveTask, viewMode, setViewMode } = useTasksStore()
+  const { switchActiveTask } = useSessionRecorder()
+  const { activeTaskId, viewMode, setViewMode } = useTasksStore()
 
   const [scope, setScope] = useState<TaskScope>('all')
   const [query, setQuery] = useState('')
@@ -84,25 +83,8 @@ export function TaskManagement() {
     })
   }, [tasks, scope, query])
 
-  // Records the focus time since the last recorded segment for `taskId` and
-  // restarts the baseline, so the next record (or the phase completion) only
-  // counts new time.
-  const recordPartialSession = (taskId: string) => {
-    const { mode, timeLeft, lastSessionTimeLeft, setLastSessionTimeLeft } =
-      useTimerStore.getState()
-    if (mode !== 'work') return
-    const durationSec = Math.max(0, lastSessionTimeLeft - timeLeft)
-    if (durationSec > 0) {
-      void record({ taskId, durationSec, mode: 'work' })
-    }
-    setLastSessionTimeLeft(timeLeft)
-  }
-
   const handleUpdateStatus = async (taskId: string, newStatus: TaskStatus) => {
-    if (newStatus === 'done' && activeTaskId === taskId) {
-      recordPartialSession(taskId)
-      setActiveTask(null)
-    }
+    if (newStatus === 'done' && activeTaskId === taskId) switchActiveTask(null)
 
     setTogglingTaskIds((prev) => new Set(prev).add(taskId))
     try {
@@ -118,16 +100,11 @@ export function TaskManagement() {
 
   const handleToggleStatus = (task: Task) => handleUpdateStatus(task.id, task.status === 'done' ? 'todo' : 'done')
 
-  const handleStopFocus = (task: Task) => {
-    recordPartialSession(task.id)
-    setActiveTask(null)
-  }
+  const handleStopFocus = () => switchActiveTask(null)
 
   const handleFocus = (task: Task) => {
     if (activeTaskId !== task.id) {
-      if (activeTaskId) recordPartialSession(activeTaskId)
-      else useTimerStore.getState().setLastSessionTimeLeft(useTimerStore.getState().timeLeft)
-      setActiveTask(task.id)
+      switchActiveTask(task.id)
       if (task.status === 'todo') void updateTask({ id: task.id, input: { status: 'doing' } })
     }
     closePanel()
@@ -154,7 +131,7 @@ export function TaskManagement() {
   const confirmDelete = async () => {
     if (!deleteConfirmId) return
     try {
-      if (deleteConfirmId === activeTaskId) setActiveTask(null)
+      if (deleteConfirmId === activeTaskId) switchActiveTask(null)
       await hardDeleteTask(deleteConfirmId)
       if (editingId === deleteConfirmId) setEditingId(null)
     } catch {

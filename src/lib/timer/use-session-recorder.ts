@@ -5,6 +5,7 @@ import {
   flushSessionQueue,
   type SessionPayload,
 } from './session-recorder';
+import { switchActiveTask as switchTask } from './switch-active-task';
 
 /** Session recorder bound to the query cache: refreshes stats on success only. */
 export function useSessionRecorder() {
@@ -21,6 +22,11 @@ export function useSessionRecorder() {
     [invalidate],
   );
   const flush = useCallback(() => flushSessionQueue(invalidate), [invalidate]);
+  /** Changes the active task, first recording the focus segment of the previous one. */
+  const switchActiveTask = useCallback(
+    (nextTaskId: string | null) => switchTask(nextTaskId, record),
+    [record],
+  );
 
-  return { record, flush };
+  return { record, flush, switchActiveTask };
 }
