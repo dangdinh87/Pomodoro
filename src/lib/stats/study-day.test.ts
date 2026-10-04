@@ -1,6 +1,7 @@
 import {
   addDays,
   eachDay,
+  formatterCacheSizeForTests,
   getBrowserTimeZone,
   isValidTimeZone,
   parseDayParam,
@@ -151,5 +152,17 @@ describe('studyTodayDate', () => {
   it('returns local midnight of the current study day', () => {
     const today = studyTodayDate(VN, vn('2026-10-05T02:00:00'));
     expect([today.getFullYear(), today.getMonth(), today.getDate(), today.getHours()]).toEqual([2026, 9, 4, 0]);
+  });
+});
+
+describe('formatter cache', () => {
+  // Intl reads zone names case-insensitively, and the zone arrives from the client: a key per
+  // spelling would be an unbounded, authenticated memory growth.
+  it('keeps one formatter per zone however its letters are cased', () => {
+    studyDayOf(new Date(0), VN);
+    const before = formatterCacheSizeForTests();
+    const spellings = ['ASIA/HO_CHI_MINH', 'asia/ho_chi_minh', 'aSiA/hO_cHi_MiNh', 'Asia/Ho_Chi_MINH'];
+    for (const tz of spellings) expect(studyDayOf(new Date(0), tz)).toBe(studyDayOf(new Date(0), VN));
+    expect(formatterCacheSizeForTests()).toBe(before);
   });
 });

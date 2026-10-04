@@ -40,11 +40,19 @@ export function getBrowserTimeZone(): string {
   }
 }
 
+// Keyed by the lowercased zone: `Intl` reads zone names case-insensitively and the zone comes from the
+// client, so keying by the raw string would let one spelling per case combination fill the map.
 const formatters = new Map<string, Intl.DateTimeFormat>();
+
+/** Test helper: how many formatters are cached. */
+export function formatterCacheSizeForTests(): number {
+  return formatters.size;
+}
 
 /** The local wall clock at `ms` in `tz`, expressed as if that wall clock were UTC. */
 function wallClockMs(ms: number, tz: string): number {
-  let formatter = formatters.get(tz);
+  const key = tz.toLowerCase();
+  let formatter = formatters.get(key);
   if (!formatter) {
     formatter = new Intl.DateTimeFormat('en-US', {
       timeZone: tz,
@@ -56,7 +64,7 @@ function wallClockMs(ms: number, tz: string): number {
       minute: '2-digit',
       second: '2-digit',
     });
-    formatters.set(tz, formatter);
+    formatters.set(key, formatter);
   }
   const part: Record<string, number> = {};
   for (const { type, value } of formatter.formatToParts(new Date(ms))) part[type] = Number(value);
