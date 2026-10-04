@@ -5,9 +5,10 @@
  *   /guide            -> rewrite to /en/guide   (English has no prefix in the browser)
  *   /vi, /ja/guide    -> untouched               (the [lang] route serves them)
  *   /en, /en/guide    -> 308 to /, /guide        (one URL per page: no duplicate content)
- *   /vi/tasks         -> 308 to /vi?panel=tasks  (former pages are panels now)
+ *   /vi/tasks         -> 308 to /vi?panel=tasks  (former pages are panels now; /vi/timer -> /vi)
  *   /fr, /fr/guide    -> untouched               (unsupported locale: the route answers 404)
- *   /api, /_next, files with an extension, metadata routes, /dev -> untouched
+ *   /opengraph-image  -> rewrite to /en/opengraph-image (each language has its own share image)
+ *   /api, /_next, files with an extension, sitemap/robots, /dev -> untouched
  */
 import { localePath, splitLocalePath } from './locale-path';
 import { DEFAULT_LANG, type Lang } from './negotiate-locale';
@@ -17,9 +18,14 @@ export type LocaleRoute =
   | { action: 'rewrite'; pathname: string }
   | { action: 'redirect'; pathname: string; search: string };
 
-/** Former pages: the panel that replaced them (null = just the app). Mirrors redirects() in next.config.ts. */
+/**
+ * Former pages: the panel that replaced them (null = just the app). Mirrors redirects() in
+ * next.config.ts, which handles the unprefixed English URLs; legacy-redirects.test.ts keeps the
+ * two in step. `/timer` was the main timer page, so it goes to the home (where the timer is),
+ * NOT to `?panel=timer`, which is the timer *settings* panel.
+ */
 const LEGACY_PAGES: Record<string, string | null> = {
-  timer: 'timer',
+  timer: null,
   tasks: 'tasks',
   history: 'stats',
   progress: 'stats',
@@ -34,18 +40,12 @@ const LEGACY_PAGES: Record<string, string | null> = {
   chat: null,
 };
 
-/** First segments that are never pages: API, build output, dev tools and generated metadata routes. */
-const NON_PAGE_SEGMENTS = new Set([
-  'api',
-  '_next',
-  'dev',
-  'sitemap.xml',
-  'robots.txt',
-  'opengraph-image',
-  'twitter-image',
-  'icon',
-  'apple-icon',
-]);
+/**
+ * First segments that are never pages: API, build output, dev tools and generated metadata
+ * routes. `opengraph-image` is deliberately absent: the share image is per language and lives
+ * in the `[lang]` tree, so `/opengraph-image` is rewritten to `/en/opengraph-image` like a page.
+ */
+const NON_PAGE_SEGMENTS = new Set(['api', '_next', 'dev', 'sitemap.xml', 'robots.txt', 'icon', 'apple-icon']);
 
 /** `fr`, `pt-br`: looks like a locale but is not one we serve. */
 const LOCALE_LIKE = /^[a-z]{2}(?:-[a-z]{2,4})?$/i;

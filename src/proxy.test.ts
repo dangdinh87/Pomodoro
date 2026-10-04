@@ -39,10 +39,21 @@ describe('proxy', () => {
   });
 
   it('sends a former page to its panel in the same language', () => {
-    const res = proxy(req('/vi/timer'));
+    const res = proxy(req('/vi/tasks'));
     expect(res.status).toBe(308);
-    expect(path(getRedirectUrl(res))).toBe('/vi?panel=timer');
+    expect(path(getRedirectUrl(res))).toBe('/vi?panel=tasks');
     expect(path(getRedirectUrl(proxy(req('/ja/leaderboard'))))).toBe('/ja');
+  });
+
+  it('sends /timer to the timer home in every language (the timer IS the home page)', () => {
+    expect(path(getRedirectUrl(proxy(req('/vi/timer'))))).toBe('/vi');
+    expect(path(getRedirectUrl(proxy(req('/ja/timer'))))).toBe('/ja');
+    expect(path(getRedirectUrl(proxy(req('/en/timer'))))).toBe('/');
+  });
+
+  it('serves each language its own share image (English through the /en rewrite)', () => {
+    expect(path(getRewrittenUrl(proxy(req('/opengraph-image'))))).toBe('/en/opengraph-image');
+    expect(isRewrite(proxy(req('/vi/opengraph-image')))).toBe(false);
   });
 
   it('does not set or read the language cookie, and ignores Accept-Language', () => {

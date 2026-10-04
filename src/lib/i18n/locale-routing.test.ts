@@ -35,7 +35,8 @@ describe('resolveLocaleRoute', () => {
 
   describe('legacy page URLs, in every locale', () => {
     it.each([
-      ['/vi/timer', '/vi', '?panel=timer'],
+      ['/vi/timer', '/vi', ''],
+      ['/ja/timer', '/ja', ''],
       ['/vi/tasks', '/vi', '?panel=tasks'],
       ['/ja/history', '/ja', '?panel=stats'],
       ['/ja/progress', '/ja', '?panel=stats'],
@@ -54,6 +55,7 @@ describe('resolveLocaleRoute', () => {
 
     it('goes straight to the final URL for /en/<legacy>, without a second hop', () => {
       expect(resolveLocaleRoute('/en/tasks', '')).toEqual(redirect('/', '?panel=tasks'));
+      expect(resolveLocaleRoute('/en/timer', '')).toEqual(redirect('/', ''));
       expect(resolveLocaleRoute('/en/chat', '')).toEqual(redirect('/', ''));
     });
 
@@ -75,8 +77,6 @@ describe('resolveLocaleRoute', () => {
       '/_next/image',
       '/sitemap.xml',
       '/robots.txt',
-      '/opengraph-image',
-      '/twitter-image',
       '/icon',
       '/apple-icon',
       '/manifest.json',
@@ -88,6 +88,13 @@ describe('resolveLocaleRoute', () => {
       '/dev',
     ])('%s', (pathname) => {
       expect(resolveLocaleRoute(pathname, '')).toEqual(next);
+    });
+
+    it('serves the share image of each language from its own tree, English unprefixed', () => {
+      expect(resolveLocaleRoute('/opengraph-image', '?abc123')).toEqual(rewrite('/en/opengraph-image'));
+      expect(resolveLocaleRoute('/vi/opengraph-image', '')).toEqual(next);
+      expect(resolveLocaleRoute('/ja/opengraph-image', '')).toEqual(next);
+      expect(resolveLocaleRoute('/en/opengraph-image', '')).toEqual(redirect('/opengraph-image'));
     });
 
     it('does not mistake a page whose name starts like an excluded one', () => {
