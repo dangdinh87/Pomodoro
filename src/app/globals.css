@@ -150,6 +150,20 @@
   }
 }
 
+/* Sticker utilities that need variant support (group-*:, data-*:, hover:). */
+/* Playful tilt for decorative stickers, toasts and landing cards only (never forms, lists, tables).
+   Uses the individual `rotate` property so it composes with the press translate. */
+@utility tilt-l {
+  rotate: -1deg;
+}
+@utility tilt-r {
+  rotate: 1deg;
+}
+/* Sticker outline: --outline-w (2.5px) in --outline. Use border-2 border-outline for elements <= 32px tall. */
+@utility border-sticker {
+  border: var(--outline-w) solid var(--outline);
+}
+
 /* Only the legal pages use it; keeps v3's centred, capped container. */
 @utility container {
   margin-inline: auto;
@@ -258,11 +272,6 @@
     transform: translate(var(--sticker-offset, 4px), var(--sticker-offset, 4px));
     box-shadow: 0 0 0 var(--outline);
   }
-
-  /* Playful tilt for decorative stickers, toasts and landing cards only (never forms, lists, tables).
-     Uses the individual `rotate` property so it composes with the press translate. */
-  .tilt-l { rotate: -1deg; }
-  .tilt-r { rotate: 1deg; }
 
   /* Doodle layer for the default scene (background-renderer) and any element that should look like the page paper */
   .paper-bg {

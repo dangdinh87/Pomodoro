@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils"
 
 const Tabs = TabsPrimitive.Root
 
+// Segmented control: a raised, outlined pill tray; the active tab floats on it as a small sticker.
+// p-1.5 leaves room inside the scroll box for the active tab's shadow and the focus ring.
 const TabsList = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.List>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
@@ -14,7 +16,7 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "flex items-center gap-1 overflow-x-auto shadow-[inset_0_-1px_0_var(--border)] scrollbar-hide",
+      "flex w-full items-center gap-1 overflow-x-auto rounded-full border-sticker bg-surface-raised p-1.5 scrollbar-hide",
       className
     )}
     {...props}
@@ -29,9 +31,8 @@ const TabsTrigger = React.forwardRef<
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      "relative inline-flex items-center justify-center gap-2 whitespace-nowrap px-3 pb-[11px] pt-[9px] text-[0.85rem] font-medium text-ink-muted transition-colors duration-150 hover:text-ink-secondary focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand/40 rounded-t-md disabled:pointer-events-none disabled:opacity-50",
-      "after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:rounded-t-sm after:bg-brand after:opacity-0 after:transition-opacity",
-      "data-[state=active]:font-semibold data-[state=active]:text-ink data-[state=active]:after:opacity-100",
+      "focus-ring relative inline-flex h-9 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full border-2 border-transparent px-4 font-heading text-[0.9375rem] font-bold leading-none text-ink-secondary transition-[background-color,color,box-shadow,transform] duration-100 hover:text-ink focus-visible:outline-offset-0 disabled:pointer-events-none disabled:opacity-50",
+      "data-[state=active]:border-outline data-[state=active]:bg-surface data-[state=active]:text-ink data-[state=active]:shadow-[2px_2px_0_var(--outline)]",
       className
     )}
     {...props}

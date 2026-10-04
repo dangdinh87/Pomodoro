@@ -3,15 +3,16 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
-// Tag / badge — docs/design-system.md §7.4. Pick a tone by meaning (§4.2); neutral by default.
+// Tag / badge: 2px outlined pill. Pick a tone by meaning (spec §3.1); neutral by default.
+// Tones use the soft -bg with the -ink text colour (never the solid DEFAULT fill as text).
 const badgeVariants = cva(
-  "inline-flex items-center gap-1 whitespace-nowrap rounded-full px-[9px] py-[3px] text-[0.6875rem] font-medium leading-[1.4]",
+  "inline-flex items-center gap-1 whitespace-nowrap rounded-full border-2 border-outline px-2.5 py-0.5 text-xs font-bold leading-[1.4]",
   {
     variants: {
       variant: {
         default: "bg-surface-raised text-ink-secondary",
         secondary: "bg-surface-raised text-ink-secondary",
-        outline: "border border-border text-ink-secondary",
+        outline: "bg-transparent text-ink-secondary",
         brand: "bg-brand-soft text-brand-ink",
         success: "bg-success-bg text-success-ink",
         warning: "bg-warning-bg text-warning-ink",

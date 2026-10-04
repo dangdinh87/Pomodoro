@@ -38,8 +38,8 @@ export function PageHeader({
   return (
     <header className={cn('mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between', className)}>
       <div className="min-w-0 space-y-1.5">
-        <h1 className="font-heading text-[1.75rem] font-bold leading-[1.1] tracking-[-0.02em] text-ink">{title}</h1>
-        {description && <p className="text-sm text-ink-muted">{description}</p>}
+        <h1 className="font-heading text-[clamp(1.75rem,4vw,2.25rem)] font-extrabold leading-[1.1] tracking-[-0.02em] text-ink">{title}</h1>
+        {description && <p className="text-[0.9375rem] text-ink-muted">{description}</p>}
       </div>
       {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}
     </header>
@@ -50,7 +50,7 @@ export function PageHeader({
 export function SectionHeading({ children, action, className }: { children: ReactNode; action?: ReactNode; className?: string }) {
   return (
     <div className={cn('mb-3 flex items-center justify-between gap-3', className)}>
-      <h2 className="font-heading text-[0.9375rem] font-bold tracking-[-0.01em] text-ink">{children}</h2>
+      <h2 className="font-heading text-[1.0625rem] font-bold tracking-[-0.01em] text-ink">{children}</h2>
       {action}
     </div>
   );

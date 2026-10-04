@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import type { Icon as PhosphorIcon } from '@phosphor-icons/react';
+import { IconTile, type IconTileTone } from '@/components/ui/icon-tile';
 import { cn } from '@/lib/utils';
 
 export type StatItem = {
@@ -7,25 +8,30 @@ export type StatItem = {
   value: ReactNode;
   hint?: ReactNode;
   icon?: PhosphorIcon;
+  /** Candy colour of the icon tile; cycles through the candy set when omitted. */
+  tone?: IconTileTone;
 };
 
-/** Several numbers in one hairline-divided strip — never N separate cards (design-system §7.7). */
+const TONE_CYCLE: IconTileTone[] = ['butter', 'sky', 'mint', 'lilac', 'peach', 'tomato'];
+
+/** Several numbers as a row of sticker tiles with big Baloo figures (spec §5). */
 export function StatStrip({ items, className }: { items: StatItem[]; className?: string }) {
   return (
     <dl
       className={cn(
-        'grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border',
+        // gap-3.5 keeps each tile's 2px hard shadow clear of its neighbour
+        'grid grid-cols-2 gap-3.5',
         items.length >= 4 ? 'min-[720px]:grid-cols-4' : items.length === 3 ? 'min-[720px]:grid-cols-3' : '',
         className,
       )}
     >
-      {items.map(({ label, value, hint, icon: Icon }) => (
-        <div key={label} className="flex min-w-0 flex-col gap-1.5 bg-surface px-5 py-4">
-          <dt className="flex items-center gap-1.5 text-[0.8125rem] text-ink-muted">
-            {Icon && <Icon size={14} className="shrink-0 text-ink-faint" />}
+      {items.map(({ label, value, hint, icon: Icon, tone }, index) => (
+        <div key={label} className="sticker-sm flex min-w-0 flex-col gap-2 rounded-lg px-4 py-3.5">
+          <dt className="flex items-center gap-2 text-[0.8125rem] font-semibold text-ink-muted">
+            {Icon && <IconTile icon={Icon} size="sm" tone={tone ?? TONE_CYCLE[index % TONE_CYCLE.length]} />}
             <span className="truncate">{label}</span>
           </dt>
-          <dd className="font-heading text-[clamp(1.4rem,2.4vw,1.75rem)] font-bold leading-none tracking-[-0.02em] text-ink tabular-nums">
+          <dd className="font-heading text-[clamp(1.75rem,3vw,2.375rem)] font-extrabold leading-none tracking-[-0.02em] text-ink tabular-nums">
             {value}
           </dd>
           {hint && <dd className="text-xs text-ink-muted">{hint}</dd>}
