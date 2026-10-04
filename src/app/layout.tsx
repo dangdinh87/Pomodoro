@@ -46,6 +46,8 @@ export const metadata: Metadata = {
   // No root canonical: each indexable page declares its own (see page metadata)
   icons: {
     icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
       { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
       { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
     ],
@@ -68,14 +70,6 @@ export const metadata: Metadata = {
     // No `url` here: child pages would inherit the homepage og:url. Each
     // indexable page sets its own openGraph.url (see buildPageMetadata).
     siteName: 'Study Bro',
-    images: [
-      {
-        url: `${SITE_URL}/card.jpg`,
-        width: 1280,
-        height: 664,
-        alt: 'Study Bro - Pomodoro Timer App',
-      },
-    ],
     locale: 'en_US',
     type: 'website',
   },
@@ -84,7 +78,6 @@ export const metadata: Metadata = {
     title: 'Study Bro - Free Pomodoro Timer & Focus Tools',
     description:
       'Free Pomodoro timer with task management, focus sounds and break mini games.',
-    images: [`${SITE_URL}/card.jpg`],
   },
 };
 

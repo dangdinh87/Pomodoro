@@ -1,12 +1,8 @@
 import type { Metadata } from 'next';
+import { SHARE_IMAGE_ALT, SHARE_IMAGE_PATH, SHARE_IMAGE_SIZE } from './share-image';
 
 const SITE_NAME = 'Study Bro';
-const SHARE_IMAGE = {
-  url: '/card.jpg',
-  width: 1280,
-  height: 664,
-  alt: 'Study Bro - Pomodoro Timer App',
-};
+const SHARE_IMAGE = { url: SHARE_IMAGE_PATH, ...SHARE_IMAGE_SIZE, alt: SHARE_IMAGE_ALT };
 
 interface PageMetadataInput {
   /** Path of the page, e.g. '/timer'. Resolved against the root metadataBase. */
