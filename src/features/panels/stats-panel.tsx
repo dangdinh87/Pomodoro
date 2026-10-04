@@ -16,13 +16,15 @@ import { closePanel, openPanel } from "@/features/app-shell/panel-store"
 import { HistoryLoading } from "@/features/stats/components/history-loading"
 import { SessionList } from "@/features/stats/components/session-list"
 import { StreakHeatmap, heatmapRange } from "@/features/stats/components/streak-heatmap"
+import { studyTodayDate } from "@/lib/stats/study-day"
 import { WeekChart } from "@/features/stats/components/week-chart"
 
 type RangeKey = "today" | "week" | "month"
 const RANGE_KEYS: RangeKey[] = ["today", "week", "month"]
 
+// Ranges are study days (the day starts at 04:00), so "today" is not the calendar date before 04:00.
 function rangeFor(key: RangeKey): DateRange {
-    const today = new Date()
+    const today = studyTodayDate()
     if (key === "today") return { from: today, to: today }
     if (key === "week") return { from: subDays(today, 6), to: today }
     return { from: startOfMonth(today), to: today }

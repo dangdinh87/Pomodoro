@@ -2,11 +2,12 @@
 
 import { addDays, startOfWeek, subWeeks } from 'date-fns'
 import { useI18n } from '@/contexts/i18n-context'
-import { INTL_LOCALE, parseDayKey, toDayKey } from './history-format'
+import { studyTodayDate } from '@/lib/stats/study-day'
+import { INTL_LOCALE, toDayKey } from './history-format'
 
 const WEEKS = 12
 
-export function heatmapRange(today = new Date()) {
+export function heatmapRange(today = studyTodayDate()) {
     return { from: startOfWeek(subWeeks(today, WEEKS - 1), { weekStartsOn: 1 }), to: today }
 }
 
@@ -34,7 +35,7 @@ export function StreakHeatmap({ data }: StreakHeatmapProps) {
     const { t, lang } = useI18n()
     const locale = INTL_LOCALE[lang]
     const minutesByDay = new Map(data.map((d) => [d.date, Math.round(d.duration / 60)]))
-    const today = new Date()
+    const today = studyTodayDate()
     const todayKey = toDayKey(today)
     const start = heatmapRange(today).from
 

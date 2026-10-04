@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import { useTranslation } from '@/contexts/i18n-context';
 import { Coffee } from '@phosphor-icons/react/dist/ssr';
 import { useStats } from '@/hooks/use-stats';
@@ -9,6 +9,7 @@ import { useSystemStore } from '@/stores/system-store';
 import { useTimerStore } from '@/stores/timer-store';
 import { useTasksStore } from '@/stores/task-store';
 import { useTasks } from '@/hooks/use-tasks';
+import { studyTodayDate } from '@/lib/stats/study-day';
 import { TaskSelector } from './task-selector';
 
 export const DailyProgress = memo(function DailyProgress() {
@@ -18,10 +19,9 @@ export const DailyProgress = memo(function DailyProgress() {
     const isFocusMode = useSystemStore((state) => state.isFocusMode);
     const activeTaskId = useTasksStore((state) => state.activeTaskId);
 
-    const todayRange = useMemo(() => {
-        const now = new Date();
-        return { from: now, to: now };
-    }, []);
+    // Today's study day (the day starts at 04:00); recomputed per render so it rolls over without a reload.
+    const today = studyTodayDate();
+    const todayRange = { from: today, to: today };
 
     const { tasks } = useTasks({ statusFilter: 'all', limit: 50 });
     const activeTask = tasks.find((task) => task.id === activeTaskId);

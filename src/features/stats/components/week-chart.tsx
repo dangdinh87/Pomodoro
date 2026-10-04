@@ -2,6 +2,7 @@
 
 import { useI18n } from '@/contexts/i18n-context'
 import { cn } from '@/lib/utils'
+import { studyTodayDate } from '@/lib/stats/study-day'
 import { INTL_LOCALE, parseDayKey, toDayKey } from './history-format'
 
 interface WeekChartProps {
@@ -12,7 +13,7 @@ const CHART_HEIGHT = 160
 
 export function WeekChart({ data }: WeekChartProps) {
     const { t, lang } = useI18n()
-    const todayKey = toDayKey(new Date())
+    const todayKey = toDayKey(studyTodayDate())
     const days = data.slice(-7).map((item) => {
         const date = parseDayKey(item.date)
         return {

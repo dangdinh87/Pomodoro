@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/auth-store';
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
+import { getBrowserTimeZone } from '@/lib/stats/study-day';
 
 export interface StatsData {
   summary: {
@@ -22,20 +23,23 @@ export interface StatsData {
   }[];
 }
 
+/**
+ * The server groups sessions by study day (04:00 local) in `tz`. The range
+ * holds study days as local-midnight dates (see `studyTodayDate`), sent as
+ * yyyy-MM-dd keys.
+ */
 async function fetchStats(
   dateRange: DateRange | undefined,
+  tz: string,
 ): Promise<StatsData> {
-  let url = '/api/stats';
+  const params = new URLSearchParams({ tz });
 
   if (dateRange?.from && dateRange?.to) {
-    const params = new URLSearchParams({
-      startDate: format(dateRange.from, 'yyyy-MM-dd'),
-      endDate: format(dateRange.to, 'yyyy-MM-dd'),
-    });
-    url += `?${params.toString()}`;
+    params.set('startDate', format(dateRange.from, 'yyyy-MM-dd'));
+    params.set('endDate', format(dateRange.to, 'yyyy-MM-dd'));
   }
 
-  const res = await fetch(url);
+  const res = await fetch(`/api/stats?${params.toString()}`);
   if (!res.ok) {
     throw new Error('Failed to fetch stats');
   }
@@ -45,8 +49,10 @@ async function fetchStats(
 
 export function useStats(dateRange: DateRange | undefined) {
   const user = useAuthStore((state) => state.user);
+  const tz = getBrowserTimeZone();
   const queryKey = [
     'stats',
+    tz,
     dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : undefined,
     dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : undefined,
   ];
@@ -54,7 +60,7 @@ export function useStats(dateRange: DateRange | undefined) {
   return useQuery({
     queryKey,
     enabled: !!user,
-    queryFn: () => fetchStats(dateRange),
+    queryFn: () => fetchStats(dateRange, tz),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
