@@ -1020,7 +1020,7 @@
     "overdue": "Overdue",
     "pomodoroProgress": "{done} of {total} Pomodoros",
     "emptyTitle": "No tasks yet",
-    "emptyDescription": "Add your first task above, then press Focus to start a session.",
+    "emptyDescription": "Add your first task above, then press Select to link it to your focus session.",
     "emptyAction": "Add your first task",
     "noMatchTitle": "No tasks match",
     "noMatchDescription": "Try a different filter or search term.",

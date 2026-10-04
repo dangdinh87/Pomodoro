@@ -1021,7 +1021,7 @@
     "pomodoroProgress": "{done} / {total} ポモドーロ",
     "emptyTitle": "タスクはまだありません",
     "emptyAction": "最初のタスクを追加",
-    "emptyDescription": "上の入力欄から最初のタスクを追加し、「集中する」を押してセッションを始めましょう。",
+    "emptyDescription": "上の入力欄から最初のタスクを追加し、「選択」を押して集中セッションに紐づけましょう。",
     "noMatchTitle": "一致するタスクがありません",
     "noMatchDescription": "別のフィルターやキーワードをお試しください。",
     "clearFilters": "フィルターを解除",

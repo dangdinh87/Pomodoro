@@ -1020,7 +1020,7 @@
     "pomodoroProgress": "{done}/{total} Pomodoro",
     "emptyTitle": "Chưa có việc nào",
     "emptyAction": "Thêm việc đầu tiên",
-    "emptyDescription": "Thêm việc đầu tiên ở trên, rồi bấm Tập trung để bắt đầu phiên.",
+    "emptyDescription": "Thêm việc đầu tiên ở trên, rồi bấm Chọn để gắn việc vào phiên tập trung.",
     "noMatchTitle": "Không có việc phù hợp",
     "noMatchDescription": "Thử đổi bộ lọc hoặc từ khoá khác.",
     "clearFilters": "Xoá bộ lọc",
@@ -1267,7 +1267,7 @@
       "title": "Kỹ thuật Pomodoro là gì",
       "p1": "Kỹ thuật Pomodoro là phương pháp quản lý thời gian do Francesco Cirillo phát triển vào cuối thập niên 1980. Bạn làm việc theo các khối ngắn, cố định, thường là 25 phút, xen kẽ những quãng nghỉ ngắn. Mỗi khối là một **pomodoro**, tiếng Ý nghĩa là quả cà chua, theo chiếc đồng hồ bếp hình quả cà chua mà Cirillo dùng hồi còn là sinh viên.",
       "p2": "Điểm mấu chốt không phải con số 25. Khối thời gian cố định cho bạn một điểm bắt đầu, một điểm kết thúc và một việc duy nhất để làm. Nhờ vậy dễ bắt đầu hơn và khó bị phân tán hơn. Sau bốn khối bạn nghỉ dài hơn.",
-      "p3": "Study Bro là đồng hồ Pomodoro xây quanh vòng lặp đó: chế độ toàn màn hình, nghỉ ngắn, nghỉ dài, việc gắn được vào phiên và lịch sử những gì bạn đã hoàn thành."
+      "p3": "Study Bro là đồng hồ Pomodoro xây quanh vòng lặp đó: các chế độ tập trung, nghỉ ngắn và nghỉ dài, việc gắn được vào phiên và lịch sử những gì bạn đã hoàn thành."
     },
     "session": {
       "title": "Cách chạy một phiên tập trung",
