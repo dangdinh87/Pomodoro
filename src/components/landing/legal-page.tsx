@@ -1,3 +1,4 @@
+import { PAGE_UPDATED } from '@/lib/seo/pages';
 import { DocLayout, P, UL, type DocSection } from './doc-layout';
 
 export interface LegalSectionSpec {
@@ -40,7 +41,7 @@ export function LegalPage({
       title={t(`${ns}.title`)}
       lead={t(`${ns}.lead`)}
       meta={t('legal.updated')}
-      metaDateTime="2026-10-02"
+      metaDateTime={PAGE_UPDATED.legal}
       tocLabel={t('guide2.toc')}
       sections={sections}
     />

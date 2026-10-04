@@ -1247,17 +1247,25 @@
   },
   "site": {
     "meta": {
+      "home": {
+        "title": "Pomodoro Timer Online – Free, No Signup | Study Bro",
+        "description": "Free online Pomodoro timer with tasks, ambient focus sounds, break mini games and focus history. No signup needed: open the page and start."
+      },
       "guide": {
-        "title": "Pomodoro Technique Guide • Study Bro",
-        "description": "How the Pomodoro Technique works, how to run a focus session, choose 25/5, 50/10 or 52/17, handle interruptions, use task estimates and keyboard shortcuts."
+        "title": "Pomodoro Technique Guide: 25/5, 50/10 and 52/17",
+        "description": "Learn how the Pomodoro Technique works, how to run a focus session, pick 25/5, 50/10 or 52/17, handle interruptions and estimate tasks."
       },
       "privacy": {
-        "title": "Privacy Policy • Study Bro",
+        "title": "Privacy Policy",
         "description": "What Study Bro stores, what stays on your device, which services process data, and how to export or delete it."
       },
       "terms": {
-        "title": "Terms of Service • Study Bro",
+        "title": "Terms of Service",
         "description": "The terms for using Study Bro, the free Pomodoro timer with tasks and focus sounds."
+      },
+      "og": {
+        "tagline": "Free Pomodoro timer · tasks · focus sounds",
+        "alt": "Study Bro: free Pomodoro timer with tasks and focus sounds"
       }
     },
     "header": {

@@ -1,18 +1,24 @@
-import { MetadataRoute } from 'next';
-import { SITE_URL } from '@/config/site';
+import type { MetadataRoute } from 'next';
+import { SUPPORTED_LANGS } from '@/lib/i18n/negotiate-locale';
+import { INDEXABLE_PAGES } from '@/lib/seo/pages';
+import { languageAlternates, pageUrl } from '@/lib/seo/urls';
 
-// Static generation at build time; lastModified = build time
+// Static generation at build time. Dates are the fixed per-page ones in `lib/seo/pages`.
 export const dynamic = 'force-static';
 
-// Indexable pages only; app panels live on `/` and are not separate pages.
+/**
+ * One entry per page per language. Each entry carries the whole hreflang cluster (itself
+ * included, plus x-default), so the sitemap says the same thing as the <link rel="alternate">
+ * tags in the page head. App panels live on `/` and are not separate pages.
+ */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = SITE_URL;
-  const lastModified = new Date();
-
-  return [
-    { url: baseUrl, lastModified, changeFrequency: 'weekly', priority: 1 },
-    { url: `${baseUrl}/guide`, lastModified, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${baseUrl}/privacy`, lastModified, changeFrequency: 'yearly', priority: 0.3 },
-    { url: `${baseUrl}/terms`, lastModified, changeFrequency: 'yearly', priority: 0.3 },
-  ];
+  return INDEXABLE_PAGES.flatMap(({ path, lastModified, changeFrequency, priority }) =>
+    SUPPORTED_LANGS.map((lang) => ({
+      url: pageUrl(lang, path),
+      lastModified,
+      changeFrequency,
+      priority,
+      alternates: { languages: languageAlternates(path) },
+    })),
+  );
 }

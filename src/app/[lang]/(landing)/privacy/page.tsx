@@ -5,10 +5,10 @@ import { buildPageMetadata } from '@/lib/seo/page-metadata';
 import { getT } from '@/lib/server-translations';
 
 export async function generateMetadata({ params }: LangParams): Promise<Metadata> {
-  const lang = await routeLang(params);
-  const t = getT(lang);
+  const locale = await routeLang(params);
+  const t = getT(locale);
   return buildPageMetadata({
-    lang,
+    locale,
     path: '/privacy',
     title: t('site.meta.privacy.title'),
     description: t('site.meta.privacy.description'),

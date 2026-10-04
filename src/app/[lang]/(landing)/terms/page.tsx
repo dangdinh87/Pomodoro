@@ -5,10 +5,10 @@ import { buildPageMetadata } from '@/lib/seo/page-metadata';
 import { getT } from '@/lib/server-translations';
 
 export async function generateMetadata({ params }: LangParams): Promise<Metadata> {
-  const lang = await routeLang(params);
-  const t = getT(lang);
+  const locale = await routeLang(params);
+  const t = getT(locale);
   return buildPageMetadata({
-    lang,
+    locale,
     path: '/terms',
     title: t('site.meta.terms.title'),
     description: t('site.meta.terms.description'),

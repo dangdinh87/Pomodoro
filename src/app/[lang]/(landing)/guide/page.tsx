@@ -6,17 +6,20 @@ import { Button } from '@/components/ui/button';
 import { Kbd } from '@/components/ui/kbd';
 import { DocLayout, OL, P, UL, type DocSection } from '@/components/landing/doc-layout';
 import { PanelLink } from '@/components/landing/panel-link';
+import { JsonLd } from '@/components/seo/json-ld';
 import type { PanelId } from '@/features/app-shell/panel-store';
 import { localePath } from '@/lib/i18n/locale-path';
 import { routeLang, type LangParams } from '@/lib/i18n/route-lang';
+import { howToJsonLd } from '@/lib/seo/json-ld';
 import { buildPageMetadata } from '@/lib/seo/page-metadata';
+import { PAGE_UPDATED } from '@/lib/seo/pages';
 import { getT } from '@/lib/server-translations';
 
 export async function generateMetadata({ params }: LangParams): Promise<Metadata> {
-  const lang = await routeLang(params);
-  const t = getT(lang);
+  const locale = await routeLang(params);
+  const t = getT(locale);
   return buildPageMetadata({
-    lang,
+    locale,
     path: '/guide',
     title: t('site.meta.guide.title'),
     description: t('site.meta.guide.description'),
@@ -201,26 +204,16 @@ export default async function GuidePage({ params }: LangParams) {
     },
   ];
 
-  const howTo = {
-    '@context': 'https://schema.org',
-    '@type': 'HowTo',
-    name: t('guide2.session.title'),
-    description: t('guide2.session.intro'),
-    step: steps.map((text, i) => ({
-      '@type': 'HowToStep',
-      position: i + 1,
-      text: text.replaceAll('**', ''),
-    })),
-  };
+  const howTo = howToJsonLd(lang, { name: t('guide2.session.title'), description: t('guide2.session.intro'), steps });
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howTo) }} />
+      <JsonLd data={howTo} />
       <DocLayout
         title={t('guide2.title')}
         lead={t('guide2.lead')}
         meta={t('guide2.updated')}
-        metaDateTime="2026-10-05"
+        metaDateTime={PAGE_UPDATED.guide}
         tocLabel={t('guide2.toc')}
         sections={sections}
         after={

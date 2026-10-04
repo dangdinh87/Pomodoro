@@ -1247,17 +1247,25 @@
   },
   "site": {
     "meta": {
+      "home": {
+        "title": "Đồng hồ Pomodoro online miễn phí – Hẹn giờ học tập | Study Bro",
+        "description": "Đồng hồ Pomodoro online miễn phí để hẹn giờ học tập và làm việc, có danh sách việc, âm thanh tập trung, trò chơi giờ nghỉ và lịch sử. Không cần đăng ký."
+      },
       "guide": {
-        "title": "Hướng dẫn kỹ thuật Pomodoro • Study Bro",
-        "description": "Kỹ thuật Pomodoro hoạt động thế nào, cách chạy một phiên tập trung, chọn 25/5, 50/10 hay 52/17, xử lý gián đoạn, ước lượng việc và phím tắt."
+        "title": "Phương pháp Pomodoro là gì? Hướng dẫn cách dùng",
+        "description": "Phương pháp (kỹ thuật) Pomodoro là gì, cách chạy một phiên tập trung, chọn nhịp 25/5, 50/10 hay 52/17, xử lý gián đoạn và ước lượng việc."
       },
       "privacy": {
-        "title": "Chính sách quyền riêng tư • Study Bro",
-        "description": "Study Bro lưu những gì, gì chỉ nằm trên thiết bị của bạn, dịch vụ nào xử lý dữ liệu, và cách xuất hoặc xoá dữ liệu."
+        "title": "Chính sách quyền riêng tư",
+        "description": "Study Bro lưu dữ liệu gì, dữ liệu nào chỉ nằm trên thiết bị của bạn, dịch vụ nào xử lý dữ liệu, và cách xuất hoặc xoá dữ liệu."
       },
       "terms": {
-        "title": "Điều khoản sử dụng • Study Bro",
+        "title": "Điều khoản sử dụng",
         "description": "Điều khoản khi dùng Study Bro, đồng hồ Pomodoro miễn phí có việc và âm thanh tập trung."
+      },
+      "og": {
+        "tagline": "Pomodoro miễn phí · việc cần làm · âm thanh nền",
+        "alt": "Study Bro: đồng hồ Pomodoro miễn phí có việc cần làm và âm thanh tập trung"
       }
     },
     "header": {

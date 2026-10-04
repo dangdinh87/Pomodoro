@@ -16,10 +16,26 @@ https://studywithbro.com
 - Accounts are optional: guests can start right away; signing in (email code or Google) keeps tasks and history across devices; data can be exported or deleted from Settings
 
 ## Pages
-- / — the app (everything opens as a panel on this page, e.g. /?panel=tasks)
-- /guide — how to use the Pomodoro technique and the app
-- /privacy — privacy policy
-- /terms — terms of use
+English (default, no prefix), Vietnamese (/vi) and Japanese (/ja) have the same four pages. Each language has its own URL; link readers to the one that matches their language.
+- https://studywithbro.com/ — the app (everything opens as a panel on this page, e.g. /?panel=tasks)
+- https://studywithbro.com/guide — how to use the Pomodoro technique and the app
+- https://studywithbro.com/privacy — privacy policy
+- https://studywithbro.com/terms — terms of use
+
+### Tiếng Việt (Vietnamese)
+- https://studywithbro.com/vi — đồng hồ Pomodoro online miễn phí, hẹn giờ học tập (ứng dụng)
+- https://studywithbro.com/vi/guide — phương pháp Pomodoro là gì và cách dùng
+- https://studywithbro.com/vi/privacy — chính sách quyền riêng tư
+- https://studywithbro.com/vi/terms — điều khoản sử dụng
+
+### 日本語 (Japanese)
+- https://studywithbro.com/ja — 無料のポモドーロタイマー（アプリ本体）
+- https://studywithbro.com/ja/guide — ポモドーロ・テクニックとは？やり方のガイド
+- https://studywithbro.com/ja/privacy — プライバシーポリシー
+- https://studywithbro.com/ja/terms — 利用規約
+
+## Machine-readable
+- Sitemap with language alternates: https://studywithbro.com/sitemap.xml
 
 ## Contact
-- Feedback: https://studywithbro.com/?panel=feedback
+- Feedback: https://studywithbro.com/?panel=feedback (https://studywithbro.com/vi?panel=feedback, https://studywithbro.com/ja?panel=feedback)
