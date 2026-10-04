@@ -81,9 +81,8 @@ export function LoginForm({ googleEnabled, onSignedIn }: { googleEnabled: boolea
   }
 
   return (
-    // m-1.5: the dialog around this card scrolls (overflow-y-auto), which clips the card's outline on the
-    // top/left and its hard shadow on the bottom/right when the card touches the dialog edge.
-    <Card className="m-1.5 max-w-md">
+    // The dialog around this card (panel-host, `bare`) pads its scroll box, so the outline and shadow are not clipped
+    <Card className="max-w-md">
       <CardHeader className="space-y-2 text-center">
         <CardTitle className="flex flex-col items-center gap-3 font-heading text-2xl font-extrabold">
           {/* Tomo reacts to the form: worried while an error is showing, happy otherwise */}

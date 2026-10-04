@@ -37,19 +37,33 @@ function SheetPanel({ id, side, children }: { id: PanelId; side: 'left' | 'right
   );
 }
 
+/**
+ * A dialog the panel fills edge to edge (its content is the card). `bare`: the shell is invisible and the
+ * content brings its own sticker card (login). The shell scrolls (`overflow-y-auto`) on short screens, and a
+ * scroll container clips what sticks out of its padding box, so a bare shell pads 8px: room for the card's
+ * 2.5px outline and 6px hard shadow.
+ */
 function DialogPanel({
   id,
   className,
+  bare = false,
   children,
 }: {
   id: PanelId;
   className?: string;
+  bare?: boolean;
   children: ReactNode;
 }) {
   const open = usePanelStore((s) => s.active === id);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={cn('block max-h-[90dvh] max-w-2xl overflow-y-auto p-0', className)}>
+      <DialogContent
+        className={cn(
+          'block max-h-[90dvh] max-w-2xl overflow-y-auto p-0',
+          bare && 'border-0 bg-transparent p-2 shadow-none',
+          className,
+        )}
+      >
         <PanelTitle id={id} as={DialogTitle} />
         {open && children}
       </DialogContent>
@@ -86,7 +100,7 @@ export function PanelHost({ googleEnabled }: { googleEnabled: boolean }) {
       >
         <ArcadePanel />
       </DialogPanel>
-      <DialogPanel id="login" className="max-w-md border-0 bg-transparent shadow-none">
+      <DialogPanel id="login" bare className="max-w-md">
         <LoginForm googleEnabled={googleEnabled} onSignedIn={closePanel} />
       </DialogPanel>
     </>
