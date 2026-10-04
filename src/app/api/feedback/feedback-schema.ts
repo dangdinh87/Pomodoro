@@ -1,4 +1,4 @@
-const feedbackTypes = ['feature', 'bug', 'question', 'other'] as const
+import { FEEDBACK_TYPES as feedbackTypes } from '@/db/schema'
 
 export type FeedbackType = (typeof feedbackTypes)[number]
 

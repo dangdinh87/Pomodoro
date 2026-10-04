@@ -1140,7 +1140,8 @@
       "updateFailed": "Không cập nhật được việc. Bạn thử lại nhé.",
       "deleteFailed": "Không xoá được việc. Bạn thử lại nhé.",
       "reorderFailed": "Không sắp xếp lại được các việc. Bạn thử lại nhé.",
-      "cloneFailed": "Không nhân bản được việc. Bạn thử lại nhé."
+      "cloneFailed": "Không nhân bản được việc. Bạn thử lại nhé.",
+      "limitReached": "Bạn đã đạt giới hạn {max} việc. Hãy xoá bớt việc đã xong để thêm việc mới."
     }
   },
   "timerUi": {

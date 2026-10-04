@@ -1,4 +1,5 @@
 import {
+  MAX_DISPLAY_ORDER,
   isUuid,
   sanitizeSearchTerm,
   validateCreateTask,
@@ -76,5 +77,53 @@ describe('validateUpdateTask', () => {
 
   it('rejects an invalid due date', () => {
     expect(validateUpdateTask({ due_date: 'x' }).success).toBe(false);
+  });
+});
+
+describe('tag bounds', () => {
+  const tagsOf = (count: number, length = 5) =>
+    Array.from({ length: count }, (_, i) => String(i).padStart(length, 'x'));
+
+  it('accepts up to 10 tags of up to 32 characters', () => {
+    const ok = validateCreateTask({ title: 'x', tags: [...tagsOf(9), 'a'.repeat(32)] });
+    expect(ok.success && ok.data.tags).toHaveLength(10);
+  });
+
+  it('rejects a tag longer than 32 characters with a 400-style detail', () => {
+    for (const result of [
+      validateCreateTask({ title: 'x', tags: ['a'.repeat(33)] }),
+      validateUpdateTask({ tags: ['fine', 'b'.repeat(200)] }),
+    ]) {
+      expect(result.success).toBe(false);
+      if (!result.success) expect(result.error.details?.tags).toEqual(['Each tag must be at most 32 characters']);
+    }
+  });
+
+  it('rejects more than 10 distinct tags instead of silently dropping the rest', () => {
+    for (const result of [validateCreateTask({ title: 'x', tags: tagsOf(11) }), validateUpdateTask({ tags: tagsOf(11) })]) {
+      expect(result.success).toBe(false);
+      if (!result.success) expect(result.error.details?.tags).toEqual(['At most 10 tags per task']);
+    }
+  });
+
+  it('counts a tag once however often it is repeated, and ignores blanks', () => {
+    const result = validateCreateTask({ title: 'x', tags: [...tagsOf(10), ...tagsOf(10), '', '   ', 7] });
+    expect(result.success && result.data.tags).toHaveLength(10);
+  });
+});
+
+describe('display_order bounds', () => {
+  const orderResult = (display_order: unknown) => validateUpdateTask({ display_order });
+
+  it('accepts 0 through the largest int4', () => {
+    expect(orderResult(0)).toEqual({ success: true, data: { display_order: 0 } });
+    expect(orderResult(MAX_DISPLAY_ORDER)).toEqual({ success: true, data: { display_order: 2147483647 } });
+    expect(orderResult(2.6)).toEqual({ success: true, data: { display_order: 3 } });
+  });
+
+  it.each([-1, MAX_DISPLAY_ORDER + 1, 1e12, Infinity, NaN, '5', 'abc', null, {}])('rejects %j with a detail, not a database error', (value) => {
+    const result = orderResult(value);
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error.details?.display_order).toBeDefined();
   });
 });

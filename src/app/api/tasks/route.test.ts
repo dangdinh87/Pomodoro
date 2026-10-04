@@ -56,6 +56,26 @@ describe('/api/tasks', () => {
     expect((await res.json()).details.title).toBeDefined();
   });
 
+  it('rejects a tag that is too long or more than 10 tags with 400', async () => {
+    const tooLong = await POST(jsonRequest(URL_BASE, { title: 'x', tags: ['a'.repeat(33)] }));
+    expect(tooLong.status).toBe(400);
+    expect((await tooLong.json()).details.tags).toBeDefined();
+    const tooMany = await POST(jsonRequest(URL_BASE, { title: 'x', tags: Array.from({ length: 11 }, (_, i) => `t${i}`) }));
+    expect(tooMany.status).toBe(400);
+  });
+
+  it('answers 409 with a code at the 2000 task limit; deleted tasks do not count', async () => {
+    await mockDb.insert(tasks).values([
+      ...Array.from({ length: 1999 }, (_, i) => ({ userId: 'u1', title: `t${i}` })),
+      ...Array.from({ length: 5 }, (_, i) => ({ userId: 'u1', title: `gone${i}`, isDeleted: true })),
+    ]);
+    expect((await POST(jsonRequest(URL_BASE, { title: 'the 2000th' }))).status).toBe(201);
+
+    const full = await POST(jsonRequest(URL_BASE, { title: 'one too many' }));
+    expect(full.status).toBe(409);
+    expect(await full.json()).toMatchObject({ code: 'TASK_LIMIT_REACHED', max: 2000 });
+  });
+
   it("lists only the user's own, non-deleted tasks with a total", async () => {
     await createTestUser(mockDb, 'u2');
     await mockDb.insert(tasks).values([

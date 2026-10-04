@@ -4,7 +4,7 @@ import { db } from '@/db';
 import { tasks } from '@/db/schema';
 import { getSessionUser } from '@/lib/auth/session-user';
 import { badRequest, readJson, serverError, unauthorized } from '@/lib/api/responses';
-import { isUuid } from '../task-schemas';
+import { MAX_DISPLAY_ORDER, isUuid } from '../task-schemas';
 
 const MAX_REORDER = 500;
 
@@ -14,7 +14,9 @@ const isOrderUpdate = (value: unknown): value is OrderUpdate =>
   !!value &&
   typeof value === 'object' &&
   isUuid((value as OrderUpdate).id) &&
-  Number.isInteger((value as OrderUpdate).displayOrder);
+  Number.isInteger((value as OrderUpdate).displayOrder) &&
+  (value as OrderUpdate).displayOrder >= 0 &&
+  (value as OrderUpdate).displayOrder <= MAX_DISPLAY_ORDER;
 
 export async function POST(request: Request) {
   const user = await getSessionUser();
@@ -26,7 +28,7 @@ export async function POST(request: Request) {
     return badRequest('Tasks array is required');
   }
   if (!updates.every(isOrderUpdate)) {
-    return badRequest('Each task must have id and displayOrder');
+    return badRequest(`Each task must have an id and a displayOrder between 0 and ${MAX_DISPLAY_ORDER}`);
   }
 
   try {

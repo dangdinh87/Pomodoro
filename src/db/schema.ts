@@ -1,6 +1,9 @@
+import { sql } from 'drizzle-orm';
 import {
+  type AnyPgColumn,
   bigint,
   boolean,
+  check,
   index,
   integer,
   pgTable,
@@ -9,6 +12,16 @@ import {
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
+
+// Enum-like text columns: the TS union and the database CHECK are built from the same list.
+export const TASK_PRIORITIES = ['LOW', 'MEDIUM', 'HIGH'] as const;
+export const TASK_STATUSES = ['TODO', 'DOING', 'DONE'] as const;
+export const SESSION_MODES = ['work', 'shortBreak', 'longBreak'] as const;
+export const FEEDBACK_TYPES = ['feature', 'bug', 'question', 'other'] as const;
+
+/** `column in ('a', 'b')` for a CHECK; the values are code constants, never user input. */
+const oneOf = (column: AnyPgColumn, values: readonly string[]) =>
+  sql`${column} in (${sql.raw(values.map((value) => `'${value}'`).join(', '))})`;
 
 const createdAt = () => timestamp('created_at', { withTimezone: true }).defaultNow().notNull();
 const updatedAt = () =>
@@ -93,8 +106,8 @@ export const tasks = pgTable(
       .references(() => user.id, { onDelete: 'cascade' }),
     title: text('title').notNull(),
     description: text('description'),
-    priority: text('priority', { enum: ['LOW', 'MEDIUM', 'HIGH'] }).default('MEDIUM').notNull(),
-    status: text('status', { enum: ['TODO', 'DOING', 'DONE'] }).default('TODO').notNull(),
+    priority: text('priority', { enum: TASK_PRIORITIES }).default('MEDIUM').notNull(),
+    status: text('status', { enum: TASK_STATUSES }).default('TODO').notNull(),
     estimatePomodoros: integer('estimate_pomodoros').default(1).notNull(),
     actualPomodoros: integer('actual_pomodoros').default(0).notNull(),
     timeSpentMs: bigint('time_spent_ms', { mode: 'number' }).default(0).notNull(),
@@ -106,7 +119,11 @@ export const tasks = pgTable(
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
-  (t) => [index('tasks_user_order_idx').on(t.userId, t.isDeleted, t.displayOrder)],
+  (t) => [
+    index('tasks_user_order_idx').on(t.userId, t.isDeleted, t.displayOrder),
+    check('tasks_priority_check', oneOf(t.priority, TASK_PRIORITIES)),
+    check('tasks_status_check', oneOf(t.status, TASK_STATUSES)),
+  ],
 );
 
 export const userTags = pgTable('user_tags', {
@@ -126,7 +143,7 @@ export const focusSessions = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
     taskId: uuid('task_id').references(() => tasks.id, { onDelete: 'set null' }),
-    mode: text('mode', { enum: ['work', 'shortBreak', 'longBreak'] }).notNull(),
+    mode: text('mode', { enum: SESSION_MODES }).notNull(),
     durationSec: integer('duration_sec').notNull(),
     /**
      * Id the client minted for this session (its outbox item id). Retrying the
@@ -139,17 +156,30 @@ export const focusSessions = pgTable(
   },
   (t) => [
     index('focus_sessions_user_created_idx').on(t.userId, t.createdAt),
+    // Stats and streaks read one mode ("work") of a user over a date range
+    index('focus_sessions_user_mode_created_idx').on(t.userId, t.mode, t.createdAt),
+    // ON DELETE SET NULL on a task scans for its sessions; without this it is a full table scan
+    index('focus_sessions_task_id_idx').on(t.taskId),
     uniqueIndex('focus_sessions_user_client_session_uidx').on(t.userId, t.clientSessionId),
+    check('focus_sessions_mode_check', oneOf(t.mode, SESSION_MODES)),
   ],
 );
 
-export const feedbacks = pgTable('feedbacks', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
-  type: text('type', { enum: ['feature', 'bug', 'question', 'other'] }).notNull(),
-  message: text('message').notNull(),
-  rating: integer('rating'),
-  name: text('name'),
-  email: text('email'),
-  createdAt: createdAt(),
-});
+export const feedbacks = pgTable(
+  'feedbacks',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
+    type: text('type', { enum: FEEDBACK_TYPES }).notNull(),
+    message: text('message').notNull(),
+    rating: integer('rating'),
+    name: text('name'),
+    email: text('email'),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    // Deleting a user nulls feedbacks.user_id: this index keeps that from scanning the table
+    index('feedbacks_user_id_idx').on(t.userId),
+    check('feedbacks_type_check', oneOf(t.type, FEEDBACK_TYPES)),
+  ],
+);

@@ -190,6 +190,32 @@ describe('useTasks optimistic updates', () => {
       expect(toast.error).not.toHaveBeenCalledWith(en.tasksUi.errors.createFailed);
     });
 
+    it('tells the user about the task limit when the API answers 409', async () => {
+      const list = fetchMock.getMockImplementation() as (url: string, init?: { method?: string }) => unknown;
+      fetchMock.mockImplementation((url: string, init?: { method?: string }) =>
+        init?.method === 'POST'
+          ? Promise.resolve({ ok: false, status: 409, json: () => Promise.resolve({ code: 'TASK_LIMIT_REACHED', max: 2000 }) })
+          : list(url, init),
+      );
+      await create();
+      expect(toast.error).toHaveBeenCalledWith(en.tasksUi.errors.limitReached.replace('{max}', '2000'));
+      expect(toast.error).not.toHaveBeenCalledWith(en.tasksUi.errors.createFailed);
+    });
+
+    it('does the same when duplicating a task hits the limit', async () => {
+      const list = fetchMock.getMockImplementation() as (url: string, init?: { method?: string }) => unknown;
+      fetchMock.mockImplementation((url: string, init?: { method?: string }) =>
+        init?.method === 'POST'
+          ? Promise.resolve({ ok: false, status: 409, json: () => Promise.resolve({ code: 'TASK_LIMIT_REACHED', max: 2000 }) })
+          : list(url, init),
+      );
+      const { result } = await setup();
+      await act(async () => {
+        await result.current.cloneTask('a').catch(() => undefined);
+      });
+      expect(toast.error).toHaveBeenCalledWith(en.tasksUi.errors.limitReached.replace('{max}', '2000'));
+    });
+
     it('shows the specific toast when the guest sign-in is rate limited', async () => {
       vi.mocked(ensureSession).mockRejectedValueOnce(new TooManyRequestsError());
       await create();

@@ -15,6 +15,7 @@ import {
 import { useAuthStore } from '@/stores/auth-store';
 import { ensureSession } from '@/lib/auth-client';
 import { TooManyRequestsError } from '@/lib/api/too-many-requests-error';
+import { TaskLimitError, taskLimitErrorFrom } from '@/lib/tasks/task-limit-error';
 import { useI18n } from '@/contexts/i18n-context';
 import { toast } from 'sonner';
 import { startOfDay, endOfDay } from 'date-fns';
@@ -133,6 +134,10 @@ async function createTask(input: CreateTaskInput): Promise<Task> {
   if (res.status === 429) throw new TooManyRequestsError();
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
+    if (res.status === 409) {
+      const limitError = taskLimitErrorFrom(errorData);
+      if (limitError) throw limitError;
+    }
     const errorMessage =
       errorData.details || errorData.error || 'Failed to create task';
     console.error('Failed to create task:', {
@@ -207,7 +212,10 @@ async function cloneTask(taskId: string): Promise<Task> {
   const res = await fetch(`/api/tasks/${taskId}/clone`, {
     method: 'POST',
   });
-  if (!res.ok) throw new Error('Failed to clone task');
+  if (!res.ok) {
+    const limitError = res.status === 409 ? taskLimitErrorFrom(await res.json().catch(() => null)) : null;
+    throw limitError ?? new Error('Failed to clone task');
+  }
   const data = await res.json();
   return mapTaskFromApi(data.task);
 }
@@ -297,7 +305,9 @@ export function useTasks(filters: any = {}) {
       toast.error(
         error instanceof TooManyRequestsError
           ? t('errors.tooManyRequests')
-          : t('tasksUi.errors.createFailed'),
+          : error instanceof TaskLimitError
+            ? t('tasksUi.errors.limitReached', { max: error.max })
+            : t('tasksUi.errors.createFailed'),
       );
       console.error(error);
     },
@@ -387,8 +397,12 @@ export function useTasks(filters: any = {}) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
     },
-    onError: () => {
-      toast.error(t('tasksUi.errors.cloneFailed'));
+    onError: (error) => {
+      toast.error(
+        error instanceof TaskLimitError
+          ? t('tasksUi.errors.limitReached', { max: error.max })
+          : t('tasksUi.errors.cloneFailed'),
+      );
     },
   });
 

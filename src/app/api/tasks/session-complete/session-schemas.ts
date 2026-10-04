@@ -1,7 +1,6 @@
 import { SESSION_MAX_DURATION_SEC } from '@/config/constants'
+import { SESSION_MODES as sessionModes } from '@/db/schema'
 import { isUuid } from '../task-schemas'
-
-const sessionModes = ['work', 'shortBreak', 'longBreak'] as const
 
 // Accepted window for a client-reported end time: an offline session may be
 // uploaded days later, and a few minutes of clock skew must not lose one.

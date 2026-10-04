@@ -1140,7 +1140,8 @@
       "updateFailed": "Couldn't update the task. Please try again.",
       "deleteFailed": "Couldn't delete the task. Please try again.",
       "reorderFailed": "Couldn't reorder the tasks. Please try again.",
-      "cloneFailed": "Couldn't duplicate the task. Please try again."
+      "cloneFailed": "Couldn't duplicate the task. Please try again.",
+      "limitReached": "You've reached the limit of {max} tasks. Delete some finished ones to add more."
     }
   },
   "timerUi": {

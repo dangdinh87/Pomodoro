@@ -54,6 +54,12 @@ describe('PATCH /api/tasks/[id]', () => {
   it('rejects an invalid body', async () => {
     expect((await patch(mine, { title: '' })).status).toBe(400);
   });
+
+  it('answers 400, not 500, for a display_order that does not fit the column', async () => {
+    expect((await patch(mine, { display_order: 2147483648 })).status).toBe(400);
+    expect((await patch(mine, { display_order: -3 })).status).toBe(400);
+    expect((await patch(mine, { display_order: 2147483647 })).status).toBe(200);
+  });
 });
 
 describe('DELETE /api/tasks/[id]', () => {
@@ -83,6 +89,18 @@ describe('POST /api/tasks/[id]/clone', () => {
     });
     expect((await CLONE(new Request('http://localhost'), params(theirs))).status).toBe(404);
   });
+
+  it('keeps the copy inside the int4 range of display_order', async () => {
+    await mockDb.update(tasks).set({ displayOrder: 2147483647 }).where(eq(tasks.id, mine));
+    const res = await CLONE(new Request('http://localhost'), params(mine));
+    expect(res.status).toBe(201);
+    expect((await res.json()).task.display_order).toBe(2147483647);
+  });
+
+  it('answers 409 with a code once the user is at the task limit', async () => {
+    await mockDb.insert(tasks).values(Array.from({ length: 1999 }, (_, i) => ({ userId: 'u1', title: `t${i}` })));
+    expect((await CLONE(new Request('http://localhost'), params(mine))).status).toBe(409);
+  });
 });
 
 describe('POST /api/tasks/reorder', () => {
@@ -99,5 +117,11 @@ describe('POST /api/tasks/reorder', () => {
   it('validates the payload', async () => {
     expect((await reorder({ tasks: [] })).status).toBe(400);
     expect((await reorder({ tasks: [{ id: mine, displayOrder: 'x' }] })).status).toBe(400);
+  });
+
+  it('answers 400, not 500, for a displayOrder outside 0..2147483647', async () => {
+    expect((await reorder({ tasks: [{ id: mine, displayOrder: 2147483648 }] })).status).toBe(400);
+    expect((await reorder({ tasks: [{ id: mine, displayOrder: -1 }] })).status).toBe(400);
+    expect((await reorder({ tasks: [{ id: mine, displayOrder: 2147483647 }] })).status).toBe(200);
   });
 });

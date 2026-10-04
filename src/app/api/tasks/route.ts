@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { and, arrayContains, asc, count, desc, eq, gte, ilike, lte, or, type SQL } from 'drizzle-orm';
 import { db } from '@/db';
-import { tasks } from '@/db/schema';
+import { TASK_PRIORITIES, TASK_STATUSES, tasks } from '@/db/schema';
 import { getSessionUser } from '@/lib/auth/session-user';
 import { badRequest, readJson, serverError, unauthorized } from '@/lib/api/responses';
+import { isTaskLimitReached, taskLimitResponse } from '@/lib/tasks/task-limit';
 import { toTaskJson } from '@/lib/tasks/task-json';
 import { isValidTagFilter, sanitizeSearchTerm, validateCreateTask } from './task-schemas';
 
@@ -16,8 +17,6 @@ const DATE_FIELDS = {
   updated_at: tasks.updatedAt,
   due_date: tasks.dueDate,
 } as const;
-const STATUSES = ['TODO', 'DOING', 'DONE'] as const;
-const PRIORITIES = ['LOW', 'MEDIUM', 'HIGH'] as const;
 
 function parsePositiveInt(value: string | null, fallback: number, max: number) {
   const parsed = Number.parseInt(value ?? '', 10);
@@ -43,8 +42,8 @@ export async function GET(request: Request) {
   const page = parsePositiveInt(searchParams.get('page'), 1, MAX_PAGE);
   const q = sanitizeSearchTerm(searchParams.get('q'));
   const tag = searchParams.get('tag');
-  const status = pick(STATUSES, searchParams.get('status'));
-  const priority = pick(PRIORITIES, searchParams.get('priority'));
+  const status = pick(TASK_STATUSES, searchParams.get('status'));
+  const priority = pick(TASK_PRIORITIES, searchParams.get('priority'));
   const dateField =
     DATE_FIELDS[searchParams.get('dateField') as keyof typeof DATE_FIELDS] ?? DATE_FIELDS.created_at;
   const from = parseDate(searchParams.get('from'));
@@ -93,6 +92,7 @@ export async function POST(request: Request) {
   const { title, description, priority, estimate_pomodoros, tags: taskTags, due_date, is_template } =
     parsed.data;
   try {
+    if (await isTaskLimitReached(user.id)) return taskLimitResponse();
     const [task] = await db
       .insert(tasks)
       .values({
