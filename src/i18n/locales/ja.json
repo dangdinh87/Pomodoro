@@ -635,14 +635,14 @@
       "playBackground": "バックグラウンド再生",
       "placeholder": "YouTubeのリンクを貼り付け…",
       "invalidLink": "動画のリンクが正しくありません。",
-      "nowPlaying": "再生中",
-      "soundSettings": "サウンド設定",
-      "status": {
       "errors": {
         "cannotPlay": "この動画を再生できません。リンクを確認してください。",
         "playerFailed": "YouTubeプレーヤーを起動できませんでした。もう一度お試しください。",
         "controlFailed": "再生を操作できませんでした。もう一度お試しください。"
       },
+      "nowPlaying": "再生中",
+      "soundSettings": "サウンド設定",
+      "status": {
         "playing": "再生中",
         "paused": "一時停止"
       },

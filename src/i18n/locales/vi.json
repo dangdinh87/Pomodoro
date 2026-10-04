@@ -635,14 +635,14 @@
       "playBackground": "Phát ở nền",
       "placeholder": "Dán liên kết YouTube…",
       "invalidLink": "Liên kết video không hợp lệ.",
-      "nowPlaying": "Đang phát",
-      "soundSettings": "Cài đặt âm thanh",
-      "status": {
       "errors": {
         "cannotPlay": "Không phát được video này. Bạn kiểm tra lại liên kết nhé.",
         "playerFailed": "Không khởi động được trình phát YouTube. Bạn thử lại nhé.",
         "controlFailed": "Không điều khiển được trình phát. Bạn thử lại nhé."
       },
+      "nowPlaying": "Đang phát",
+      "soundSettings": "Cài đặt âm thanh",
+      "status": {
         "playing": "Đang phát",
         "paused": "Tạm dừng"
       },

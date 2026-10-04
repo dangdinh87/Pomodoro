@@ -635,14 +635,14 @@
       "playBackground": "Play in background",
       "placeholder": "Paste a YouTube link…",
       "invalidLink": "Invalid video link.",
-      "nowPlaying": "Now playing",
-      "soundSettings": "Sound settings",
-      "status": {
       "errors": {
         "cannotPlay": "Couldn't play this video. Check the link and try again.",
         "playerFailed": "Couldn't start the YouTube player. Please try again.",
         "controlFailed": "Couldn't control playback. Please try again."
       },
+      "nowPlaying": "Now playing",
+      "soundSettings": "Sound settings",
+      "status": {
         "playing": "Playing",
         "paused": "Paused"
       },
