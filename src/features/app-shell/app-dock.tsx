@@ -19,12 +19,15 @@ import { preloadPanel } from './panel-loaders';
 import { togglePanel, usePanelStore, type PanelId } from './panel-store';
 
 // Mobile (< 768px): a sticker tray along the bottom edge, labels under the icons, clear of the home
-// indicator. Desktop: a loose row of 52px tiles floating over the stage. Both are `fixed`, so a short
-// viewport (1366x768 with browser chrome) can never push the dock below the fold.
+// indicator. Desktop: a loose row of 52px tiles floating over the stage. The dock is pinned to the bottom of
+// the viewport while the stage is on screen (see the sticky frame below), so a short viewport (1366x768 with
+// browser chrome) can never push it below the fold, and it scrolls away with the stage instead of covering
+// the content under it.
 const NAV_TRAY =
-  'fixed inset-x-1.5 bottom-[max(0.5rem,env(safe-area-inset-bottom))] z-30 grid grid-flow-col auto-cols-fr items-start rounded-lg border-sticker bg-surface p-1 shadow-sticker md:inset-x-auto md:bottom-[max(1rem,env(safe-area-inset-bottom))] md:left-1/2 md:flex md:-translate-x-1/2 md:items-center md:gap-3 md:rounded-none md:border-0 md:bg-transparent md:p-0 md:shadow-none';
+  'pointer-events-auto absolute inset-x-1.5 bottom-[max(0.5rem,env(safe-area-inset-bottom))] z-30 grid grid-flow-col auto-cols-fr items-start rounded-lg border-sticker bg-surface p-1 shadow-sticker md:inset-x-auto md:bottom-[max(1rem,env(safe-area-inset-bottom))] md:left-1/2 md:flex md:-translate-x-1/2 md:items-center md:gap-3 md:rounded-none md:border-0 md:bg-transparent md:p-0 md:shadow-none';
 // Focus mode keeps one tile (leave fullscreen), at every width.
-const NAV_FOCUS = 'fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 z-30 flex -translate-x-1/2 items-center';
+const NAV_FOCUS =
+  'pointer-events-auto absolute bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 z-30 flex -translate-x-1/2 items-center';
 
 const DOCK_BUTTON =
   'focus-ring group relative flex min-w-0 flex-col items-center gap-1 rounded-[14px] py-1 text-ink-secondary aria-pressed:bg-surface-raised aria-pressed:text-ink md:gap-0 md:p-0 md:aria-pressed:bg-transparent';
@@ -153,36 +156,42 @@ export function AppDock() {
   const focusLabel = isFullscreen ? t('timerUi.dock.exitFocus') : t('timerUi.dock.focus');
 
   return (
-    <nav data-chrome aria-label={t('shell.dock')} className={isFocusMode ? NAV_FOCUS : NAV_TRAY}>
-      <TooltipProvider delayDuration={250}>
-        {!isFocusMode && panels.map((id) => <DockButton key={id} id={id} />)}
-        {fullscreenSupported && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                data-panel="fullscreen"
-                aria-label={isFullscreen ? t('timerComponents.enhancedTimer.exitFocus') : t('timerComponents.enhancedTimer.enterFocus')}
-                className={cn(DOCK_BUTTON, !isFocusMode && 'md:ml-2')}
-                onClick={toggleFullscreen}
-              >
-                <IconTile
-                  icon={isFullscreen ? ArrowsIn : ArrowsOut}
-                  tone="surface"
-                  size="md"
-                  className={cn(DOCK_TILE, TILE_REST)}
-                />
-                <span aria-hidden="true" className={LABEL}>
-                  {t('shell.fullscreenShort')}
-                </span>
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="top" sideOffset={12} className="max-md:hidden">
-              {focusLabel}
-            </TooltipContent>
-          </Tooltip>
-        )}
-      </TooltipProvider>
-    </nav>
+    // The frame covers the stage section; its sticky child is one viewport tall and stays at the top of the
+    // screen until the section's end, then rides up with it. The nav sits at the bottom of that child.
+    <div className="pointer-events-none absolute inset-0 z-30" data-testid="dock-frame">
+      <div className="pointer-events-none sticky top-0 h-dvh">
+        <nav data-chrome aria-label={t('shell.dock')} className={isFocusMode ? NAV_FOCUS : NAV_TRAY}>
+          <TooltipProvider delayDuration={250}>
+            {!isFocusMode && panels.map((id) => <DockButton key={id} id={id} />)}
+            {fullscreenSupported && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    data-panel="fullscreen"
+                    aria-label={isFullscreen ? t('timerComponents.enhancedTimer.exitFocus') : t('timerComponents.enhancedTimer.enterFocus')}
+                    className={cn(DOCK_BUTTON, !isFocusMode && 'md:ml-2')}
+                    onClick={toggleFullscreen}
+                  >
+                    <IconTile
+                      icon={isFullscreen ? ArrowsIn : ArrowsOut}
+                      tone="surface"
+                      size="md"
+                      className={cn(DOCK_TILE, TILE_REST)}
+                    />
+                    <span aria-hidden="true" className={LABEL}>
+                      {t('shell.fullscreenShort')}
+                    </span>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top" sideOffset={12} className="max-md:hidden">
+                  {focusLabel}
+                </TooltipContent>
+              </Tooltip>
+            )}
+          </TooltipProvider>
+        </nav>
+      </div>
+    </div>
   );
 }

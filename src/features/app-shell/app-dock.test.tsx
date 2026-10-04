@@ -20,12 +20,20 @@ describe('AppDock', () => {
     Reflect.deleteProperty(document.documentElement, 'requestFullscreen');
   });
 
-  it('is fixed to the viewport, so a short window can never push it below the fold', () => {
+  it('stays at the bottom of the screen while the stage shows, and leaves with the stage', () => {
     render(<AppDock />);
     const nav = screen.getByRole('navigation', { name: 'shell.dock' });
-    expect(nav.className).toContain('fixed');
     expect(nav.className).toContain('safe-area-inset-bottom');
     expect(nav).toHaveAttribute('data-chrome');
+    // A viewport-tall sticky box inside a frame that covers the stage section: pinned while the stage is
+    // in view (a short window cannot push the dock below the fold), carried off with the stage at its end
+    // (it never covers the landing content below). Neither is `fixed`.
+    const box = nav.parentElement!;
+    expect(box.className).toContain('sticky');
+    expect(box.className).toContain('h-dvh');
+    expect(box.parentElement).toBe(screen.getByTestId('dock-frame'));
+    expect(screen.getByTestId('dock-frame').className).toContain('absolute inset-0');
+    expect(nav.className).not.toContain('fixed');
   });
 
   it('gives each panel its candy colour', () => {
