@@ -197,6 +197,62 @@ describe('YouTube mini player: errors and closing', () => {
   });
 });
 
+describe('YouTube mini player: the page tree is replaced while it plays', () => {
+  // Switching language (router.push to /vi) re-creates the whole [lang] tree and leaving (main) for
+  // /guide drops its layout: the card, its slot and the iframe leave the page with it.
+  it('stops the player when the card unmounts, so no state claims playback with no iframe', async () => {
+    const view = render(<YouTubeMiniPlayer />);
+    const { result } = renderHook(() => useYouTubePlayer());
+    await act(async () => {
+      await result.current.play({ videoId: 'lofi123' });
+    });
+    await act(async () => {}); // onReady
+    const player = lastPlayer();
+    expect(useYouTubeStore.getState().status).toBe('playing');
+
+    view.unmount();
+
+    expect(player.destroy).toHaveBeenCalled();
+    expect(useYouTubeStore.getState()).toMatchObject({ status: 'stopped', source: null });
+    expect(useAudioStore.getState().currentlyPlaying).toBeNull();
+    expect(document.querySelector('iframe')).toBeNull();
+    expect(toast.error).not.toHaveBeenCalled(); // not a failure, nothing to apologise for
+  });
+
+  it('the new tree shows no dead Pause button', async () => {
+    const first = render(<YouTubeMiniPlayer />);
+    const { result } = renderHook(() => useYouTubePlayer());
+    await act(async () => {
+      await result.current.play({ videoId: 'lofi123' });
+    });
+    await act(async () => {});
+
+    first.unmount(); // language switch: old tree out ...
+    render(<YouTubeMiniPlayer />); // ... fresh tree in
+
+    expect(screen.queryByTestId('youtube-mini-player')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'common.pause' })).not.toBeInTheDocument();
+  });
+
+  it('can play again in the new tree', async () => {
+    const first = render(<YouTubeMiniPlayer />);
+    const { result } = renderHook(() => useYouTubePlayer());
+    await act(async () => {
+      await result.current.play({ videoId: 'lofi123' });
+    });
+    await act(async () => {});
+    first.unmount();
+    render(<YouTubeMiniPlayer />);
+
+    await act(async () => {
+      await result.current.play({ videoId: 'again' });
+    });
+
+    expect(FakePlayer.instances).toHaveLength(2);
+    expect(screen.getByTestId('youtube-mini-player')).toContainElement(document.querySelector('iframe'));
+  });
+});
+
 describe('YouTube mini player: controls', () => {
   it('toggles play and pause', async () => {
     await startPlaying();

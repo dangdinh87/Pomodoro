@@ -20,7 +20,7 @@ import { Button } from '@/components/ui/button';
 import { IconTile } from '@/components/ui/icon-tile';
 import { Slider } from '@/components/ui/slider';
 import { useI18n } from '@/contexts/i18n-context';
-import { YOUTUBE_MIN_PX, YOUTUBE_SLOT_ID } from '@/lib/audio/youtube-controller';
+import { YOUTUBE_MIN_PX, YOUTUBE_SLOT_ID, stopYouTube } from '@/lib/audio/youtube-controller';
 import { playingTitle } from '@/lib/audio/playing-title';
 import { cn } from '@/lib/utils';
 import { useAudioStore } from '@/stores/audio-store';
@@ -47,7 +47,8 @@ const WIDTH_COLLAPSED = 'w-[calc(200px+2*var(--outline-w))]';
  * pointer rests, the card dims with the rest of the chrome (globals.css) but stays visible.
  *
  * Mounted once in AppProviders: it also owns the error toast, because a playback error can arrive after the
- * Sounds panel that started the video is closed.
+ * Sounds panel that started the video is closed. Unmounting it (language switch, leaving the app pages) stops
+ * playback: the iframe cannot outlive its card.
  */
 export function YouTubeMiniPlayer() {
   const { t } = useI18n();
@@ -62,6 +63,12 @@ export function YouTubeMiniPlayer() {
   const { masterVolume, isMuted } = useAudioStore((state) => state.audioSettings);
   const updateVolume = useAudioStore((state) => state.updateVolume);
   const toggleMute = useAudioStore((state) => state.toggleMute);
+
+  // The card is the iframe's only home. When it unmounts (switching language re-creates the whole [lang]
+  // tree; leaving (main) for /guide drops this provider) the iframe leaves the page and the sound stops with
+  // it, so stop the player too: otherwise the stores keep saying "playing" and the next card offers a Pause
+  // button that talks to a dead iframe.
+  useEffect(() => () => stopYouTube(), []);
 
   useEffect(() => {
     if (!errorKey) return;
