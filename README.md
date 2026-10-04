@@ -2,7 +2,7 @@
 
 A study-focused Pomodoro web app: a customizable timer with several clock styles, tasks linked to focus sessions, ambient sounds and a YouTube player, focus history and streaks, and short break games. Available in English, Vietnamese and Japanese.
 
-Live: https://pomodorostudy.online
+Live: https://studywithbro.com
 
 ## Features
 

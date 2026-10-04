@@ -3,7 +3,7 @@
 > Free Pomodoro timer for studying and focused work, in one page: focus sessions with short and long breaks, tasks linked to sessions, focus history and streaks, ambient sounds, animated scenes and short break games. Works without an account. Available in English, Vietnamese and Japanese.
 
 ## Website
-https://pomodorostudy.online
+https://studywithbro.com
 
 ## What it does
 - Pomodoro timer: focus, short break and long break; presets 25/5, 50/10, 52/17, 90/20 or custom lengths; automatic switching between focus and breaks (optional)
@@ -22,4 +22,4 @@ https://pomodorostudy.online
 - /terms — terms of use
 
 ## Contact
-- Feedback: https://pomodorostudy.online/?panel=feedback
+- Feedback: https://studywithbro.com/?panel=feedback

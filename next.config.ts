@@ -46,8 +46,8 @@ const domainMoveRedirects =
     ? [
         {
           source: '/:path*',
-          has: [{ type: 'host' as const, value: '(?:(?:www\\.)?pomodoro-focus\\.site|www\\.pomodorostudy\\.online)' }],
-          destination: 'https://pomodorostudy.online/:path*',
+          has: [{ type: 'host' as const, value: '(?:(?:www\\.)?pomodoro-focus\\.site|www\\.studywithbro\\.com)' }],
+          destination: 'https://studywithbro.com/:path*',
           permanent: true,
         },
       ]
