@@ -1,18 +1,18 @@
 import { useAudioStore } from '@/stores/audio-store';
-import { alarmSounds } from '@/lib/audio/sound-catalog';
+import { ALARM_NONE, alarmSounds, resolveAlarmType } from '@/lib/audio/sound-catalog';
 
 const FALLBACK_ALARM_URL = '/sounds/alarms/bell.mp3';
 
-/** `alarmType` value that turns the bell off. */
-export const ALARM_NONE = 'none';
+export { ALARM_NONE };
 
 // Audio element per sound file, created ahead of time so the bell does not wait
 // on a network fetch (or on a throttled tab) when the session ends.
 const preloaded = new Map<string, HTMLAudioElement>();
 
 function selectedAlarmUrl(alarmType: string): string | null {
-  if (alarmType === ALARM_NONE) return null;
-  return alarmSounds.find((a) => a.id === alarmType)?.url || FALLBACK_ALARM_URL;
+  const id = resolveAlarmType(alarmType);
+  if (id === ALARM_NONE) return null;
+  return alarmSounds.find((a) => a.id === id)?.url ?? FALLBACK_ALARM_URL;
 }
 
 function audioFor(url: string): HTMLAudioElement {

@@ -141,7 +141,7 @@ describe('TimerSettings (saves as you change)', () => {
       clockSize: 'large',
       keepScreenOn: true,
     });
-    useAudioStore.getState().updateAudioSettings({ alarmType: 'gong', alarmVolume: 30 });
+    useAudioStore.getState().updateAudioSettings({ alarmType: 'wood', alarmVolume: 30 });
 
     render(<TimerSettings onClose={vi.fn()} />);
     await user.click(screen.getAllByRole('button', { name: 'timerSettings.actions.resetDefaults' })[0]);

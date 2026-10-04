@@ -8,8 +8,8 @@ import { Switch } from '@/components/ui/switch'
 import { SettingsSection, SettingsRow } from '@/components/settings/settings-section'
 import { useI18n } from '@/contexts/i18n-context'
 import { isWakeLockSupported } from '@/features/timer/hooks/use-screen-wake-lock'
-import { alarmSounds } from '@/lib/audio/sound-catalog'
-import { ALARM_NONE, playAlarm } from '@/lib/timer/alarm'
+import { ALARM_NONE, alarmSounds, resolveAlarmType } from '@/lib/audio/sound-catalog'
+import { playAlarm } from '@/lib/timer/alarm'
 import { useNotificationState } from '@/lib/timer/use-notification-state'
 import { useAudioStore } from '@/stores/audio-store'
 import { useTimerStore } from '@/stores/timer-store'
@@ -34,7 +34,9 @@ export function BellNotificationsSection({ onChange }: { onChange?: () => void }
     // Wake Lock exists only in some browsers; the server snapshot keeps SSR markup identical
     const wakeLock = useSyncExternalStore(subscribeNever, isWakeLockSupported, () => false)
 
-    const silent = alarmType === ALARM_NONE
+    // Older saves may hold a retired id (gong, soft); show what actually plays
+    const sound = resolveAlarmType(alarmType)
+    const silent = sound === ALARM_NONE
     const volume = Math.max(MIN_VOLUME, alarmVolume)
 
     const notificationStatus: Record<string, { status: string; hint: string }> = {
@@ -52,7 +54,7 @@ export function BellNotificationsSection({ onChange }: { onChange?: () => void }
         <SettingsSection title={t('timerSettings.bell.title')}>
             <SettingsRow label={t('timerSettings.bell.sound')} description={t('timerSettings.bell.soundHint')}>
                 <Select
-                    value={alarmType}
+                    value={sound}
                     onValueChange={(next) => {
                         updateAudioSettings({ alarmType: next })
                         onChange?.()

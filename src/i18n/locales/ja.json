@@ -199,9 +199,9 @@
       "sounds": {
         "bell": "ベル",
         "chime": "チャイム",
-        "gong": "ゴング",
         "digital": "デジタル",
-        "soft": "ソフト",
+        "wood": "ウッドブロック",
+        "kitchen": "キッチンタイマー",
         "none": "なし"
       },
       "volume": "音量",

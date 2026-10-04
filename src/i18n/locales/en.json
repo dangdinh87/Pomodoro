@@ -199,9 +199,9 @@
       "sounds": {
         "bell": "Bell",
         "chime": "Chime",
-        "gong": "Gong",
         "digital": "Digital",
-        "soft": "Soft",
+        "wood": "Wood",
+        "kitchen": "Kitchen timer",
         "none": "None"
       },
       "volume": "Volume",

@@ -199,9 +199,9 @@
       "sounds": {
         "bell": "Chuông",
         "chime": "Chuông nhẹ",
-        "gong": "Chiêng",
         "digital": "Kỹ thuật số",
-        "soft": "Nhẹ nhàng",
+        "wood": "Gõ gỗ",
+        "kitchen": "Đồng hồ bếp",
         "none": "Tắt chuông"
       },
       "volume": "Âm lượng",

@@ -161,7 +161,6 @@ const noise: SoundItem[] = [
     vn: 'Tiếng ồn trắng',
     icon: '⚪',
     url: '/sounds/noise/white-noise.mp3',
-    hidden: true,
   },
   {
     id: 'brown-noise',
@@ -178,7 +177,6 @@ const noise: SoundItem[] = [
     vn: 'Tiếng ồn hồng',
     icon: '🧠',
     url: '/sounds/noise/pink-noise.mp3',
-    hidden: true,
   },
 ];
 
@@ -377,7 +375,8 @@ export const hiddenAmbientSounds: ReadonlyArray<SoundItem> = allCategories.flatM
   c.sounds.filter((s) => s.hidden),
 );
 
-// Alarm sounds
+// Alarm sounds. Each file is synthesized by scripts/generate-alarm-sounds.sh and must stay
+// different from the others (guarded by sound-assets.test.ts).
 export const alarmSounds: AlarmItem[] = [
   { id: 'bell', label: 'Bell', vn: 'Chuông', url: '/sounds/alarms/bell.mp3' },
   {
@@ -387,24 +386,45 @@ export const alarmSounds: AlarmItem[] = [
     url: '/sounds/alarms/chime.mp3',
   },
   {
-    id: 'gong',
-    label: 'Gong',
-    vn: 'Chuông đồng',
-    url: '/sounds/alarms/gong.mp3',
-  },
-  {
     id: 'digital',
     label: 'Digital',
     vn: 'Kỹ thuật số',
     url: '/sounds/alarms/digital.mp3',
   },
   {
-    id: 'soft',
-    label: 'Soft',
-    vn: 'Nhẹ nhàng',
-    url: '/sounds/alarms/soft.mp3',
+    id: 'wood',
+    label: 'Wood',
+    vn: 'Mõ gỗ',
+    url: '/sounds/alarms/wood.mp3',
+  },
+  {
+    id: 'kitchen',
+    label: 'Kitchen timer',
+    vn: 'Đồng hồ bếp',
+    url: '/sounds/alarms/kitchen.mp3',
   },
 ];
+
+/** `alarmType` value that turns the bell off. */
+export const ALARM_NONE = 'none';
+
+const DEFAULT_ALARM = 'bell';
+
+// Ids saved by earlier versions, mapped to the closest sound that replaced them
+const legacyAlarmIds: Readonly<Record<string, string>> = {
+  gong: 'bell',
+  soft: 'chime',
+};
+
+/**
+ * The stored `alarmType` as an id the picker and the player know: ids from earlier versions
+ * (gong, soft) map to their replacement, anything unknown becomes the bell.
+ */
+export function resolveAlarmType(alarmType: string): string {
+  if (alarmType === ALARM_NONE) return ALARM_NONE;
+  const id = legacyAlarmIds[alarmType] ?? alarmType;
+  return alarmSounds.some((a) => a.id === id) ? id : DEFAULT_ALARM;
+}
 
 // Backward-compatible: flat catalog object for existing code
 // soundCatalog.ambient returns all ambient sounds as flat array

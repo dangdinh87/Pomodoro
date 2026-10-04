@@ -63,11 +63,19 @@ describe('BellNotificationsSection', () => {
 
       const options = screen.getAllByRole('option').map((o) => o.textContent);
       expect(options).toEqual(
-        ['bell', 'chime', 'gong', 'digital', 'soft', 'none'].map((id) => `timerSettings.bell.sounds.${id}`),
+        ['bell', 'chime', 'digital', 'wood', 'kitchen', 'none'].map((id) => `timerSettings.bell.sounds.${id}`),
       );
-      await user.click(screen.getByRole('option', { name: 'timerSettings.bell.sounds.gong' }));
-      expect(audio().alarmType).toBe('gong');
+      await user.click(screen.getByRole('option', { name: 'timerSettings.bell.sounds.wood' }));
+      expect(audio().alarmType).toBe('wood');
       expect(onChange).toHaveBeenCalled();
+    });
+
+    it('shows the replacement when an older save holds a retired sound', () => {
+      useAudioStore.setState({ audioSettings: { ...audio(), alarmType: 'gong' } });
+      render(<BellNotificationsSection />);
+      expect(screen.getByRole('combobox', { name: 'timerSettings.bell.sound' })).toHaveTextContent(
+        'timerSettings.bell.sounds.bell',
+      );
     });
 
     it('None silences the bell: volume and preview are disabled', async () => {

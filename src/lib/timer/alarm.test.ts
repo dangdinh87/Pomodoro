@@ -15,6 +15,8 @@ interface FakeAudio {
 }
 
 let created: FakeAudio[];
+// alarm.ts keeps the elements it made, so a later test finds them cached; this registry survives
+const everCreated = new Map<string, FakeAudio>();
 
 describe('alarm', () => {
   beforeEach(() => {
@@ -29,17 +31,18 @@ describe('alarm', () => {
         play: vi.fn().mockResolvedValue(undefined),
       };
       created.push(audio);
+      everCreated.set(src, audio);
       return audio;
     }) as unknown as typeof Audio;
   });
 
   it('plays the selected sound at the chosen volume, from the start', () => {
-    audioSettings = { alarmType: 'gong', alarmVolume: 40 };
+    audioSettings = { alarmType: 'wood', alarmVolume: 40 };
     playAlarm();
-    const gong = created.find((a) => a.src === '/sounds/alarms/gong.mp3')!;
-    expect(gong.play).toHaveBeenCalledTimes(1);
-    expect(gong.volume).toBeCloseTo(0.4);
-    expect(gong.currentTime).toBe(0);
+    const wood = created.find((a) => a.src === '/sounds/alarms/wood.mp3')!;
+    expect(wood.play).toHaveBeenCalledTimes(1);
+    expect(wood.volume).toBeCloseTo(0.4);
+    expect(wood.currentTime).toBe(0);
   });
 
   it('never goes quieter than 10%', () => {
@@ -54,6 +57,17 @@ describe('alarm', () => {
     expect(created.at(-1)!.src).toBe('/sounds/alarms/bell.mp3');
   });
 
+  it.each([
+    ['gong', '/sounds/alarms/bell.mp3'],
+    ['soft', '/sounds/alarms/chime.mp3'],
+  ])('plays the replacement for the retired "%s" sound', (retired, url) => {
+    audioSettings = { alarmType: retired, alarmVolume: 70 };
+    const played = () => everCreated.get(url)?.play.mock.calls.length ?? 0;
+    const before = played();
+    playAlarm();
+    expect(played()).toBe(before + 1);
+  });
+
   it('is silent when set to None', () => {
     audioSettings = { alarmType: ALARM_NONE, alarmVolume: 70 };
     const before = created.length;
@@ -63,17 +77,17 @@ describe('alarm', () => {
   });
 
   it('preload fetches the selected file once and play reuses that element', () => {
-    audioSettings = { alarmType: 'soft', alarmVolume: 70 };
+    audioSettings = { alarmType: 'kitchen', alarmVolume: 70 };
     preloadAlarm();
     preloadAlarm();
-    const soft = created.filter((a) => a.src.endsWith('soft.mp3'));
-    expect(soft).toHaveLength(1);
-    expect(soft[0].preload).toBe('auto');
-    expect(soft[0].load).toHaveBeenCalled();
+    const kitchen = created.filter((a) => a.src.endsWith('kitchen.mp3'));
+    expect(kitchen).toHaveLength(1);
+    expect(kitchen[0].preload).toBe('auto');
+    expect(kitchen[0].load).toHaveBeenCalled();
 
     playAlarm();
-    expect(created.filter((a) => a.src.endsWith('soft.mp3'))).toHaveLength(1);
-    expect(soft[0].play).toHaveBeenCalledTimes(1);
+    expect(created.filter((a) => a.src.endsWith('kitchen.mp3'))).toHaveLength(1);
+    expect(kitchen[0].play).toHaveBeenCalledTimes(1);
   });
 
   it('swallows playback errors (autoplay blocked)', () => {

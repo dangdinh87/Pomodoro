@@ -38,7 +38,7 @@ describe('loading mixes that reference removed sounds', () => {
       useAudioStore.getState().loadPreset({
         id: 'user-2',
         name: 'Silent mix',
-        sounds: [{ id: 'white-noise', volume: 50 }],
+        sounds: [{ id: 'cat-purring', volume: 50 }],
         isBuiltIn: false,
       }),
     ).resolves.toBeUndefined();
