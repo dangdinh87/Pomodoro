@@ -208,6 +208,12 @@ export class AudioManager {
   private currentSource: AudioSource | null = null
   private ambientPlayers: Map<string, HTMLAudioPlayer> = new Map()
   private ambientVolumes: Map<string, number> = new Map() // per-sound volumes (0-100)
+  // Sounds whose Audio element exists but play() has not settled yet. A second
+  // request for the same id joins this attempt instead of creating another element
+  // (a double click or a slider drag would otherwise leave an orphan looping forever).
+  private pendingAmbient: Map<string, Promise<boolean>> = new Map()
+  // Pending sounds that were stopped before they finished starting
+  private cancelledAmbient: Set<string> = new Set()
   private masterVolume = 50
   private isMuted = false
   private fadeInMs = 300
@@ -419,14 +425,31 @@ export class AudioManager {
 
   // Ambient mixing methods
   async playAmbient(source: AudioSource): Promise<boolean> {
+    const soundId = source.id
+
+    // If already playing, just return true
+    if (this.ambientPlayers.has(soundId)) {
+      return true
+    }
+
+    // Still starting: join that attempt. A stop that arrived meanwhile is withdrawn.
+    const pending = this.pendingAmbient.get(soundId)
+    if (pending) {
+      this.cancelledAmbient.delete(soundId)
+      return pending
+    }
+
+    const attempt = this.startAmbient(source).finally(() => {
+      this.pendingAmbient.delete(soundId)
+    })
+    this.pendingAmbient.set(soundId, attempt)
+    return attempt
+  }
+
+  private async startAmbient(source: AudioSource): Promise<boolean> {
+    const soundId = source.id
+    let player: HTMLAudioPlayer | null = null
     try {
-      const soundId = source.id
-
-      // If already playing, just return true
-      if (this.ambientPlayers.has(soundId)) {
-        return true
-      }
-
       // Store per-sound volume (clamped)
       const soundVolume = Math.max(0, Math.min(100, source.volume))
       this.ambientVolumes.set(soundId, soundVolume)
@@ -436,10 +459,17 @@ export class AudioManager {
 
       // Create player with effective volume
       const effectiveSource = { ...source, volume: effectiveVolume }
-      const player = new HTMLAudioPlayer(effectiveSource)
+      player = new HTMLAudioPlayer(effectiveSource)
 
       // Play the sound
       await player.play()
+
+      // Stopped while it was starting: do not let it sound
+      if (this.cancelledAmbient.delete(soundId)) {
+        await player.stop()
+        this.ambientVolumes.delete(soundId)
+        return false
+      }
 
       // Store in map
       this.ambientPlayers.set(soundId, player)
@@ -447,11 +477,19 @@ export class AudioManager {
       return true
     } catch (error) {
       console.error('Failed to play ambient sound:', error)
+      this.cancelledAmbient.delete(soundId)
+      this.ambientVolumes.delete(soundId)
+      // The element exists even though play() was refused: release it
+      await player?.stop().catch(() => {})
       return false
     }
   }
 
   async stopAmbient(soundId: string): Promise<void> {
+    // Not playing yet: flag it so it never starts sounding
+    if (this.pendingAmbient.has(soundId)) {
+      this.cancelledAmbient.add(soundId)
+    }
     const player = this.ambientPlayers.get(soundId)
     if (player) {
       try {
@@ -475,8 +513,8 @@ export class AudioManager {
   }
 
   async stopAllAmbient(): Promise<void> {
-    const promises = Array.from(this.ambientPlayers.keys()).map(id => this.stopAmbient(id))
-    await Promise.all(promises)
+    const ids = new Set([...this.ambientPlayers.keys(), ...this.pendingAmbient.keys()])
+    await Promise.all(Array.from(ids).map(id => this.stopAmbient(id)))
     this.ambientPlayers.clear()
     this.ambientVolumes.clear()
   }

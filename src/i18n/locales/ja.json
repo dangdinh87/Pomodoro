@@ -586,6 +586,7 @@
       "library": "ライブラリ",
       "saveMix": "ミックスを保存",
       "savePresetTitle": "プリセットを保存",
+      "mixedLabel": "ミックス環境音（{count}種類）",
       "savePresetDescription": "現在の環境音ミックスから新しいプリセットを作成します（{{count}}サウンド）。",
       "icon": "アイコン",
       "iconPlaceholder": "🎵 またはテキスト",

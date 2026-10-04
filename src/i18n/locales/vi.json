@@ -586,6 +586,7 @@
       "library": "Thư viện",
       "saveMix": "Lưu preset",
       "savePresetTitle": "Lưu preset",
+      "mixedLabel": "Âm thanh hỗn hợp ({count} âm)",
       "savePresetDescription": "Tạo preset mới từ bản trộn âm thanh nền hiện tại ({{count}} âm thanh).",
       "icon": "Biểu tượng",
       "iconPlaceholder": "🎵 hoặc chữ",

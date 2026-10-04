@@ -586,6 +586,7 @@
       "library": "Library",
       "saveMix": "Save mix",
       "savePresetTitle": "Save preset",
+      "mixedLabel": "Mixed ambient ({count} sounds)",
       "savePresetDescription": "Create a new preset from your current ambient mix ({{count}} sound{{plural}}).",
       "icon": "Icon",
       "iconPlaceholder": "🎵 or text",

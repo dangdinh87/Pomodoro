@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { audioManager, AudioSource } from '@/lib/audio/audio-manager';
-import { soundCatalog } from '@/lib/audio/sound-catalog';
+import { soundCatalog, findSound } from '@/lib/audio/sound-catalog';
 
 // --- Types ---
 
@@ -26,6 +26,8 @@ export interface CurrentlyPlayingAudio {
   volume: number;
   isPlaying: boolean;
   icon?: string;
+  /** How many sounds a 'mixed-ambient' entry stands for (the title is built per language) */
+  count?: number;
   timestamp?: number;
   duration?: number;
   currentTime?: number;
@@ -42,7 +44,47 @@ export interface AudioSettings {
   youtubeUrl: string;
 }
 
+/**
+ * What is left to do with a mix restored from storage. Browsers refuse to start audio
+ * before the first user gesture, so a restored mix shows its sliders at once but only
+ * starts sounding on that gesture (or when the timer starts).
+ * - 'none': nothing pending (players exist, or there is no mix)
+ * - 'autoplay': start on the first gesture
+ * - 'paused': the mix was paused when the page closed; wait for the play button
+ */
+export type AmbientRestore = 'none' | 'autoplay' | 'paused';
+
+/** Mix from storage -> known sounds only, volume 1..100, one entry per sound. */
+export function sanitizeAmbientMix(raw: unknown): AmbientSoundState[] {
+  if (!Array.isArray(raw)) return [];
+  const seen = new Set<string>();
+  const mix: AmbientSoundState[] = [];
+  for (const item of raw) {
+    const id = item?.id;
+    const volume = item?.volume;
+    if (typeof id !== 'string' || typeof volume !== 'number' || !Number.isFinite(volume)) continue;
+    if (!findSound(id) || seen.has(id)) continue;
+    const clamped = Math.min(100, Math.round(volume));
+    if (clamped <= 0) continue;
+    seen.add(id);
+    mix.push({ id, volume: clamped });
+  }
+  return mix;
+}
+
 // --- State ---
+
+/** What reaches localStorage (see `partialize`). */
+type PersistedAudio = Pick<
+  AudioState,
+  | 'audioHistory'
+  | 'audioSettings'
+  | 'favorites'
+  | 'recentlyPlayed'
+  | 'presets'
+  | 'savedAmbientState'
+  | 'activeAmbientSounds'
+> & { ambientPaused: boolean };
 
 interface AudioState {
   currentlyPlaying: CurrentlyPlayingAudio | null;
@@ -53,6 +95,7 @@ interface AudioState {
   activeAmbientSounds: AmbientSoundState[]; // changed from string[]
   presets: SoundPreset[];
   savedAmbientState: AmbientSoundState[];
+  ambientRestore: AmbientRestore; // runtime only
 
   // Actions
   setCurrentlyPlaying: (audio: CurrentlyPlayingAudio | null) => void;
@@ -65,6 +108,10 @@ interface AudioState {
   toggleAmbient: (soundId: string) => Promise<void>;
   stopAmbient: (soundId: string) => Promise<void>;
   stopAllAmbient: () => Promise<void>;
+  /** Start a mix restored from storage. Resolves false if the browser still refused. */
+  startRestoredAmbient: (opts?: { force?: boolean }) => Promise<boolean>;
+  /** Give up on restored sounds that never started, so the sliders match what plays. */
+  dropUnstartedAmbient: () => void;
   updateCurrentlyPlayingForAmbients: () => void;
   playAudio: (source: AudioSource) => Promise<void>;
   togglePlayPause: () => Promise<void>;
@@ -102,6 +149,19 @@ interface AudioState {
   };
 }
 
+function mixedAmbientPlaying(count: number, masterVolume: number): CurrentlyPlayingAudio {
+  return {
+    type: 'ambient',
+    id: 'mixed-ambient',
+    // English fallback only: screens build the title with `playingTitle` (i18n, count)
+    name: 'Mixed Ambient',
+    count,
+    volume: masterVolume,
+    isPlaying: true,
+    timestamp: Date.now(),
+  };
+}
+
 const defaultAudioSettings: AudioSettings = {
   masterVolume: 50,
   isMuted: false,
@@ -123,6 +183,7 @@ export const useAudioStore = create<AudioState>()(
       activeAmbientSounds: [],
       presets: [],
       savedAmbientState: [],
+      ambientRestore: 'none',
 
       setCurrentlyPlaying: (audio) => {
         const current = get().currentlyPlaying;
@@ -189,7 +250,7 @@ export const useAudioStore = create<AudioState>()(
           return;
         }
 
-        const { audioSettings, activeAmbientSounds } = get();
+        const { audioSettings } = get();
         const source: AudioSource = {
           id: sound.id,
           type: 'ambient',
@@ -203,8 +264,13 @@ export const useAudioStore = create<AudioState>()(
         const success = await audioManager.playAmbient(source);
 
         if (success) {
+          // Read the mix AFTER the await: other plays may have landed meanwhile, and a
+          // sound already listed (restored mix, double click) is updated, not repeated.
+          const { activeAmbientSounds } = get();
           const newEntry: AmbientSoundState = { id: soundId, volume };
-          const newActiveAmbientSounds = [...activeAmbientSounds, newEntry];
+          const newActiveAmbientSounds = activeAmbientSounds.some((s) => s.id === soundId)
+            ? activeAmbientSounds.map((s) => (s.id === soundId ? newEntry : s))
+            : [...activeAmbientSounds, newEntry];
           const soundCount = newActiveAmbientSounds.length;
 
           // Calculate new currentlyPlaying based on new ambient sounds
@@ -225,14 +291,7 @@ export const useAudioStore = create<AudioState>()(
               timestamp: Date.now(),
             };
           } else {
-            newCurrentlyPlaying = {
-              type: 'ambient',
-              id: 'mixed-ambient',
-              name: `Mixed Ambient (${soundCount} sounds)`,
-              volume: audioSettings.masterVolume,
-              isPlaying: true,
-              timestamp: Date.now(),
-            };
+            newCurrentlyPlaying = mixedAmbientPlaying(soundCount, audioSettings.masterVolume);
           }
 
           // BATCH all updates into single set() to prevent multiple re-renders
@@ -304,20 +363,15 @@ export const useAudioStore = create<AudioState>()(
             };
           }
         } else {
-          newCurrentlyPlaying = {
-            type: 'ambient',
-            id: 'mixed-ambient',
-            name: `Mixed Ambient (${soundCount} sounds)`,
-            volume: audioSettings.masterVolume,
-            isPlaying: true,
-            timestamp: Date.now(),
-          };
+          newCurrentlyPlaying = mixedAmbientPlaying(soundCount, audioSettings.masterVolume);
         }
 
         // BATCH update
         set({
           activeAmbientSounds: newActiveAmbientSounds,
           currentlyPlaying: newCurrentlyPlaying,
+          // Nothing left to restore once the whole mix is gone
+          ...(soundCount === 0 ? { ambientRestore: 'none' as const } : {}),
         });
       },
 
@@ -328,7 +382,34 @@ export const useAudioStore = create<AudioState>()(
         set({
           activeAmbientSounds: [],
           currentlyPlaying: isMainSource ? current : null,
+          ambientRestore: 'none',
         });
+      },
+
+      startRestoredAmbient: async ({ force = false } = {}) => {
+        const { ambientRestore, activeAmbientSounds } = get();
+        if (ambientRestore === 'none' || (ambientRestore === 'paused' && !force)) return true;
+
+        // Claim it first: two gestures in a row must not start the mix twice
+        set({ ambientRestore: 'none' });
+        const toStart = activeAmbientSounds.filter(
+          (s) => s.volume > 0 && !audioManager.isAmbientActive(s.id),
+        );
+        await Promise.all(toStart.map((s) => get().playAmbient(s.id, s.volume)));
+
+        const refused = toStart.some((s) => !audioManager.isAmbientActive(s.id));
+        // Still blocked (no real gesture yet): keep the mix for the next attempt
+        if (refused) set({ ambientRestore });
+        return !refused;
+      },
+
+      dropUnstartedAmbient: () => {
+        set((state) => ({
+          activeAmbientSounds: state.activeAmbientSounds.filter((s) =>
+            audioManager.isAmbientActive(s.id),
+          ),
+          ambientRestore: 'none',
+        }));
       },
 
       updateCurrentlyPlayingForAmbients: () => {
@@ -360,13 +441,9 @@ export const useAudioStore = create<AudioState>()(
           }
         } else {
           // Multiple ambients - show mixed status
-          get().setCurrentlyPlaying({
-            type: 'ambient',
-            id: 'mixed-ambient',
-            name: `Mixed Ambient (${activeWithVolume.length} sounds)`,
-            volume: get().audioSettings.masterVolume,
-            isPlaying: true,
-          });
+          get().setCurrentlyPlaying(
+            mixedAmbientPlaying(activeWithVolume.length, get().audioSettings.masterVolume),
+          );
         }
       },
 
@@ -429,6 +506,10 @@ export const useAudioStore = create<AudioState>()(
           await audioManager.pause();
           get().updatePlayingStatus(false);
         } else {
+          // A mix restored from storage has no players yet: pressing play creates them
+          if (get().ambientRestore !== 'none') {
+            await get().startRestoredAmbient({ force: true });
+          }
           await audioManager.resume();
 
           const { activeAmbientSounds } = get();
@@ -696,26 +777,42 @@ export const useAudioStore = create<AudioState>()(
           if (!persistedState.savedAmbientState)
             persistedState.savedAmbientState = [];
         }
-        return persistedState as AudioState;
+        return persistedState as PersistedAudio;
       },
       partialize: (state) => ({
         audioHistory: state.audioHistory,
         audioSettings: state.audioSettings,
         favorites: state.favorites,
         recentlyPlayed: state.recentlyPlayed,
-        // activeAmbientSounds: state.activeAmbientSounds, // Do not persist active sounds as AudioManager resets on reload
         presets: state.presets,
         savedAmbientState: state.savedAmbientState,
+        // The mix (ids + per-sound volume) survives a reload; playback restarts on a gesture
+        activeAmbientSounds: state.activeAmbientSounds,
+        ambientPaused:
+          state.ambientRestore === 'paused' ||
+          (state.currentlyPlaying !== null && !state.currentlyPlaying.isPlaying),
       }),
       merge: (persistedState, currentState) => {
+        const { ambientPaused, ...persisted } = (persistedState ?? {}) as {
+          ambientPaused?: boolean;
+        } & Partial<AudioState>;
+        const mix = sanitizeAmbientMix(persisted.activeAmbientSounds);
         return {
           ...currentState,
-          ...(persistedState as object),
+          ...persisted,
           // Always use current runtime currentlyPlaying, not persisted
           currentlyPlaying: currentState.currentlyPlaying,
-          // Clear active sounds on hydration — AudioManager has no players after reload
-          activeAmbientSounds: [],
+          // AudioManager has no players after a reload: sliders come back now, sound on a gesture
+          activeAmbientSounds: mix,
+          ambientRestore: mix.length === 0 ? 'none' : ambientPaused ? 'paused' : 'autoplay',
         };
+      },
+      // The manager is a fresh singleton on every load: give it the saved master volume
+      // and mute, or the UI would say "Muted" while sounds still play at full level
+      onRehydrateStorage: () => (state) => {
+        if (!state) return;
+        audioManager.setVolume(state.audioSettings.masterVolume);
+        audioManager.setMute(state.audioSettings.isMuted);
       },
     },
   ),

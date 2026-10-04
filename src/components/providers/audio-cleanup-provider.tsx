@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { audioManager } from '@/lib/audio/audio-manager';
+import { useAmbientRestore } from '@/hooks/use-ambient-restore';
 
 /**
  * AudioCleanupProvider
@@ -12,6 +13,9 @@ import { audioManager } from '@/lib/audio/audio-manager';
  * caused by stale audio elements from previous sessions.
  */
 export function AudioCleanupProvider() {
+  // A mix restored from the last visit starts on the first gesture (autoplay policy)
+  useAmbientRestore();
+
   useEffect(() => {
     // Only clean up orphaned audio elements (from previous sessions)
     // Don't use globalAudioCleanup() as it destroys AudioManager state
