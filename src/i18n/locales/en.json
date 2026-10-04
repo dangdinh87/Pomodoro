@@ -905,7 +905,8 @@
       "googleConnectionFailed": "Unable to connect to Google. Try again later.",
       "sendFailed": "Couldn't send the code. Try again in a minute.",
       "invalidCode": "That code is wrong or has expired.",
-      "tooManyCodes": "You've requested a lot of codes. Please wait about 10 minutes and try again."
+      "tooManyCodes": "You've requested a lot of codes. Please wait about 10 minutes and try again.",
+      "tooManyCodesForEmail": "Too many codes were sent to this email address recently. Please wait a few minutes and try again."
     },
     "guestNote": "Tasks and sessions you made as a guest move to your account."
   },

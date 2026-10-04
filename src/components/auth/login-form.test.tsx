@@ -30,11 +30,24 @@ describe('LoginForm: requesting a code', () => {
     expect(send).toHaveBeenCalledWith({ email: 'me@example.com', type: 'sign-in' });
   });
 
-  it('says so when too many codes were requested (HTTP 429), and stays on the email step', async () => {
-    send.mockResolvedValue({ data: null, error: { status: 429, code: 'OTP_EMAIL_RATE_LIMITED', message: 'x' } } as never);
+  it('says so when too many codes were requested from this network (HTTP 429), and stays on the email step', async () => {
+    send.mockResolvedValue({ data: null, error: { status: 429, message: 'x' } } as never);
     renderForm();
     expect(await screen.findByRole('alert')).toHaveTextContent(/requested a lot of codes/i);
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+  });
+
+  it('says it is this address that got too many codes (the cause may be somebody else), and stays on the email step', async () => {
+    send.mockResolvedValue({ data: null, error: { status: 429, code: 'OTP_EMAIL_RATE_LIMITED', message: 'x' } } as never);
+    renderForm();
+    expect(await screen.findByRole('alert')).toHaveTextContent(/sent to this email address/i);
+    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+  });
+
+  it('speaks Vietnamese and Japanese about the address limit too', async () => {
+    send.mockResolvedValue({ data: null, error: { status: 429, code: 'OTP_EMAIL_RATE_LIMITED', message: 'x' } } as never);
+    renderForm('vi');
+    expect(await screen.findByRole('alert')).toHaveTextContent('Địa chỉ email này đã nhận quá nhiều mã');
   });
 
   it('speaks Vietnamese and Japanese too', async () => {

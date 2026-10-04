@@ -11,6 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { useI18n } from '@/contexts/i18n-context';
 import { useAuth } from '@/hooks/use-auth';
 import { authClient } from '@/lib/auth-client';
+import { OTP_EMAIL_RATE_LIMITED } from '@/lib/auth/otp-error-codes';
 
 const CODE_LENGTH = 6;
 
@@ -50,8 +51,9 @@ export function LoginForm({ googleEnabled, onSignedIn }: { googleEnabled: boolea
     });
     setBusy(false);
     if (sendError) {
-      // 429: Better Auth's per-IP limit or our per-address limit (src/lib/auth/otp-limits.ts)
-      setError(t(sendError.status === 429 ? 'login.errors.tooManyCodes' : 'login.errors.sendFailed'));
+      // 429: Better Auth's per-IP limit (this network asked too often) or our per-address limit, which
+      // carries a code: then the cause may well be somebody else, so say it is the address (src/lib/auth/otp-limits.ts)
+      setError(t(sendError.status === 429 ? (sendError.code === OTP_EMAIL_RATE_LIMITED ? 'login.errors.tooManyCodesForEmail' : 'login.errors.tooManyCodes') : 'login.errors.sendFailed'));
       return;
     }
     setCode('');
