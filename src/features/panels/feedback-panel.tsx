@@ -1,7 +1,10 @@
 'use client';
 
+import { motion, useReducedMotion } from 'motion/react';
+import { Tomo } from '@/components/brand/tomo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { FilterChip, FilterChipGroup } from '@/components/ui/filter-chip';
 import { PanelBody, PageHeader } from '@/components/ui/page-header';
@@ -14,7 +17,7 @@ import {
     validateFeedbackForm,
     type FeedbackFormErrors,
 } from '@/features/feedback/feedback-form';
-import { Bug, CheckCircle, CircleNotch, Lightbulb, NotePencil, PaperPlaneTilt, Question, Star } from '@phosphor-icons/react/dist/ssr';
+import { Bug, CircleNotch, Lightbulb, NotePencil, PaperPlaneTilt, Question } from '@phosphor-icons/react/dist/ssr';
 import { useState } from 'react';
 
 const FEEDBACK_TYPES = [
@@ -25,6 +28,22 @@ const FEEDBACK_TYPES = [
 ] as const;
 
 type FeedbackType = (typeof FEEDBACK_TYPES)[number]['key'];
+
+/** Hand-drawn star: gold with the sticker outline when lit, an empty outline when not (readable on every surface). */
+function StarShape({ lit }: { lit: boolean }) {
+    return (
+        <svg viewBox="0 0 24 24" width={30} height={30} aria-hidden="true" focusable="false">
+            <path
+                d="M12 2.9l2.7 5.8 6.3.8-4.6 4.4 1.2 6.3L12 17.1l-5.6 3.1 1.2-6.3L3 9.5l6.3-.8L12 2.9Z"
+                fill={lit ? 'var(--gold)' : 'transparent'}
+                stroke={lit ? 'var(--outline)' : 'var(--control-edge)'}
+                strokeWidth={1.8}
+                strokeLinejoin="round"
+                className="transition-[fill] duration-150"
+            />
+        </svg>
+    );
+}
 
 function StarRating({ value, onChange, label }: { value: number; onChange: (v: number) => void; label: (n: number) => string }) {
     const [hover, setHover] = useState(0);
@@ -41,13 +60,9 @@ function StarRating({ value, onChange, label }: { value: number; onChange: (v: n
                     onMouseEnter={() => setHover(star)}
                     aria-pressed={star <= value}
                     aria-label={label(star)}
-                    className="rounded-md p-0.5 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand/40"
+                    className="focus-ring rounded-md p-0.5 transition-transform duration-100 hover:-translate-y-px active:translate-y-px focus-visible:outline-offset-0"
                 >
-                    <Star
-                        size={26}
-                        weight={star <= shown ? 'fill' : 'regular'}
-                        className={`transition-colors duration-150 ${star <= shown ? 'text-gold' : 'text-ink-faint'}`}
-                    />
+                    <StarShape lit={star <= shown} />
                 </button>
             ))}
         </div>
@@ -57,6 +72,7 @@ function StarRating({ value, onChange, label }: { value: number; onChange: (v: n
 export default function FeedbackPanel() {
     const { t } = useI18n();
     const { user, isAuthenticated } = useAuth();
+    const reduceMotion = useReducedMotion();
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
@@ -105,12 +121,32 @@ export default function FeedbackPanel() {
     if (success) {
         return (
             <PanelBody>
-                <div role="status" className="mx-auto flex max-w-sm flex-col items-center py-10 text-center">
-                    <CheckCircle size={40} weight="fill" className="mb-4 text-success" aria-hidden />
-                    <h2 className="mb-2 font-heading text-2xl font-bold tracking-[-0.02em] text-ink">{t('feedback.success.title')}</h2>
-                    <p className="mb-6 text-sm text-ink-muted">{t('feedback.success.message')}</p>
+                <div role="status" className="mx-auto flex max-w-sm flex-col items-center py-8 text-center">
+                    <motion.div
+                        initial={reduceMotion ? false : { scale: 0.6 }}
+                        animate={reduceMotion ? undefined : { scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 420, damping: 22 }}
+                    >
+                        {/* two little hops of joy */}
+                        <motion.div
+                            animate={reduceMotion ? undefined : { y: [0, -14, 0, -7, 0] }}
+                            transition={{ duration: 0.9, delay: 0.15, ease: 'easeOut' }}
+                        >
+                            <Tomo face="party" size={136} />
+                        </motion.div>
+                    </motion.div>
+                    {/* Tomo's thank-you: a speech bubble whose tail points up at the mascot */}
+                    <div className="relative mt-5 border-sticker rounded-lg bg-surface px-5 py-4 shadow-sticker-sm">
+                        <span
+                            aria-hidden="true"
+                            className="absolute -top-[9px] left-1/2 size-4 -translate-x-1/2 rotate-45 border-l-[length:var(--outline-w)] border-t-[length:var(--outline-w)] border-outline bg-surface"
+                        />
+                        <h2 className="relative font-heading text-2xl font-extrabold tracking-[-0.02em] text-ink">{t('feedback.success.title')}</h2>
+                        <p className="relative mt-1.5 text-sm font-semibold text-ink-secondary">{t('feedback.success.message')}</p>
+                    </div>
                     <Button
-                        variant="outline"
+                        variant="secondary"
+                        className="mt-6"
                         onClick={() => {
                             setSuccess(false);
                             setMessage('');
@@ -135,7 +171,7 @@ export default function FeedbackPanel() {
         <PanelBody className="sm:max-w-none">
             <PageHeader title={t('feedback.title')} description={t('feedback.subtitle')} className="mb-6 pr-8" />
 
-            <form onSubmit={handleSubmit} noValidate className="space-y-5">
+            <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
                 <FilterChipGroup label={t('feedback.form.type')} className="flex-wrap">
                     {FEEDBACK_TYPES.map(({ key, Icon }) => (
                         <FilterChip key={key} active={type === key} onClick={() => setType(key)}>
@@ -146,9 +182,7 @@ export default function FeedbackPanel() {
                 </FilterChipGroup>
 
                 <div className="space-y-1.5">
-                    <label htmlFor="feedback-message" className="text-sm font-medium text-ink-secondary">
-                        {t('feedback.form.message')}
-                    </label>
+                    <Label htmlFor="feedback-message">{t('feedback.form.message')}</Label>
                     <Textarea
                         id="feedback-message"
                         placeholder={t('feedback.form.messagePlaceholder')}
@@ -163,7 +197,7 @@ export default function FeedbackPanel() {
                     />
                     <div id="feedback-message-meta" className="flex items-start justify-between gap-3 text-xs">
                         <p role="alert" className="text-danger-ink">{messageError}</p>
-                        <span className={`ml-auto shrink-0 tabular-nums ${remaining < 0 ? 'text-danger-ink' : remaining < 100 ? 'text-ink-secondary' : 'text-ink-faint'}`}>
+                        <span className={`ml-auto shrink-0 font-semibold tabular-nums ${remaining < 0 ? 'text-danger-ink' : remaining < 100 ? 'text-ink-secondary' : 'text-ink-muted'}`}>
                             {message.length}/{MESSAGE_MAX}
                         </span>
                     </div>
@@ -171,17 +205,15 @@ export default function FeedbackPanel() {
 
                 <div className="grid gap-5 sm:grid-cols-2">
                     <div className="space-y-1.5">
-                        <p className="text-sm font-medium text-ink-secondary">
+                        <p className="text-sm font-bold text-ink">
                             {t('feedback.form.rating')}{' '}
-                            <span className="font-normal text-ink-muted">({t('pagesUi.feedback.optional')})</span>
+                            <span className="font-medium text-ink-muted">({t('pagesUi.feedback.optional')})</span>
                         </p>
                         <StarRating value={rating} onChange={setRating} label={(n) => t('feedback.form.starLabel', { n })} />
                     </div>
 
                     <div className="space-y-1.5">
-                        <label htmlFor="feedback-email" className="text-sm font-medium text-ink-secondary">
-                            {t('feedback.form.email')}
-                        </label>
+                        <Label htmlFor="feedback-email">{t('feedback.form.email')}</Label>
                         <Input
                             id="feedback-email"
                             type="email"
@@ -203,7 +235,7 @@ export default function FeedbackPanel() {
                 </div>
 
                 {submitError && (
-                    <p role="alert" className="rounded-lg border border-danger/40 px-3 py-2 text-sm text-danger-ink">
+                    <p role="alert" className="rounded-md border-2 border-danger-ink bg-danger-bg px-3 py-2 text-sm font-semibold text-danger-ink">
                         {submitError}
                     </p>
                 )}
