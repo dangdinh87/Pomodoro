@@ -171,9 +171,7 @@
     },
     "actions": {
       "resetDefaults": "Đặt lại mặc định",
-      "cancel": "Huỷ",
-      "save": "Lưu cài đặt",
-      "saveChanges": "Lưu thay đổi"
+      "cancel": "Huỷ"
     },
     "toasts": {
       "saved": "Đã lưu cài đặt hẹn giờ",
@@ -188,7 +186,35 @@
       "decrease": "Giảm {label}",
       "increase": "Tăng {label}"
     },
-    "cycleSummary": "Một chu kỳ đầy đủ: {sessions} phiên tập trung, khoảng {total} phút."
+    "cycleSummary": "Một chu kỳ đầy đủ: {sessions} phiên tập trung, khoảng {total} phút.",
+    "bell": {
+      "title": "Chuông & thông báo",
+      "sound": "Âm chuông",
+      "soundHint": "Phát khi hết một phiên tập trung hoặc giờ nghỉ.",
+      "sounds": {
+        "bell": "Chuông",
+        "chime": "Chuông nhẹ",
+        "gong": "Chuông đồng",
+        "digital": "Kỹ thuật số",
+        "soft": "Nhẹ nhàng",
+        "none": "Tắt chuông"
+      },
+      "volume": "Âm lượng",
+      "previewLabel": "Nghe thử",
+      "previewHint": "Nghe chuông ở mức âm lượng này.",
+      "preview": "Phát thử",
+      "notifications": "Thông báo trình duyệt",
+      "notificationsHint": "Nhận thông báo hệ thống khi hết phiên mà tab đang chạy nền.",
+      "notificationsTurnOn": "Bật",
+      "notificationsOn": "Đang bật",
+      "notificationsOnHint": "Bạn sẽ nhận thông báo khi hết phiên mà tab đang chạy nền.",
+      "notificationsDenied": "Đã chặn",
+      "notificationsDeniedHint": "Trình duyệt đang chặn thông báo của trang này. Hãy cho phép trong cài đặt trang web (biểu tượng cạnh thanh địa chỉ), rồi tải lại trang.",
+      "notificationsUnsupported": "Không hỗ trợ",
+      "notificationsUnsupportedHint": "Trình duyệt này không hiển thị được thông báo.",
+      "keepScreenOn": "Giữ màn hình sáng khi tập trung",
+      "keepScreenOnHint": "Màn hình không tự tắt trong phiên tập trung. Tốn pin hơn một chút."
+    }
   },
   "tasks": {
     "title": "Việc cần làm",
@@ -906,7 +932,7 @@
     "unitMin": "phút",
     "unitSessions": "phiên",
     "autoStartBreakHint": "Bắt đầu giờ nghỉ ngay khi phiên làm việc kết thúc.",
-    "autoStartWorkHint": "Bắt đầu phiên làm việc tiếp theo ngay khi giờ nghỉ kết thúc.",
+    "autoStartWorkHint": "Bắt đầu phiên tập trung tiếp theo ngay khi giờ nghỉ kết thúc. Vẫn sẽ chờ sau giờ nghỉ dài, hoặc khi bạn đã rời máy.",
     "lowTimeWarningHint": "Đồng hồ nhấp nháy trong 10 giây cuối.",
     "clockStyleHint": "Kiểu hiển thị của đồng hồ đếm ngược. Bản xem trước chạy trực tiếp.",
     "clockSizeHint": "Điều chỉnh cỡ đồng hồ.",

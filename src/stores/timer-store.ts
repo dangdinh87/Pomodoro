@@ -79,7 +79,7 @@ interface TimerState {
   goToNextStep: () => void;
 }
 
-const defaultSettings: TimerSettings = {
+export const defaultSettings: TimerSettings = {
   workDuration: 25,
   shortBreakDuration: 5,
   longBreakDuration: 15,

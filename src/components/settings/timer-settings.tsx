@@ -1,13 +1,17 @@
 "use client"
 
-import { useEffect, useRef, useState, type Ref } from 'react'
+import { useRef, useState, type Ref } from 'react'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Minus, Plus, X } from '@phosphor-icons/react/dist/ssr';
 import { cn } from '@/lib/utils'
-import { useTimerStore, type ClockType } from '@/stores/timer-store'
+import { defaultSettings, useTimerStore, type TimerSettings as TimerSettingsData } from '@/stores/timer-store'
+import { useAudioStore } from '@/stores/audio-store'
 import { toast } from 'sonner'
 import { SettingsSection, SettingsRow } from '@/components/settings/settings-section'
+import { BellNotificationsSection } from '@/components/settings/bell-notifications-section'
+import { SavedIndicator } from '@/features/settings/saved-indicator'
+import { useSavedFlash } from '@/features/settings/use-saved-flash'
 import { useI18n } from '@/contexts/i18n-context'
 import { ClockStylePicker } from '@/features/timer/components/clocks/clock-style-picker'
 import { isThreeDClock, resolveClockType } from '@/features/timer/components/clocks/clock-registry'
@@ -20,40 +24,7 @@ import {
     type DurationKey,
 } from '@/components/settings/timer-presets'
 
-type ClockSize = 'small' | 'medium' | 'large'
-
-interface TimerSettingsData {
-    workDuration: number
-    shortBreakDuration: number
-    longBreakDuration: number
-    longBreakInterval: number
-    autoStartBreak: boolean
-    autoStartWork: boolean
-    clockType: ClockType
-    clockSize: ClockSize
-    showClock: boolean
-    lowTimeWarningEnabled: boolean
-}
-
-const DEFAULTS: TimerSettingsData = {
-    workDuration: 25,
-    shortBreakDuration: 5,
-    longBreakDuration: 15,
-    longBreakInterval: 4,
-    autoStartBreak: true,
-    autoStartWork: true,
-    clockType: 'digital',
-    clockSize: 'medium',
-    showClock: false,
-    lowTimeWarningEnabled: true,
-}
-
-const toDraft = (s: TimerSettingsData): Record<DurationKey, string> => ({
-    workDuration: String(s.workDuration),
-    shortBreakDuration: String(s.shortBreakDuration),
-    longBreakDuration: String(s.longBreakDuration),
-    longBreakInterval: String(s.longBreakInterval),
-})
+type ClockSize = TimerSettingsData['clockSize']
 
 const SIZES: ClockSize[] = ['small', 'medium', 'large']
 
@@ -124,75 +95,54 @@ const pillOff = 'bg-surface-raised text-ink-secondary hover:bg-surface-hover hov
 
 export function TimerSettings({ onClose }: { onClose?: () => void }) {
     const { t } = useI18n()
-    const { settings, updateSettings } = useTimerStore()
-    const [local, setLocal] = useState<TimerSettingsData>(DEFAULTS)
-    // Free typing happens in string drafts; they are clamped on blur / save.
-    const [draft, setDraft] = useState<Record<DurationKey, string>>(toDraft(DEFAULTS))
+    const settings = useTimerStore((s) => s.settings)
+    const updateSettings = useTimerStore((s) => s.updateSettings)
+    const [saved, flash] = useSavedFlash()
+    // Free typing happens in string drafts (only while a field is being edited);
+    // they are clamped and applied on blur / Enter. Otherwise the field shows the store.
+    const [typing, setTyping] = useState<Partial<Record<DurationKey, string>>>({})
     const workInput = useRef<HTMLInputElement>(null)
+    const fieldValue = (key: DurationKey) => typing[key] ?? String(settings[key])
+    const endTyping = (...keys: DurationKey[]) =>
+        setTyping((d) => Object.fromEntries(Object.entries(d).filter(([k]) => !keys.includes(k as DurationKey))))
 
-    useEffect(() => {
-        const next: TimerSettingsData = {
-            workDuration: settings.workDuration ?? DEFAULTS.workDuration,
-            shortBreakDuration: settings.shortBreakDuration ?? DEFAULTS.shortBreakDuration,
-            longBreakDuration: settings.longBreakDuration ?? DEFAULTS.longBreakDuration,
-            longBreakInterval: settings.longBreakInterval ?? DEFAULTS.longBreakInterval,
-            autoStartBreak: settings.autoStartBreak ?? DEFAULTS.autoStartBreak,
-            autoStartWork: settings.autoStartWork ?? DEFAULTS.autoStartWork,
-            clockType: resolveClockType(settings.clockType),
-            clockSize: settings.clockSize ?? DEFAULTS.clockSize,
-            showClock: settings.showClock ?? DEFAULTS.showClock,
-            lowTimeWarningEnabled: settings.lowTimeWarningEnabled ?? DEFAULTS.lowTimeWarningEnabled,
-        }
-        setLocal(next)
-        setDraft(toDraft(next))
-    }, [settings])
+    // Every change is applied (and persisted by the store) the moment it is made
+    const save = (patch: Partial<TimerSettingsData>) => {
+        updateSettings(patch)
+        flash()
+    }
 
     const durationsFromDraft = (): Pick<TimerSettingsData, DurationKey> => ({
-        workDuration: parseDuration('workDuration', draft.workDuration, local.workDuration),
-        shortBreakDuration: parseDuration('shortBreakDuration', draft.shortBreakDuration, local.shortBreakDuration),
-        longBreakDuration: parseDuration('longBreakDuration', draft.longBreakDuration, local.longBreakDuration),
-        longBreakInterval: parseDuration('longBreakInterval', draft.longBreakInterval, local.longBreakInterval),
+        workDuration: parseDuration('workDuration', fieldValue('workDuration'), settings.workDuration),
+        shortBreakDuration: parseDuration('shortBreakDuration', fieldValue('shortBreakDuration'), settings.shortBreakDuration),
+        longBreakDuration: parseDuration('longBreakDuration', fieldValue('longBreakDuration'), settings.longBreakDuration),
+        longBreakInterval: parseDuration('longBreakInterval', fieldValue('longBreakInterval'), settings.longBreakInterval),
     })
 
-    const commit = (key: DurationKey) => {
-        const n = parseDuration(key, draft[key], local[key])
-        setDraft((d) => ({ ...d, [key]: String(n) }))
-        setLocal((l) => ({ ...l, [key]: n }))
+    const applyDuration = (key: DurationKey, n: number) => {
+        endTyping(key)
+        if (n !== settings[key]) save({ [key]: n })
     }
 
-    const step = (key: DurationKey, delta: number) => {
-        const n = clampDuration(key, parseDuration(key, draft[key], local[key]) + delta)
-        setDraft((d) => ({ ...d, [key]: String(n) }))
-        setLocal((l) => ({ ...l, [key]: n }))
-    }
+    const commit = (key: DurationKey) => applyDuration(key, parseDuration(key, fieldValue(key), settings[key]))
+
+    const step = (key: DurationKey, delta: number) =>
+        applyDuration(key, clampDuration(key, parseDuration(key, fieldValue(key), settings[key]) + delta))
 
     const applyPreset = (index: number) => {
-        const p = DURATION_PRESETS[index]
-        setLocal((l) => ({ ...l, ...p }))
-        setDraft((d) => ({
-            ...d,
-            workDuration: String(p.workDuration),
-            shortBreakDuration: String(p.shortBreakDuration),
-            longBreakDuration: String(p.longBreakDuration),
-        }))
-    }
-
-    const saveSettings = () => {
-        const normalized: TimerSettingsData = { ...local, ...durationsFromDraft() }
-        setLocal(normalized)
-        setDraft(toDraft(normalized))
-        updateSettings(normalized)
-        toast.success(t('timerSettings.toasts.saved'))
-        onClose?.()
+        endTyping('workDuration', 'shortBreakDuration', 'longBreakDuration')
+        save({ ...DURATION_PRESETS[index] })
     }
 
     const resetToDefaults = () => {
-        setLocal(DEFAULTS)
-        setDraft(toDraft(DEFAULTS))
+        updateSettings(defaultSettings)
+        useAudioStore.getState().updateAudioSettings({ alarmType: 'bell', alarmVolume: 70 })
+        setTyping({})
+        flash()
         toast.success(t('timerSettings.toasts.reset'))
     }
 
-    const live = { ...local, ...durationsFromDraft() }
+    const live = { ...settings, ...durationsFromDraft() }
     const activePreset = matchPreset(live.workDuration, live.shortBreakDuration)
     const unitMin = t('settingsUi.unitMin')
 
@@ -208,9 +158,9 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
             <div className="flex sm:justify-end">
                 <Switch
                     id={id}
-                    checked={local[key]}
+                    checked={settings[key]}
                     aria-label={label}
-                    onCheckedChange={(checked) => setLocal((l) => ({ ...l, [key]: checked }))}
+                    onCheckedChange={(checked) => save({ [key]: checked })}
                 />
             </div>
         </SettingsRow>
@@ -257,9 +207,9 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                             id={f.id}
                             label={f.label}
                             unit={f.unit}
-                            value={draft[f.key]}
+                            value={fieldValue(f.key)}
                             inputRef={f.key === 'workDuration' ? workInput : undefined}
-                            onType={(v) => setDraft((d) => ({ ...d, [f.key]: v }))}
+                            onType={(v) => setTyping((d) => ({ ...d, [f.key]: v }))}
                             onCommit={() => commit(f.key)}
                             onStep={(delta) => step(f.key, delta)}
                             decLabel={t('timerSettings.stepper.decrease', { label: f.label })}
@@ -278,6 +228,8 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                 {toggleRow('low-time-warning', t('timerSettings.labels.lowTimeWarning'), t('settingsUi.lowTimeWarningHint'), 'lowTimeWarningEnabled')}
             </SettingsSection>
 
+            <BellNotificationsSection onChange={flash} />
+
             <SettingsSection title={t('timerSettings.labels.clockDisplay')}>
                 <div className="space-y-3 px-5 py-4">
                     <div className="space-y-0.5">
@@ -285,13 +237,13 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                         <p className="text-[0.8125rem] text-ink-muted">{t('settingsUi.clockStyleHint')}</p>
                     </div>
                     <ClockStylePicker
-                        value={resolveClockType(local.clockType)}
-                        onChange={(clockType) => setLocal((l) => ({ ...l, clockType }))}
+                        value={resolveClockType(settings.clockType)}
+                        onChange={(clockType) => save({ clockType })}
                         workMinutes={live.workDuration}
-                        warn={local.lowTimeWarningEnabled}
+                        warn={settings.lowTimeWarningEnabled}
                         labelledBy="clock-style-label"
                     />
-                    {isThreeDClock(local.clockType) && (
+                    {isThreeDClock(settings.clockType) && (
                         <p className="text-[0.8125rem] text-ink-muted">{t('clockStyles.webglNote')}</p>
                     )}
                 </div>
@@ -302,9 +254,9 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                                 key={size}
                                 type="button"
                                 role="radio"
-                                aria-checked={local.clockSize === size}
-                                onClick={() => setLocal((l) => ({ ...l, clockSize: size }))}
-                                className={cn(pillBase, 'flex-1 sm:flex-none', local.clockSize === size ? pillOn : pillOff)}
+                                aria-checked={settings.clockSize === size}
+                                onClick={() => save({ clockSize: size })}
+                                className={cn(pillBase, 'flex-1 sm:flex-none', settings.clockSize === size ? pillOn : pillOff)}
                             >
                                 {sizeLabels[size]}
                             </button>
@@ -319,9 +271,9 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
         return (
             <div className="space-y-6">
                 {body}
-                <div className="flex justify-between border-t border-border pt-4">
+                <div className="flex items-center justify-between border-t border-border pt-4">
                     <Button variant="outline" onClick={resetToDefaults}>{t('timerSettings.actions.resetDefaults')}</Button>
-                    <Button onClick={saveSettings}>{t('timerSettings.actions.saveChanges')}</Button>
+                    <SavedIndicator show={saved} />
                 </div>
             </div>
         )
@@ -330,10 +282,12 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
     return (
         <div className="flex h-full flex-col">
             <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border bg-surface px-4 py-3 sm:px-6 sm:py-4">
-                <h2 className="truncate font-heading text-lg font-semibold text-ink">{t('timerSettings.title')}</h2>
+                <div className="flex min-w-0 items-center gap-3">
+                    <h2 className="truncate font-heading text-lg font-semibold text-ink">{t('timerSettings.title')}</h2>
+                    <SavedIndicator show={saved} />
+                </div>
                 <div className="flex shrink-0 items-center gap-2">
                     <Button variant="outline" onClick={resetToDefaults} size="sm" className="hidden sm:inline-flex">{t('timerSettings.actions.resetDefaults')}</Button>
-                    <Button onClick={saveSettings} size="sm">{t('timerSettings.actions.save')}</Button>
                     <Button variant="ghost" size="icon" onClick={onClose}>
                         <X size={16} />
                         <span className="sr-only">{t('common.close')}</span>

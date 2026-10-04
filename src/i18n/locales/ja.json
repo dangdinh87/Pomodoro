@@ -171,9 +171,7 @@
     },
     "actions": {
       "resetDefaults": "初期設定に戻す",
-      "cancel": "キャンセル",
-      "save": "設定を保存",
-      "saveChanges": "変更を保存"
+      "cancel": "キャンセル"
     },
     "toasts": {
       "saved": "タイマー設定を保存しました",
@@ -188,7 +186,35 @@
       "decrease": "{label}を減らす",
       "increase": "{label}を増やす"
     },
-    "cycleSummary": "1サイクル：集中セッション{sessions}回、約{total}分。"
+    "cycleSummary": "1サイクル：集中セッション{sessions}回、約{total}分。",
+    "bell": {
+      "title": "チャイムと通知",
+      "sound": "チャイム音",
+      "soundHint": "集中セッションや休憩が終わったときに鳴ります。",
+      "sounds": {
+        "bell": "ベル",
+        "chime": "チャイム",
+        "gong": "ゴング",
+        "digital": "デジタル",
+        "soft": "ソフト",
+        "none": "なし"
+      },
+      "volume": "音量",
+      "previewLabel": "試し聴き",
+      "previewHint": "この音量でチャイムを確認できます。",
+      "preview": "再生",
+      "notifications": "ブラウザ通知",
+      "notificationsHint": "タブがバックグラウンドにあるとき、セッション終了を通知でお知らせします。",
+      "notificationsTurnOn": "オンにする",
+      "notificationsOn": "オン",
+      "notificationsOnHint": "タブがバックグラウンドにあるとき、セッション終了を通知でお知らせします。",
+      "notificationsDenied": "ブロック中",
+      "notificationsDeniedHint": "このサイトの通知はブラウザでブロックされています。アドレスバー横のアイコンからサイトの設定で許可し、ページを再読み込みしてください。",
+      "notificationsUnsupported": "非対応",
+      "notificationsUnsupportedHint": "このブラウザは通知を表示できません。",
+      "keepScreenOn": "集中中は画面をつけたままにする",
+      "keepScreenOnHint": "集中セッション中に画面が自動でスリープしないようにします。電池の消費がやや増えます。"
+    }
   },
   "tasks": {
     "title": "タスク",
@@ -906,7 +932,7 @@
     "unitMin": "分",
     "unitSessions": "回",
     "autoStartBreakHint": "作業セッションが終わったらすぐに休憩を始めます。",
-    "autoStartWorkHint": "休憩が終わったらすぐに次の作業セッションを始めます。",
+    "autoStartWorkHint": "休憩が終わったらすぐに次の集中セッションを始めます。長い休憩のあとや、席を外しているときは待機します。",
     "lowTimeWarningHint": "残り10秒で時計が点滅します。",
     "clockStyleHint": "カウントダウンの見た目です。プレビューはリアルタイムで動きます。",
     "clockSizeHint": "時計の大きさを変えます。",

@@ -171,9 +171,7 @@
     },
     "actions": {
       "resetDefaults": "Reset to defaults",
-      "cancel": "Cancel",
-      "save": "Save",
-      "saveChanges": "Save changes"
+      "cancel": "Cancel"
     },
     "toasts": {
       "saved": "Timer settings saved",
@@ -188,7 +186,35 @@
       "decrease": "Decrease {label}",
       "increase": "Increase {label}"
     },
-    "cycleSummary": "One cycle: {sessions} focus sessions, about {total} min."
+    "cycleSummary": "One cycle: {sessions} focus sessions, about {total} min.",
+    "bell": {
+      "title": "Bell & notifications",
+      "sound": "Bell sound",
+      "soundHint": "Plays when a focus session or a break ends.",
+      "sounds": {
+        "bell": "Bell",
+        "chime": "Chime",
+        "gong": "Gong",
+        "digital": "Digital",
+        "soft": "Soft",
+        "none": "None"
+      },
+      "volume": "Volume",
+      "previewLabel": "Try it out",
+      "previewHint": "Hear the bell at this volume.",
+      "preview": "Preview",
+      "notifications": "Browser notifications",
+      "notificationsHint": "Get a system notification when a session ends while this tab is in the background.",
+      "notificationsTurnOn": "Turn on",
+      "notificationsOn": "On",
+      "notificationsOnHint": "You'll get a notification when a session ends while this tab is in the background.",
+      "notificationsDenied": "Blocked",
+      "notificationsDeniedHint": "Notifications are blocked for this site. Allow them in your browser's site settings (the icon next to the address bar), then reload the page.",
+      "notificationsUnsupported": "Not supported",
+      "notificationsUnsupportedHint": "This browser can't show notifications.",
+      "keepScreenOn": "Keep screen on while focusing",
+      "keepScreenOnHint": "Stops your screen from going to sleep during a focus session. Uses a bit more battery."
+    }
   },
   "tasks": {
     "title": "Tasks",
@@ -906,7 +932,7 @@
     "unitMin": "min",
     "unitSessions": "sessions",
     "autoStartBreakHint": "Start the break as soon as a work session ends.",
-    "autoStartWorkHint": "Start the next work session as soon as a break ends.",
+    "autoStartWorkHint": "Start the next focus session as soon as a break ends. It still waits after a long break, or if you've been away.",
     "lowTimeWarningHint": "Pulse the clock during the last 10 seconds.",
     "clockStyleHint": "How the countdown looks. Previews are live.",
     "clockSizeHint": "Scales the clock.",
