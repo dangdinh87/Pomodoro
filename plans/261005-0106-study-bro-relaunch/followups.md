@@ -6,7 +6,7 @@
 | 2 | Index `(user_id, mode, created_at)` cho focus sessions | 1B | Migration ở phase 4 (DB hardening) |
 | 3 | `AppearanceSettings` cũ trong `general-settings.tsx` là code chết; file có WIP thời tiết | 2.1 | Chỉ xoá khi WIP thời tiết đã commit, hoặc stage hunk riêng |
 | 4 | `general-settings.tsx` còn 2 `t() \|\| fallback` (test đang whitelist file này) | 1D | Như #3 |
-| 5 | Comment cũ ở `src/stores/audio-store.ts:42` | 1F | Dọn ở phase 4 |
+| 5 | Comment cũ ở `src/stores/audio-store.ts:42` | 1F | **Xong (4a)**: dọn 2 comment cũ khi store lên v4 |
 | 6 | Kiểm `/opengraph-image` trên Vercel preview (font đọc từ `assets/fonts`) | 2.2 | Kiểm khi CI build / preview |
 | 7 | `card.jpg` (lộ tên/email) còn trong lịch sử git | 2.2 | Cần chủ dự án quyết viết lại lịch sử (force-push) — ghi vào báo cáo cuối |
 | 8 | Doodle cà chua trên nền giấy kem giống giọt nước | 2.2 | Vẽ lại hình nhỏ trong SVG doodle |
@@ -22,8 +22,12 @@
 | 18 | **P1-8 YouTube vẫn phát qua iframe ẩn** (rủi ro ToS); `floating-player-bar.tsx` bị comment trong `app-providers.tsx`, `youtube-suggestions.tsx` không ai render, còn chuỗi cứng | audit, 2.5b | Batch 2.7: mini player hiển thị, thu gọn được, `onError` |
 | 19 | `timer-settings.tsx` + `bell-notifications*` chưa batch nào restyle chủ động (chỉ ăn theo `SettingsSection`) | 2.5a, 2.5b | Batch 2.7 |
 | 20 | 2048: ô trống gần trùng màu bàn cờ ở chế độ sáng (màu in-game) | 2.5b | Bỏ qua (luật: không đổi màu trong game) |
-| 21 | Lệnh ⌘K "Skip" bấm nút theo aria-label (dễ gãy) | 2.4a | Gọi store action (đã nhờ 2.7 nếu đơn giản) |
+| 21 | Lệnh ⌘K "Skip" bấm nút theo aria-label (dễ gãy) | 2.4a | **Xong (4a)**: nút và ⌘K cùng gọi `requestTimerSkip()` (`features/timer/lib/request-skip.ts`) |
 | 22 | `app-home.tsx` (WIP thời tiết) còn ghi cứng `data-theme="dark"` — vô hại vì selector là `:root[data-theme]` | 2.4a | Dọn khi WIP thời tiết commit |
 | 23 | Mobile: thẻ YouTube (sàn 200×200 theo ToS) che nửa dưới thẻ timer | 2.7 | Mobile: đặt player trong luồng trang dưới thẻ timer (không overlay), hoặc trong khay trên tab bar có chừa chỗ |
 | 24 | Thẻ YouTube `z-40` bị panel/dialog `z-50` che khi mở | 2.7 | Cân nhắc: khi panel mở, đưa player vào góc panel hoặc chấp nhận (ghi lý do) |
 | 25 | 404 lồng (`/vi/nope`) HTML là vỏ lỗi Next, UI VI dựng sau hydrate | 3a | Kiểm ở preview; noindex nên SEO không ảnh hưởng |
+| 26 | File sót chưa xoá được (lệnh `rm` bị chặn quyền): `migrations/`, `supabase_schema.sql`, `fix_sessions_rls.sql`, `public/images/` (png 3,9 MB + `file.svg`); đã grep 0 tham chiếu | 4a | Chủ dự án cho phép rồi chạy `git rm -r migrations supabase_schema.sql fix_sessions_rls.sql public/images` |
+| 27 | `.Jules/palette.md` vs `.jules/palette.md` trùng tên trên đĩa không phân biệt hoa thường; chỉ khác 3 dòng trống, sửa bằng `git rm --cached .Jules/palette.md` | 4a | Một commit riêng khi phiên khác đã commit xong `.Jules/palette.md` |
+| 28 | `NEXT_PUBLIC_FEATURE_HISTORY` chỉ ẩn UI, không chặn `/api/history` và `/api/stats` (`feature-gate.ts` chưa từng được nối, đã xoá) | 4a | Nối cờ vào 2 route hoặc bỏ cờ |
+| 29 | Video gợi ý `04RM0CQPLHQ` trong `src/data/youtube-suggestions.ts` trả 404 thumbnail | 4a | Thay bằng video còn sống |
