@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { StickerCard } from '@/components/ui/sticker-card';
 import { useI18n } from '@/contexts/i18n-context';
 import { localePath } from '@/lib/i18n/locale-path';
+import { reportClientError } from '@/lib/observability/report-client-error';
 
 interface RouteErrorProps {
   error: Error & { digest?: string };
@@ -31,6 +32,7 @@ export function RouteError({
 
   useEffect(() => {
     console.error(error);
+    reportClientError(error, 'route-error');
   }, [error]);
 
   return (

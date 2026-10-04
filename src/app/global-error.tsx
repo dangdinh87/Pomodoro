@@ -5,6 +5,7 @@ import { Tomo } from '@/components/brand/tomo';
 import { localePath } from '@/lib/i18n/locale-path';
 import { DEFAULT_LANG, type Lang } from '@/lib/i18n/negotiate-locale';
 import { detectErrorLang, globalErrorCopy } from '@/lib/i18n/global-error-copy';
+import { reportClientError } from '@/lib/observability/report-client-error';
 
 /*
  * Replaces the root layout when it fails: no providers, no globals.css, no next/font. So the page
@@ -77,6 +78,7 @@ export default function GlobalError({
 
   useEffect(() => {
     console.error(error);
+    reportClientError(error, 'global-error');
   }, [error]);
 
   return (

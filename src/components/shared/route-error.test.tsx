@@ -1,5 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { reportClientError } from '@/lib/observability/report-client-error';
 import { RouteError } from './route-error';
+
+vi.mock('@/lib/observability/report-client-error', () => ({ reportClientError: vi.fn() }));
 
 const state = vi.hoisted(() => ({ lang: 'en' }));
 vi.mock('@/contexts/i18n-context', () => ({
@@ -12,6 +15,7 @@ vi.mock('@/contexts/i18n-context', () => ({
 describe('RouteError', () => {
   beforeEach(() => {
     state.lang = 'en';
+    vi.mocked(reportClientError).mockClear();
     vi.spyOn(console, 'error').mockImplementation(() => {});
   });
   afterEach(() => vi.restoreAllMocks());
@@ -39,6 +43,15 @@ describe('RouteError', () => {
     render(<RouteError error={new Error('boom')} reset={vi.fn()} homeHref="/" homeLabelKey="errors.boundary.goTimer" />);
 
     expect(screen.getByRole('link', { name: 'errors.boundary.goTimer' })).toHaveAttribute('href', '/ja');
+  });
+
+  it('reports the error once to the server for error tracking', () => {
+    const error = Object.assign(new Error('boom'), { digest: 'abc123' });
+    const { rerender } = render(<RouteError error={error} reset={vi.fn()} homeHref="/" homeLabelKey="errors.boundary.goHome" />);
+    rerender(<RouteError error={error} reset={vi.fn()} homeHref="/" homeLabelKey="errors.boundary.goHome" />);
+
+    expect(reportClientError).toHaveBeenCalledTimes(1);
+    expect(reportClientError).toHaveBeenCalledWith(error, 'route-error');
   });
 
   it('prints the digest as a reference only when there is one', () => {
