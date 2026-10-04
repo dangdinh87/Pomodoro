@@ -30,13 +30,14 @@ Bốn file `phase-0N-*.md` dự kiến ban đầu không được viết: viết
 | 1A | Ghi phiên: khách luôn được ghi (`ensureSession`), rate limit khách, `completedFullSession`, `client_session_id` + migration, `endedAt`, trần 24h trong transaction | 1B | **xong** b643e24…f292c88 (migration 0002) |
 | 1B | Thống kê theo múi giờ người dùng + ranh giới 04:00, aggregate SQL (stats, history, streak, export) | 1A | **xong** 3b1f004…9158d8f |
 | 1C | Timer UX: `autoStartWork=false` + ngừng tự chạy, confirm reset, báo hết phiên chắc chắn (setTimeout đúng mốc, preload, Wake Lock), mục "Chuông & thông báo", chữ thông báo i18n | 2.1 | **xong** 7d9ab80…fc91ba8 |
-| 1D | i18n: 5 key thiếu, bỏ `t() \|\| fallback`, toast + Close i18n; ẩn 9 âm câm + test; P2 nhanh (scene Esc, fullscreen, manifest, error homeHref, redirect leaderboard/chat, GA ID) — tách 1D (i18n, copy, âm câm — **xong**), 1E (P2 chức năng — **xong** c2223f6…bb8e542), 1F (tổng hợp chuông + noise bằng ffmpeg — đang làm) | 2.3, 2.5a | đang làm |
+| 1D | i18n: 5 key thiếu, bỏ `t() \|\| fallback`, toast + Close i18n; ẩn 9 âm câm + test; P2 nhanh (scene Esc, fullscreen, manifest, error homeHref, redirect leaderboard/chat, GA ID) — tách 1D (i18n, copy, âm câm — **xong**), 1E (P2 chức năng — **xong** c2223f6…bb8e542), 1F (tổng hợp chuông + noise bằng ffmpeg — **xong** 631c322, c360dbb) | 2.3, 2.5a | **xong** |
 | 2.1 | Nền móng: token sáng/tối, `.btn*`/`.sticker*`, nền giấy kem, font Baloo 2 + Nunito, Sáng/Tối/Hệ thống, 6 preset + test tương phản | 1C | **xong** cdd85b0…a7198ba |
 | 2.2 | Thương hiệu: Tomo SVG 5 mặt, Logo, favicon, icon PWA, manifest, OG `next/og`, gỡ sói + `card.jpg` | 1C | **xong** ac18c60…5d6c5f9 |
 | 2.3 | Primitive: mọi `components/ui/*` + IconTile, StickerCard, StreakPill, SessionTomatoes, TomoBubble; `text-white` → `text-on-accent` — tách 2.3a (overlay) và 2.3b (control + primitive mới, thêm `--control-edge` cho dark) | 1D, 1E | **xong** 56b34c1…815704d |
-| 2.4 | Khung app + timer — 2.4a (status bar, dock, tab bar mobile, ⌘K + `?`, H1 + SSR 25:00) và 2.4b (thẻ đồng hồ, đồng hồ 2D, `pickTomoMood`, bong bóng, SessionCelebration) | 2.5 | đang làm |
-| 2.5 | Panel — 2.5a (việc, thống kê, cài đặt, góp ý) đang làm; 2.5b (âm thanh, không gian, đồng hồ, arcade + mini timer) đang làm | 2.4 | đang làm |
-| 2.6 | Trang ngoài app: landing, guide/legal, 404/lỗi/đăng nhập; viết lại `docs/design-system.md` | — | chưa làm |
+| 2.4 | Khung app + timer — 2.4a (status bar, dock, tab bar mobile, ⌘K + `?`, H1 + SSR 25:00) và 2.4b (thẻ đồng hồ, đồng hồ 2D, `pickTomoMood`, bong bóng, SessionCelebration — **xong** 164ed1f…536d804) | 2.5 | 2.4a đang làm |
+| 2.5 | Panel — 2.5a (việc, thống kê, cài đặt, góp ý) **xong** 67010d4…215a747; 2.5b (âm thanh, không gian, đồng hồ, arcade + mini timer) **xong** c14cd5c…2e84d9b | 2.4 | **xong** |
+| 2.7 | Dọn dẹp sau rebrand: mini player YouTube hiển thị (P1-8), timer/bell settings, follow-up #1 #8 #16 #18 #19 | 3a | chưa làm |
+| 2.6 | Trang ngoài app: landing, guide/legal, 404/lỗi/đăng nhập; viết lại `docs/design-system.md` | 2.4a, 2.5b | **xong** 7695916…ab61843 |
 | 3.x | `[lang]` routing + hreflang + metadata theo locale + static/ISR + JSON-LD + locale tải động + PGlite động | — | chưa làm |
 | 4.x | migrate action, error tracking, rate limit OTP, CSP report, DB hardening, ratchet, dọn code chết, push + PR nháp + CI xanh | — | chưa làm |
 

@@ -14,3 +14,11 @@
 | 10 | Throttle tab ẩn > 5 phút chưa đo trên trình duyệt thật; Service Worker cho thông báo Android; mở khoá audio iOS | 1C | Phase PWA sau |
 | 11 | GA ID prod phải là `G-…` hoặc `GTM-…` sạch (`.env` local đang dính dòng) | 1E | Việc chủ dự án |
 | 12 | Reduced-motion chưa kiểm trên trình duyệt thật (chỉ có test) | 2.1, 2.4b | Kiểm ở batch rà soát cuối bằng emulate `prefers-reduced-motion` |
+| 13 | Nhóm trong `general-settings` và `weather-settings` cùng IconTile sliders màu butter; cần truyền `icon`/`tone` riêng | 2.5a | Sau khi WIP thời tiết được commit |
+| 14 | Heatmap theo `--accent-solid` (bộ màu người dùng) thay vì cứng cà chua — **đã quyết giữ** (mặc định vẫn là cà chua) | 2.5a | Ghi vào design-system doc |
+| 15 | Không dùng bí danh icon kiểu `ArmchairIcon`: `modularizeImports` làm build lỗi mà tsc không bắt | 2.6 | Thêm lint rule/kiểm trong CI build (phase 4) |
+| 16 | `DialogPanel id="login"` có `overflow-y-auto` cắt viền thẻ; đang tạm `m-1.5` | 2.6 | Sửa gốc ở panel host (rà soát cuối) |
+| 17 | Chưa chụp `/terms`, 404 tiếng Nhật, login dark | 2.6 | Rà soát cuối |
+| 18 | **P1-8 YouTube vẫn phát qua iframe ẩn** (rủi ro ToS); `floating-player-bar.tsx` bị comment trong `app-providers.tsx`, `youtube-suggestions.tsx` không ai render, còn chuỗi cứng | audit, 2.5b | Batch 2.7: mini player hiển thị, thu gọn được, `onError` |
+| 19 | `timer-settings.tsx` + `bell-notifications*` chưa batch nào restyle chủ động (chỉ ăn theo `SettingsSection`) | 2.5a, 2.5b | Batch 2.7 |
+| 20 | 2048: ô trống gần trùng màu bàn cờ ở chế độ sáng (màu in-game) | 2.5b | Bỏ qua (luật: không đổi màu trong game) |
