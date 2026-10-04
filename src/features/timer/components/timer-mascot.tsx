@@ -9,7 +9,8 @@ import { useSystemStore } from '@/stores/system-store';
 import { useActiveTask } from '../hooks/use-active-task';
 
 /** Same height for both states, so starting the timer does not move the card. */
-const SLOT = 'mb-4 flex min-h-[72px] w-full items-center justify-center';
+// The stage shrinks with the viewport height (see .stage-card in globals.css): Tomo and the gap below follow it.
+const SLOT = 'mb-(--stage-mascot-mb) flex min-h-(--stage-tomo) w-full items-center justify-center';
 
 /**
  * Top of the timer card (spec §4.2, §7.3). Idle or on a break: Tomo with a speech bubble (greeting, break tip,
@@ -39,11 +40,11 @@ export const TimerMascot = memo(function TimerMascot() {
     return (
         <div className={SLOT}>
             {mood.lineKey ? (
-                <TomoBubble id="timer-mood" face={mood.face} tomoSize={72} className="w-full justify-center">
+                <TomoBubble id="timer-mood" face={mood.face} tomoSize={72} className="w-full justify-center [&_svg[data-face]]:size-(--stage-tomo)">
                     {t(mood.lineKey)}
                 </TomoBubble>
             ) : (
-                <Tomo face={mood.face} size={72} />
+                <Tomo face={mood.face} size={72} className="size-(--stage-tomo)" />
             )}
         </div>
     );

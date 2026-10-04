@@ -580,6 +580,32 @@
 
 }
 
+/* ═══ Timer stage: the card and the dock fit one screen (batch 2.7) ═══
+   The section around the card reserves 160px (pt-16 status bar + pb-24 dock), so the card may be at most
+   100dvh - 160px tall. At 820px of height and above everything has its full size (what 1440x900 shows);
+   below that the spacing, Tomo and the digits shrink together until 640px, where a 657px laptop window
+   still shows the whole card and the dock. --stage-t is that 0..1 progress: lengths cannot be divided in
+   calc() yet, but tan(atan2(a, b)) is a / b as a plain number. The live card (enhanced-timer.tsx) and the
+   server skeleton (app-home-skeleton.tsx) both read these, so they always have the same size. */
+.stage-card {
+  --stage-t: clamp(0, tan(atan2(100dvh - 640px, 180px)), 1);
+  --stage-pad: 20px;
+  --stage-tomo: calc(52px + 20px * var(--stage-t));
+  --stage-mascot-mb: calc(8px + 8px * var(--stage-t));
+  --stage-chips-mb: calc(8px + 12px * var(--stage-t));
+  --stage-digits: calc(108px + 52px * var(--stage-t));
+  --stage-gap: calc(8px + 8px * var(--stage-t));
+  --stage-controls-mt: calc(12px + 16px * var(--stage-t));
+  --stage-btn: calc(48px + 8px * var(--stage-t));
+  --stage-gap-lg: calc(12px + 8px * var(--stage-t));
+  --stage-gap-sm: calc(8px + 4px * var(--stage-t));
+}
+@media (min-width: 640px) {
+  .stage-card {
+    --stage-pad: calc(20px + 12px * var(--stage-t));
+  }
+}
+
 /* ═══ Timer: chrome fades while a session runs and the pointer is idle (hooks/use-chrome-idle.ts) ═══ */
 [data-chrome] {
   transition: opacity 0.6s ease;

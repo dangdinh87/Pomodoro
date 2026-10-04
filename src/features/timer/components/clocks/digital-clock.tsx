@@ -16,11 +16,12 @@ export type DigitalClockProps = {
 };
 
 // Viewport-based on purpose (the settings gallery scales this component by measuring it). The maxima keep
-// "00:00" inside the 560px timer card: 4 digits and the colon are about 2.6em wide.
+// "00:00" inside the 560px timer card: 4 digits and the colon are about 2.6em wide. On a short screen the
+// stage (.stage-card in globals.css) also caps the height with --stage-digits; elsewhere the old maximum applies.
 const sizeClasses = {
   small: 'text-[length:calc(clamp(60px,19vw,112px)*var(--clock-scale,1))]',
-  medium: 'text-[length:calc(clamp(76px,27vw,160px)*var(--clock-scale,1))]',
-  large: 'text-[length:calc(clamp(88px,29vw,176px)*var(--clock-scale,1))]',
+  medium: 'text-[length:calc(clamp(76px,min(27vw,var(--stage-digits,160px)),160px)*var(--clock-scale,1))]',
+  large: 'text-[length:calc(clamp(88px,min(29vw,calc(var(--stage-digits,160px)+16px)),176px)*var(--clock-scale,1))]',
 };
 
 export const DigitalClock = memo(

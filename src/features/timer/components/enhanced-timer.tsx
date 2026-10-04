@@ -30,13 +30,13 @@ export function EnhancedTimer() {
 
   return (
     <div className="z-10 w-full max-w-140">
-      <section className="sticker-lg flex flex-col items-center p-5 sm:p-8">
+      <section className="stage-card sticker-lg flex flex-col items-center p-(--stage-pad)">
         <TimerMascot />
         <div data-chrome>
           <TimerModeSelector />
         </div>
         <TimerClockDisplay />
-        <div className="mt-7 flex w-full flex-col items-center gap-5">
+        <div className="mt-(--stage-controls-mt) flex w-full flex-col items-center gap-(--stage-gap-lg)">
           <TimerControls />
           <DailyProgress />
         </div>

@@ -59,7 +59,7 @@ export const TimerModeSelector = memo(function TimerModeSelector() {
 
     return (
         <>
-            <FilterChipGroup label={t('timerUi.modeGroup')} className="mb-5 justify-center">
+            <FilterChipGroup label={t('timerUi.modeGroup')} className="mb-(--stage-chips-mb) justify-center">
                 {MODES.map(({ value, labelKey }) => (
                     <FilterChip
                         key={value}

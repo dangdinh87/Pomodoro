@@ -201,7 +201,7 @@ export const TimerControls = memo(function TimerControls() {
 
     return (
         <>
-            <div className="flex w-full flex-col items-center gap-3">
+            <div className="flex w-full flex-col items-center gap-(--stage-gap-sm)">
                 <div className="flex w-full items-center justify-center gap-3 sm:gap-4">
                     <Button
                         onClick={requestTimerReset}
@@ -220,7 +220,7 @@ export const TimerControls = memo(function TimerControls() {
                         disabled={isProcessing}
                         title={isRunning ? t('timer.controls.pause_hint') : t('timer.controls.start_hint')}
                         size="lg"
-                        className="h-14 min-w-0 max-w-[280px] flex-1 text-xl"
+                        className="h-(--stage-btn) min-w-0 max-w-[280px] flex-1 text-xl"
                     >
                         <span className="inline-flex items-center gap-2.5">
                             {isRunning ? (
@@ -244,7 +244,7 @@ export const TimerControls = memo(function TimerControls() {
                         <SkipForward size={22} weight="fill" aria-hidden="true" />
                     </Button>
                 </div>
-                <p data-chrome className="flex items-center gap-1.5 text-[0.8125rem] font-semibold text-ink-muted [@media(hover:none)]:hidden">
+                <p data-chrome className="flex items-center gap-1.5 text-[0.8125rem] font-semibold text-ink-muted [@media(hover:none)]:hidden [@media(max-height:700px)]:hidden">
                     {hintBefore}
                     <Kbd>{t('timerUi.spaceKey')}</Kbd>
                     {hintAfter}

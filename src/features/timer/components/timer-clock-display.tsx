@@ -110,8 +110,8 @@ export const TimerClockDisplay = memo(function TimerClockDisplay() {
     const showProgressLine = clockType !== 'analog' && clockType !== 'tomato' && clockType !== 'orbit';
 
     return (
-        <div className="flex w-full flex-col items-center gap-4">
-            <div className="flex w-full flex-col items-center gap-3.5">
+        <div className="flex w-full flex-col items-center gap-(--stage-gap)">
+            <div className="flex w-full flex-col items-center gap-(--stage-gap)">
                 {/* 3D stages are sized by the viewport; never let one spill out of the card */}
                 <div className="flex w-full justify-center [&>*]:max-w-full">{clockContent}</div>
                 {showProgressLine && <TimerProgress percent={progressPercent} reduceMotion={Boolean(reduceMotion)} />}
