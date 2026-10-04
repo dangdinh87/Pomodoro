@@ -17,7 +17,8 @@ import { useAuth } from '@/hooks/use-auth';
 import { useI18n } from '@/contexts/i18n-context';
 import { SettingsRow, SettingsSection } from '@/components/settings/settings-section';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { DownloadSimple, SignOut, UserCircle } from '@phosphor-icons/react/dist/ssr';
+import { DownloadSimple, SignOut, Trash, UserCircle } from '@phosphor-icons/react/dist/ssr';
+import { Tomo } from '@/components/brand/tomo';
 import { openPanel } from '@/features/app-shell/panel-store';
 import { getBrowserTimeZone, studyDayOf } from '@/lib/stats/study-day';
 
@@ -36,15 +37,13 @@ export function AccountSettings() {
 
   if (!isAuthenticated || !user) {
     return (
-      <div className="rounded-lg border border-border bg-surface p-5">
+      <div className="sticker p-5">
         <div className="flex items-start gap-3.5">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-surface-raised text-ink-secondary">
-            <UserCircle size={22} aria-hidden />
-          </span>
+          <Tomo face="happy" size={56} className="shrink-0" />
           <div className="min-w-0 space-y-1">
-            <h2 className="font-heading text-[0.9375rem] font-bold tracking-[-0.01em] text-ink">
+            <h3 className="font-heading text-[1.0625rem] font-extrabold tracking-[-0.01em] text-ink">
               {t('settings.account.guest.title')}
-            </h2>
+            </h3>
             <p className="text-[0.8125rem] leading-snug text-ink-muted">{t('settings.account.guest.description')}</p>
           </div>
         </div>
@@ -123,7 +122,7 @@ export function AccountSettings() {
 
   return (
     <div className="space-y-8">
-      <SettingsSection title={t('settings.account.title')}>
+      <SettingsSection title={t('settings.account.title')} icon={UserCircle} tone="sky">
         <div className="flex items-center gap-3.5 px-4 py-4 sm:px-5">
           <Avatar className="size-11">
             {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt="" />}
@@ -148,25 +147,20 @@ export function AccountSettings() {
         </SettingsRow>
       </SettingsSection>
 
-      <section className="space-y-3">
-        <h2 className="font-heading text-[0.9375rem] font-bold tracking-[-0.01em] text-danger-ink">
-          {t('settings.account.delete.title')}
-        </h2>
-        <div className="rounded-lg border border-danger/40 bg-surface">
-          <SettingsRow label={t('settings.account.delete.title')} description={t('settings.account.delete.description')}>
-            <Button
-              variant="destructive"
-              className="w-full"
-              onClick={() => {
-                setDeleteConfirm('');
-                setDeleteError(null);
-                setDeleteOpen(true);
-              }}
-            >
-              {t('settings.account.delete.button')}
-            </Button>
-          </SettingsRow>
-        </div>
+      <SettingsSection title={t('settings.account.delete.title')} icon={Trash} tone="tomato">
+        <SettingsRow label={t('settings.account.delete.title')} description={t('settings.account.delete.description')}>
+          <Button
+            variant="destructive"
+            className="w-full"
+            onClick={() => {
+              setDeleteConfirm('');
+              setDeleteError(null);
+              setDeleteOpen(true);
+            }}
+          >
+            {t('settings.account.delete.button')}
+          </Button>
+        </SettingsRow>
 
         <AlertDialog open={deleteOpen} onOpenChange={(open) => !deleting && setDeleteOpen(open)}>
           <AlertDialogContent>
@@ -187,7 +181,7 @@ export function AccountSettings() {
                 onChange={(e) => setDeleteConfirm(e.target.value)}
               />
               {deleteError && (
-                <p role="alert" className="text-sm text-destructive">
+                <p role="alert" className="text-sm font-semibold text-danger-ink">
                   {deleteError}
                 </p>
               )}
@@ -208,7 +202,7 @@ export function AccountSettings() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      </section>
+      </SettingsSection>
     </div>
   );
 }

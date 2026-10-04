@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react"
 import { useTheme } from "next-themes"
-import { Desktop, Moon, Sun } from "@phosphor-icons/react/dist/ssr"
+import { Desktop, Moon, Palette, Sun, TextAa } from "@phosphor-icons/react/dist/ssr"
+import { ColorPresetPicker } from "@/components/settings/color-preset-picker"
 import { SettingsSection, SettingsRow } from "@/components/settings/settings-section"
+import { FilterChip, FilterChipGroup } from "@/components/ui/filter-chip"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useI18n } from "@/contexts/i18n-context"
 import { SavedIndicator } from "@/features/settings/saved-indicator"
@@ -29,16 +31,6 @@ const THEME_MODES = [
 
 type ThemeMode = (typeof THEME_MODES)[number]["value"]
 
-function Swatch({ preset }: { preset: ColorPreset }) {
-    return (
-        <span
-            aria-hidden
-            className="size-3.5 shrink-0 rounded-full border-2 border-outline"
-            style={{ backgroundColor: preset.swatch }}
-        />
-    )
-}
-
 /**
  * Settings → Appearance. The panel already shows "Appearance" as its heading, so the cards are
  * named by what they hold (colour, text) instead of repeating it.
@@ -61,7 +53,7 @@ export function AppearanceSettings() {
     const mode: ThemeMode = THEME_MODES.some((m) => m.value === theme) ? (theme as ThemeMode) : "light"
     const presetName = (p: ColorPreset) => t(`settings.general.theme.themes.${p.key}`)
 
-    const handleModeChange = (value: string) => {
+    const handleModeChange = (value: ThemeMode) => {
         setTheme(value)
         flashColor()
     }
@@ -88,70 +80,51 @@ export function AppearanceSettings() {
         flashText()
     }
 
-    const ModeIcon = THEME_MODES.find((m) => m.value === mode)!.Icon
-
     return (
         <div className="space-y-8">
-            <SettingsSection title={t("settings.general.theme.colorSection")} action={<SavedIndicator show={colorSaved} />}>
+            <SettingsSection
+                title={t("settings.general.theme.colorSection")}
+                icon={Palette}
+                tone="lilac"
+                action={<SavedIndicator show={colorSaved} />}
+            >
                 <SettingsRow
+                    stacked
                     label={t("settings.general.theme.mode")}
                     description={t("settings.general.theme.modeDescription")}
                 >
-                    <Select value={mode} onValueChange={handleModeChange}>
-                        <SelectTrigger>
-                            <SelectValue placeholder={t("settings.general.theme.selectModePlaceholder")}>
-                                <span className="flex items-center gap-2">
-                                    <ModeIcon size={16} weight="bold" aria-hidden />
-                                    {t(`settings.general.theme.${mode}`)}
-                                </span>
-                            </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                            {THEME_MODES.map(({ value, Icon }) => (
-                                <SelectItem key={value} value={value}>
-                                    <span className="flex items-center gap-2">
-                                        <Icon size={16} weight="bold" aria-hidden />
-                                        {t(`settings.general.theme.${value}`)}
-                                    </span>
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                    <FilterChipGroup label={t("settings.general.theme.mode")} className="flex-wrap">
+                        {THEME_MODES.map(({ value, Icon }) => (
+                            <FilterChip key={value} active={mode === value} onClick={() => handleModeChange(value)}>
+                                <Icon size={16} weight="bold" aria-hidden />
+                                {t(`settings.general.theme.${value}`)}
+                            </FilterChip>
+                        ))}
+                    </FilterChipGroup>
                 </SettingsRow>
 
                 <SettingsRow
+                    stacked
                     label={t("settings.general.theme.colorTheme")}
                     description={t("settings.general.theme.colorThemeDescription")}
                 >
-                    <Select value={preset.key} onValueChange={handlePresetChange}>
-                        <SelectTrigger>
-                            <SelectValue placeholder={t("settings.general.theme.selectColorPlaceholder")}>
-                                <span className="flex items-center gap-2">
-                                    <Swatch preset={preset} />
-                                    {presetName(preset)}
-                                </span>
-                            </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                            {allColorPresets.map((p) => (
-                                <SelectItem key={p.key} value={p.key} className="py-2">
-                                    <span className="flex items-center gap-2.5">
-                                        <Swatch preset={p} />
-                                        <span className="flex flex-col">
-                                            <span>{presetName(p)}</span>
-                                            <span className="text-xs text-ink-muted">
-                                                {t(`settings.general.theme.themeDescriptions.${p.key}`)}
-                                            </span>
-                                        </span>
-                                    </span>
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                    <ColorPresetPicker
+                        presets={allColorPresets}
+                        value={preset.key}
+                        onChange={handlePresetChange}
+                        label={t("settings.general.theme.colorTheme")}
+                        nameOf={presetName}
+                        descriptionOf={(p) => t(`settings.general.theme.themeDescriptions.${p.key}`)}
+                    />
                 </SettingsRow>
             </SettingsSection>
 
-            <SettingsSection title={t("settings.general.theme.textSection")} action={<SavedIndicator show={textSaved} />}>
+            <SettingsSection
+                title={t("settings.general.theme.textSection")}
+                icon={TextAa}
+                tone="sky"
+                action={<SavedIndicator show={textSaved} />}
+            >
                 <SettingsRow
                     label={t("settings.general.theme.fontFamily")}
                     description={t("settings.general.theme.fontDescription")}
@@ -166,7 +139,7 @@ export function AppearanceSettings() {
                                     <span className="flex w-full items-center justify-between gap-2">
                                         {f.name}
                                         {i === 0 && (
-                                            <span className="rounded-full bg-surface-raised px-2 py-0.5 text-[0.6875rem] text-ink-secondary">
+                                            <span className="rounded-full border-2 border-outline bg-brand-soft px-2 py-0.5 text-[0.6875rem] font-bold text-brand-ink">
                                                 {t("settings.general.theme.themes.recommended")}
                                             </span>
                                         )}
