@@ -183,14 +183,18 @@ export function BackgroundRenderer() {
   };
 
   let style: React.CSSProperties;
+  // The default scene ("Giấy kem") carries the paper doodle (globals.css .paper-bg).
+  let className: string | undefined;
 
   switch (background.type) {
     case 'solid':
       // The default scene follows the timer mode (see --stage-tint in globals.css).
-      style =
-        background.value === 'var(--surface-page)'
-          ? { ...base, backgroundColor: 'var(--stage-tint)', transition: 'opacity 800ms ease, background-color 700ms ease' }
-          : { ...base, backgroundColor: background.value };
+      if (background.value === 'var(--surface-page)') {
+        style = { ...base, backgroundColor: 'var(--stage-tint)', transition: 'opacity 800ms ease, background-color 700ms ease' };
+        className = 'paper-bg';
+      } else {
+        style = { ...base, backgroundColor: background.value };
+      }
       break;
     case 'gradient':
       style = { ...base, background: background.value };
@@ -201,5 +205,5 @@ export function BackgroundRenderer() {
       break;
   }
 
-  return <div style={style} />;
+  return <div className={className} style={style} />;
 }

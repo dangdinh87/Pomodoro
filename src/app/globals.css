@@ -1,9 +1,11 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+/* Dark mode is set by next-themes on <html data-theme="dark">. Subtrees that still carry a
+   hard-coded data-theme="dark" (legacy "always dark stage") follow the user's theme instead. */
+@custom-variant dark (&:where(:root[data-theme="dark"], :root[data-theme="dark"] *));
 
-/* Design tokens live as plain CSS variables further down (:root + [data-theme='dark']).
+/* Design tokens live as plain CSS variables further down (:root + :root[data-theme='dark']).
    `inline` makes utilities reference those variables directly, so a runtime colour
    preset (src/config/themes.ts) re-skins every utility, and opacity modifiers
    (bg-brand/10) still work through Tailwind's own color-mix. */
@@ -11,7 +13,6 @@
   --font-heading: var(--font-heading);
   --font-body: var(--font-body);
   --font-mono: var(--font-mono);
-  --font-space-grotesk: var(--font-heading);
 
   /* shadcn/ui names */
   --color-border: var(--border);
@@ -21,11 +22,11 @@
   --color-background: var(--surface-page);
   --color-foreground: var(--ink);
   --color-primary: var(--accent-solid);
-  --color-primary-foreground: #fff;
+  --color-primary-foreground: var(--on-accent);
   --color-secondary: var(--surface-raised);
   --color-secondary-foreground: var(--ink);
-  --color-destructive: var(--rose-solid);
-  --color-destructive-foreground: #fff;
+  --color-destructive: var(--danger);
+  --color-destructive-foreground: var(--on-accent);
   --color-muted: var(--surface-raised);
   --color-muted-foreground: var(--ink-muted);
   --color-accent: var(--surface-hover);
@@ -51,30 +52,51 @@
   --color-brand-solid: var(--accent-solid);
   --color-brand-edge: var(--accent-edge);
 
-  /* Semantic tones — pick by meaning, never for decoration (docs/design-system.md §4.2) */
-  --color-success: var(--green-solid);
-  --color-success-bg: var(--green-bg);
-  --color-success-ink: var(--green-ink);
-  --color-warning: var(--amber-solid);
-  --color-warning-bg: var(--amber-bg);
-  --color-warning-ink: var(--amber-ink);
-  --color-danger: var(--rose-solid);
-  --color-danger-bg: var(--rose-bg);
-  --color-danger-ink: var(--rose-ink);
-  --color-info: var(--blue-solid);
-  --color-info-bg: var(--blue-bg);
-  --color-info-ink: var(--blue-ink);
-  --color-ai: var(--purple-solid);
-  --color-ai-bg: var(--purple-bg);
-  --color-ai-ink: var(--purple-ink);
+  /* Sticker pop (docs/superpowers/specs/2026-10-05-sticker-pop-rebrand-design.md §3):
+     outline = sticker border/shadow colour, on-accent = text/icon on every solid colour. */
+  --color-outline: var(--outline);
+  --color-on-accent: var(--on-accent);
+
+  /* Candy colours: identity + decoration only, never for status. Always paired with on-accent. */
+  --color-candy-tomato: var(--candy-tomato);
+  --color-candy-mint: var(--candy-mint);
+  --color-candy-butter: var(--candy-butter);
+  --color-candy-lilac: var(--candy-lilac);
+  --color-candy-sky: var(--candy-sky);
+  --color-candy-peach: var(--candy-peach);
+
+  /* Semantic tones — pick by meaning, never for decoration.
+     DEFAULT is a solid fill (text on it is on-accent); -ink is the text colour on -bg or the page. */
+  --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
+  --color-success-ink: var(--success-ink);
+  --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-ink: var(--warning-ink);
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+  --color-danger-ink: var(--danger-ink);
+  --color-info: var(--info);
+  --color-info-bg: var(--info-bg);
+  --color-info-ink: var(--info-ink);
+  --color-ai: var(--ai);
+  --color-ai-bg: var(--ai-bg);
+  --color-ai-ink: var(--ai-ink);
   --color-gold: var(--gold);
   --color-timer: var(--timer-foreground);
 
-  /* `rounded` / `rounded-md` = inputs, chips (8px); `rounded-lg` = cards (12px) */
+  /* `rounded` / `rounded-md` = inputs, buttons, rows (12px); `rounded-lg` = cards, popovers (20px);
+     `rounded-xl` = modals, the timer card (28px) */
   --radius: var(--radius);
-  --radius-sm: 4px;
+  --radius-sm: 8px;
   --radius-md: var(--radius);
   --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  /* Hard offset shadows: shadow-sticker-sm | shadow-sticker | shadow-sticker-lg */
+  --shadow-sticker-sm: var(--shadow-sticker-sm);
+  --shadow-sticker: var(--shadow-sticker);
+  --shadow-sticker-lg: var(--shadow-sticker-lg);
 
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
@@ -136,169 +158,216 @@
   }
 }
 
-/* ═══ Button — docs/design-system.md §7.1. Primary/secondary/danger carry a 3D bottom edge. ═══ */
+/* ═══ Sticker pop — buttons and surfaces (spec §3.3, §5) ═══
+   Everything raised is a sticker: outline + hard offset shadow. Pressing sinks the element by the
+   shadow depth (--sticker-offset) so it looks pushed flat; hover lifts it 1px. All values read tokens,
+   so dark mode and colour presets re-skin them. */
 @layer components {
   .btn {
-    --btn-edge: 3px;
-    --btn-press-dist: 2px;
+    --sticker-offset: 4px;
     position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 7px;
-    border: 1px solid transparent;
-    border-radius: 10px;
-    font-family: var(--font-body);
-    font-weight: 650;
+    gap: 8px;
+    border: var(--outline-w) solid var(--outline);
+    border-radius: var(--radius);
+    box-shadow: var(--sticker-offset) var(--sticker-offset) 0 var(--outline);
+    font-family: var(--font-heading);
+    font-weight: 700;
     line-height: 1;
     white-space: nowrap;
     text-decoration: none;
     cursor: pointer;
     user-select: none;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.1s ease, transform 0.1s ease, filter 0.15s ease;
+    transition: transform 0.08s ease, box-shadow 0.08s ease, background-color 0.15s ease, color 0.15s ease;
   }
-  .btn:focus-visible { outline: 2px solid var(--accent-solid); outline-offset: 2px; }
-  /* !important: the dark primary rule below is more specific and would bring the 3D edge back on a disabled button */
-  .btn:disabled { cursor: not-allowed; pointer-events: none; box-shadow: none !important; transform: none !important; }
+  .btn:hover:not(:disabled) {
+    transform: translate(-1px, -1px);
+    box-shadow: calc(var(--sticker-offset) + 1px) calc(var(--sticker-offset) + 1px) 0 var(--outline);
+  }
+  .btn:active:not(:disabled) {
+    transform: translate(var(--sticker-offset), var(--sticker-offset));
+    box-shadow: 0 0 0 var(--outline);
+  }
+  .btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  .btn:disabled { cursor: not-allowed; pointer-events: none; opacity: 0.5; box-shadow: none; transform: none; }
   .btn svg { flex-shrink: 0; pointer-events: none; }
 
-  .btn--sm { --btn-edge: 2px; --btn-press-dist: 1.5px; height: 32px; padding: 0 12px; font-size: 0.8125rem; font-weight: 600; border-radius: 8px; }
-  .btn--md { height: 38px; padding: 0 16px; font-size: 0.875rem; font-weight: 650; border-radius: 10px; }
-  .btn--lg { height: 44px; padding: 0 20px; font-size: 0.9375rem; font-weight: 700; border-radius: 11px; }
-  .btn--icon { --btn-edge: 2px; --btn-press-dist: 1.5px; height: 36px; width: 36px; padding: 0; border-radius: 10px; }
+  /* Heights: sm 34 · md 42 · lg 50 · icon 40 (spec §5) */
+  .btn--sm { --sticker-offset: 3px; height: 34px; padding: 0 14px; font-size: 0.875rem; }
+  .btn--md { height: 42px; padding: 0 18px; font-size: 1rem; }
+  .btn--lg { height: 50px; padding: 0 24px; font-size: 1.125rem; }
+  .btn--icon { --sticker-offset: 3px; height: 40px; width: 40px; padding: 0; }
 
-  .btn--primary {
-    background: var(--accent-solid); color: #fff; border-color: rgba(255, 255, 255, 0.16);
-    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.25), 0 var(--btn-edge) 0 0 var(--accent-edge);
-  }
-  [data-theme='dark'] .btn--primary {
-    border-color: rgba(255, 255, 255, 0.15);
-    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.22), 0 var(--btn-edge) 0 0 var(--accent-edge);
-  }
-  .btn--primary:hover:not(:disabled) { background: var(--accent-solid-hover); filter: brightness(1.04); }
-  [data-theme='dark'] .btn--primary:hover:not(:disabled) { filter: brightness(1.08); }
-  .btn--primary:active:not(:disabled) {
-    transform: translateY(var(--btn-press-dist));
-    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.2), 0 calc(var(--btn-edge) - var(--btn-press-dist)) 0 0 var(--accent-edge);
-  }
-  .btn--primary:disabled { background: color-mix(in srgb, var(--accent-solid) 35%, var(--surface-raised)); color: rgba(255, 255, 255, 0.5); border-color: transparent; }
-  [data-theme='dark'] .btn--primary:disabled { background: color-mix(in srgb, var(--accent-solid) 24%, var(--surface)); color: rgba(255, 255, 255, 0.45); border-color: rgba(255, 255, 255, 0.06); }
+  .btn--primary { background: var(--accent-solid); color: var(--on-accent); }
+  .btn--primary:hover:not(:disabled) { background: var(--accent-solid-hover); }
 
-  .btn--secondary {
-    background: var(--surface); color: var(--ink); border-color: var(--border-strong);
-    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7), 0 var(--btn-edge) 0 0 var(--border-strong);
-  }
-  [data-theme='dark'] .btn--secondary {
-    background: #1e222b; color: #fff; border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06), 0 var(--btn-edge) 0 0 #0f1218;
-  }
-  .btn--secondary:hover:not(:disabled) { background: var(--surface-hover); color: var(--ink); }
-  [data-theme='dark'] .btn--secondary:hover:not(:disabled) { background: #252b37; color: #fff; border-color: rgba(255, 255, 255, 0.14); }
-  .btn--secondary:active:not(:disabled) { transform: translateY(var(--btn-press-dist)); }
-  .btn--secondary:disabled { color: var(--ink-faint); border-color: var(--border); opacity: 0.55; }
+  .btn--secondary { background: var(--surface); color: var(--ink); }
+  .btn--secondary:hover:not(:disabled) { background: var(--surface-hover); }
 
-  .btn--ghost { background: transparent; color: var(--ink-secondary); font-weight: 600; box-shadow: none; }
-  .btn--ghost:hover:not(:disabled) { background: var(--surface-hover); color: var(--ink); }
-  .btn--ghost:active:not(:disabled) { transform: scale(0.98); }
-  .btn--ghost:disabled { color: var(--ink-faint); opacity: 0.45; }
+  /* "fun": butter yellow, for playful secondary actions */
+  .btn--fun { background: var(--candy-butter); color: var(--on-accent); }
+  .btn--fun:hover:not(:disabled) { background: color-mix(in srgb, var(--candy-butter) 82%, white); }
 
-  .btn--link { height: auto; padding: 0; gap: 6px; background: transparent; color: var(--ink-secondary); font-weight: 500; box-shadow: none; border-radius: 0; }
-  .btn--link:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
+  .btn--danger { background: var(--danger); color: var(--on-accent); }
+  .btn--danger:hover:not(:disabled) { background: color-mix(in srgb, var(--danger) 82%, white); }
 
-  .btn--danger {
-    background: var(--rose-solid); color: #fff; border-color: rgba(255, 255, 255, 0.16);
-    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.25), 0 var(--btn-edge) 0 0 #9f1239;
+  /* Ghost and link are flat: no outline, no shadow, no sinking */
+  .btn--ghost,
+  .btn--link { border-color: transparent; box-shadow: none; background: transparent; }
+  .btn--ghost { color: var(--ink-secondary); }
+  .btn--ghost:hover:not(:disabled) { background: var(--surface-hover); color: var(--ink); transform: none; box-shadow: none; }
+  .btn--ghost:active:not(:disabled) { transform: scale(0.97); box-shadow: none; }
+
+  .btn--link { height: auto; padding: 0; gap: 6px; color: var(--ink-secondary); font-family: var(--font-body); font-weight: 600; border-radius: 0; }
+  .btn--link:hover:not(:disabled) { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; transform: none; box-shadow: none; }
+  .btn--link:active:not(:disabled) { transform: none; }
+
+  /* ── Sticker surfaces: .sticker (cards, popovers) · -sm (chips, inputs) · -lg (modals, timer card) ── */
+  .sticker,
+  .sticker-sm,
+  .sticker-lg {
+    background: var(--surface);
+    color: var(--ink);
+    border: var(--outline-w) solid var(--outline);
   }
-  [data-theme='dark'] .btn--danger { box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.22), 0 var(--btn-edge) 0 0 #881337; }
-  .btn--danger:hover:not(:disabled) { filter: brightness(1.08); }
-  .btn--danger:active:not(:disabled) { transform: translateY(var(--btn-press-dist)); }
-  .btn--danger:disabled { background: color-mix(in srgb, var(--rose-solid) 35%, var(--surface-raised)); color: rgba(255, 255, 255, 0.5); border-color: transparent; }
+  .sticker { --sticker-offset: 4px; border-radius: var(--radius-lg); box-shadow: var(--shadow-sticker); }
+  .sticker-sm { --sticker-offset: 2px; border-radius: var(--radius); box-shadow: var(--shadow-sticker-sm); }
+  .sticker-lg { --sticker-offset: 6px; border-radius: var(--radius-xl); box-shadow: var(--shadow-sticker-lg); }
+
+  /* Add to any .sticker*: hover lifts 1px, press sinks by the shadow depth */
+  .sticker-press {
+    cursor: pointer;
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+  }
+  .sticker-press:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: calc(var(--sticker-offset, 4px) + 1px) calc(var(--sticker-offset, 4px) + 1px) 0 var(--outline);
+  }
+  .sticker-press:active {
+    transform: translate(var(--sticker-offset, 4px), var(--sticker-offset, 4px));
+    box-shadow: 0 0 0 var(--outline);
+  }
+
+  /* Playful tilt for decorative stickers, toasts and landing cards only (never forms, lists, tables).
+     Uses the individual `rotate` property so it composes with the press translate. */
+  .tilt-l { rotate: -1deg; }
+  .tilt-r { rotate: 1deg; }
+
+  /* Doodle layer for the default scene (background-renderer) and any element that should look like the page paper */
+  .paper-bg {
+    background-image: var(--doodle);
+    background-size: var(--doodle-size) var(--doodle-size);
+  }
 }
 
 /*
- * Design tokens — see docs/design-system.md.
- * Only the PRIMARY block changes per brand / colour preset; everything else is shared.
+ * Design tokens — Sticker pop (docs/superpowers/specs/2026-10-05-sticker-pop-rebrand-design.md §3).
+ * Light is the default; dark is opt-in via next-themes (<html data-theme="dark">).
+ * Only the PRIMARY block changes per colour preset; everything else is shared.
  * Colour presets (src/config/themes.ts) re-declare just the PRIMARY block at runtime.
  */
 @layer base {
   :root {
     /* ═══ PRIMARY — Tomato (default preset) ═══ */
-    --accent: #D93A16;
-    --accent-hover: #B42E10;
-    --accent-soft: #FFE2D8;
-    --accent-ink: #8F2711;
-    --accent-solid: #D93A16;
-    --accent-solid-hover: #B42E10;
-    --accent-edge: #B42E10;
+    --accent: #C2330F;              /* text, links, focus ring (>= 4.5:1 on --surface-page) */
+    --accent-hover: #9E290B;
+    --accent-soft: #FFD9CC;
+    --accent-ink: #8F2711;          /* text on --accent-soft */
+    --accent-solid: #FF5A36;        /* solid fill; text on it is --on-accent */
+    --accent-solid-hover: #FF7050;
+    --accent-edge: var(--outline);  /* kept so old call sites do not break */
 
-    --font-heading: var(--font-space-grotesk, 'Space Grotesk'), system-ui, sans-serif;
-    --font-body: var(--font-be-vietnam-pro, 'Be Vietnam Pro'), system-ui, sans-serif;
+    /* Fonts: set in src/app/layout.tsx (next/font) and consumed here. Japanese falls back to system rounded Gothic. */
+    --font-heading: var(--font-baloo-2, 'Baloo 2'), 'Hiragino Maru Gothic ProN', 'Yu Gothic', Meiryo, system-ui, sans-serif;
+    --font-body: var(--font-nunito, 'Nunito'), 'Hiragino Maru Gothic ProN', 'Yu Gothic', Meiryo, system-ui, sans-serif;
     --font-mono: var(--font-jetbrains-mono, 'JetBrains Mono'), 'Fira Code', monospace;
 
-    --ink: #00060C;
-    --ink-secondary: #38414A;
-    --ink-muted: #647380;
-    --ink-faint: #8A95A0;
+    --ink: #2A1A14;                 /* main text, also the sticker outline */
+    --ink-secondary: #5A4038;
+    --ink-muted: #7A6158;           /* >= 4.5:1 on --surface-page */
+    --ink-faint: #A48E83;           /* disabled / decorative only, never text people must read */
 
-    --surface: #FFFFFF;
-    --surface-page: #F9FAFB;
-    --surface-raised: #F2F4F5;
-    --surface-hover: #E7EBEE;
+    --surface-page: #FFF3E0;        /* cream paper (doodle pattern: --doodle) */
+    --surface: #FFFCF6;             /* cards, popovers, modals */
+    --surface-raised: #FCEBD2;      /* nested cells, tracks */
+    --surface-hover: #FFE6C2;
 
-    --border: #DADEE2;
-    --border-strong: #B2BBC2;
+    --border: #EAD6BF;              /* thin inner dividers */
+    --border-strong: var(--outline);
+    --outline: #2A1A14;             /* sticker border and hard shadow colour */
+    --on-accent: #2A1A14;           /* text / icon on every solid colour */
 
-    --blue-bg: #D4E6FF;   --blue-ink: #2142AB;
-    --green-bg: #CEEDDD;  --green-ink: #005940;
-    --purple-bg: #E6E0FD; --purple-ink: #5834A4;
-    --amber-bg: #F7E59F;  --amber-ink: #823500;
-    --rose-bg: #FEDBDD;   --rose-ink: #990534;
-    --cyan-bg: #C7EDF0;   --cyan-ink: #00546A;
+    /* Candy colours — identity and decoration, always with --on-accent text, never for status */
+    --candy-tomato: #FF5A36;
+    --candy-mint: #7BDCB5;
+    --candy-butter: #FFD45C;
+    --candy-lilac: #C9B6FF;
+    --candy-sky: #7CC8FF;
+    --candy-peach: #FFB38A;
 
+    /* Semantic tones — DEFAULT = solid fill (on-accent text), -bg = soft panel, -ink = text on -bg / the page */
+    --success: #7BDCB5; --success-bg: #DDF6EA; --success-ink: #13603F;
+    --warning: #FFD45C; --warning-bg: #FFF2C7; --warning-ink: #7A5200;
+    --danger: #FF8A75;  --danger-bg: #FFE1DA;  --danger-ink: #9B2410;
+    --info: #7CC8FF;    --info-bg: #DDEFFF;    --info-ink: #0F4C81;
+    --ai: #C9B6FF;      --ai-bg: #EEE7FF;      --ai-ink: #4B2C9E;
+    --gold: #FFB800;    /* streak, trophies (with --outline) */
+
+    /* Game / chart palette (white text on top) — mini games keep their own colours, not part of the rebrand */
     --blue-solid: #1D4ED8; --green-solid: #047857; --purple-solid: #6D28D9;
     --amber-solid: #B45309; --rose-solid: #BE123C; --pink-solid: #DB2777; --cyan-solid: #0E7490;
     --amber-meter: #D9A300;
-    --gold: #E08A00;
 
-    --radius: 8px;
-    --radius-lg: 12px;
+    /* Sticker geometry */
+    --outline-w: 2.5px;             /* 2px for elements <= 32px tall */
+    --shadow-sticker-sm: 2px 2px 0 var(--outline);
+    --shadow-sticker: 4px 4px 0 var(--outline);
+    --shadow-sticker-lg: 6px 6px 0 var(--outline);
+    --radius: 12px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
 
     --timer-foreground: var(--accent);
+
+    /* Paper doodle (tiny tomatoes, stars, dots, squiggles): ~6% ink on cream. Tiled by body and the default scene (.paper-bg). */
+    --doodle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Cg opacity='0.1'%3E%3Cg transform='translate(34 44)'%3E%3Ccircle cx='0' cy='1' r='7' fill='%23FF5A36'/%3E%3Cpath d='M-4 -4 L0 -9 L4 -4 L1 -5 L0 -3 L-1 -5Z' fill='%23FF5A36'/%3E%3C/g%3E%3Cg transform='translate(176 152)'%3E%3Ccircle cx='0' cy='1' r='7' fill='%23FF5A36'/%3E%3Cpath d='M-4 -4 L0 -9 L4 -4 L1 -5 L0 -3 L-1 -5Z' fill='%23FF5A36'/%3E%3C/g%3E%3Cg transform='translate(98 208)'%3E%3Ccircle cx='0' cy='1' r='7' fill='%23FF5A36'/%3E%3Cpath d='M-4 -4 L0 -9 L4 -4 L1 -5 L0 -3 L-1 -5Z' fill='%23FF5A36'/%3E%3C/g%3E%3C/g%3E%3Cg opacity='0.06'%3E%3Cpath transform='translate(122 36) scale(1)' d='M0 -7 Q1.5 -1.5 7 0 Q1.5 1.5 0 7 Q-1.5 1.5 -7 0 Q-1.5 -1.5 0 -7Z' fill='%232A1A14'/%3E%3Cpath transform='translate(36 152) scale(0.8)' d='M0 -7 Q1.5 -1.5 7 0 Q1.5 1.5 0 7 Q-1.5 1.5 -7 0 Q-1.5 -1.5 0 -7Z' fill='%232A1A14'/%3E%3Cpath transform='translate(206 62) scale(0.9)' d='M0 -7 Q1.5 -1.5 7 0 Q1.5 1.5 0 7 Q-1.5 1.5 -7 0 Q-1.5 -1.5 0 -7Z' fill='%232A1A14'/%3E%3Cpath transform='translate(222 214) scale(0.7)' d='M0 -7 Q1.5 -1.5 7 0 Q1.5 1.5 0 7 Q-1.5 1.5 -7 0 Q-1.5 -1.5 0 -7Z' fill='%232A1A14'/%3E%3Ccircle cx='78' cy='100' r='2.5' fill='%232A1A14'/%3E%3Ccircle cx='150' cy='98' r='2' fill='%232A1A14'/%3E%3Ccircle cx='204' cy='122' r='2.5' fill='%232A1A14'/%3E%3Ccircle cx='14' cy='214' r='2' fill='%232A1A14'/%3E%3Ccircle cx='132' cy='176' r='2.5' fill='%232A1A14'/%3E%3Ccircle cx='62' cy='24' r='2' fill='%232A1A14'/%3E%3Ccircle cx='236' cy='16' r='2' fill='%232A1A14'/%3E%3Cpath transform='translate(84 62) rotate(-12)' d='M0 0 q4 -6 8 0 t8 0 t8 0' fill='none' stroke='%232A1A14' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath transform='translate(160 206) rotate(8)' d='M0 0 q4 -6 8 0 t8 0 t8 0' fill='none' stroke='%232A1A14' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath transform='translate(14 100) rotate(-6)' d='M0 0 q4 -6 8 0 t8 0 t8 0' fill='none' stroke='%232A1A14' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath transform='translate(176 22) rotate(10)' d='M0 0 q4 -6 8 0 t8 0 t8 0' fill='none' stroke='%232A1A14' stroke-width='2.2' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E");
+    --doodle-size: 240px;
   }
 
-  [data-theme='dark'] {
-    --accent: #F0532D;
-    --accent-hover: #FB7350;
-    --accent-soft: color-mix(in srgb, #F0532D 30%, #18181b);
-    --accent-ink: #FF9C7D;
-    --accent-solid: #D93A16;
-    --accent-solid-hover: #B42E10;
-    --accent-edge: #A12B10;
+  :root[data-theme='dark'] {
+    --accent: #FF8A6B;
+    --accent-hover: #FFA38A;
+    --accent-soft: #5C2E22;
+    --accent-ink: #FFB09C;
+    /* --accent-solid (+hover) and the candy colours stay as in light mode; text on them is still --on-accent */
 
-    --ink: #fafafa;
-    --ink-secondary: #d4d4d8;
-    --ink-muted: #a1a1aa;
-    --ink-faint: #71717a;
+    --ink: #FFF3E0;
+    --ink-secondary: #E8D5C0;
+    --ink-muted: #C2AA96;
+    --ink-faint: #8A7465;
 
-    --surface: #18181b;
-    --surface-page: #0a0a0b;
-    --surface-raised: #27272a;
-    --surface-hover: #3f3f46;
+    --surface-page: #1A120F;
+    --surface: #2E221C;             /* cards are lighter than the page so the black outline reads */
+    --surface-raised: #3A2C24;
+    --surface-hover: #45352B;
 
-    --border: #27272a;
-    --border-strong: #3f3f46;
+    --border: #4A392E;
+    --outline: #0B0705;
 
-    --blue-bg: #192f4c;   --blue-ink: #a3ceff;
-    --green-bg: #003829;  --green-ink: #79e0b6;
-    --purple-bg: #342647; --purple-ink: #ccbfff;
-    --amber-bg: #4b2008;  --amber-ink: #e9c551;
-    --rose-bg: #482026;   --rose-ink: #ffb4bc;
-    --cyan-bg: #003346;   --cyan-ink: #5added;
+    --success-bg: #1F3A2D; --success-ink: #8FE6C2;
+    --warning-bg: #40330F; --warning-ink: #FFD45C;
+    --danger-bg: #4A211A;  --danger-ink: #FFA591;
+    --info-bg: #1B3347;    --info-ink: #8AD0FF;
+    --ai-bg: #33284F;      --ai-ink: #D4C6FF;
 
     --blue-solid: #2563EB; --green-solid: #059669; --purple-solid: #7C3AED;
     --amber-solid: #D97706; --rose-solid: #E11D48; --pink-solid: #EC4899; --cyan-solid: #0891B2;
     --amber-meter: #FBBF24;
-    --gold: #FBBF24;
+
+    /* Chocolate paper: cream doodle at ~5% */
+    --doodle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Cg opacity='0.07'%3E%3Cg transform='translate(34 44)'%3E%3Ccircle cx='0' cy='1' r='7' fill='%23FF8A6B'/%3E%3Cpath d='M-4 -4 L0 -9 L4 -4 L1 -5 L0 -3 L-1 -5Z' fill='%23FF8A6B'/%3E%3C/g%3E%3Cg transform='translate(176 152)'%3E%3Ccircle cx='0' cy='1' r='7' fill='%23FF8A6B'/%3E%3Cpath d='M-4 -4 L0 -9 L4 -4 L1 -5 L0 -3 L-1 -5Z' fill='%23FF8A6B'/%3E%3C/g%3E%3Cg transform='translate(98 208)'%3E%3Ccircle cx='0' cy='1' r='7' fill='%23FF8A6B'/%3E%3Cpath d='M-4 -4 L0 -9 L4 -4 L1 -5 L0 -3 L-1 -5Z' fill='%23FF8A6B'/%3E%3C/g%3E%3C/g%3E%3Cg opacity='0.05'%3E%3Cpath transform='translate(122 36) scale(1)' d='M0 -7 Q1.5 -1.5 7 0 Q1.5 1.5 0 7 Q-1.5 1.5 -7 0 Q-1.5 -1.5 0 -7Z' fill='%23FFF3E0'/%3E%3Cpath transform='translate(36 152) scale(0.8)' d='M0 -7 Q1.5 -1.5 7 0 Q1.5 1.5 0 7 Q-1.5 1.5 -7 0 Q-1.5 -1.5 0 -7Z' fill='%23FFF3E0'/%3E%3Cpath transform='translate(206 62) scale(0.9)' d='M0 -7 Q1.5 -1.5 7 0 Q1.5 1.5 0 7 Q-1.5 1.5 -7 0 Q-1.5 -1.5 0 -7Z' fill='%23FFF3E0'/%3E%3Cpath transform='translate(222 214) scale(0.7)' d='M0 -7 Q1.5 -1.5 7 0 Q1.5 1.5 0 7 Q-1.5 1.5 -7 0 Q-1.5 -1.5 0 -7Z' fill='%23FFF3E0'/%3E%3Ccircle cx='78' cy='100' r='2.5' fill='%23FFF3E0'/%3E%3Ccircle cx='150' cy='98' r='2' fill='%23FFF3E0'/%3E%3Ccircle cx='204' cy='122' r='2.5' fill='%23FFF3E0'/%3E%3Ccircle cx='14' cy='214' r='2' fill='%23FFF3E0'/%3E%3Ccircle cx='132' cy='176' r='2.5' fill='%23FFF3E0'/%3E%3Ccircle cx='62' cy='24' r='2' fill='%23FFF3E0'/%3E%3Ccircle cx='236' cy='16' r='2' fill='%23FFF3E0'/%3E%3Cpath transform='translate(84 62) rotate(-12)' d='M0 0 q4 -6 8 0 t8 0 t8 0' fill='none' stroke='%23FFF3E0' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath transform='translate(160 206) rotate(8)' d='M0 0 q4 -6 8 0 t8 0 t8 0' fill='none' stroke='%23FFF3E0' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath transform='translate(14 100) rotate(-6)' d='M0 0 q4 -6 8 0 t8 0 t8 0' fill='none' stroke='%23FFF3E0' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath transform='translate(176 22) rotate(10)' d='M0 0 q4 -6 8 0 t8 0 t8 0' fill='none' stroke='%23FFF3E0' stroke-width='2.2' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E");
   }
 }
 
@@ -312,14 +381,18 @@
   body {
     font-family: var(--font-body);
     color: var(--ink);
-    background: var(--surface-page);
+    /* "Giấy kem": --surface-page (tinted by timer mode through --stage-tint) + tiled doodle */
+    background-color: var(--stage-tint);
+    background-image: var(--doodle);
+    background-size: var(--doodle-size) var(--doodle-size);
+    transition: background-color 0.7s ease;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
   }
   h1, h2, h3, h4 {
     font-family: var(--font-heading);
-    letter-spacing: -0.02em;
-    line-height: 1.1;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
   }
   ::selection {
     background: color-mix(in srgb, var(--accent) 22%, transparent);
@@ -345,10 +418,10 @@
 }
 
 @layer utilities {
-  /* macOS-like scrollbar with dark mode improvements */
+  /* macOS-like scrollbar; colours derive from --ink so they follow the theme */
   * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+    scrollbar-color: color-mix(in srgb, var(--ink) 28%, transparent) transparent;
   }
   ::-webkit-scrollbar {
     width: 8px;
@@ -358,20 +431,14 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: color-mix(in srgb, var(--ink) 28%, transparent);
     border-radius: 9999px;
     border: 2px solid transparent;
     background-clip: padding-box;
     transition: background-color 0.2s ease;
   }
-  [data-theme='dark'] ::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.3);
-  }
   ::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(0, 0, 0, 0.4);
-  }
-  [data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: color-mix(in srgb, var(--ink) 48%, transparent);
   }
 
   /* Smooth color transition for clock state changes */
@@ -414,31 +481,19 @@
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.25);
+    background-color: color-mix(in srgb, var(--ink) 32%, transparent);
     border-radius: 10px;
     transition: background-color 0.2s ease;
   }
 
-  [data-theme='dark'] .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.35);
-  }
-
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(0, 0, 0, 0.4);
-  }
-
-  [data-theme='dark'] .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(255, 255, 255, 0.4);
+    background-color: color-mix(in srgb, var(--ink) 50%, transparent);
   }
 
   /* Firefox scrollbar */
   .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
-  }
-
-  [data-theme='dark'] .custom-scrollbar {
-    scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+    scrollbar-color: color-mix(in srgb, var(--ink) 32%, transparent) transparent;
   }
 
   /* Safe area utilities for notched devices (iOS, Android) */
@@ -474,9 +529,8 @@ html[data-chrome-idle='true'] body {
 
 /*
  * Pomodoro mode colours: focus = tomato (the brand, or the chosen colour preset), short
- * break = teal, long break = blue. The stage re-points the accent so the mode chip,
- * progress line and primary button all read the current mode. The stage is always dark,
- * so only dark-mode steps are needed. Specificity (0,2,0) beats colour presets.
+ * break = mint, long break = sky. The stage re-points the accent so the mode chip,
+ * progress bar and primary button all read the current mode. Specificity beats colour presets.
  */
 /* Re-resolved on the stage: a custom property inherits the value computed at :root,
    which would pin the clock to the focus colour. */
@@ -484,34 +538,59 @@ html[data-chrome-idle='true'] body {
   --timer-foreground: var(--accent);
 }
 [data-timer][data-mode='shortBreak'] {
-  --accent: #2DD4BF;
-  --accent-hover: #5EEAD4;
-  --accent-soft: color-mix(in srgb, #14B8A6 30%, #18181b);
-  --accent-ink: #5EEAD4;
-  --accent-solid: #0F766E;
-  --accent-solid-hover: #115E59;
-  --accent-edge: #134E4A;
+  --accent: #1E7A57;
+  --accent-hover: #17634A;
+  --accent-soft: #D2F3E4;
+  --accent-ink: #13603F;
+  --accent-solid: #7BDCB5;
+  --accent-solid-hover: #8FE3C1;
 }
 [data-timer][data-mode='longBreak'] {
-  --accent: #60A5FA;
-  --accent-hover: #93C5FD;
-  --accent-soft: color-mix(in srgb, #3B82F6 30%, #18181b);
-  --accent-ink: #93C5FD;
-  --accent-solid: #2563EB;
-  --accent-solid-hover: #1D4ED8;
-  --accent-edge: #1E3A8A;
+  --accent: #1A5F99;
+  --accent-hover: #144D7D;
+  --accent-soft: #D6ECFF;
+  --accent-ink: #0F4C81;
+  --accent-solid: #7CC8FF;
+  --accent-solid-hover: #94D3FF;
+}
+:root[data-theme='dark'] [data-timer][data-mode='shortBreak'] {
+  --accent: #7BDCB5;
+  --accent-hover: #9BE8C8;
+  --accent-soft: #1F3A2D;
+  --accent-ink: #A6EBCF;
+}
+:root[data-theme='dark'] [data-timer][data-mode='longBreak'] {
+  --accent: #7CC8FF;
+  --accent-hover: #9DD7FF;
+  --accent-soft: #1B3347;
+  --accent-ink: #A9DCFF;
 }
 
-/* Default scene: a deep solid tint of the mode colour (no gradient), cross-faded on mode change.
-   Set on <html> because the scene layer sits outside the stage. */
-html {
-  --stage-tint: color-mix(in srgb, var(--accent-solid) 16%, #0a0a0b);
-}
-html[data-timer-mode='shortBreak'] {
-  --stage-tint: color-mix(in srgb, #0F766E 24%, #0a0a0b);
-}
-html[data-timer-mode='longBreak'] {
-  --stage-tint: color-mix(in srgb, #1D4ED8 20%, #0a0a0b);
+/* Default scene ("Giấy kem"): the page colour with a faint tint of the mode colour, cross-faded
+   on mode change. Set on <html> because the scene layer sits outside the stage.
+   The timer store calls the focus mode 'work'. */
+@layer base {
+  html {
+    --stage-tint: var(--surface-page);
+  }
+  html[data-timer-mode='work'] {
+    --stage-tint: color-mix(in srgb, var(--accent-solid) 4%, var(--surface-page));
+  }
+  html[data-timer-mode='shortBreak'] {
+    --stage-tint: color-mix(in srgb, var(--candy-mint) 22%, var(--surface-page));
+  }
+  html[data-timer-mode='longBreak'] {
+    --stage-tint: color-mix(in srgb, var(--candy-sky) 22%, var(--surface-page));
+  }
+  html[data-theme='dark'][data-timer-mode='work'] {
+    --stage-tint: color-mix(in srgb, var(--accent-solid) 6%, var(--surface-page));
+  }
+  html[data-theme='dark'][data-timer-mode='shortBreak'] {
+    --stage-tint: color-mix(in srgb, var(--candy-mint) 11%, var(--surface-page));
+  }
+  html[data-theme='dark'][data-timer-mode='longBreak'] {
+    --stage-tint: color-mix(in srgb, var(--candy-sky) 11%, var(--surface-page));
+  }
 }
 
 /* Reduced motion: neutralize decorative CSS animations (functional state changes stay).
