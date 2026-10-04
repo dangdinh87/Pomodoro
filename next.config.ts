@@ -58,6 +58,12 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   // PGlite loads its WASM and data files from disk at runtime.
   serverExternalPackages: ['@electric-sql/pglite'],
+  // PGlite is local-only (src/db/index.ts needs DATABASE_URL on Vercel), but the file tracer follows
+  // even a string-literal dynamic import, so its ~10 MB of WASM and data would still ship in every
+  // serverless function. pnpm keeps the real files under node_modules/.pnpm, hence two patterns.
+  outputFileTracingExcludes: {
+    '/*': ['node_modules/@electric-sql/pglite/**', 'node_modules/.pnpm/@electric-sql+pglite@*/**'],
+  },
   // The /dist/ssr barrel re-exports ~1500 icons; without this every page compiles all of them.
   modularizeImports: {
     '@phosphor-icons/react/dist/ssr': {
