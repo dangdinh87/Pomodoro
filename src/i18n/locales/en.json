@@ -86,6 +86,20 @@
       "work_done": "Focus session complete. Time for a break.",
       "break_done": "Break over. Time to focus."
     },
+    "notifications": {
+      "focusDone": {
+        "title": "Focus session done",
+        "body": "Nice work. Time for a break."
+      },
+      "breakDone": {
+        "title": "Break's over",
+        "body": "Ready to focus again?"
+      },
+      "longBreakDone": {
+        "title": "Long break's over",
+        "body": "Ready for the next round?"
+      }
+    },
     "title_prefix": {
       "work": "Focus",
       "shortBreak": "Break",

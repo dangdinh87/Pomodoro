@@ -86,6 +86,20 @@
       "work_done": "Đã xong phiên tập trung. Nghỉ một chút.",
       "break_done": "Hết giờ nghỉ. Đến lúc tập trung."
     },
+    "notifications": {
+      "focusDone": {
+        "title": "Xong phiên tập trung",
+        "body": "Làm tốt lắm! Nghỉ một chút nhé."
+      },
+      "breakDone": {
+        "title": "Hết giờ nghỉ",
+        "body": "Sẵn sàng tập trung lại chưa?"
+      },
+      "longBreakDone": {
+        "title": "Hết giờ nghỉ dài",
+        "body": "Sẵn sàng cho vòng tiếp theo chưa?"
+      }
+    },
     "title_prefix": {
       "work": "Tập trung",
       "shortBreak": "Nghỉ",

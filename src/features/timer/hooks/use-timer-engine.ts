@@ -4,9 +4,11 @@ import { useAuthStore } from '@/stores/auth-store';
 import { useTasksStore } from '@/stores/task-store';
 import { useSessionRecorder } from '@/lib/timer/use-session-recorder';
 import { shouldFlushOnAuthChange } from '@/lib/timer/session-recorder';
-import { playAlarm } from '@/lib/timer/alarm';
+import { playAlarm, preloadAlarm } from '@/lib/timer/alarm';
+import { mayAutoChain } from '@/lib/timer/auto-chain';
 import { claimCompletion, completionKey } from '@/lib/timer/completion-claim';
 import { notifyPhaseComplete } from '@/lib/timer/notifications';
+import { useI18n } from '@/contexts/i18n-context';
 import confetti from 'canvas-confetti';
 
 // Confetti celebration for work session completion
@@ -41,7 +43,14 @@ const fireWorkCompleteConfetti = () => {
   frame();
 };
 
+/** Any of these means somebody is at the screen. */
+const PRESENCE_EVENTS = ['pointerdown', 'pointermove', 'keydown', 'touchstart', 'wheel', 'focus'] as const;
+
 export function useTimerEngine() {
+  const { t } = useI18n();
+  // The loop closures outlive renders; keep the language they notify in current
+  const tRef = useRef(t);
+  tRef.current = t;
   const isRunning = useTimerStore((state) => state.isRunning);
   // Re-arm the interval when only the deadline changes (pause/resume coalesced
   // across tabs, or adopting another tab's state)
@@ -66,6 +75,13 @@ export function useTimerEngine() {
   const timerEndRef = useRef<number | null>(null);
   const prevRemainingRef = useRef(timeLeftRef.current);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  // Fires exactly at the deadline. The interval alone is not enough: hidden tabs
+  // get repeating timers throttled to about once a minute, a late alarm.
+  const deadlineTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Auto-chain guard: did anyone touch the page during the current phase, and
+  // how many finished phases in a row had nobody around.
+  const interactedRef = useRef(true);
+  const idlePhasesRef = useRef(0);
   const totalFocusTimeRef = useRef(useTimerStore.getState().totalFocusTime);
   // BUG-05 FIX: Mutex to prevent concurrent handleLoopComplete calls
   const isCompletingRef = useRef(false);
@@ -78,6 +94,26 @@ export function useTimerEngine() {
       totalFocusTimeRef.current = state.totalFocusTime;
     });
     return () => unsub();
+  }, []);
+
+  // Presence (pointer / key / focus / tab visible) feeds the auto-chain guard;
+  // coming back to the tab also rolls the daily session counter over.
+  useEffect(() => {
+    const present = () => {
+      interactedRef.current = true;
+    };
+    const onVisibility = () => {
+      if (document.visibilityState !== 'visible') return;
+      present();
+      useTimerStore.getState().syncSessionDay();
+    };
+    useTimerStore.getState().syncSessionDay();
+    for (const type of PRESENCE_EVENTS) window.addEventListener(type, present, { passive: true });
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      for (const type of PRESENCE_EVENTS) window.removeEventListener(type, present);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
   }, []);
 
   // BUG-03 FIX: Reset refs when mode changes to prevent stale values
@@ -145,6 +181,10 @@ export function useTimerEngine() {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
+      if (deadlineTimeoutRef.current) {
+        clearTimeout(deadlineTimeoutRef.current);
+        deadlineTimeoutRef.current = null;
+      }
       timerEndRef.current = null;
 
       // Several tabs run this engine on the same persisted state: exactly one
@@ -158,6 +198,9 @@ export function useTimerEngine() {
       setDeadlineAt(null);
       setIsRunning(false);
 
+      // A count carried over from an earlier study day must not decide today's long break
+      useTimerStore.getState().syncSessionDay();
+
       const stale =
         catchUp &&
         state.deadlineAt !== null &&
@@ -165,11 +208,11 @@ export function useTimerEngine() {
 
       const currentMode = state.mode;
       const currentSettings = state.settings;
-      const currentSessionCount = state.sessionCount;
+      const currentSessionCount = useTimerStore.getState().sessionCount;
 
       if (!catchUp) {
         playAlarm();
-        notifyPhaseComplete(currentMode);
+        notifyPhaseComplete(currentMode, tRef.current);
       }
 
       // The unrecorded segment started at `lastSessionTimeLeft` remaining and
@@ -207,8 +250,11 @@ export function useTimerEngine() {
         void record({ taskId: null, durationSec: duration, mode: currentMode, endedAt });
       }
 
-      // Auto-Transition (new phase starts a fresh baseline)
-      const autoStart = !catchUp;
+      // Auto-Transition (new phase starts a fresh baseline). The app only starts
+      // the next phase by itself while somebody is around, and never out of a
+      // long break; otherwise it waits on the start screen.
+      idlePhasesRef.current = interactedRef.current ? 0 : idlePhasesRef.current + 1;
+      const autoStart = !catchUp && mayAutoChain(currentMode, idlePhasesRef.current);
       const next = (
         nextMode: 'work' | 'shortBreak' | 'longBreak',
         minutes: number,
@@ -218,7 +264,11 @@ export function useTimerEngine() {
         const newDuration = minutes * 60;
         setTimeLeft(newDuration);
         useTimerStore.getState().setLastSessionTimeLeft(newDuration);
-        if (shouldStart && autoStart) setIsRunning(true);
+        if (shouldStart && autoStart) {
+          // The phase that starts now has had no visitor yet
+          interactedRef.current = false;
+          setIsRunning(true);
+        }
       };
 
       if (currentMode === 'work') {
@@ -255,6 +305,10 @@ export function useTimerEngine() {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
+      if (deadlineTimeoutRef.current) {
+        clearTimeout(deadlineTimeoutRef.current);
+        deadlineTimeoutRef.current = null;
+      }
       timerEndRef.current = null;
       setDeadlineAt(null);
       return;
@@ -290,10 +344,13 @@ export function useTimerEngine() {
       prevRemainingRef.current = timeLeftRef.current;
     }
 
-    intervalRef.current = setInterval(() => {
-      const now = Date.now();
-      const deadline = timerEndRef.current!;
-      const remainingMs = Math.max(0, deadline - now);
+    // Fetch the bell now so it can sound the instant the deadline hits
+    preloadAlarm();
+
+    const tick = () => {
+      const deadline = timerEndRef.current;
+      if (deadline === null) return; // completed (or paused) in between
+      const remainingMs = Math.max(0, deadline - Date.now());
       const remaining = Math.ceil(remainingMs / 1000);
 
       if (remaining !== timeLeftRef.current) {
@@ -319,12 +376,46 @@ export function useTimerEngine() {
       if (remaining <= 0) {
         handleLoopComplete();
       }
-    }, 250);
+    };
+
+    // One-shot timer aimed at the deadline itself. Idempotent with the interval
+    // and with other tabs: whichever gets there first completes, the rest hit
+    // the isCompleting mutex / the completion claim.
+    const armDeadlineTimeout = () => {
+      if (deadlineTimeoutRef.current) clearTimeout(deadlineTimeoutRef.current);
+      const deadline = timerEndRef.current;
+      if (deadline === null) return;
+      deadlineTimeoutRef.current = setTimeout(
+        () => {
+          deadlineTimeoutRef.current = null;
+          // Never complete early if the timer woke up a hair too soon
+          if (Date.now() < deadline) armDeadlineTimeout();
+          else tick();
+        },
+        Math.max(0, deadline - Date.now()),
+      );
+    };
+
+    intervalRef.current = setInterval(tick, 250);
+    armDeadlineTimeout();
+
+    // A hidden tab can be throttled or frozen: when visibility changes, catch
+    // up immediately (completes a deadline that already passed) and re-aim.
+    const onVisibility = () => {
+      tick();
+      if (timerEndRef.current !== null) armDeadlineTimeout();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
 
     return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
+      }
+      if (deadlineTimeoutRef.current) {
+        clearTimeout(deadlineTimeoutRef.current);
+        deadlineTimeoutRef.current = null;
       }
     };
   }, [isRunning, mode, storeDeadlineAt, setDeadlineAt, setTimeLeft, setTotalFocusTime, setMode]);

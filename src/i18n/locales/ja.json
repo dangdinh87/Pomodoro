@@ -86,6 +86,20 @@
       "work_done": "集中セッションが完了しました。休憩しましょう。",
       "break_done": "休憩が終わりました。集中しましょう。"
     },
+    "notifications": {
+      "focusDone": {
+        "title": "集中セッション完了",
+        "body": "おつかれさまでした。少し休憩しましょう。"
+      },
+      "breakDone": {
+        "title": "休憩が終わりました",
+        "body": "また集中する準備はできましたか？"
+      },
+      "longBreakDone": {
+        "title": "長い休憩が終わりました",
+        "body": "次のラウンドを始めましょうか？"
+      }
+    },
     "title_prefix": {
       "work": "集中",
       "shortBreak": "休憩",
