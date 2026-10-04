@@ -6,6 +6,7 @@ import {
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
 
@@ -127,9 +128,19 @@ export const focusSessions = pgTable(
     taskId: uuid('task_id').references(() => tasks.id, { onDelete: 'set null' }),
     mode: text('mode', { enum: ['work', 'shortBreak', 'longBreak'] }).notNull(),
     durationSec: integer('duration_sec').notNull(),
+    /**
+     * Id the client minted for this session (its outbox item id). Retrying the
+     * same session after a lost response hits the unique index instead of
+     * creating a duplicate. Null for rows written before this column existed.
+     */
+    clientSessionId: text('client_session_id'),
+    /** When the session ended (the client's end time, clamped by the API), not when it was uploaded. */
     createdAt: createdAt(),
   },
-  (t) => [index('focus_sessions_user_created_idx').on(t.userId, t.createdAt)],
+  (t) => [
+    index('focus_sessions_user_created_idx').on(t.userId, t.createdAt),
+    uniqueIndex('focus_sessions_user_client_session_uidx').on(t.userId, t.clientSessionId),
+  ],
 );
 
 export const feedbacks = pgTable('feedbacks', {
