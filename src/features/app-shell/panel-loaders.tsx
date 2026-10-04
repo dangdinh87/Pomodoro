@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect, useReducer, type ComponentType } from 'react';
+import { Component, useEffect, useReducer, useState, type ComponentType, type ReactNode } from 'react';
+import { Button } from '@/components/ui/button';
+import { useI18n } from '@/contexts/i18n-context';
 import type { PanelId } from './panel-store';
 
 /** Holds the panel's shape while its chunk loads, so the sheet/dialog animates in right away. */
@@ -15,7 +17,37 @@ function PanelSkeleton() {
   );
 }
 
-type LazyPanel = ComponentType & { preload: () => Promise<void> };
+/** A panel that could not load or crashed: say so, and let the user retry in place. */
+function PanelError({ onRetry }: { onRetry: () => void }) {
+  const { t } = useI18n();
+  return (
+    <div role="alert" className="flex flex-col items-center gap-3 px-5 py-16 text-center sm:px-8">
+      <h2 className="font-heading text-lg font-bold text-ink">{t('shell.panelError.title')}</h2>
+      <p className="max-w-xs text-sm text-ink-secondary">{t('shell.panelError.description')}</p>
+      <Button onClick={onRetry}>{t('errors.boundary.retry')}</Button>
+    </div>
+  );
+}
+
+/** Catches a panel that throws while rendering; "Try again" mounts it afresh. */
+class PanelBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  componentDidCatch(error: unknown) {
+    console.error(error);
+  }
+  render() {
+    return this.state.failed ? (
+      <PanelError onRetry={() => this.setState({ failed: false })} />
+    ) : (
+      this.props.children
+    );
+  }
+}
+
+export type LazyPanel = ComponentType & { preload: () => Promise<void> };
 
 /**
  * Code-split panel without Suspense. With next/dynamic (React.lazy) even a
@@ -23,7 +55,7 @@ type LazyPanel = ComponentType & { preload: () => Promise<void> };
  * so the dialog jumped when the real content replaced the skeleton. Here a
  * preloaded panel renders on the first frame.
  */
-function lazyPanel(load: () => Promise<{ default: ComponentType }>): LazyPanel {
+export function lazyPanel(load: () => Promise<{ default: ComponentType }>): LazyPanel {
   let Loaded: ComponentType | null = null;
   let pending: Promise<void> | null = null;
   const preload = () =>
@@ -39,10 +71,23 @@ function lazyPanel(load: () => Promise<{ default: ComponentType }>): LazyPanel {
 
   function Panel() {
     const [, rerender] = useReducer((n: number) => n + 1, 0);
+    const [failed, setFailed] = useState(false);
+    const load = () => preload().then(rerender, () => setFailed(true));
     useEffect(() => {
-      if (!Loaded) preload().then(rerender, () => {});
+      if (!Loaded) void load();
     }, []);
-    return Loaded ? <Loaded /> : <PanelSkeleton />;
+    const retry = () => {
+      setFailed(false);
+      void load();
+    };
+    if (Loaded) {
+      return (
+        <PanelBoundary>
+          <Loaded />
+        </PanelBoundary>
+      );
+    }
+    return failed ? <PanelError onRetry={retry} /> : <PanelSkeleton />;
   }
   Panel.preload = preload;
   return Panel;
@@ -62,6 +107,9 @@ export function preloadPanel(id: PanelId) {
 
 /** Warms every panel chunk once the browser is idle after the timer has rendered. */
 export function preloadPanelsWhenIdle() {
+  // Data Saver: a panel loads when it is opened (or hovered), not speculatively
+  const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+  if (connection?.saveData) return () => {};
   const run = () => (Object.keys(LAZY_PANELS) as PanelId[]).forEach(preloadPanel);
   // Safari has no requestIdleCallback.
   if (typeof window.requestIdleCallback === 'function') {

@@ -1088,6 +1088,10 @@
     "openTimer": "Open the timer",
     "streak": "{count}-day streak",
     "panels": {
+    "panelError": {
+      "title": "This panel didn't load",
+      "description": "Check your connection and try again."
+    },
       "tasks": "Tasks",
       "sound": "Sounds",
       "scene": "Scene",
