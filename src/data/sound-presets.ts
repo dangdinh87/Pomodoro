@@ -3,9 +3,10 @@ import { SoundPreset } from '@/stores/audio-store'
 /**
  * Built-in ambient sound presets
  *
- * Note: Some presets reference sounds with placeholder files (coffee-shop, library,
- * cat-purring, brown-noise). These will be added in Phase 7. The loadPreset action
- * implements graceful skip for missing/failed sounds.
+ * Every preset is built only from sounds that exist in the catalog and have a real
+ * recording (sound-assets.test.ts enforces both). Cafe, Library and Cozy were once built
+ * on silent placeholders and are recomposed from audible sounds. loadPreset still skips
+ * any id it cannot resolve, so old saved mixes never break.
  */
 export const builtInPresets: SoundPreset[] = [
   {
@@ -13,8 +14,8 @@ export const builtInPresets: SoundPreset[] = [
     name: 'Cafe',
     icon: '☕',
     sounds: [
-      { id: 'coffee-shop', volume: 50 },
-      { id: 'keyboard', volume: 25 },
+      { id: 'crowd', volume: 60 },
+      { id: 'keyboard', volume: 20 },
     ],
     isBuiltIn: true,
   },
@@ -75,18 +76,18 @@ export const builtInPresets: SoundPreset[] = [
     name: 'Library',
     icon: '📚',
     sounds: [
-      { id: 'library', volume: 50 },
-      { id: 'clock', volume: 15 },
+      { id: 'ceiling-fan', volume: 60 },
+      { id: 'clock', volume: 25 },
     ],
     isBuiltIn: true,
   },
   {
     id: 'cozy',
     name: 'Cozy',
-    icon: '🐱',
+    icon: '🛋️',
     sounds: [
-      { id: 'cat-purring', volume: 40 },
       { id: 'campfire', volume: 35 },
+      { id: 'rain-on-window', volume: 30 },
       { id: 'vinyl-effect', volume: 20 },
     ],
     isBuiltIn: true,

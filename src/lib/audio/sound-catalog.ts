@@ -17,6 +17,11 @@ export interface SoundItem {
   vn?: string;
   icon: string; // emoji
   url: string;
+  /**
+   * The mp3 is a silent placeholder (a copy of silence.mp3), so the sound is kept out of
+   * every listing and out of the lookup. Drop the flag once a real recording replaces the file.
+   */
+  hidden?: boolean;
 }
 
 export interface AlarmItem {
@@ -83,6 +88,7 @@ const nature: SoundItem[] = [
     vn: 'Chim hót',
     icon: '🐦',
     url: '/sounds/nature/birds.mp3',
+    hidden: true,
   },
   {
     id: 'night-crickets',
@@ -91,6 +97,7 @@ const nature: SoundItem[] = [
     vn: 'Dế đêm',
     icon: '🦗',
     url: '/sounds/nature/night-crickets.mp3',
+    hidden: true,
   },
   {
     id: 'fireplace',
@@ -99,6 +106,7 @@ const nature: SoundItem[] = [
     vn: 'Lò sưởi',
     icon: '🪵',
     url: '/sounds/nature/fireplace.mp3',
+    hidden: true,
   },
 ];
 
@@ -153,6 +161,7 @@ const noise: SoundItem[] = [
     vn: 'Tiếng ồn trắng',
     icon: '⚪',
     url: '/sounds/noise/white-noise.mp3',
+    hidden: true,
   },
   {
     id: 'brown-noise',
@@ -169,6 +178,7 @@ const noise: SoundItem[] = [
     vn: 'Tiếng ồn hồng',
     icon: '🧠',
     url: '/sounds/noise/pink-noise.mp3',
+    hidden: true,
   },
 ];
 
@@ -180,6 +190,7 @@ const study: SoundItem[] = [
     vn: 'Thư viện',
     icon: '📚',
     url: '/sounds/study/library.mp3',
+    hidden: true,
   },
   {
     id: 'coffee-shop',
@@ -188,6 +199,7 @@ const study: SoundItem[] = [
     vn: 'Quán cà phê',
     icon: '☕',
     url: '/sounds/study/coffee-shop.mp3',
+    hidden: true,
   },
   {
     id: 'coworking',
@@ -196,6 +208,7 @@ const study: SoundItem[] = [
     vn: 'Văn phòng',
     icon: '🏢',
     url: '/sounds/study/coworking.mp3',
+    hidden: true,
   },
 ];
 
@@ -239,6 +252,7 @@ const cozy: SoundItem[] = [
     vn: 'Mèo kêu',
     icon: '🐱',
     url: '/sounds/cozy/cat-purring.mp3',
+    hidden: true,
   },
 ];
 
@@ -331,8 +345,8 @@ const machine: SoundItem[] = [
   },
 ];
 
-// Category definitions with display order
-export const soundCategories: {
+// Category definitions with display order (hidden sounds included; filtered below)
+const allCategories: {
   key: SoundCategory;
   label: string;
   vn: string;
@@ -352,6 +366,16 @@ export const soundCategories: {
   { key: 'city', label: 'City', vn: 'Thành phố', sounds: city },
   { key: 'machine', label: 'Machine', vn: 'Máy móc', sounds: machine },
 ];
+
+// What the mixer lists: playable sounds only, and no empty categories
+export const soundCategories = allCategories
+  .map((c) => ({ ...c, sounds: c.sounds.filter((s) => !s.hidden) }))
+  .filter((c) => c.sounds.length > 0);
+
+// Placeholders waiting for a real recording (see SoundItem.hidden)
+export const hiddenAmbientSounds: ReadonlyArray<SoundItem> = allCategories.flatMap((c) =>
+  c.sounds.filter((s) => s.hidden),
+);
 
 // Alarm sounds
 export const alarmSounds: AlarmItem[] = [
