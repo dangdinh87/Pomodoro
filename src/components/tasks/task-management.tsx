@@ -202,7 +202,7 @@ export function TaskManagement() {
             title={t('tasksUi.emptyTitle')}
             description={t('tasksUi.emptyDescription')}
             action={
-              <Button variant="secondary" onClick={() => quickAddRef.current?.focus()}>
+              <Button onClick={() => quickAddRef.current?.focus()}>
                 {t('tasksUi.emptyAction')}
               </Button>
             }
@@ -215,6 +215,7 @@ export function TaskManagement() {
               <EmptyState
                 title={t('tasksUi.noMatchTitle')}
                 description={t('tasksUi.noMatchDescription')}
+                face="sleepy"
                 className="min-h-[240px]"
                 action={
                   <Button
@@ -252,7 +253,7 @@ export function TaskManagement() {
                 <Button variant="outline" size="sm" onClick={() => setPage(page - 1)} disabled={page === 1 || isLoading}>
                   {t('common.previous')}
                 </Button>
-                <span className="text-[0.8125rem] tabular-nums text-ink-muted">{t('tasksUi.page', { page, total: totalPages })}</span>
+                <span className="text-[0.8125rem] font-semibold tabular-nums text-ink-muted">{t('tasksUi.page', { page, total: totalPages })}</span>
                 <Button variant="outline" size="sm" onClick={() => setPage(page + 1)} disabled={page >= totalPages || isLoading}>
                   {t('common.next')}
                 </Button>

@@ -39,7 +39,7 @@ export const SortableTaskItem = React.memo(function SortableTaskItem({
             type="button"
             {...attributes}
             {...listeners}
-            className="absolute left-1 top-3 z-10 cursor-grab touch-none rounded p-1 text-ink-muted transition-colors hover:bg-surface-raised hover:text-ink focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand active:cursor-grabbing"
+            className="focus-ring absolute left-1 top-3 z-10 cursor-grab touch-none rounded-md p-1 text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink focus-visible:outline-offset-0 active:cursor-grabbing"
             aria-label={t('tasksUi.dragHandle')}
           >
             <DotsSixVertical size={16} />

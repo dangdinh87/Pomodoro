@@ -1014,6 +1014,7 @@
     "showCompletedOne": "Show 1 completed task",
     "showCompleted": "Show {count} completed tasks",
     "hideCompleted": "Hide completed tasks",
+    "doneCheer": "Nice work! Every task you finish counts.",
     "focus": "Select",
     "stopFocus": "Deselect",
     "focusingBadge": "Selected",

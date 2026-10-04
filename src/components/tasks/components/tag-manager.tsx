@@ -96,12 +96,12 @@ export function TagManager({ tags, isLoading: isInitialLoading, onAddTag, onRemo
                             <CircleNotch size={20} className="animate-spin text-ink-muted" />
                         </div>
                     ) : tags.length === 0 ? (
-                        <div className="rounded-lg border border-dashed border-border-strong px-4 py-8 text-center">
+                        <div className="rounded-lg border-2 border-dashed border-ink-faint px-4 py-8 text-center">
                             <p className="text-sm font-medium text-ink">{t('tasks.noTags')}</p>
                             <p className="mt-1 text-[0.8125rem] text-ink-muted">{t('tasksUi.noTagsHint')}</p>
                         </div>
                     ) : (
-                        <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-surface">
+                        <ul className="sticker-sm divide-y-2 divide-border overflow-hidden">
                             {tags.map((tag) => (
                                 <li key={tag} className="flex items-center justify-between gap-3 py-1.5 pl-3 pr-1.5">
                                     <span className="min-w-0 truncate text-sm text-ink">{tag}</span>

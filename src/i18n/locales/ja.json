@@ -1014,6 +1014,7 @@
     "showCompletedOne": "完了した 1 件を表示",
     "showCompleted": "完了した {count} 件を表示",
     "hideCompleted": "完了したタスクを隠す",
+    "doneCheer": "すごいです！やり遂げた分だけ前に進んでいます。",
     "focus": "選択",
     "stopFocus": "選択を解除",
     "focusingBadge": "選択中",

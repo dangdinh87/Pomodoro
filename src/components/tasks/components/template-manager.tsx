@@ -52,12 +52,12 @@ export function TemplateManager({ trigger, open, onOpenChange }: TemplateManager
             <CircleNotch size={20} className="animate-spin text-ink-muted" />
           </div>
         ) : templates.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border-strong px-4 py-8 text-center">
+          <div className="rounded-lg border-2 border-dashed border-ink-faint px-4 py-8 text-center">
             <p className="text-sm font-medium text-ink">{t('tasks.templates.empty')}</p>
             <p className="mx-auto mt-1 max-w-[32ch] text-[0.8125rem] text-ink-muted">{t('tasks.templates.emptyHint')}</p>
           </div>
         ) : (
-          <ul className="max-h-[400px] divide-y divide-border overflow-y-auto rounded-lg border border-border bg-surface">
+          <ul className="sticker-sm max-h-[400px] divide-y-2 divide-border overflow-y-auto">
             {templates.map((template) => (
               <li key={template.id} className="flex items-start gap-3 py-3 pl-4 pr-2">
                 <div className="min-w-0 flex-1 space-y-1">
@@ -79,7 +79,7 @@ export function TemplateManager({ trigger, open, onOpenChange }: TemplateManager
                         {tag}
                       </Badge>
                     ))}
-                    {template.tags.length > 3 && <span className="text-ink-faint">+{template.tags.length - 3}</span>}
+                    {template.tags.length > 3 && <span className="font-bold text-ink-muted">+{template.tags.length - 3}</span>}
                   </div>
                 </div>
                 <Button

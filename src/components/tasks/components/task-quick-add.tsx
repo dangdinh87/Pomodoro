@@ -3,6 +3,7 @@
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import { Flag, Minus, Plus, SlidersHorizontal, Timer } from '@phosphor-icons/react/dist/ssr'
 import { Button } from '@/components/ui/button'
+import { IconTile } from '@/components/ui/icon-tile'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TaskPriority } from '@/stores/task-store'
 import { useI18n } from '@/contexts/i18n-context'
@@ -40,9 +41,10 @@ export const TaskQuickAdd = forwardRef<HTMLInputElement, TaskQuickAddProps>(func
         e.preventDefault()
         submit()
       }}
-      className="flex flex-wrap items-center gap-x-1 gap-y-1 rounded-lg border border-border-strong bg-surface px-3 py-2 transition-[border-color,box-shadow] duration-150 focus-within:border-brand focus-within:ring-[3px] focus-within:ring-brand/15 sm:flex-nowrap"
+      // The whole bar is one sticker field: typing in it turns the shadow accent-coloured and draws the focus ring.
+      className="field flex h-auto flex-wrap items-center gap-x-1 gap-y-1 px-2.5 py-2 has-[input:focus-visible]:shadow-[2px_2px_0_var(--accent-solid)] has-[input:focus-visible]:outline-3 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-ring sm:flex-nowrap"
     >
-      <Plus size={18} className="shrink-0 text-ink-faint" aria-hidden />
+      <IconTile icon={Plus} tone="tomato" size="sm" weight="bold" className="shrink-0" />
       <input
         ref={inputRef}
         value={title}
@@ -50,7 +52,7 @@ export const TaskQuickAdd = forwardRef<HTMLInputElement, TaskQuickAddProps>(func
         placeholder={t('tasksUi.quickAddPlaceholder')}
         aria-label={t('tasksUi.quickAddLabel')}
         maxLength={200}
-        className="h-8 min-w-0 flex-1 basis-[calc(100%-2rem)] bg-transparent px-2 text-[0.9375rem] text-ink outline-hidden placeholder:text-ink-faint sm:basis-0"
+        className="h-8 min-w-0 flex-1 basis-[calc(100%-2.5rem)] bg-transparent px-2 font-body text-[0.9375rem] font-semibold text-ink outline-hidden placeholder:font-medium placeholder:text-ink-muted sm:basis-0"
       />
 
       <div className="flex w-full items-center gap-1 sm:w-auto">
@@ -92,7 +94,7 @@ export const TaskQuickAdd = forwardRef<HTMLInputElement, TaskQuickAddProps>(func
         <Select value={priority} onValueChange={(v: TaskPriority) => setPriority(v)}>
           <SelectTrigger
             aria-label={t('tasksUi.priorityLabel')}
-            className="h-8 w-auto gap-1.5 border-transparent bg-transparent px-2 text-[0.8125rem] text-ink-secondary hover:bg-surface-hover"
+            className="h-8 w-auto gap-1.5 border-transparent bg-transparent px-2 text-[0.8125rem] text-ink-secondary shadow-none! hover:bg-surface-hover data-[state=open]:shadow-none! focus-visible:shadow-none!"
           >
             <Flag size={14} className="shrink-0 text-ink-muted" aria-hidden />
             <SelectValue />

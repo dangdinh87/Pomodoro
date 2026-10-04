@@ -19,10 +19,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
+import { Badge, badgeVariants } from '@/components/ui/badge'
+import { IconTile } from '@/components/ui/icon-tile'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { X, Plus, WarningCircle, CalendarBlank, CircleNotch } from '@phosphor-icons/react/dist/ssr';
+import { X, Plus, WarningCircle, CalendarBlank, CircleNotch, ListChecks } from '@phosphor-icons/react/dist/ssr';
 import { Task } from '@/stores/task-store'
 import { useI18n } from '@/contexts/i18n-context'
 import { cn } from '@/lib/utils'
@@ -146,10 +147,11 @@ export function TaskFormModal({
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden gap-0 max-h-[90vh] flex flex-col">
-        <DialogHeader className="p-4 sm:p-6 pb-3 border-b border-border shrink-0">
-          <div className="flex items-center justify-between gap-2 pr-8">
-            <div className="min-w-0">
-              <DialogTitle className="truncate text-lg font-semibold">
+        <DialogHeader className="p-4 sm:p-6 pb-3 border-b-2 border-border shrink-0">
+          <div className="flex items-center justify-between gap-2 pr-10">
+            <div className="flex min-w-0 items-center gap-3">
+              <IconTile icon={ListChecks} tone="butter" weight="bold" />
+              <DialogTitle className="truncate">
                 {editingTask ? t('tasks.editTask') : t('tasks.addTask')}
               </DialogTitle>
             </div>
@@ -163,7 +165,7 @@ export function TaskFormModal({
 
         <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
           <div className="space-y-1.5">
-            <Label htmlFor="title" className="text-sm font-medium text-ink-secondary">
+            <Label htmlFor="title">
               {t('tasks.taskName')} <span className="text-danger-ink">*</span>
             </Label>
             <Input
@@ -171,18 +173,19 @@ export function TaskFormModal({
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               placeholder={t('tasks.taskNamePlaceholder')}
-              className={cn("h-11 text-base", errors.title ? 'border-danger' : '')}
+              className="text-base"
+              aria-invalid={!!errors.title}
               autoFocus
             />
             {errors.title && (
-              <p className="text-[11px] text-danger-ink flex items-center gap-1">
+              <p className="text-xs text-danger-ink flex items-center gap-1">
                 <WarningCircle size={12} /> {errors.title}
               </p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="description" className="text-sm font-medium text-ink-secondary">
+            <Label htmlFor="description">
               {t('tasks.taskDescription')}
             </Label>
             <Textarea
@@ -190,10 +193,11 @@ export function TaskFormModal({
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder={t('tasks.taskDescriptionPlaceholder')}
-              className={cn("resize-none min-h-[80px]", errors.description ? 'border-danger' : '')}
+              className="min-h-[80px] resize-none"
+              aria-invalid={!!errors.description}
             />
             {errors.description && (
-              <p className="text-[11px] text-danger-ink flex items-center gap-1">
+              <p className="text-xs text-danger-ink flex items-center gap-1">
                 <WarningCircle size={12} /> {errors.description}
               </p>
             )}
@@ -201,7 +205,7 @@ export function TaskFormModal({
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 [&>div]:min-w-0">
             <div className="space-y-1.5">
-              <Label htmlFor="estimatePomodoros" className="text-sm font-medium text-ink-secondary">
+              <Label htmlFor="estimatePomodoros">
                 {t('tasksUi.estimateShort')}
               </Label>
               <Input
@@ -214,17 +218,17 @@ export function TaskFormModal({
                   const val = e.target.value === '' ? 0 : parseInt(e.target.value)
                   setFormData({ ...formData, estimatePomodoros: isNaN(val) ? 0 : val })
                 }}
-                className={cn("h-10", errors.estimatePomodoros ? 'border-danger' : '')}
+                aria-invalid={!!errors.estimatePomodoros}
               />
               {errors.estimatePomodoros && (
-                <p className="text-[11px] text-danger-ink flex items-center gap-1">
+                <p className="text-xs text-danger-ink flex items-center gap-1">
                   <WarningCircle size={12} /> {errors.estimatePomodoros}
                 </p>
               )}
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="priority" className="text-sm font-medium text-ink-secondary">
+              <Label htmlFor="priority">
                 {t('tasks.priority')}
               </Label>
               <Select
@@ -233,7 +237,7 @@ export function TaskFormModal({
                   setFormData({ ...formData, priority: val })
                 }
               >
-                <SelectTrigger id="priority" className="h-10">
+                <SelectTrigger id="priority">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -245,7 +249,7 @@ export function TaskFormModal({
             </div>
 
             <div className="col-span-2 space-y-1.5 sm:col-span-1">
-              <Label htmlFor="dueDate" className="text-sm font-medium text-ink-secondary">
+              <Label htmlFor="dueDate">
                 {t('tasks.dueDate')}
               </Label>
               <Popover open={dateOpen} onOpenChange={setDateOpen}>
@@ -254,10 +258,10 @@ export function TaskFormModal({
                     id="dueDate"
                     type="button"
                     variant="outline"
-                    className="h-10 w-full justify-start gap-2 px-3 font-normal"
+                    className="w-full justify-start gap-2 px-3.5 font-body font-semibold"
                   >
                     <CalendarBlank size={16} className="shrink-0 text-ink-muted" />
-                    <span className={cn('truncate', !formData.dueDate && 'text-ink-faint')}>
+                    <span className={cn('truncate', !formData.dueDate && 'font-medium text-ink-muted')}>
                       {formData.dueDate
                         ? toDate(formData.dueDate).toLocaleDateString(lang, { day: 'numeric', month: 'short', year: 'numeric' })
                         : t('tasksUi.pickDate')}
@@ -275,7 +279,7 @@ export function TaskFormModal({
                     }}
                   />
                   {formData.dueDate && (
-                    <div className="border-t border-border p-2">
+                    <div className="border-t-2 border-border p-2">
                       <Button
                         type="button"
                         variant="ghost"
@@ -298,7 +302,7 @@ export function TaskFormModal({
           {/* Only show status field when editing existing task */}
           {editingTask && (
             <div className="space-y-1.5">
-              <Label htmlFor="status" className="text-sm font-medium text-ink-secondary">
+              <Label htmlFor="status">
                 {t('tasks.status')}
               </Label>
               <Select
@@ -307,7 +311,7 @@ export function TaskFormModal({
                   setFormData({ ...formData, status: val })
                 }
               >
-                <SelectTrigger id="status" className="h-10">
+                <SelectTrigger id="status">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -320,7 +324,7 @@ export function TaskFormModal({
           )}
 
           <div className="space-y-1.5">
-            <Label htmlFor="tag-input" className="text-sm font-medium text-ink-secondary">
+            <Label htmlFor="tag-input">
               {t('tasksUi.tagsLabel')}
             </Label>
             {formData.tags.length > 0 && (
@@ -335,7 +339,7 @@ export function TaskFormModal({
                     <button
                       type="button"
                       onClick={() => removeTag(tag)}
-                      className="rounded-full p-0.5 transition-colors hover:bg-surface-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand"
+                      className="focus-ring rounded-full p-0.5 transition-colors hover:bg-surface-hover focus-visible:outline-offset-1"
                       aria-label={`${t('common.delete')} ${tag}`}
                     >
                       <X size={10} />
@@ -356,15 +360,13 @@ export function TaskFormModal({
                   }
                 }}
                 placeholder={t('tasksUi.tagsPlaceholder')}
-                className="h-9"
               />
               <Button
                 type="button"
                 variant="secondary"
-                size="sm"
                 disabled={!tagInput.trim()}
                 onClick={() => handleAddTag(tagInput)}
-                className="h-9 shrink-0 gap-1 px-3"
+                className="shrink-0 gap-1 px-3"
               >
                 <Plus size={14} />
                 {t('common.add')}
@@ -380,7 +382,7 @@ export function TaskFormModal({
                     key={tag}
                     type="button"
                     onClick={() => handleAddTag(tag)}
-                    className="rounded-full border border-border px-2.5 py-0.5 text-xs text-ink-secondary transition-colors hover:border-border-strong hover:bg-surface-raised focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand"
+                    className={cn(badgeVariants({ variant: 'outline' }), 'focus-ring cursor-pointer bg-surface transition-colors hover:bg-surface-hover')}
                   >
                     {tag}
                   </button>
@@ -390,7 +392,7 @@ export function TaskFormModal({
           </div>
         </form>
 
-        <DialogFooter className="px-4 sm:px-6 py-3 sm:py-4 bg-surface-raised border-t border-border shrink-0">
+        <DialogFooter className="px-4 sm:px-6 py-3 sm:py-4 bg-surface-raised border-t-2 border-border shrink-0">
           <Button
             type="button"
             variant="ghost"

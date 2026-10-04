@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { IconTile } from '@/components/ui/icon-tile'
 import {
   Popover,
   PopoverContent,
@@ -33,7 +34,7 @@ export function TemplatePicker({ onSelect }: TemplatePickerProps) {
         <Button
           variant="outline"
           size="sm"
-          className="h-8 gap-1.5 text-[0.8125rem]"
+          className="gap-1.5"
           disabled={isLoading}
         >
           <BookmarkSimple size={14} />
@@ -43,14 +44,14 @@ export function TemplatePicker({ onSelect }: TemplatePickerProps) {
               {templates.length}
             </Badge>
           )}
-          <CaretDown size={12} className="opacity-50" />
+          <CaretDown size={12} weight="bold" aria-hidden />
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-80 p-0 overflow-hidden">
-        <div className="p-3 border-b">
+        <div className="border-b-2 border-border p-3">
           <div className="flex items-center gap-2">
-            <BookmarkSimple size={16} className="text-ink-faint" />
-            <span className="font-semibold text-sm">{t('tasks.templates.title')}</span>
+            <IconTile icon={BookmarkSimple} tone="lilac" size="sm" />
+            <span className="font-heading text-sm font-bold">{t('tasks.templates.title')}</span>
           </div>
           <p className="text-xs text-ink-muted mt-1">
             {t('tasks.templates.description')}
@@ -58,9 +59,9 @@ export function TemplatePicker({ onSelect }: TemplatePickerProps) {
         </div>
         {templates.length === 0 ? (
           <div className="p-6 text-center">
-            <BookmarkSimple size={32} className="mx-auto text-ink-muted/30 mb-2" />
-            <p className="text-sm text-ink-muted">{t('tasks.templates.empty')}</p>
-            <p className="text-xs text-ink-muted/70 mt-1">{t('tasks.templates.emptyHint')}</p>
+            <BookmarkSimple size={32} className="mx-auto mb-2 text-ink-faint" aria-hidden />
+            <p className="text-sm font-semibold text-ink">{t('tasks.templates.empty')}</p>
+            <p className="mt-1 text-xs text-ink-muted">{t('tasks.templates.emptyHint')}</p>
           </div>
         ) : (
           <div className="max-h-64 overflow-y-auto p-2 space-y-1">
@@ -69,9 +70,8 @@ export function TemplatePicker({ onSelect }: TemplatePickerProps) {
                 key={template.id}
                 onClick={() => handleSelect(template)}
                 className={cn(
-                  "w-full text-left p-3 rounded-lg transition-colors overflow-hidden",
-                  "hover:bg-surface-hover focus:bg-surface-hover focus:outline-hidden",
-                  "border border-transparent hover:border-border"
+                  "focus-ring w-full overflow-hidden rounded-lg border-2 border-transparent p-3 text-left transition-colors focus-visible:outline-offset-0",
+                  "hover:border-outline hover:bg-surface-hover"
                 )}
               >
                 <div className="overflow-hidden">
@@ -83,7 +83,7 @@ export function TemplatePicker({ onSelect }: TemplatePickerProps) {
                   )}
                 </div>
                 <div className="flex items-center gap-2 mt-2">
-                  <span className="text-[10px] text-ink-muted">
+                  <span className="text-xs text-ink-muted">
                     {t(template.estimatePomodoros === 1 ? 'tasksUi.estimateValue' : 'tasksUi.estimateValuePlural', { count: template.estimatePomodoros })}
                   </span>
                   {template.tags.length > 0 && (
@@ -94,7 +94,7 @@ export function TemplatePicker({ onSelect }: TemplatePickerProps) {
                         </Badge>
                       ))}
                       {template.tags.length > 3 && (
-                        <span className="text-[10px] text-ink-muted">
+                        <span className="text-xs font-bold text-ink-muted">
                           +{template.tags.length - 3}
                         </span>
                       )}

@@ -54,7 +54,7 @@ export function TaskKanbanBoard({
     return (
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {STATUSES.map((status) => (
-          <Skeleton key={status} className="h-[240px] w-full rounded-lg" />
+          <Skeleton key={status} className="h-[240px] w-full rounded-[20px]" />
         ))}
       </div>
     )
@@ -70,7 +70,8 @@ export function TaskKanbanBoard({
       onDragEnd={dnd.handleDragEnd}
       onDragCancel={dnd.handleDragCancel}
     >
-      <div className="flex snap-x snap-mandatory items-stretch gap-3 overflow-x-auto pb-2 md:grid md:grid-cols-3 md:gap-4 md:overflow-visible md:pb-0">
+      {/* p-1/-m-1 + pr-2/pb-2: the lanes' hard shadows (4px) must not be clipped by the scroll box */}
+      <div className="-m-1 flex scroll-pl-1 snap-x snap-mandatory items-stretch gap-3.5 overflow-x-auto p-1 pb-2 pr-2 md:grid md:grid-cols-3 md:gap-4 md:overflow-visible md:pb-1 md:pr-1">
         {STATUSES.map((status) => (
           <TaskKanbanColumn
             key={status}

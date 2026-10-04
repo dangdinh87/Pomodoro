@@ -130,12 +130,10 @@ export function TaskSelector({ className }: TaskSelectorProps) {
         </PopoverTrigger>
 
         <PopoverContent
-          data-theme="dark"
           data-timer
           data-mode={timerMode}
           align="center"
-          sideOffset={8}
-          className="w-[min(92vw,380px)] overflow-hidden rounded-lg border-border bg-surface p-0 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.4)]"
+          className="w-[min(92vw,380px)] overflow-hidden p-0"
         >
           <div className="flex items-center justify-between px-4 pb-2 pt-3">
             <h3 className="text-[0.8125rem] font-semibold text-ink">{t('timerUi.activeTasks')}</h3>
@@ -188,7 +186,6 @@ export function TaskSelector({ className }: TaskSelectorProps) {
               placeholder={t('timerUi.addTaskPlaceholder')}
               aria-label={t('timerUi.addTask')}
               maxLength={120}
-              className="h-9"
             />
             <Button type="submit" variant="secondary" size="sm" disabled={!draft.trim() || isCreating}>
               {t('timerUi.addTask')}
@@ -240,7 +237,7 @@ export function TaskSelector({ className }: TaskSelectorProps) {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <Confetti size={20} className="text-gold" />
+              <Confetti size={20} className="text-warning-ink" />
               {t('timerComponents.taskSelector.taskComplete.title')}
             </AlertDialogTitle>
             <AlertDialogDescription>

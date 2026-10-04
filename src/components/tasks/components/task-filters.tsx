@@ -63,7 +63,7 @@ export function TaskFilters({ scope, counts, query, onScopeChange, onQueryChange
 
       {searchOpen && (
         <div className="relative">
-          <MagnifyingGlass size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" aria-hidden />
+          <MagnifyingGlass size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted" aria-hidden />
           <Input
             ref={inputRef}
             value={query}
@@ -71,7 +71,7 @@ export function TaskFilters({ scope, counts, query, onScopeChange, onQueryChange
             onKeyDown={(e) => e.key === 'Escape' && closeSearch()}
             placeholder={t('tasksUi.searchPlaceholder')}
             aria-label={t('tasksUi.searchOpen')}
-            className="h-10 pl-9"
+            className="pl-10"
           />
         </div>
       )}
