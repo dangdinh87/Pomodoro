@@ -89,6 +89,8 @@ export function TaskManagement() {
     setTogglingTaskIds((prev) => new Set(prev).add(taskId))
     try {
       await updateTask({ id: taskId, input: { status: newStatus } })
+    } catch {
+      // the mutation already rolled back and showed the error toast
     } finally {
       setTogglingTaskIds((prev) => {
         const next = new Set(prev)
@@ -105,7 +107,7 @@ export function TaskManagement() {
   const handleFocus = (task: Task) => {
     if (activeTaskId !== task.id) {
       switchActiveTask(task.id)
-      if (task.status === 'todo') void updateTask({ id: task.id, input: { status: 'doing' } })
+      if (task.status === 'todo') void updateTask({ id: task.id, input: { status: 'doing' } }).catch(() => undefined)
     }
     closePanel()
   }
