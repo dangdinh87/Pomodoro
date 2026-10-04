@@ -1,4 +1,4 @@
-import { FEEDBACK_MESSAGE_MAX_LENGTH } from '@/app/api/feedback/feedback-schema'
+import { FEEDBACK_MESSAGE_MAX_LENGTH } from '@/lib/feedback/limits'
 
 export const MESSAGE_MAX = FEEDBACK_MESSAGE_MAX_LENGTH
 // Mirrors the server check so the form never sends what the API would reject.

@@ -12,12 +12,14 @@ import {
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
+import { FEEDBACK_TYPES } from '@/lib/feedback/limits';
+
+export { FEEDBACK_TYPES };
 
 // Enum-like text columns: the TS union and the database CHECK are built from the same list.
 export const TASK_PRIORITIES = ['LOW', 'MEDIUM', 'HIGH'] as const;
 export const TASK_STATUSES = ['TODO', 'DOING', 'DONE'] as const;
 export const SESSION_MODES = ['work', 'shortBreak', 'longBreak'] as const;
-export const FEEDBACK_TYPES = ['feature', 'bug', 'question', 'other'] as const;
 
 /** `column in ('a', 'b')` for a CHECK; the values are code constants, never user input. */
 const oneOf = (column: AnyPgColumn, values: readonly string[]) =>

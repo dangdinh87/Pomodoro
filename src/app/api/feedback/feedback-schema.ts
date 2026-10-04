@@ -1,8 +1,8 @@
-import { FEEDBACK_TYPES as feedbackTypes } from '@/db/schema'
+import { FEEDBACK_MESSAGE_MAX_LENGTH, FEEDBACK_TYPES as feedbackTypes } from '@/lib/feedback/limits'
 
 export type FeedbackType = (typeof feedbackTypes)[number]
 
-export const FEEDBACK_MESSAGE_MAX_LENGTH = 2000
+export { FEEDBACK_MESSAGE_MAX_LENGTH }
 const NAME_MAX_LENGTH = 100
 // RFC 5321 practical limit for an email address
 const EMAIL_MAX_LENGTH = 254
