@@ -5,7 +5,7 @@
   "scripts": {
     "bg:optimize": "node scripts/optimize-backgrounds.mjs",
     "icons:brand": "tsx scripts/generate-brand-icons.mjs",
-    "prebuild": "node scripts/optimize-backgrounds.mjs",
+    "prebuild": "node scripts/check-prod-env.mjs && node scripts/optimize-backgrounds.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

@@ -80,8 +80,10 @@ Do these once, in order, before the first production deploy.
 |---|---|---|
 | `DATABASE_URL` | yes | Neon **pooled** connection string (the app runs on serverless functions) |
 | `BETTER_AUTH_SECRET` | yes | `openssl rand -base64 32` |
-| `BETTER_AUTH_URL`, `NEXT_PUBLIC_SITE_URL` | yes | `https://studywithbro.com` |
+| `BETTER_AUTH_URL`, `NEXT_PUBLIC_SITE_URL` | yes | The https origin that serves this deploy: `https://studywithbro.com` once that domain is live, the current production origin (`https://www.pomodoro-focus.site`) until the cutover. Build-time (inlined), and every canonical URL, hreflang, the sitemap and the share image come from it. |
 | `RESEND_API_KEY`, `EMAIL_FROM` | yes | Without them nobody can sign in by email. `EMAIL_FROM` must belong to a domain verified in Resend. |
+
+The code defaults to `https://studywithbro.com` when `NEXT_PUBLIC_SITE_URL` is unset, which is right for local runs, CI and previews. To make sure a production deploy never ships on that default by accident, `scripts/check-prod-env.mjs` (run by `prebuild`) **fails the build** when `VERCEL_ENV=production` and `NEXT_PUBLIC_SITE_URL` (an https origin) or `EMAIL_FROM` is missing. The log says which one.
 | `SENTRY_DSN` | recommended | Error tracking. Without it errors still go to the Vercel runtime logs as JSON. |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | optional | Redirect URI `<BETTER_AUTH_URL>/api/auth/callback/google` |
 | `NEXT_PUBLIC_GA_ID` | optional | `G-XXXXXXXXXX` or `GTM-XXXXXXX` |
@@ -93,6 +95,8 @@ Remove the old Supabase, MegaLLM and Spotify variables from Vercel.
 
 1. Run the **DB migrate** workflow by hand (Actions > DB migrate > Run workflow, branch `master`) so the schema exists before traffic arrives.
 2. Merge to `master`; Vercel deploys. Later migrations run by themselves when `drizzle/**` changes.
+
+   **A deploy that needs a new migration:** the DB migrate workflow and the Vercel build start from the same push and finish independently, and Vercel makes the new build live as soon as it is ready. Code that reads or writes a new column fails until the migration has run. So run the **DB migrate** workflow (or let the one triggered by the push finish, and check it is green) **before the deploy goes live**: with auto-promote on, merge once the migration is additive and already applied; or turn off auto-assign of the production domain, wait for the workflow, then promote the deployment. Write migrations additive so the previous deploy keeps working in the meantime.
 3. Check `/api/auth/ok`, sign in with an email code, and open the browser console for Content-Security-Policy-Report-Only reports. Reports are also posted to `/api/csp-report` and logged. When they are clean, rename the header to `Content-Security-Policy` in `next.config.ts` to enforce.
 4. Point an uptime monitor at `/` and `/api/auth/ok`, and schedule a database backup (Neon point-in-time restore has a short window on the free plan).
 
