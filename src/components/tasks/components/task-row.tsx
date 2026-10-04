@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { isPast, isToday, isTomorrow } from 'date-fns'
-import { BookmarkSimple, CircleNotch, Copy, DotsThree, Pencil, Play, Stop, Trash, CalendarBlank } from '@phosphor-icons/react/dist/ssr'
+import { BookmarkSimple, CircleNotch, Copy, DotsThree, Pencil, Target, Trash, CalendarBlank, X } from '@phosphor-icons/react/dist/ssr'
 import { Task } from '@/stores/task-store'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -189,7 +189,7 @@ export const TaskRow = React.memo(function TaskRow({
             className="hidden gap-1.5 text-ink-secondary opacity-0 transition-opacity focus-visible:opacity-100 group-focus-within:opacity-100 group-hover:opacity-100 md:inline-flex"
             aria-label={`${isActive ? t('tasksUi.stopFocus') : t('tasksUi.focus')} - ${task.title}`}
           >
-            {isActive ? <Stop size={14} weight="fill" /> : <Play size={14} weight="fill" />}
+            {isActive ? <X size={14} weight="bold" /> : <Target size={14} />}
             {isActive ? t('tasksUi.stopFocus') : t('tasksUi.focus')}
           </Button>
         )}
@@ -221,7 +221,7 @@ export const TaskRow = React.memo(function TaskRow({
                 onClick={() => (isActive ? onStopFocus(task) : onFocus(task))}
                 className={cn('cursor-pointer gap-2', quick && 'md:hidden')}
               >
-                {isActive ? <Stop size={15} weight="fill" /> : <Play size={15} weight="fill" />}
+                {isActive ? <X size={15} weight="bold" /> : <Target size={15} />}
                 {isActive ? t('tasksUi.stopFocus') : t('tasksUi.focus')}
               </DropdownMenuItem>
             )}
