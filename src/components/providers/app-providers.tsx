@@ -71,9 +71,8 @@ export function AppProviders({ children }: AppProvidersProps) {
   return (
     <ThemeProvider
       attribute="data-theme"
-      defaultTheme="dark"
-      forcedTheme="dark"
-      enableSystem={false}
+      defaultTheme="light"
+      enableSystem
       disableTransitionOnChange
     >
       <NextTopLoader

@@ -361,6 +361,8 @@
         "light": "ライト",
         "dark": "ダーク",
         "system": "システム",
+        "colorSection": "カラー",
+        "textSection": "文字",
         "sizes": {
           "small": "小",
           "medium": "中",

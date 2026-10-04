@@ -361,6 +361,8 @@
         "light": "Sáng",
         "dark": "Tối",
         "system": "Theo hệ thống",
+        "colorSection": "Màu sắc",
+        "textSection": "Chữ",
         "sizes": {
           "small": "Nhỏ",
           "medium": "Trung bình",

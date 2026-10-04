@@ -361,6 +361,8 @@
         "light": "Light",
         "dark": "Dark",
         "system": "System",
+        "colorSection": "Colour",
+        "textSection": "Text",
         "sizes": {
           "small": "Small",
           "medium": "Medium",

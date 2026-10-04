@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { GeneralSettings, AppearanceSettings } from "@/components/settings/general-settings"
+import { GeneralSettings } from "@/components/settings/general-settings"
+import { AppearanceSettings } from "@/components/settings/appearance-settings"
 import { AccountSettings } from "@/components/settings/account-settings"
 import { SETTINGS_SECTIONS, type SettingsSectionId } from "@/features/settings/settings-sections"
 import { useI18n } from '@/contexts/i18n-context'
