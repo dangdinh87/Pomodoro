@@ -1,5 +1,6 @@
 import { installMemoryStorage } from '@/test-utils/memory-storage';
 import { useAuthStore } from '@/stores/auth-store';
+import { SESSION_LIMIT_CODE } from '@/config/constants';
 import { ensureSession } from '@/lib/auth-client';
 import {
   recordSession,
@@ -12,7 +13,11 @@ vi.mock('@/lib/auth-client', () => ({ ensureSession: vi.fn() }));
 const ensureSessionMock = vi.mocked(ensureSession);
 
 const payload = { taskId: 't1', durationSec: 1500, mode: 'work' as const };
-const res = (status: number) => ({ ok: status >= 200 && status < 300, status });
+const res = (status: number, body: unknown = {}) => ({
+  ok: status >= 200 && status < 300,
+  status,
+  json: async () => body,
+});
 
 describe('session-recorder', () => {
   let fetchMock: ReturnType<typeof vi.fn>;
@@ -124,6 +129,21 @@ describe('session-recorder', () => {
       expect(fetchMock).toHaveBeenCalledTimes(1);
       expect(queue()).toHaveLength(0);
       expect(onRecorded).toHaveBeenCalledTimes(1);
+    });
+
+    it('marks an item as a guest\'s only when the session found is anonymous', async () => {
+      // the auth store was stale: a real account is signed in, ensureSession finds it
+      ensureSessionMock.mockResolvedValue({ id: 'real-1', isAnonymous: false });
+      fetchMock.mockResolvedValue(res(503));
+      await recordSession(payload);
+      expect(queue()[0]).toMatchObject({ userId: 'real-1', guest: false });
+    });
+
+    it('marks it as a guest\'s when the session is anonymous (so signing in later can carry it over)', async () => {
+      ensureSessionMock.mockResolvedValue({ id: 'guest-1', isAnonymous: true });
+      fetchMock.mockResolvedValue(res(503));
+      await recordSession(payload);
+      expect(queue()[0]).toMatchObject({ userId: 'guest-1', guest: true });
     });
 
     it('shares one sign-in between sessions recorded at the same time', async () => {
@@ -288,12 +308,36 @@ describe('session-recorder', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it.each([400, 429])('does not retry %i', async (status) => {
-    fetchMock.mockResolvedValue(res(status));
+  it.each([
+    [400, { error: 'Invalid' }],
+    [429, { error: 'Daily session limit exceeded', code: SESSION_LIMIT_CODE }],
+  ])('does not retry %i (the server will never accept it)', async (status, body) => {
+    fetchMock.mockResolvedValue(res(status, body));
     const onRecorded = vi.fn();
     await expect(recordSession(payload, onRecorded)).resolves.toBe('dropped');
     expect(queue()).toHaveLength(0);
     expect(onRecorded).not.toHaveBeenCalled();
+  });
+
+  // A firewall / WAF answers 429 or 403 in front of the app: that says nothing about the session
+  it.each([
+    [429, '<html>Too Many Requests</html>'],
+    [429, { error: 'rate limited' }],
+    [403, { error: 'Forbidden' }],
+    [403, '<html>blocked</html>'],
+  ])('keeps the session for a later retry on a platform %i', async (status, body) => {
+    fetchMock.mockResolvedValue({ ok: false, status, json: async () => { if (typeof body === 'string') throw new SyntaxError('not json'); return body; } });
+    await expect(recordSession(payload)).resolves.toBe('queued');
+    expect(queue()).toHaveLength(1);
+    expect(queue()[0].attempts).toBe(1);
+  });
+
+  it('gives up on a session only after the attempts run out, not at the first 403', async () => {
+    fetchMock.mockResolvedValue(res(403));
+    await recordSession(payload);
+    for (let i = 0; i < 4; i++) await flushSessionQueue();
+    expect(queue()).toHaveLength(0);
+    expect(fetchMock).toHaveBeenCalledTimes(5);
   });
 
   it('keeps 401 for retry while a user is logged in', async () => {

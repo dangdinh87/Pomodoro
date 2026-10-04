@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { and, eq, gt, lte, sql, sum } from 'drizzle-orm';
 import { db } from '@/db';
 import { focusSessions, tasks } from '@/db/schema';
-import { SESSION_MAX_TOTAL_SEC_PER_DAY } from '@/config/constants';
+import { SESSION_LIMIT_CODE, SESSION_MAX_TOTAL_SEC_PER_DAY } from '@/config/constants';
 import { getSessionUser } from '@/lib/auth/session-user';
 import { badRequest, readJson, serverError, unauthorized } from '@/lib/api/responses';
 import { resolveSessionEnd, validateSessionCompletion } from './session-schemas';
@@ -92,7 +92,7 @@ export async function POST(request: Request) {
     });
 
     if ('limited' in outcome) {
-      return NextResponse.json({ error: 'Daily session limit exceeded' }, { status: 429 });
+      return NextResponse.json({ error: 'Daily session limit exceeded', code: SESSION_LIMIT_CODE }, { status: 429 });
     }
     return NextResponse.json(outcome);
   } catch (error) {

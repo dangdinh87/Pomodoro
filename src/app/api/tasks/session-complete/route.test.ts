@@ -3,7 +3,7 @@ import { createTestDb, createTestUser, jsonRequest, resetTestDb, type TestDb } f
 import { getSessionUser } from '@/lib/auth/session-user';
 import { eq, sql } from 'drizzle-orm';
 import { focusSessions, tasks } from '@/db/schema';
-import { SESSION_MAX_TOTAL_SEC_PER_DAY } from '@/config/constants';
+import { SESSION_LIMIT_CODE, SESSION_MAX_TOTAL_SEC_PER_DAY } from '@/config/constants';
 import { POST } from './route';
 
 let mockDb: TestDb;
@@ -69,7 +69,10 @@ describe('POST /api/tasks/session-complete', () => {
 
   it('refuses time beyond 24 hours in a rolling day', async () => {
     await mockDb.insert(focusSessions).values({ userId: 'u1', mode: 'work', durationSec: SESSION_MAX_TOTAL_SEC_PER_DAY - 100 });
-    expect((await record({ mode: 'work', durationSec: 101 })).status).toBe(429);
+    const refused = await record({ mode: 'work', durationSec: 101 });
+    expect(refused.status).toBe(429);
+    // typed, so the client can tell it from a 429 of the platform firewall (which is worth retrying)
+    expect(await refused.json()).toMatchObject({ code: SESSION_LIMIT_CODE });
     expect((await record({ mode: 'work', durationSec: 100 })).status).toBe(200);
   });
 

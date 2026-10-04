@@ -1,3 +1,4 @@
+import { SESSION_LIMIT_CODE } from '@/config/constants';
 import { ensureSession, type SessionUser } from '@/lib/auth-client';
 import { useAuthStore } from '@/stores/auth-store';
 import type { TimerMode } from '@/stores/timer-store';
@@ -131,9 +132,19 @@ export function normalizeDuration(durationSec: number): number {
 }
 
 // ok: acknowledged. drop: permanent rejection (400 invalid, 429 daily cap).
-// network: offline/aborted. server: 5xx or 401 (a logged-in client may just
-// have an expired token), retried a limited number of times.
+// network: offline/aborted. server: anything else that is not an acknowledgement
+// (5xx, 401 since a logged-in client may just have an expired token, and a 403 /
+// 429 from a firewall in front of the app), retried a limited number of times.
 type SendOutcome = 'ok' | 'drop' | 'network' | 'server';
+
+/** Did the app itself answer 429 because of the daily cap (typed `code`), not a firewall or CDN? */
+async function isDailyLimit(res: Response): Promise<boolean> {
+  try {
+    return ((await res.json()) as { code?: unknown } | null)?.code === SESSION_LIMIT_CODE;
+  } catch {
+    return false; // not JSON: not ours
+  }
+}
 
 /** When the segment ended: its own end time, else when it was queued (items stored by older versions). */
 function endTime({ payload, queuedAt }: QueuedSession): string {
@@ -159,7 +170,9 @@ async function send(item: QueuedSession): Promise<SendOutcome> {
       keepalive: true, // let the request survive tab close / reload
     });
     if (res.ok) return 'ok';
-    return res.status >= 500 || res.status === 401 ? 'server' : 'drop';
+    if (res.status === 400) return 'drop';
+    if (res.status === 429 && (await isDailyLimit(res))) return 'drop';
+    return 'server';
   } catch {
     return 'network';
   }
@@ -229,7 +242,7 @@ export async function recordSession(
       patchItem(item.id, { sendingAt: undefined });
       return 'queued';
     }
-    patchItem(item.id, { userId: guest.id, guest: true, sendingAt: Date.now() });
+    patchItem(item.id, { userId: guest.id, guest: guest.isAnonymous, sendingAt: Date.now() });
   }
 
   const outcome = await send(item);
