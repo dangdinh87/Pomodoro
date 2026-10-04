@@ -8,7 +8,7 @@
  *   /vi/tasks         -> 308 to /vi?panel=tasks  (former pages are panels now; /vi/timer -> /vi)
  *   /fr, /fr/guide    -> untouched               (unsupported locale: the route answers 404)
  *   /opengraph-image  -> rewrite to /en/opengraph-image (each language has its own share image)
- *   /api, /_next, files with an extension, sitemap/robots, /dev -> untouched
+ *   /api, /_next, /_vercel, files with an extension, sitemap/robots, /dev -> untouched
  */
 import { localePath, splitLocalePath } from './locale-path';
 import { DEFAULT_LANG, type Lang } from './negotiate-locale';
@@ -41,11 +41,11 @@ const LEGACY_PAGES: Record<string, string | null> = {
 };
 
 /**
- * First segments that are never pages: API, build output, dev tools and generated metadata
- * routes. `opengraph-image` is deliberately absent: the share image is per language and lives
+ * First segments that are never pages: API, build output, Vercel's own endpoints (Analytics beacons),
+ * dev tools and generated metadata routes. `opengraph-image` is deliberately absent: the share image is per language and lives
  * in the `[lang]` tree, so `/opengraph-image` is rewritten to `/en/opengraph-image` like a page.
  */
-const NON_PAGE_SEGMENTS = new Set(['api', '_next', 'dev', 'sitemap.xml', 'robots.txt', 'icon', 'apple-icon']);
+const NON_PAGE_SEGMENTS = new Set(['api', '_next', '_vercel', 'dev', 'sitemap.xml', 'robots.txt', 'icon', 'apple-icon']);
 
 /** `fr`, `pt-br`: looks like a locale but is not one we serve. */
 const LOCALE_LIKE = /^[a-z]{2}(?:-[a-z]{2,4})?$/i;

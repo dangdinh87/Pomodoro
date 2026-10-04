@@ -22,6 +22,7 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-    // Page requests only: not the API, Next internals, /dev or anything with an extension (static files).
-    matcher: ['/((?!api(?:/|$)|_next(?:/|$)|dev(?:/|$)|.*\\..*).*)'],
+    // Page requests only: not the API, Next/Vercel internals (/_vercel/insights, /_vercel/speed-insights),
+    // /dev or anything with an extension (static files).
+    matcher: ['/((?!api(?:/|$)|_next(?:/|$)|_vercel(?:/|$)|dev(?:/|$)|.*\\..*).*)'],
 }

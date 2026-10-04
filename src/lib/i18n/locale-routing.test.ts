@@ -75,6 +75,8 @@ describe('resolveLocaleRoute', () => {
       '/api',
       '/_next/static/chunks/app.js',
       '/_next/image',
+      '/_vercel/insights/view',
+      '/_vercel/speed-insights/vitals',
       '/sitemap.xml',
       '/robots.txt',
       '/icon',
@@ -100,6 +102,7 @@ describe('resolveLocaleRoute', () => {
     it('does not mistake a page whose name starts like an excluded one', () => {
       expect(resolveLocaleRoute('/device', '')).toEqual(rewrite('/en/device'));
       expect(resolveLocaleRoute('/apis', '')).toEqual(rewrite('/en/apis'));
+      expect(resolveLocaleRoute('/_vercelish', '')).toEqual(rewrite('/en/_vercelish'));
     });
   });
 });

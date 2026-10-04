@@ -67,7 +67,7 @@ describe('proxy', () => {
 describe('proxy matcher', () => {
   const runsOn = (url: string) => unstable_doesMiddlewareMatch({ config, url });
 
-  it.each(['/', '/guide', '/vi', '/vi/guide', '/en/guide', '/fr', '/device', '/apis'])('runs on %s', (url) => {
+  it.each(['/', '/guide', '/vi', '/vi/guide', '/en/guide', '/fr', '/device', '/apis', '/_vercelish'])('runs on %s', (url) => {
     expect(runsOn(url)).toBe(true);
   });
 
@@ -80,6 +80,8 @@ describe('proxy matcher', () => {
     '/manifest.json',
     '/icons/icon-192x192.png',
     '/dev/ui',
+    '/_vercel/insights/view', // Vercel Analytics beacon: must not become /en/_vercel/...
+    '/_vercel/speed-insights/vitals',
   ])('skips %s', (url) => {
     expect(runsOn(url)).toBe(false);
   });
