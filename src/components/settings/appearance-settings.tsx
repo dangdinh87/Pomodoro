@@ -59,7 +59,7 @@ export function AppearanceSettings() {
     }, [])
 
     const mode: ThemeMode = THEME_MODES.some((m) => m.value === theme) ? (theme as ThemeMode) : "light"
-    const presetName = (p: ColorPreset) => t(`settings.general.theme.themes.${p.key}`) || p.name
+    const presetName = (p: ColorPreset) => t(`settings.general.theme.themes.${p.key}`)
 
     const handleModeChange = (value: string) => {
         setTheme(value)
@@ -140,7 +140,7 @@ export function AppearanceSettings() {
                                         <span className="flex flex-col">
                                             <span>{presetName(p)}</span>
                                             <span className="text-xs text-ink-muted">
-                                                {t(`settings.general.theme.themeDescriptions.${p.key}`) || p.description}
+                                                {t(`settings.general.theme.themeDescriptions.${p.key}`)}
                                             </span>
                                         </span>
                                     </span>

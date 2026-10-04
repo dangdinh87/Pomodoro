@@ -113,7 +113,7 @@ export const TimerControls = memo(function TimerControls() {
                     completedFullSession: false,
                 });
             } else {
-                toast.info(t('timer.skipped_not_recorded') || 'Session skipped - not recorded');
+                toast.info(t('timer.skipped_not_recorded'));
             }
         } else {
             // Breaks are not recorded on manual skip
@@ -260,19 +260,18 @@ export const TimerControls = memo(function TimerControls() {
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>
-                            {t('timer.skip_confirm.title') || 'Skip without recording?'}
+                            {t('timer.skip_confirm.title')}
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                            {t('timer.skip_confirm.description') ||
-                                `You've completed less than ${MINIMUM_COMPLETION_PERCENT}% of this session. This will not count as a completed pomodoro.`}
+                            {t('timer.skip_confirm.description')}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>
-                            {t('common.cancel') || 'Cancel'}
+                            {t('common.cancel')}
                         </AlertDialogCancel>
                         <AlertDialogAction onClick={handleConfirmedSkip}>
-                            {t('timer.skip_confirm.confirm') || 'Skip anyway'}
+                            {t('timer.skip_confirm.confirm')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

@@ -77,19 +77,18 @@ export const TimerModeSelector = memo(function TimerModeSelector() {
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>
-                            {t('timer.mode_switch_confirm.title') || 'Switch mode?'}
+                            {t('timer.mode_switch_confirm.title')}
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                            {t('timer.mode_switch_confirm.description') ||
-                                'Timer is running. Switching mode will discard your current progress.'}
+                            {t('timer.mode_switch_confirm.description')}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel onClick={handleCancelSwitch}>
-                            {t('common.cancel') || 'Cancel'}
+                            {t('common.cancel')}
                         </AlertDialogCancel>
                         <AlertDialogAction variant="destructive" onClick={handleConfirmedSwitch}>
-                            {t('timer.mode_switch_confirm.confirm') || 'Switch anyway'}
+                            {t('timer.mode_switch_confirm.confirm')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
