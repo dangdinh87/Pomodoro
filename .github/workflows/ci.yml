@@ -23,8 +23,9 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm type-check
-      # Ratchet: fail if new warnings are introduced (lower the number as they are fixed)
-      - run: pnpm lint --max-warnings 189
+      # Ratchet: fail if new warnings are introduced (lower the number as they are fixed).
+      # 50 = measured on a clean checkout, 2026-10-05.
+      - run: pnpm lint --max-warnings 50
       - run: pnpm i18n:check
       - run: pnpm test --coverage
       - run: pnpm build

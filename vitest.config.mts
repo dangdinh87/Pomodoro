@@ -17,7 +17,8 @@ export default defineConfig({
       include: ['src/**/*.{ts,tsx}'],
       exclude: ['src/**/*.d.ts', 'src/**/*.test.{ts,tsx}', 'src/test-utils/**'],
       // Ratchet: set just below the measured coverage; raise it as tests are added.
-      thresholds: { statements: 14, branches: 13, functions: 11, lines: 14 },
+      // Measured 2026-10-05 on a clean checkout: 51.3 statements / 45.6 branches / 51.3 functions / 51.8 lines.
+      thresholds: { statements: 50, branches: 44, functions: 50, lines: 50 },
     },
   },
 });

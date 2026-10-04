@@ -8,6 +8,7 @@ export default defineConfig([
   // Agent tooling folders hold worktrees and scratch copies of the app.
   globalIgnores([
     '.next/**',
+    'coverage/**',
     'next-env.d.ts',
     '.kilo/**',
     '.claude/**',
@@ -32,6 +33,26 @@ export default defineConfig([
       'react-hooks/refs': 'warn',
       'react-hooks/purity': 'warn',
       'react-hooks/static-components': 'warn',
+    },
+  },
+  {
+    // next.config.ts maps `@phosphor-icons/react/dist/ssr` imports to one file per icon
+    // (modularizeImports). The deprecated `*Icon` aliases (ArmchairIcon) have no file, so the
+    // build fails with "Can't resolve .../ssr/ArmchairIcon" while tsc and the tests stay green.
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@phosphor-icons/react/dist/ssr'],
+              importNamePattern: '^.+Icon$',
+              message:
+                'Import the icon by its plain name (Armchair, not ArmchairIcon): modularizeImports in next.config.ts has no file for the *Icon aliases, so the build fails.',
+            },
+          ],
+        },
+      ],
     },
   },
   {
