@@ -1,18 +1,19 @@
-import { MAX_IDLE_PHASES, mayAutoChain } from './auto-chain';
+import { mayAutoChain } from './auto-chain';
 
 describe('mayAutoChain', () => {
-  it('chains focus and short breaks while the user is around', () => {
-    expect(mayAutoChain('work', 0)).toBe(true);
-    expect(mayAutoChain('shortBreak', 1)).toBe(true);
+  it('a focus session always rolls into its break', () => {
+    expect(mayAutoChain('work', true)).toBe(true);
+    // even when nobody touched the page: the idle cycle ends after the break
+    expect(mayAutoChain('work', false)).toBe(true);
+  });
+
+  it('a short break rolls into focus only if someone was around since the focus began', () => {
+    expect(mayAutoChain('shortBreak', true)).toBe(true);
+    expect(mayAutoChain('shortBreak', false)).toBe(false);
   });
 
   it('never chains out of a long break', () => {
-    expect(mayAutoChain('longBreak', 0)).toBe(false);
-  });
-
-  it('stops after a whole idle focus + break cycle', () => {
-    expect(MAX_IDLE_PHASES).toBe(2);
-    expect(mayAutoChain('work', 2)).toBe(false);
-    expect(mayAutoChain('shortBreak', 3)).toBe(false);
+    expect(mayAutoChain('longBreak', true)).toBe(false);
+    expect(mayAutoChain('longBreak', false)).toBe(false);
   });
 });

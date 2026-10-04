@@ -80,10 +80,9 @@ export function useTimerEngine() {
   // Fires exactly at the deadline. The interval alone is not enough: hidden tabs
   // get repeating timers throttled to about once a minute, a late alarm.
   const deadlineTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // Auto-chain guard: did anyone touch the page during the current phase, and
-  // how many finished phases in a row had nobody around.
+  // Auto-chain guard: did anyone touch the page since the current focus phase began
+  // (reset whenever a fresh focus starts). Mounting counts as presence.
   const interactedRef = useRef(true);
-  const idlePhasesRef = useRef(0);
   const totalFocusTimeRef = useRef(useTimerStore.getState().totalFocusTime);
   // BUG-05 FIX: Mutex to prevent concurrent handleLoopComplete calls
   const isCompletingRef = useRef(false);
@@ -252,11 +251,10 @@ export function useTimerEngine() {
         void record({ taskId: null, durationSec: duration, mode: currentMode, endedAt });
       }
 
-      // Auto-Transition (new phase starts a fresh baseline). The app only starts
-      // the next phase by itself while somebody is around, and never out of a
-      // long break; otherwise it waits on the start screen.
-      idlePhasesRef.current = interactedRef.current ? 0 : idlePhasesRef.current + 1;
-      const autoStart = !catchUp && mayAutoChain(currentMode, idlePhasesRef.current);
+      // Auto-Transition (new phase starts a fresh baseline). A break only rolls
+      // into the next focus if somebody was around since the previous focus began,
+      // and never out of a long break; otherwise it waits on the start screen.
+      const autoStart = !catchUp && mayAutoChain(currentMode, interactedRef.current);
       const next = (
         nextMode: 'work' | 'shortBreak' | 'longBreak',
         minutes: number,
@@ -267,8 +265,6 @@ export function useTimerEngine() {
         setTimeLeft(newDuration);
         useTimerStore.getState().setLastSessionTimeLeft(newDuration);
         if (shouldStart && autoStart) {
-          // The phase that starts now has had no visitor yet
-          interactedRef.current = false;
           setIsRunning(true);
         }
       };
@@ -322,6 +318,7 @@ export function useTimerEngine() {
       return;
     }
 
+    const armedBefore = timerEndRef.current !== null;
     const deadlineAt = useTimerStore.getState().deadlineAt; // Check if deadline exists
     // Also re-evaluate when the store holds a different deadline than we armed
     // (adopted from another tab)
@@ -345,6 +342,13 @@ export function useTimerEngine() {
       }
       prevRemainingRef.current = timeLeftRef.current;
     }
+
+    // A fresh focus (auto-started or by hand) opens a new attendance window; a
+    // resume mid-phase keeps what the user already did during it.
+    const freshFocus =
+      useTimerStore.getState().mode === 'work' &&
+      timeLeftRef.current >= useTimerStore.getState().settings.workDuration * 60;
+    if (freshFocus && !armedBefore) interactedRef.current = false;
 
     // Fetch the bell now so it can sound the instant the deadline hits
     preloadAlarm();

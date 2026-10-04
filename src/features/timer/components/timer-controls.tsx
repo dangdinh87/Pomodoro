@@ -155,7 +155,7 @@ export const TimerControls = memo(function TimerControls() {
                 setTimeLeft(newDuration);
                 useTimerStore.getState().setLastSessionTimeLeft(newDuration);
                 // Skipping a long break ends the chain: the next focus waits for a click
-                if (settings.autoStartWork && mayAutoChain(mode, 0) && !skipWithoutRecording) {
+                if (settings.autoStartWork && mayAutoChain(mode, true) && !skipWithoutRecording) {
                     requestAnimationFrame(() => setIsRunning(true));
                 }
             }

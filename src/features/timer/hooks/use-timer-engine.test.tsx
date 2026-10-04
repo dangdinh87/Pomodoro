@@ -338,22 +338,20 @@ describe('useTimerEngine auto-start chain', () => {
     expect(useTimerStore.getState().isRunning).toBe(false);
   });
 
-  it('waits on the start screen after a whole focus + break cycle without any interaction', () => {
-    // started by the user (mount counts as presence), then left alone
+  it('waits on the start screen after one focus + break cycle without any interaction', () => {
+    // Start pressed, then the user walks away (the Start press itself is not "around")
     resetStore({ timeLeft: 60, isRunning: true, deadlineAt: T + MINUTE });
     renderHook(() => useTimerEngine());
 
-    runPhase(); // focus 1 (attended) -> break auto-starts
+    runPhase(); // focus 1 (nobody around) -> its break still auto-starts
     expect(useTimerStore.getState()).toMatchObject({ mode: 'shortBreak', isRunning: true });
-    runPhase(); // break (nobody around) -> focus auto-starts
-    expect(useTimerStore.getState()).toMatchObject({ mode: 'work', isRunning: true });
-    runPhase(); // focus 2 (nobody around): a whole idle cycle -> stop
-    expect(useTimerStore.getState()).toMatchObject({ mode: 'shortBreak', isRunning: false, timeLeft: 60 });
-    expect(mockRecord).toHaveBeenCalledTimes(3);
+    runPhase(); // break (nobody around): a whole idle cycle -> the next focus waits
+    expect(useTimerStore.getState()).toMatchObject({ mode: 'work', isRunning: false, timeLeft: 60 });
+    expect(mockRecord).toHaveBeenCalledTimes(2);
 
     // and it stays stopped
     runPhase(5 * MINUTE);
-    expect(mockRecord).toHaveBeenCalledTimes(3);
+    expect(mockRecord).toHaveBeenCalledTimes(2);
   });
 
   it.each([
@@ -362,41 +360,65 @@ describe('useTimerEngine auto-start chain', () => {
     ['keydown', () => window.dispatchEvent(new Event('keydown'))],
     ['window focus', () => window.dispatchEvent(new Event('focus'))],
     ['tab becoming visible', () => document.dispatchEvent(new Event('visibilitychange'))],
-  ])('%s during a phase keeps the chain going', (_name, fire) => {
+  ])('%s during the focus keeps the chain going', (_name, fire) => {
+    resetStore({ timeLeft: 60, isRunning: true, deadlineAt: T + MINUTE });
+    renderHook(() => useTimerEngine());
+
+    runPhase(MINUTE / 2);
+    act(() => fire()); // the user is at the screen during the focus
+    runPhase(MINUTE / 2 + 1000); // focus ends -> break
+    runPhase(); // break (idle) ends -> focus still auto-starts: they were around since the focus began
+    expect(useTimerStore.getState()).toMatchObject({ mode: 'work', isRunning: true });
+  });
+
+  it('interaction during the break alone also keeps the chain going', () => {
     resetStore({ timeLeft: 60, isRunning: true, deadlineAt: T + MINUTE });
     renderHook(() => useTimerEngine());
 
     runPhase(); // focus 1 -> break
     runPhase(MINUTE / 2);
-    act(() => fire()); // the user is back in the middle of the break
+    interact('keydown');
     runPhase(MINUTE / 2 + 1000); // break ends -> focus
-    runPhase(); // focus 2 (idle) -> break still auto-starts: only 1 idle phase so far
-    expect(useTimerStore.getState()).toMatchObject({ mode: 'shortBreak', isRunning: true });
-  });
-
-  it('counts the next idle cycle from zero after the user comes back', () => {
-    resetStore({ timeLeft: 60, isRunning: true, deadlineAt: T + MINUTE });
-    renderHook(() => useTimerEngine());
-    runPhase(); // focus 1 -> break
-    runPhase(); // break (idle) -> focus
-    interact(); // user returns during focus 2
-    runPhase(); // focus 2 (attended) -> break
-    expect(useTimerStore.getState()).toMatchObject({ mode: 'shortBreak', isRunning: true });
-    runPhase(); // break (idle 1) -> focus
     expect(useTimerStore.getState()).toMatchObject({ mode: 'work', isRunning: true });
   });
 
-  it('manual start after the chain stopped resumes normal chaining', () => {
+  it('counts the next idle cycle from zero once a new focus has begun', () => {
+    resetStore({ timeLeft: 60, isRunning: true, deadlineAt: T + MINUTE });
+    renderHook(() => useTimerEngine());
+    interact(); // around during focus 1
+    runPhase(); // focus 1 -> break
+    runPhase(); // break (idle) -> focus 2 (attended since focus 1 began)
+    expect(useTimerStore.getState()).toMatchObject({ mode: 'work', isRunning: true });
+    runPhase(); // focus 2 (nobody around) -> break
+    expect(useTimerStore.getState()).toMatchObject({ mode: 'shortBreak', isRunning: true });
+    runPhase(); // break (idle): nobody since focus 2 began -> stop
+    expect(useTimerStore.getState()).toMatchObject({ mode: 'work', isRunning: false });
+  });
+
+  it('a manual start after the chain stopped resumes normal chaining', () => {
     resetStore({ timeLeft: 60, isRunning: true, deadlineAt: T + MINUTE });
     renderHook(() => useTimerEngine());
     runPhase();
-    runPhase();
-    runPhase(); // stopped on the break
-    expect(useTimerStore.getState().isRunning).toBe(false);
+    runPhase(); // stopped on the next focus
+    expect(useTimerStore.getState()).toMatchObject({ mode: 'work', isRunning: false });
 
     interact('pointerdown'); // click Start
     act(() => useTimerStore.getState().resumeTimer());
-    runPhase(); // break (attended)
+    interact('pointermove'); // and stays around
+    runPhase(); // focus 2 (attended) -> break
+    runPhase(); // break (idle) -> focus 3, someone was around since focus 2 began
+    expect(useTimerStore.getState()).toMatchObject({ mode: 'work', isRunning: true });
+  });
+
+  it('resuming a paused focus is not a new focus: earlier presence still counts', () => {
+    resetStore({ timeLeft: 60, isRunning: true, deadlineAt: T + MINUTE });
+    renderHook(() => useTimerEngine());
+    runPhase(20_000);
+    interact(); // around during this focus
+    act(() => useTimerStore.getState().pauseTimer());
+    act(() => useTimerStore.getState().resumeTimer()); // resume mid-phase
+    runPhase(MINUTE); // focus ends -> break
+    runPhase(); // break (idle) -> focus
     expect(useTimerStore.getState()).toMatchObject({ mode: 'work', isRunning: true });
   });
 });
