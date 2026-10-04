@@ -1159,7 +1159,7 @@
       "lead": "One page with the timer, your tasks and your history. Everything below is in the app today.",
       "timer": {
         "title": "Focus, short break and long break",
-        "desc": "Three timer modes with adjustable lengths (focus up to 60 minutes), a long break every few sessions, optional auto-start for the next step and a choice of clock styles."
+        "desc": "Three timer modes with adjustable lengths (focus up to 120 minutes), a long break every few sessions, optional auto-start for the next step and a choice of clock styles."
       },
       "tasks": {
         "title": "Tasks linked to sessions",
@@ -1228,7 +1228,7 @@
       },
       "q3": {
         "q": "Can I change the timer lengths?",
-        "a": "Yes. In Timer settings you can set focus from 1 to 60 minutes, short break from 1 to 30, long break from 1 to 60, and how many sessions come before a long break (2 to 10). You can also turn auto-start for breaks and focus sessions on or off."
+        "a": "Yes. In Timer settings you can set focus from 1 to 120 minutes, short break from 1 to 30, long break from 1 to 60, and how many sessions come before a long break (2 to 10). Presets cover 25/5, 50/10, 52/17 and 90/20. You can also turn auto-start for breaks and focus sessions on or off."
       },
       "q4": {
         "q": "How do tasks work with the timer?",
@@ -1276,7 +1276,7 @@
         "5": "**Take the short break.** Five minutes away from the screen. Do not start something new.",
         "6": "**Repeat, and rest longer after four.** After four focus sessions take a long break (15 minutes by default, up to 30 is common), then start a new cycle."
       },
-      "note": "By default Study Bro starts the next step on its own. If you prefer to press start yourself, turn off auto-start in Timer settings (C)."
+      "note": "By default a break starts on its own when a focus session ends, but the next focus session waits until you press start. You can change both in Timer settings (C)."
     },
     "rhythm": {
       "title": "Choosing 25/5, 50/10, 52/17 or a longer block",
@@ -1305,7 +1305,7 @@
         "for": "Demanding work you want to protect from interruption. The 90-minute figure borrows from ultradian-rhythm ideas, where the evidence is mixed."
       },
       "how": "How to choose: use 25/5 for a week. If the timer rings just as you get going, move to 50/10. If you cannot make yourself start, shorten the block. Whatever you pick, keep the breaks.",
-      "limits": "In Timer settings (C) focus can be 1 to 60 minutes, a short break 1 to 30, a long break 1 to 60, and a long break can come every 2 to 10 sessions. For a 90-minute block, run two linked sessions and keep the break between them short."
+      "limits": "In Timer settings (C) focus can be 1 to 120 minutes, a short break 1 to 30, a long break 1 to 60, and a long break can come every 2 to 10 sessions. For a 90-minute block, choose the 90/20 preset: 90 minutes of focus, then a 20-minute break."
     },
     "interruptions": {
       "title": "Handling interruptions",

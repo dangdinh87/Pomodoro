@@ -1159,7 +1159,7 @@
       "lead": "Một trang gồm đồng hồ, danh sách việc và lịch sử của bạn. Mọi thứ dưới đây đều có sẵn trong ứng dụng.",
       "timer": {
         "title": "Tập trung, nghỉ ngắn và nghỉ dài",
-        "desc": "Ba chế độ với thời lượng tuỳ chỉnh (tập trung tối đa 60 phút), nghỉ dài sau một số phiên, tự chuyển bước tiếp theo nếu bạn muốn và nhiều kiểu đồng hồ."
+        "desc": "Ba chế độ với thời lượng tuỳ chỉnh (tập trung tối đa 120 phút), nghỉ dài sau một số phiên, tự chuyển bước tiếp theo nếu bạn muốn và nhiều kiểu đồng hồ."
       },
       "tasks": {
         "title": "Việc gắn với phiên",
@@ -1228,7 +1228,7 @@
       },
       "q3": {
         "q": "Tôi có đổi được thời lượng không?",
-        "a": "Có. Trong cài đặt hẹn giờ, bạn đặt tập trung từ 1 đến 60 phút, nghỉ ngắn từ 1 đến 30, nghỉ dài từ 1 đến 60 và số phiên trước mỗi lần nghỉ dài (2 đến 10). Bạn cũng bật hoặc tắt tự chạy bước tiếp theo cho giờ nghỉ và phiên tập trung."
+        "a": "Có. Trong cài đặt hẹn giờ, bạn đặt tập trung từ 1 đến 120 phút, nghỉ ngắn từ 1 đến 30, nghỉ dài từ 1 đến 60 và số phiên trước mỗi lần nghỉ dài (2 đến 10). Có sẵn các mẫu 25/5, 50/10, 52/17 và 90/20. Bạn cũng bật hoặc tắt tự chạy bước tiếp theo cho giờ nghỉ và phiên tập trung."
       },
       "q4": {
         "q": "Việc hoạt động cùng đồng hồ thế nào?",
@@ -1276,7 +1276,7 @@
         "5": "**Nghỉ ngắn.** Năm phút rời màn hình. Đừng bắt đầu việc mới.",
         "6": "**Lặp lại, và nghỉ dài sau bốn phiên.** Sau bốn phiên tập trung, nghỉ dài (mặc định 15 phút, thường tới 30), rồi bắt đầu chu kỳ mới."
       },
-      "note": "Mặc định Study Bro tự chuyển sang bước tiếp theo. Nếu bạn thích tự bấm bắt đầu, hãy tắt tự chạy trong Cài đặt hẹn giờ (C)."
+      "note": "Mặc định, giờ nghỉ tự bắt đầu khi phiên tập trung kết thúc, còn phiên tập trung tiếp theo sẽ đợi bạn bấm bắt đầu. Bạn có thể đổi cả hai trong Cài đặt hẹn giờ (C)."
     },
     "rhythm": {
       "title": "Chọn 25/5, 50/10, 52/17 hay khối dài hơn",
@@ -1305,7 +1305,7 @@
         "for": "Việc đòi hỏi cao, cần được bảo vệ khỏi gián đoạn. Con số 90 phút mượn từ ý tưởng nhịp ultradian, và bằng chứng về nó còn trái chiều."
       },
       "how": "Cách chọn: dùng 25/5 trong một tuần. Nếu đồng hồ reo đúng lúc bạn vừa vào guồng, chuyển sang 50/10. Nếu bạn khó bắt đầu, rút ngắn khối lại. Dù chọn gì, hãy giữ giờ nghỉ.",
-      "limits": "Trong Cài đặt hẹn giờ (C), tập trung từ 1 đến 60 phút, nghỉ ngắn 1 đến 30, nghỉ dài 1 đến 60, và nghỉ dài có thể đến sau mỗi 2 đến 10 phiên. Với khối 90 phút, hãy chạy hai phiên liền nhau và giữ quãng nghỉ giữa chúng thật ngắn."
+      "limits": "Trong Cài đặt hẹn giờ (C), tập trung từ 1 đến 120 phút, nghỉ ngắn 1 đến 30, nghỉ dài 1 đến 60, và nghỉ dài có thể đến sau mỗi 2 đến 10 phiên. Với khối 90 phút, hãy chọn mẫu 90/20: 90 phút tập trung, rồi nghỉ 20 phút."
     },
     "interruptions": {
       "title": "Xử lý gián đoạn",
