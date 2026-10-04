@@ -1324,6 +1324,7 @@
     "title": "Kỹ thuật Pomodoro: hướng dẫn thực hành",
     "lead": "Pomodoro là gì, cách chạy một phiên, chọn thời lượng nào, và dùng Study Bro để thực hiện.",
     "toc": "Trong trang này",
+    "updated": "Cập nhật lần cuối: 05/10/2026",
     "what": {
       "title": "Kỹ thuật Pomodoro là gì",
       "p1": "Kỹ thuật Pomodoro là phương pháp quản lý thời gian do Francesco Cirillo phát triển vào cuối thập niên 1980. Bạn làm việc theo các khối ngắn, cố định, thường là 25 phút, xen kẽ những quãng nghỉ ngắn. Mỗi khối là một **pomodoro**, tiếng Ý nghĩa là quả cà chua, theo chiếc đồng hồ bếp hình quả cà chua mà Cirillo dùng hồi còn là sinh viên.",
@@ -1424,6 +1425,14 @@
       "stats": "Mở Thống kê",
       "arcade": "Mở Trò chơi",
       "palette": "Tìm và chạy mọi lệnh"
+    },
+    "sources": {
+      "title": "Nguồn tham khảo",
+      "intro": "Hướng dẫn này tóm tắt thực hành từ các nguồn dưới đây. Chỗ nào bằng chứng còn yếu, nội dung đều nói rõ.",
+      "list": {
+        "1": "**Francesco Cirillo, The Pomodoro Technique** (Currency, 2018): khối 25 phút, các quãng nghỉ và cách xử lý gián đoạn.",
+        "2": "**DeskTime** (2014): phân tích dữ liệu hoạt động của chính người dùng công ty này, nguồn gốc của nhịp 52/17. Đây là phân tích riêng của một công ty, không phải nghiên cứu có đối chứng."
+      }
     },
     "cta": {
       "title": "Sẵn sàng cho khối đầu tiên?",

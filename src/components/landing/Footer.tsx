@@ -10,12 +10,12 @@ import { LanguageSwitcher } from '@/components/layout/language-switcher';
 import { PanelLink } from './panel-link';
 
 const LINK =
-  'rounded text-sm text-ink-muted transition-colors hover:text-ink focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand';
+  'focus-ring rounded-sm text-[0.9375rem] font-semibold text-ink-secondary underline-offset-4 transition-colors hover:text-ink hover:underline';
 
 function Column({ title, children }: { title: string; children: ReactNode }) {
   return (
     <nav aria-label={title}>
-      <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-ink-faint">{title}</h2>
+      <h2 className="mb-3 font-heading text-base font-bold text-ink">{title}</h2>
       <ul className="space-y-2.5">{children}</ul>
     </nav>
   );
@@ -24,14 +24,14 @@ function Column({ title, children }: { title: string; children: ReactNode }) {
 export async function Footer() {
   const t = await getT();
   return (
-    <footer className="border-t border-border bg-surface-page px-[clamp(16px,4vw,32px)]">
+    <footer className="border-t-[length:var(--outline-w)] border-outline bg-surface-raised px-[clamp(16px,4vw,32px)]">
       <div className="mx-auto max-w-[1180px]">
         <div className="grid gap-10 py-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
           <div className="max-w-sm">
-            <Link href="/" className="inline-flex items-center gap-2.5 rounded focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand">
+            <Link href="/" className="focus-ring inline-flex items-center gap-2.5 rounded-md">
               <Logo size={28} />
             </Link>
-            <p className="mt-3 text-sm leading-relaxed text-ink-muted">{t('site.footer.tagline')}</p>
+            <p className="mt-3 text-sm leading-relaxed text-ink-secondary">{t('site.footer.tagline')}</p>
           </div>
 
           <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3">
@@ -55,8 +55,8 @@ export async function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col items-start justify-between gap-4 border-t border-border py-6 sm:flex-row sm:items-center">
-          <p className="text-sm text-ink-muted">
+        <div className="flex flex-col items-start justify-between gap-4 border-t-2 border-border py-6 sm:flex-row sm:items-center">
+          <p className="text-sm text-ink-secondary">
             © {new Date().getFullYear()} {t('brand.title')}. {t('landing.footer.rightsReserved')}
           </p>
           <LanguageSwitcher />

@@ -36,7 +36,7 @@ const RHYTHMS = ['classic', 'extended', 'ratio', 'deep'] as const;
 function Go({ panel, children }: { panel: PanelId; children: ReactNode }) {
   return (
     <p>
-      <PanelLink panel={panel} className="inline-flex items-center gap-1.5 font-medium text-brand hover:underline">
+      <PanelLink panel={panel} className="focus-ring inline-flex items-center gap-1.5 rounded-sm font-heading text-base font-bold text-brand underline-offset-4 hover:text-brand-hover hover:underline">
         {children}
         <ArrowRight size={14} weight="bold" />
       </PanelLink>
@@ -79,20 +79,20 @@ export default async function GuidePage() {
       body: (
         <>
           <P>{t('guide2.rhythm.intro')}</P>
-          <div className="overflow-x-auto rounded-lg border border-border bg-surface">
+          <div className="border-sticker overflow-x-auto rounded-xl bg-surface">
             <table className="w-full min-w-[34rem] text-left text-sm">
-              <thead className="bg-surface-raised text-xs font-semibold uppercase tracking-wider text-ink-muted">
+              <thead className="border-b-2 border-outline bg-surface-raised font-heading text-sm font-bold text-ink">
                 <tr>
-                  <th scope="col" className="px-4 py-2.5">{t('guide2.rhythm.colName')}</th>
-                  <th scope="col" className="px-4 py-2.5">{t('guide2.rhythm.colTimes')}</th>
-                  <th scope="col" className="px-4 py-2.5">{t('guide2.rhythm.colFor')}</th>
+                  <th scope="col" className="px-4 py-3">{t('guide2.rhythm.colName')}</th>
+                  <th scope="col" className="px-4 py-3">{t('guide2.rhythm.colTimes')}</th>
+                  <th scope="col" className="px-4 py-3">{t('guide2.rhythm.colFor')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border align-top">
+              <tbody className="divide-y-2 divide-border align-top">
                 {RHYTHMS.map((r) => (
                   <tr key={r}>
-                    <th scope="row" className="px-4 py-3 font-semibold text-ink">{t(`guide2.rhythm.${r}.name`)}</th>
-                    <td className="whitespace-nowrap px-4 py-3 tabular-nums text-ink">{t(`guide2.rhythm.${r}.times`)}</td>
+                    <th scope="row" className="px-4 py-3 font-heading text-base font-bold text-ink">{t(`guide2.rhythm.${r}.name`)}</th>
+                    <td className="whitespace-nowrap px-4 py-3 font-bold tabular-nums text-ink">{t(`guide2.rhythm.${r}.times`)}</td>
                     <td className="px-4 py-3 text-ink-secondary">{t(`guide2.rhythm.${r}.for`)}</td>
                   </tr>
                 ))}
@@ -154,19 +154,19 @@ export default async function GuidePage() {
       body: (
         <>
           <P>{t('guide2.shortcuts.intro')}</P>
-          <div className="overflow-hidden rounded-lg border border-border bg-surface">
+          <div className="border-sticker overflow-x-auto rounded-xl bg-surface">
             <table className="w-full text-left text-sm">
-              <thead className="bg-surface-raised text-xs font-semibold uppercase tracking-wider text-ink-muted">
+              <thead className="border-b-2 border-outline bg-surface-raised font-heading text-sm font-bold text-ink">
                 <tr>
-                  <th scope="col" className="w-40 px-4 py-2.5">{t('pagesUi.guide.colKey')}</th>
-                  <th scope="col" className="px-4 py-2.5">{t('pagesUi.guide.colAction')}</th>
+                  <th scope="col" className="w-40 px-4 py-3">{t('pagesUi.guide.colKey')}</th>
+                  <th scope="col" className="px-4 py-3">{t('pagesUi.guide.colAction')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y-2 divide-border">
                 {SHORTCUTS.map(({ keys, action }) => (
                   <tr key={action}>
                     <td className="px-4 py-2.5">
-                      <span className="flex items-center gap-1.5">
+                      <span className="flex flex-wrap items-center gap-1.5">
                         {keys.map((k, i) => (
                           <span key={k} className="flex items-center gap-1.5">
                             {i > 0 ? <span className="text-xs text-ink-muted">/</span> : null}
@@ -181,6 +181,16 @@ export default async function GuidePage() {
               </tbody>
             </table>
           </div>
+        </>
+      ),
+    },
+    {
+      id: 'sources',
+      title: t('guide2.sources.title'),
+      body: (
+        <>
+          <P>{t('guide2.sources.intro')}</P>
+          <UL items={list('guide2.sources.list', 2)} />
         </>
       ),
     },
@@ -204,12 +214,14 @@ export default async function GuidePage() {
       <DocLayout
         title={t('guide2.title')}
         lead={t('guide2.lead')}
+        meta={t('guide2.updated')}
+        metaDateTime="2026-10-05"
         tocLabel={t('guide2.toc')}
         sections={sections}
         after={
-          <section className="border-t border-border pt-10">
-            <h2 className="font-heading text-2xl font-bold leading-[1.15] tracking-[-0.02em] text-ink">{t('guide2.cta.title')}</h2>
-            <p className="mt-3 text-base leading-[1.7] text-ink-secondary">{t('guide2.cta.text')}</p>
+          <section className="border-t-2 border-dashed border-border pt-10">
+            <h2 className="font-heading text-2xl font-bold leading-[1.2] tracking-[-0.02em] text-ink">{t('guide2.cta.title')}</h2>
+            <p className="mt-3 text-base leading-[1.75] text-ink-secondary [&:lang(ja)]:leading-[1.95]">{t('guide2.cta.text')}</p>
             <Button asChild size="lg" className="mt-6">
               <Link href="/">{t('guide2.cta.button')}</Link>
             </Button>

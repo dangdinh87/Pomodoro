@@ -1324,6 +1324,7 @@
     "title": "The Pomodoro Technique: a practical guide",
     "lead": "What it is, how to run a session, which lengths to choose, and how to use Study Bro to do it.",
     "toc": "On this page",
+    "updated": "Last updated: October 5, 2026",
     "what": {
       "title": "What the Pomodoro Technique is",
       "p1": "The Pomodoro Technique is a time-management method developed by Francesco Cirillo in the late 1980s. You work in short, fixed blocks, traditionally 25 minutes, separated by short breaks. Each block is a **pomodoro**, Italian for tomato, after the tomato-shaped kitchen timer Cirillo used as a student.",
@@ -1424,6 +1425,14 @@
       "stats": "Open Stats",
       "arcade": "Open the Arcade",
       "palette": "Search and run any command"
+    },
+    "sources": {
+      "title": "Sources",
+      "intro": "This guide is a practical summary of the sources below. Where the evidence is weak, the text says so.",
+      "list": {
+        "1": "**Francesco Cirillo, The Pomodoro Technique** (Currency, 2018): the 25-minute block, the breaks and the rules for handling interruptions.",
+        "2": "**DeskTime** (2014): an analysis of its own users' activity data, the origin of the 52/17 rhythm. It is one company's analysis, not a controlled study."
+      }
     },
     "cta": {
       "title": "Ready for the first block?",

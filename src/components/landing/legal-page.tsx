@@ -40,6 +40,7 @@ export function LegalPage({
       title={t(`${ns}.title`)}
       lead={t(`${ns}.lead`)}
       meta={t('legal.updated')}
+      metaDateTime="2026-10-02"
       tocLabel={t('guide2.toc')}
       sections={sections}
     />
