@@ -8,7 +8,7 @@ const script = path.resolve(import.meta.dirname, '../../scripts/check-prod-env.m
 
 function run(env: Record<string, string>) {
   // A clean environment: whatever the machine running the tests has set must not leak in
-  const result = spawnSync(process.execPath, [script], { env: { PATH: process.env.PATH ?? '', ...env }, encoding: 'utf8' });
+  const result = spawnSync(process.execPath, [script], { env: { PATH: process.env.PATH ?? '', ...env } as unknown as NodeJS.ProcessEnv, encoding: 'utf8' });
   return { code: result.status, out: `${result.stdout}${result.stderr}` };
 }
 
@@ -53,7 +53,7 @@ describe('check-prod-env (production build gate)', () => {
     expect(run({ ...production, ...configured, NEXT_PUBLIC_SITE_URL: 'https://studywithbro.com/' }).code).toBe(0);
   });
 
-  it.each([{}, { VERCEL_ENV: 'preview' }, { VERCEL_ENV: 'development' }])(
+  it.each<Record<string, string>>([{}, { VERCEL_ENV: 'preview' }, { VERCEL_ENV: 'development' }])(
     'leaves every other build alone (CI, local, preview): %o',
     (env) => {
       expect(run(env).code).toBe(0);
