@@ -3,7 +3,7 @@ import { consumeRateLimit, getClientIp } from '@/lib/api/in-memory-rate-limiter'
 import { readCappedText } from '@/lib/api/read-capped-text';
 import { badRequest } from '@/lib/api/responses';
 import { cspViolationToReport, parseCspReports } from '@/lib/observability/csp-report';
-import { scheduleReport } from '@/lib/observability/schedule-report';
+import { scheduleGatedReport } from '@/lib/observability/report-gate';
 
 const MAX_BODY_BYTES = 16 * 1024;
 const LIMIT_PER_WINDOW = 60;
@@ -14,7 +14,8 @@ const ACCEPTED_TYPES = ['application/csp-report', 'application/reports+json', 'a
 /**
  * Where the Content-Security-Policy `report-uri` / `report-to` point. Browsers send these without
  * credentials and ignore the answer, so there is no auth or origin check; the size cap and the
- * per-IP limit keep it from being a log-flooding tool.
+ * per-IP limit keep it from being a log-flooding tool, and the report gate (sampling, dedupe, a
+ * per-instance cap) keeps it from draining the Sentry quota.
  */
 export async function POST(request: Request) {
   const limit = consumeRateLimit(`csp-report:${getClientIp(request)}`, LIMIT_PER_WINDOW, WINDOW_MS);
@@ -39,6 +40,6 @@ export async function POST(request: Request) {
   const looksLikeReport = Array.isArray(body) || (!!body && typeof body === 'object' && 'csp-report' in body);
   if (!looksLikeReport) return badRequest('Not a CSP report');
 
-  for (const violation of parseCspReports(body)) scheduleReport(cspViolationToReport(violation));
+  for (const violation of parseCspReports(body)) scheduleGatedReport(cspViolationToReport(violation));
   return new NextResponse(null, { status: 204 });
 }

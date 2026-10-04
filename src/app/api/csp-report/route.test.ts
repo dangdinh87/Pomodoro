@@ -1,6 +1,7 @@
 /** @vitest-environment node */
 import { resetRateLimitsForTests } from '@/lib/api/in-memory-rate-limiter';
 import { reportError } from '@/lib/observability/error-reporter';
+import { resetReportGateForTests } from '@/lib/observability/report-gate';
 import { POST } from './route';
 
 vi.mock('@/lib/observability/error-reporter', async (importOriginal) => ({
@@ -21,8 +22,11 @@ const LEGACY = JSON.stringify({ 'csp-report': { 'document-uri': 'x' } });
 
 beforeEach(() => {
   resetRateLimitsForTests();
+  resetReportGateForTests();
   vi.mocked(reportError).mockClear();
+  vi.spyOn(Math, 'random').mockReturnValue(0); // inside the 10% sample unless a test says otherwise
 });
+afterEach(() => vi.restoreAllMocks());
 
 describe('POST /api/csp-report', () => {
   it('accepts application/csp-report with 204 and logs the violation as a warning', async () => {
@@ -65,5 +69,40 @@ describe('POST /api/csp-report', () => {
     expect(limited.status).toBe(429);
     expect(limited.headers.get('Retry-After')).not.toBeNull();
     expect((await send(LEGACY, 'application/csp-report', '198.51.100.1')).status).toBe(204);
+  });
+
+  describe('keeping the Sentry quota safe', () => {
+    const violation = (blocked: string) => JSON.stringify({ 'csp-report': { 'document-uri': 'https://studywithbro.com/', 'blocked-uri': blocked, 'violated-directive': "script-src 'self'" } });
+
+    it('forwards only about 10% of the reports', async () => {
+      vi.spyOn(Math, 'random').mockReturnValue(0.5);
+      expect((await send(violation('inline'))).status).toBe(204);
+      expect(reportError).not.toHaveBeenCalled();
+
+      vi.spyOn(Math, 'random').mockReturnValue(0.05);
+      expect((await send(violation('inline'))).status).toBe(204);
+      expect(reportError).toHaveBeenCalledTimes(1);
+    });
+
+    it('forwards the same violation once per window, however many visitors hit it', async () => {
+      for (let i = 0; i < 10; i++) expect((await send(violation('inline'), 'application/csp-report', `203.0.113.${i + 1}`)).status).toBe(204);
+      expect(reportError).toHaveBeenCalledTimes(1);
+    });
+
+    it('forwards at most 30 different violations a minute from this instance', async () => {
+      for (let i = 0; i < 40; i++) {
+        const res = await send(violation(`https://cdn${i}.example/a.js`), 'application/csp-report', `203.0.113.${i + 10}`);
+        expect(res.status).toBe(204);
+      }
+      expect(reportError).toHaveBeenCalledTimes(30);
+    });
+
+    it('a batch counts each violation, not each request', async () => {
+      const body = JSON.stringify(
+        Array.from({ length: 10 }, (_, i) => ({ type: 'csp-violation', body: { documentURL: 'https://studywithbro.com/', blockedURL: `https://c${i}.example/x.js`, effectiveDirective: 'script-src' } })),
+      );
+      for (let i = 0; i < 5; i++) await send(body, 'application/reports+json', `203.0.113.${i + 1}`);
+      expect(reportError).toHaveBeenCalledTimes(10); // the same ten violations, forwarded once
+    });
   });
 });

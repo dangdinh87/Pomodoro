@@ -3,14 +3,18 @@ import { consumeRateLimit, getClientIp } from '@/lib/api/in-memory-rate-limiter'
 import { readCappedText } from '@/lib/api/read-capped-text';
 import { badRequest } from '@/lib/api/responses';
 import { sameOriginJsonGuard } from '@/lib/api/same-origin-json-guard';
-import { scheduleReport } from '@/lib/observability/schedule-report';
+import { scheduleGatedReport } from '@/lib/observability/report-gate';
 import { validateClientError } from './client-error-schema';
 
 const MAX_BODY_BYTES = 8 * 1024;
 const LIMIT_PER_WINDOW = 20;
 const WINDOW_MS = 60 * 1000;
 
-/** Error boundaries post here, so browser-side crashes reach the same log/Sentry pipeline as server errors. */
+/**
+ * Error boundaries post here, so browser-side crashes reach the same log/Sentry pipeline as server errors.
+ * The endpoint is public (a same-origin check does not stop `curl`), so reports pass the report gate:
+ * repeats, extension noise and anything over the per-instance cap are answered 204 and not forwarded.
+ */
 export async function POST(request: Request) {
   const blocked = sameOriginJsonGuard(request, { requireJson: true });
   if (blocked) return blocked;
@@ -36,6 +40,6 @@ export async function POST(request: Request) {
   if (!parsed.success) return badRequest(parsed.error);
 
   const { boundary, path, ...error } = parsed.data;
-  scheduleReport({ source: 'client', ...error, route: path, tags: { boundary } });
+  scheduleGatedReport({ source: 'client', ...error, route: path, tags: { boundary } });
   return new NextResponse(null, { status: 204 });
 }

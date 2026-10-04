@@ -1,6 +1,7 @@
 /** @vitest-environment node */
 import { resetRateLimitsForTests } from '@/lib/api/in-memory-rate-limiter';
 import { reportError } from '@/lib/observability/error-reporter';
+import { resetReportGateForTests } from '@/lib/observability/report-gate';
 import { POST } from './route';
 
 vi.mock('@/lib/observability/error-reporter', async (importOriginal) => ({
@@ -22,6 +23,7 @@ const VALID = { boundary: 'route-error', message: 'Cannot read properties of und
 
 beforeEach(() => {
   resetRateLimitsForTests();
+  resetReportGateForTests();
   vi.mocked(reportError).mockClear();
 });
 
@@ -70,5 +72,32 @@ describe('POST /api/client-error', () => {
     expect(Number(limited.headers.get('Retry-After'))).toBeGreaterThan(0);
     // another address is unaffected
     expect((await send(VALID, { headers: { 'x-forwarded-for': '198.51.100.9' } })).status).toBe(204);
+  });
+
+  describe('keeping the Sentry quota safe', () => {
+    it('forwards a crash once: the identical repeat is answered 204 but not reported', async () => {
+      expect((await send(VALID)).status).toBe(204);
+      expect((await send(VALID)).status).toBe(204);
+      expect((await send({ ...VALID, stack: 'at g (b.js:2:2)', digest: 'other' })).status).toBe(204);
+      expect(reportError).toHaveBeenCalledTimes(1);
+
+      expect((await send({ ...VALID, message: 'a different crash' })).status).toBe(204);
+      expect(reportError).toHaveBeenCalledTimes(2);
+    });
+
+    it('drops crashes thrown by browser extensions', async () => {
+      const res = await send({ ...VALID, stack: 'at run (chrome-extension://abcdef/content.js:1:1)' });
+      expect(res.status).toBe(204);
+      expect((await send({ ...VALID, message: 'x', stack: 'run@moz-extension://1234/a.js:1:1' })).status).toBe(204);
+      expect(reportError).not.toHaveBeenCalled();
+    });
+
+    it('forwards at most 30 different reports a minute from this instance, whoever sends them', async () => {
+      for (let i = 0; i < 40; i++) {
+        const res = await send({ ...VALID, message: `crash ${i}` }, { headers: { 'x-forwarded-for': `203.0.113.${i + 10}` } });
+        expect(res.status).toBe(204);
+      }
+      expect(reportError).toHaveBeenCalledTimes(30);
+    });
   });
 });
