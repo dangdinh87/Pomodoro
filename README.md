@@ -38,21 +38,18 @@ pnpm dev                     # http://localhost:3000
 
 ### Environment variables
 
-Every variable is documented in [`.env.example`](./.env.example). In short:
-
-| Variable | Required | Notes |
-|---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | yes | Public by design. Access is enforced by RLS. |
-| `MEGALLM_API_KEY` | for chat | Server-only. |
-| `SUPABASE_SERVICE_ROLE_KEY` | for account deletion | Server-only. Without it, `DELETE /api/account` returns 503. |
-| `NEXT_PUBLIC_FEATURE_CHAT` / `_LEADERBOARD` / `_HISTORY` | no | Build-time flags. Redeploy after changing them. |
-| `NEXT_PUBLIC_GA_ID` | no | Google Analytics. |
+Every variable is documented in [`.env.example`](./.env.example) (one line each, with where it is read). With none set, the app runs locally on a built-in PGlite database and prints sign-in codes to the console.
 
 Never put a secret in a `NEXT_PUBLIC_` variable: those values are inlined into the browser bundle.
 
 ### Database
 
-SQL migrations live in [`migrations/`](./migrations) and are currently applied by hand in the Supabase SQL editor. The base `tasks` and `sessions` tables are not yet in the repo. Moving to the Supabase CLI with a baseline dump of the live schema is planned; see [the remediation plan](./plans/261001-0847-project-gap-remediation/plan.md), phase 02.
+Postgres through Drizzle ORM. Locally the app uses PGlite (`.pglite/`, created and migrated on server start) whenever `DATABASE_URL` is unset; production uses Neon.
+
+1. Edit `src/db/schema.ts`.
+2. `pnpm db:generate --name <what-changed>` writes `drizzle/NNNN_<name>.sql` and its `meta/` snapshot. Commit both.
+3. Tests run every migration on an in-memory PGlite, so a broken migration fails `pnpm test`.
+4. Production is migrated by [`.github/workflows/db-migrate.yml`](./.github/workflows/db-migrate.yml) (push to `master` touching `drizzle/**`, or run it by hand). Write migrations additive (new column, new index) so the previous deploy keeps working while the new one rolls out.
 
 ## Scripts
 
@@ -66,6 +63,38 @@ SQL migrations live in [`migrations/`](./migrations) and are currently applied b
 | `pnpm i18n:check` | Fails if en, vi and ja have different translation keys |
 | `pnpm bg:optimize` | Regenerate optimized background images (also runs before `build`) |
 | `pnpm icons:brand` | Regenerate `favicon.svg`/`.ico`, the PWA icons and `apple-touch-icon.png` from the Tomo artwork (`src/components/brand/tomo-art.ts`) |
+
+## Deploy checklist
+
+Do these once, in order, before the first production deploy.
+
+**1. GitHub** (Settings > Secrets and variables > Actions; a `production` environment secret works too)
+
+| Secret | Used by | Value |
+|---|---|---|
+| `DATABASE_URL` | `db-migrate.yml` | Neon **unpooled** (direct) connection string. The job fails on a pooled `-pooler` URL or an empty value. |
+
+**2. Vercel** (Production environment; Preview should use its own Neon branch, never the production database)
+
+| Variable | Required | Value |
+|---|---|---|
+| `DATABASE_URL` | yes | Neon **pooled** connection string (the app runs on serverless functions) |
+| `BETTER_AUTH_SECRET` | yes | `openssl rand -base64 32` |
+| `BETTER_AUTH_URL`, `NEXT_PUBLIC_SITE_URL` | yes | `https://studywithbro.com` |
+| `RESEND_API_KEY`, `EMAIL_FROM` | yes | Without them nobody can sign in by email. `EMAIL_FROM` must belong to a domain verified in Resend. |
+| `SENTRY_DSN` | recommended | Error tracking. Without it errors still go to the Vercel runtime logs as JSON. |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | optional | Redirect URI `<BETTER_AUTH_URL>/api/auth/callback/google` |
+| `NEXT_PUBLIC_GA_ID` | optional | `G-XXXXXXXXXX` or `GTM-XXXXXXX` |
+| `DOMAIN_MOVE` | only at the domain move | `1` makes the old domain 308 to the canonical one. Leave it unset until the new domain serves this project. |
+
+Remove the old Supabase, MegaLLM and Spotify variables from Vercel.
+
+**3. First deploy**
+
+1. Run the **DB migrate** workflow by hand (Actions > DB migrate > Run workflow, branch `master`) so the schema exists before traffic arrives.
+2. Merge to `master`; Vercel deploys. Later migrations run by themselves when `drizzle/**` changes.
+3. Check `/api/auth/ok`, sign in with an email code, and open the browser console for Content-Security-Policy-Report-Only reports. Reports are also posted to `/api/csp-report` and logged. When they are clean, rename the header to `Content-Security-Policy` in `next.config.ts` to enforce.
+4. Point an uptime monitor at `/` and `/api/auth/ok`, and schedule a database backup (Neon point-in-time restore has a short window on the free plan).
 
 ## Project structure
 

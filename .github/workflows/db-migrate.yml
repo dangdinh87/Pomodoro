@@ -1,0 +1,42 @@
+name: DB migrate
+
+# Applies drizzle/ migrations to the production database (Neon).
+# Runs only from master: on a push that touches drizzle/**, or by hand (Actions > DB migrate > Run workflow).
+# There is deliberately no pull_request trigger: PRs and forks never get the database secret.
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'drizzle/**'
+  workflow_dispatch:
+
+# Two migrations must never run at the same time, and a running one is never cancelled halfway.
+concurrency:
+  group: db-migrate
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  migrate:
+    # A manual run from another branch would apply unreviewed migration files to production.
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # drizzle.config.ts throws when DATABASE_URL is empty or is the pooled Neon URL.
+      - run: pnpm db:migrate
+        env:
+          # Neon UNPOOLED (direct) connection string. Repository or "production" environment secret.
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
