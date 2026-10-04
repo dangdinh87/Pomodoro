@@ -244,10 +244,9 @@ export const PresetChips = memo(function PresetChips() {
           <DialogHeader>
             <DialogTitle>{t('audio.presets.savePresetTitle')}</DialogTitle>
             <DialogDescription>
-              {t('audio.presets.savePresetDescription', {
-                count: activeAmbientWithVolume.length,
-                plural: activeAmbientWithVolume.length !== 1 ? 's' : ''
-              })}
+              {activeAmbientWithVolume.length === 1
+                ? t('audio.presets.savePresetDescriptionOne')
+                : t('audio.presets.savePresetDescription', { count: activeAmbientWithVolume.length })}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">

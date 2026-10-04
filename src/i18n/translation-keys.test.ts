@@ -3,6 +3,8 @@ import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import en from '@/i18n/locales/en.json';
+import vi from '@/i18n/locales/vi.json';
+import ja from '@/i18n/locales/ja.json';
 import { allColorPresets } from '@/config/themes';
 import { builtInPresets } from '@/data/sound-presets';
 import { soundCategories } from '@/lib/audio/sound-catalog';
@@ -115,5 +117,38 @@ describe('translation keys built from color presets', () => {
       `settings.general.theme.themeDescriptions.${p.key}`,
     ]);
     expect(keys.filter((k) => !known.has(k))).toEqual([]);
+  });
+});
+
+describe('placeholders in locale strings', () => {
+  const strings = (locale: unknown) => {
+    const out: Record<string, string> = {};
+    const walk = (node: unknown, prefix: string) => {
+      for (const [k, v] of Object.entries(node as Record<string, unknown>)) {
+        const key = prefix ? `${prefix}.${k}` : k;
+        if (typeof v === 'string') out[key] = v;
+        else if (v && typeof v === 'object') walk(v, key);
+      }
+    };
+    walk(locale, '');
+    return out;
+  };
+  const locales = { en: strings(en), vi: strings(vi), ja: strings(ja) };
+
+  it('use single braces: t() only fills {name}, so {{name}} would show as "{2}"', () => {
+    const bad = Object.entries(locales).flatMap(([lang, dict]) =>
+      Object.entries(dict)
+        .filter(([, text]) => /\{\{\s*\w+\s*\}\}/.test(text))
+        .map(([key]) => `${lang}:${key}`),
+    );
+    expect(bad).toEqual([]);
+  });
+
+  it('are the same in every language', () => {
+    const names = (text: string) => [...text.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort().join(',');
+    const mismatched = Object.keys(locales.en)
+      .filter((key) => ['vi', 'ja'].some((lang) => names(locales[lang as 'vi' | 'ja'][key] ?? '') !== names(locales.en[key])))
+      .map((key) => `${key}: en={${names(locales.en[key])}} vi={${names(locales.vi[key] ?? '')}} ja={${names(locales.ja[key] ?? '')}}`);
+    expect(mismatched).toEqual([]);
   });
 });

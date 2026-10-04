@@ -583,6 +583,7 @@
       "playing": "playing",
       "stopAll": "Stop all",
       "active": "active",
+      "mixedLabel": "Mixed ambient ({count} sounds)",
       "pausedAlert": {
         "title": "YouTube is active",
         "description": "Ambient sounds are paused while YouTube is playing to prevent sound overlap."
@@ -592,8 +593,8 @@
       "library": "Library",
       "saveMix": "Save mix",
       "savePresetTitle": "Save preset",
-      "mixedLabel": "Mixed ambient ({count} sounds)",
-      "savePresetDescription": "Create a new preset from your current ambient mix ({{count}} sound{{plural}}).",
+      "savePresetDescriptionOne": "Create a new preset from your current ambient mix (1 sound).",
+      "savePresetDescription": "Create a new preset from your current ambient mix ({count} sounds).",
       "icon": "Icon",
       "iconPlaceholder": "🎵 or text",
       "name": "Preset name",
