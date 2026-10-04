@@ -29,8 +29,9 @@ import { useYouTubePlayer } from '@/hooks/use-youtube-player';
 
 // Docked bottom-left, above the dock (desktop) or the bottom tab bar (mobile). z-40: over the page and the
 // dock (z-30), under panels and dialogs (z-50), which are opened on purpose and close again.
+// Offsets = the dock's own bottom margin (max(0.5rem|1rem, safe area)) + its height + a gap of about 10px.
 const DOCK_OFFSET =
-  'left-2 bottom-[calc(6rem+env(safe-area-inset-bottom))] md:left-4 md:bottom-[calc(5.5rem+env(safe-area-inset-bottom))]';
+  'left-2 bottom-[calc(max(0.5rem,env(safe-area-inset-bottom))+6rem)] md:left-4 md:bottom-[calc(max(1rem,env(safe-area-inset-bottom))+4.5rem)]';
 // The card is as wide as the video needs: expanded 16:9 up to 416px, collapsed exactly YouTube's minimum
 // (200px of video plus the 2.5px border on each side).
 const WIDTH_EXPANDED = 'w-[min(23rem,calc(100vw-1rem))] md:w-[26rem]';
