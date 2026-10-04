@@ -50,7 +50,6 @@ export const TimerControls = memo(function TimerControls() {
     const setMode = useTimerStore((state) => state.setMode);
     const setTimeLeft = useTimerStore((state) => state.setTimeLeft);
     const setDeadlineAt = useTimerStore((state) => state.setDeadlineAt);
-    const sessionCount = useTimerStore((state) => state.sessionCount);
 
     // Local state
     const [skipConfirmOpen, setSkipConfirmOpen] = useState(false);
@@ -199,25 +198,25 @@ export const TimerControls = memo(function TimerControls() {
         : hasProgress
           ? t('timerUi.resume')
           : mode === 'work'
-            ? t('timerUi.startFocus')
+            ? t('timer.controls.start')
             : t('timerUi.startBreak');
     const hintKey = isRunning ? 'timerUi.hintPause' : hasProgress ? 'timerUi.hintResume' : 'timerUi.hintStart';
     const [hintBefore, hintAfter = ''] = t(hintKey).split('{key}');
 
     return (
         <>
-            <div className="flex flex-col items-center gap-3">
-                <div className="flex items-center justify-center gap-3">
+            <div className="flex w-full flex-col items-center gap-3">
+                <div className="flex w-full items-center justify-center gap-3 sm:gap-4">
                     <Button
                         onClick={requestTimerReset}
                         disabled={isProcessing}
                         aria-label={t('timer.controls.aria.reset')}
                         title={t('timer.controls.reset_hint')}
-                        variant="ghost"
+                        variant="secondary"
                         size="icon"
-                        className="h-10 w-10 rounded-full text-ink-secondary hover:text-ink"
+                        className="size-12 shrink-0 rounded-full"
                     >
-                        <ArrowCounterClockwise size={16} aria-hidden="true" />
+                        <ArrowCounterClockwise size={22} weight="bold" aria-hidden="true" />
                     </Button>
 
                     <Button
@@ -225,13 +224,13 @@ export const TimerControls = memo(function TimerControls() {
                         disabled={isProcessing}
                         title={isRunning ? t('timer.controls.pause_hint') : t('timer.controls.start_hint')}
                         size="lg"
-                        className="min-w-[168px]"
+                        className="h-14 min-w-0 max-w-[280px] flex-1 text-xl"
                     >
-                        <span className="inline-flex items-center gap-2">
+                        <span className="inline-flex items-center gap-2.5">
                             {isRunning ? (
-                                <Pause size={16} weight="fill" aria-hidden="true" />
+                                <Pause size={22} weight="fill" aria-hidden="true" />
                             ) : (
-                                <Play size={16} weight="fill" aria-hidden="true" />
+                                <Play size={22} weight="fill" aria-hidden="true" />
                             )}
                             {primaryLabel}
                         </span>
@@ -240,16 +239,16 @@ export const TimerControls = memo(function TimerControls() {
                     <Button
                         onClick={handleSkipClick}
                         disabled={isProcessing}
-                        variant="ghost"
+                        variant="secondary"
                         size="icon"
                         aria-label={t('timer.controls.skip_hint')}
                         title={t('timer.controls.skip_hint')}
-                        className="h-10 w-10 rounded-full text-ink-secondary hover:text-ink"
+                        className="size-12 shrink-0 rounded-full"
                     >
-                        <SkipForward size={16} aria-hidden="true" />
+                        <SkipForward size={22} weight="fill" aria-hidden="true" />
                     </Button>
                 </div>
-                <p data-chrome className="flex items-center gap-1.5 text-xs text-ink-faint [@media(hover:none)]:hidden">
+                <p data-chrome className="flex items-center gap-1.5 text-[0.8125rem] font-semibold text-ink-muted [@media(hover:none)]:hidden">
                     {hintBefore}
                     <Kbd>{t('timerUi.spaceKey')}</Kbd>
                     {hintAfter}

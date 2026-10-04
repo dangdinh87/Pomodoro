@@ -10,39 +10,7 @@ import { mayAutoChain } from '@/lib/timer/auto-chain';
 import { claimCompletion, completionKey } from '@/lib/timer/completion-claim';
 import { notifyPhaseComplete } from '@/lib/timer/notifications';
 import { useI18n } from '@/contexts/i18n-context';
-import confetti from 'canvas-confetti';
-
-// Confetti celebration for work session completion
-const fireWorkCompleteConfetti = () => {
-  const duration = 2000;
-  const animationEnd = Date.now() + duration;
-  const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6'];
-
-  const frame = () => {
-    confetti({
-      particleCount: 3,
-      angle: 60,
-      spread: 55,
-      origin: { x: 0 },
-      colors: colors,
-      zIndex: 9999,
-    });
-    confetti({
-      particleCount: 3,
-      angle: 120,
-      spread: 55,
-      origin: { x: 1 },
-      colors: colors,
-      zIndex: 9999,
-    });
-
-    if (Date.now() < animationEnd) {
-      requestAnimationFrame(frame);
-    }
-  };
-
-  frame();
-};
+import { announceFocusComplete } from '@/features/mascot/celebration-store';
 
 /** Any of these means somebody is at the screen. */
 const PRESENCE_EVENTS = ['pointerdown', 'pointermove', 'keydown', 'touchstart', 'wheel', 'focus'] as const;
@@ -240,7 +208,11 @@ export function useTimerEngine() {
       if (stale) {
         // Too old to be a real session: no record, no counters, no streak
       } else if (currentMode === 'work') {
-        if (!catchUp) fireWorkCompleteConfetti();
+        if (!catchUp) {
+          // Hands the moment to the celebration (confetti included); the alarm and the notification stay here
+          const planStep = state.usePlan ? state.plan[state.currentStepIndex] : undefined;
+          announceFocusComplete((planStep ? planStep.minutes * 60 : configDuration) / 60);
+        }
         incrementCompletedSessions();
         void record({
           taskId: useTasksStore.getState().activeTaskId || null,

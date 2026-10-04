@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Task, useTasksStore } from '@/stores/task-store';
 import { useTasks } from '@/hooks/use-tasks';
 import { Button } from '@/components/ui/button';
@@ -21,8 +21,11 @@ import { useI18n } from '@/contexts/i18n-context';
 import { useTimerStore } from '@/stores/timer-store';
 import { useSessionRecorder } from '@/lib/timer/use-session-recorder';
 
+// Sticker pill on the timer card. Dashed while no task is chosen (an invitation), solid and raised once one is.
 const PILL =
-  'inline-flex h-10 max-w-[min(88vw,320px)] items-center gap-2 rounded-full border border-border bg-surface/60 px-4 backdrop-blur-md transition-colors hover:bg-surface-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand';
+  'focus-ring inline-flex h-12 min-w-0 max-w-full items-center gap-2.5 rounded-[var(--radius)] border-2 px-4 text-left transition-[background-color,box-shadow,transform] duration-100 hover:bg-surface-hover';
+const PILL_EMPTY = 'border-dashed border-control-edge bg-transparent';
+const PILL_CHOSEN = 'border-solid border-outline bg-surface-raised shadow-sticker-sm active:translate-x-0.5 active:translate-y-0.5 active:shadow-none';
 
 interface TaskSelectorProps {
   className?: string;
@@ -115,17 +118,17 @@ export function TaskSelector({ className }: TaskSelectorProps) {
     <>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <button type="button" className={cn(PILL, className)}>
-            <Target size={14} className={cn('shrink-0', activeTask ? 'text-brand' : 'text-ink-faint')} aria-hidden="true" />
-            <span className={cn('truncate text-[0.8125rem] font-medium', activeTask ? 'text-ink' : 'text-ink-secondary')}>
+          <button type="button" className={cn(PILL, activeTask ? PILL_CHOSEN : PILL_EMPTY, className)}>
+            <Target size={18} weight="bold" className={cn('shrink-0', activeTask ? 'text-brand' : 'text-ink-secondary')} aria-hidden="true" />
+            <span className={cn('min-w-0 flex-1 truncate font-heading text-base font-bold', activeTask ? 'text-ink' : 'text-ink-secondary')}>
               {activeTask ? activeTask.title : t('timerComponents.taskSelector.selectToFocus')}
             </span>
             {activeTask && (
-              <span className="shrink-0 text-xs font-semibold tabular-nums text-ink-muted">
+              <span className="shrink-0 font-heading text-sm font-bold tabular-nums text-ink-secondary">
                 {activeTask.actualPomodoros}/{activeTask.estimatePomodoros}
               </span>
             )}
-            <CaretDown size={12} className="shrink-0 text-ink-faint" aria-hidden="true" />
+            <CaretDown size={14} weight="bold" className="shrink-0 text-ink-secondary" aria-hidden="true" />
           </button>
         </PopoverTrigger>
 

@@ -1,10 +1,10 @@
 'use client';
 
 import { memo, useMemo } from 'react';
-import { cn } from '@/lib/utils';
 import { useTimerStore } from '@/stores/timer-store';
 import { useReducedMotion } from 'motion/react';
 import { SessionCycle } from './session-cycle';
+import { TimerProgress } from './timer-progress';
 import {
     AnalogClock,
     DigitalClock,
@@ -111,16 +111,10 @@ export const TimerClockDisplay = memo(function TimerClockDisplay() {
 
     return (
         <div className="flex w-full flex-col items-center gap-4">
-            <div className="flex w-fit max-w-full flex-col items-center gap-3">
-                {clockContent}
-                {showProgressLine && (
-                    <div className="h-[3px] w-full overflow-hidden rounded-full bg-border" aria-hidden="true">
-                        <div
-                            className={cn('h-full rounded-full bg-primary', !reduceMotion && 'transition-[width] duration-1000 ease-linear')}
-                            style={{ width: `${Math.min(100, Math.max(0, progressPercent))}%` }}
-                        />
-                    </div>
-                )}
+            <div className="flex w-full flex-col items-center gap-3.5">
+                {/* 3D stages are sized by the viewport; never let one spill out of the card */}
+                <div className="flex w-full justify-center [&>*]:max-w-full">{clockContent}</div>
+                {showProgressLine && <TimerProgress percent={progressPercent} reduceMotion={Boolean(reduceMotion)} />}
             </div>
             <SessionCycle />
         </div>

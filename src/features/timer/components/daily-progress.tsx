@@ -7,9 +7,8 @@ import { useStats } from '@/hooks/use-stats';
 import { useAuth } from '@/hooks/use-auth';
 import { useSystemStore } from '@/stores/system-store';
 import { useTimerStore } from '@/stores/timer-store';
-import { useTasksStore } from '@/stores/task-store';
-import { useTasks } from '@/hooks/use-tasks';
 import { studyTodayDate } from '@/lib/stats/study-day';
+import { useActiveTask } from '../hooks/use-active-task';
 import { TaskSelector } from './task-selector';
 
 export const DailyProgress = memo(function DailyProgress() {
@@ -17,14 +16,12 @@ export const DailyProgress = memo(function DailyProgress() {
     const { hasSession } = useAuth();
     const mode = useTimerStore((state) => state.mode);
     const isFocusMode = useSystemStore((state) => state.isFocusMode);
-    const activeTaskId = useTasksStore((state) => state.activeTaskId);
 
     // Today's study day (the day starts at 04:00); recomputed per render so it rolls over without a reload.
     const today = studyTodayDate();
     const todayRange = { from: today, to: today };
 
-    const { tasks } = useTasks({ statusFilter: 'all', limit: 50 });
-    const activeTask = tasks.find((task) => task.id === activeTaskId);
+    const activeTask = useActiveTask();
 
     const { data: statsData } = useStats(todayRange);
     const sessions = statsData?.summary.completedSessions || 0;
@@ -50,18 +47,18 @@ export const DailyProgress = memo(function DailyProgress() {
     if (isFocusMode) return null;
 
     return (
-        <div className="flex min-h-[44px] flex-col items-center gap-3">
-            {mode === 'work' && <TaskSelector />}
+        <div className="flex min-h-[48px] w-full flex-col items-center gap-3">
+            {mode === 'work' && <TaskSelector className="w-full" />}
 
             {isBreakMode && activeTask && (
-                <div className="inline-flex h-10 max-w-[min(88vw,320px)] items-center gap-2 rounded-full border border-border bg-surface/60 px-4 backdrop-blur-md">
-                    <Coffee size={14} className="shrink-0 text-ink-faint" aria-hidden="true" />
-                    <span className="shrink-0 text-xs text-ink-muted">{t('timer.breakTask')}:</span>
-                    <span className="truncate text-[0.8125rem] font-medium text-ink">{activeTask.title}</span>
+                <div className="inline-flex h-11 max-w-full items-center gap-2 rounded-full border-2 border-outline bg-surface-raised px-4">
+                    <Coffee size={16} weight="bold" className="shrink-0 text-ink-secondary" aria-hidden="true" />
+                    <span className="shrink-0 text-[0.8125rem] font-semibold text-ink-secondary">{t('timer.breakTask')}:</span>
+                    <span className="truncate font-heading text-[0.9375rem] font-bold text-ink">{activeTask.title}</span>
                 </div>
             )}
 
-            {hasSession && summary && <p data-chrome className="text-xs text-ink-muted tabular-nums">{summary}</p>}
+            {hasSession && summary && <p data-chrome className="text-[0.8125rem] font-semibold text-ink-secondary tabular-nums">{summary}</p>}
         </div>
     );
 });

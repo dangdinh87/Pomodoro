@@ -59,13 +59,13 @@ export const TimerModeSelector = memo(function TimerModeSelector() {
 
     return (
         <>
-            <FilterChipGroup label={t('timerUi.modeGroup')} className="mb-8 justify-center">
+            <FilterChipGroup label={t('timerUi.modeGroup')} className="mb-5 justify-center">
                 {MODES.map(({ value, labelKey }) => (
                     <FilterChip
                         key={value}
                         active={mode === value}
                         onClick={() => handleModeChange(value)}
-                        className="h-9 px-4 text-sm"
+                        className="h-9 px-4 text-[0.9375rem]"
                     >
                         {t(labelKey)}
                     </FilterChip>
