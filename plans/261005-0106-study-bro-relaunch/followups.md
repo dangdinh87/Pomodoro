@@ -34,3 +34,7 @@
 | 30 | Xoá `migrations/`, `supabase_schema.sql`, `fix_sessions_rls.sql`, `public/images/` (0 tham chiếu) — **bị bộ kiểm quyền chặn**, không lách | 4a | Chủ dự án tự chạy `git rm -r …` hoặc cấp quyền |
 | 31 | `.Jules/palette.md` vs `.jules/palette.md` va chạm hoa/thường | 4a | `git rm --cached .Jules/palette.md` (chủ dự án quyết) |
 | 32 | Video gợi ý YouTube `04RM0CQPLHQ` trả 404 thumbnail | 4a | Kiểm và thay id trong danh sách gợi ý/preset |
+| 33 | First-load JS `/[lang]` 318 KB gzip, guide/privacy/terms 209 KB gzip (ngân sách mục tiêu ≤ 200 KB cho app, trang nội dung nên < 120 KB) | build-check | Batch perf: phân tích chunk, lazy-load provider/motion/confetti/cmdk, trang nội dung không kéo provider của app |
+| 34 | `instrumentation.js.nft.json` vẫn kéo 177 file PGlite (20 MB) | build-check | Instrumentation không import db ở production; import động chỉ khi local |
+| 35 | Build in "Better Auth Base URL not set" ×7 | build-check | `baseURL` fallback từ `SITE_URL` khi không có `BETTER_AUTH_URL` |
+| 36 | Permissions-Policy ở HEAD là `geolocation=()`; hunk `geolocation=(self)` nằm trong WIP thời tiết | build-check | Commit cùng tính năng thời tiết |
