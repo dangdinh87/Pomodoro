@@ -272,7 +272,6 @@ Câu chữ nằm ở `src/i18n/locales/{en,vi,ja}.json`; mọi khoá phải có 
 
 ## 13. Việc còn nợ (đã biết)
 
-- Tooltip thật của dock là `animate-ui/components/animate/tooltip.tsx`, chưa theo kiểu `bg-ink`; `animate-ui/components/buttons/button.tsx` có `buttonVariants` riêng chưa theo sticker.
 - Khối landing dưới app (`(main)/page.tsx`) đang tô `bg-surface-page` đặc nên mất hoạ tiết.
 - Mini player YouTube trên điện thoại (390px) che nửa dưới thẻ timer vì video phải ≥ 200×200 (xem mục 7a); chưa có cách kéo đi chỗ khác.
 - Tiêu đề tab của 404 và trang lỗi là "Study Bro App" (từ metadata root).
