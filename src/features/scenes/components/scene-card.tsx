@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useState, type KeyboardEventHandler, type ReactNode, type Ref } from 'react';
 import { Check, CircleNotch, Timer } from '@phosphor-icons/react/dist/ssr';
 import { cn } from '@/lib/utils';
+import { useI18n } from '@/contexts/i18n-context';
 import { getSceneThumbnail } from '../lib/scene-thumbnails';
 import type { SceneMeta } from '../lib/scene-registry';
 
@@ -13,43 +14,67 @@ interface GalleryCardProps {
   /** Small pill top-left, e.g. "Follows timer". */
   badge?: string;
   onSelect: () => void;
+  /** Extra classes for the preview box; it is 16:9 unless overridden (e.g. `aspect-auto h-28`). */
+  previewClassName?: string;
+  /** Anything laid over the preview besides the "follows timer" badge, e.g. a "3D" pill. */
+  overlay?: ReactNode;
+  /** Radio-group mode (clock picker): the card is `role="radio"` with roving focus instead of a pressed toggle. */
+  radio?: { tabIndex: number; onKeyDown: KeyboardEventHandler<HTMLButtonElement>; buttonRef: Ref<HTMLButtonElement> };
   children: ReactNode;
 }
 
-/** Shared tile for scenes, photos and videos so the whole gallery reads as one grid. */
-export function GalleryCard({ label, selected, loading, badge, onSelect, children }: GalleryCardProps) {
+/**
+ * Shared sticker tile for scenes, photos, videos and clock styles: preview on top, name below.
+ * The chosen card gets a thick accent frame and an "In use" label (text, not colour alone).
+ */
+export function GalleryCard({ label, selected, loading, badge, onSelect, previewClassName, overlay, radio, children }: GalleryCardProps) {
+  const { t } = useI18n();
   return (
-    <button
-      type="button"
-      aria-pressed={selected}
-      title={label}
-      onClick={onSelect}
-      className={cn(
-        'relative aspect-video w-full overflow-hidden rounded-lg border transition-shadow duration-150 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
-        selected ? 'border-transparent ring-2 ring-brand' : 'border-border hover:border-border-strong',
+    <div className="relative">
+      {selected && (
+        <span
+          aria-hidden="true"
+          data-slot="selected-frame"
+          className="pointer-events-none absolute -inset-2 rounded-[28px] border-4 border-primary"
+        />
       )}
-    >
-      {children}
-      {badge && (
-        <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-black/55 px-1.5 py-0.5 text-[10px] font-medium text-white">
-          <Timer size={10} weight="bold" aria-hidden />
-          {badge}
+      <button
+        ref={radio?.buttonRef}
+        type="button"
+        {...(radio
+          ? { role: 'radio', 'aria-checked': selected, tabIndex: radio.tabIndex, onKeyDown: radio.onKeyDown }
+          : { 'aria-pressed': selected })}
+        title={label}
+        aria-label={label}
+        onClick={onSelect}
+        className="sticker sticker-press focus-ring group relative flex w-full flex-col overflow-hidden text-left focus-visible:outline-offset-1"
+      >
+        <span className={cn('relative block aspect-video w-full overflow-hidden border-b-2 border-outline bg-surface-raised', previewClassName)}>
+          {children}
+          {overlay}
+          {badge && (
+            <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full border-2 border-outline bg-candy-butter px-1.5 py-0.5 text-[0.6875rem] font-bold leading-none text-on-accent">
+              <Timer size={11} weight="bold" aria-hidden />
+              {badge}
+            </span>
+          )}
+          {loading && (
+            <span className="absolute inset-0 flex items-center justify-center bg-surface/70">
+              <CircleNotch size={22} weight="bold" className="animate-spin text-ink" aria-hidden />
+            </span>
+          )}
         </span>
-      )}
-      {selected && !loading && (
-        <span className="absolute right-2 top-2 rounded-full bg-primary p-0.5 text-white">
-          <Check size={12} weight="bold" aria-hidden />
+        <span className="flex min-h-11 flex-wrap items-center justify-between gap-x-2 gap-y-1 px-3 py-2">
+          <span className="min-w-0 max-w-full truncate font-heading text-[0.9375rem] font-bold leading-tight text-ink">{label}</span>
+          {selected && (
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full border-2 border-outline bg-primary px-2 py-0.5 text-xs font-bold leading-none text-on-accent">
+              <Check size={11} weight="bold" aria-hidden />
+              {t('scenes.inUse')}
+            </span>
+          )}
         </span>
-      )}
-      {loading && (
-        <span className="absolute inset-0 flex items-center justify-center bg-black/40">
-          <CircleNotch size={20} className="animate-spin text-white" aria-hidden />
-        </span>
-      )}
-      <span className="absolute inset-x-0 bottom-0 bg-black/60 px-2 py-1.5 text-center text-xs font-medium text-white">
-        {label}
-      </span>
-    </button>
+      </button>
+    </div>
   );
 }
 
@@ -96,11 +121,17 @@ export function SceneCard({ scene, label, followsLabel, selected, onSelect }: Sc
   );
 }
 
-/** The default scene: a solid tint that follows the timer mode, so its tile shows the live stage tint. */
+/**
+ * The default scene, "Cream paper": the doodle paper of the page itself with the stage tint on top,
+ * so its tile shows the live tint of the current timer mode.
+ */
 export function DefaultSceneCard({ label, followsLabel, selected, onSelect }: Omit<SceneCardProps, 'scene' | 'onSelect'> & { onSelect: () => void }) {
   return (
     <GalleryCard label={label} selected={selected} badge={followsLabel} onSelect={onSelect}>
-      <span className="absolute inset-0 transition-colors duration-700" style={{ backgroundColor: 'var(--stage-tint)' }} />
+      <span
+        className={cn('paper-bg absolute inset-0 transition-colors duration-700')}
+        style={{ backgroundColor: 'var(--stage-tint)', backgroundSize: '112px 112px' }}
+      />
     </GalleryCard>
   );
 }

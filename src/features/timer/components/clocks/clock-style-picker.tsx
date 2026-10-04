@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
-import { Check } from '@phosphor-icons/react/dist/ssr';
-import { cn } from '@/lib/utils';
+import { Cube } from '@phosphor-icons/react/dist/ssr';
 import { useI18n } from '@/contexts/i18n-context';
+import { GalleryCard } from '@/features/scenes/components/scene-card';
 import { useTimerStore } from '@/stores/timer-store';
 import { AnalogClock } from './analog-clock';
 import { DigitalClock } from './digital-clock';
@@ -86,7 +86,7 @@ function useStaggeredMount(active: boolean) {
   return ready;
 }
 
-/** The real clock component at thumbnail size, on a dark tile like the timer stage. */
+/** The real clock component at thumbnail size, on the same paper as the timer stage (follows the light/dark theme). */
 export function ClockPreview({
   type,
   workMinutes,
@@ -141,13 +141,12 @@ export function ClockPreview({
   return (
     <div
       ref={ref}
-      data-theme="dark"
       data-timer
       data-mode={mode}
       aria-hidden="true"
       // The live clocks are decorative here; the card's own label names the style.
       inert
-      className="relative w-full overflow-hidden rounded-md bg-surface-page"
+      className="relative w-full overflow-hidden bg-surface-page"
       style={{ height: TILE_HEIGHT }}
     >
       {content}
@@ -182,46 +181,34 @@ export function ClockStylePicker({
   };
 
   return (
-    <div role="radiogroup" aria-labelledby={labelledBy} className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+    <div role="radiogroup" aria-labelledby={labelledBy} className="-mx-2 grid grid-cols-2 gap-5 p-2 sm:grid-cols-3 lg:grid-cols-4">
       {CLOCK_STYLES.map((style, index) => {
         const selected = value === style.id;
         return (
-          <button
+          <GalleryCard
             key={style.id}
-            ref={(el) => {
-              refs.current[style.id] = el;
+            label={t(style.labelKey)}
+            selected={selected}
+            onSelect={() => onChange(style.id)}
+            previewClassName="aspect-auto"
+            overlay={
+              style.is3d ? (
+                <span className="absolute right-2 top-2 z-10 inline-flex items-center gap-1 rounded-full border-2 border-outline bg-candy-lilac px-1.5 py-0.5 text-[0.6875rem] font-bold leading-none text-on-accent">
+                  <Cube size={11} weight="fill" aria-hidden />
+                  {t('clockStyles.badge3d')}
+                </span>
+              ) : undefined
+            }
+            radio={{
+              tabIndex: selected ? 0 : -1,
+              onKeyDown: (e) => move(e, index),
+              buttonRef: (el) => {
+                refs.current[style.id] = el;
+              },
             }}
-            type="button"
-            role="radio"
-            aria-checked={selected}
-            tabIndex={selected ? 0 : -1}
-            onClick={() => onChange(style.id)}
-            onKeyDown={(e) => move(e, index)}
-            className={cn(
-              'group flex flex-col gap-2 rounded-lg border bg-surface p-2 text-left transition-[border-color,box-shadow] duration-150 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand',
-              selected ? 'border-transparent ring-2 ring-brand' : 'border-border hover:border-border-strong',
-            )}
           >
             <ClockPreview type={style.id} workMinutes={workMinutes} warn={warn} />
-            <span className="flex min-h-6 items-center justify-between gap-2 px-1">
-              <span className={cn('truncate text-[0.8125rem]', selected ? 'font-semibold text-ink' : 'font-medium text-ink-secondary')}>
-                {t(style.labelKey)}
-              </span>
-              <span className="flex shrink-0 items-center gap-1.5">
-                {style.is3d && (
-                  <span className="rounded bg-surface-raised px-1.5 py-0.5 text-[0.6875rem] font-semibold leading-none text-ink-secondary">
-                    {t('clockStyles.badge3d')}
-                  </span>
-                )}
-                {selected && (
-                  <>
-                    <Check size={14} weight="bold" className="text-brand" aria-hidden />
-                    <span className="sr-only">{t('settingsUi.selected')}</span>
-                  </>
-                )}
-              </span>
-            </span>
-          </button>
+          </GalleryCard>
         );
       })}
     </div>

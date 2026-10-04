@@ -1606,7 +1606,7 @@
       "minimal": "Tối giản"
     },
     "names": {
-      "pomodoro": "Pomodoro",
+      "pomodoro": "Giấy kem",
       "aurora": "Cực quang",
       "rain": "Cửa sổ mưa",
       "nebula": "Tinh vân",
@@ -1618,7 +1618,8 @@
       "planet": "Hành tinh xa"
     },
     "followsTimer": "Theo đồng hồ",
-    "defaultHint": "Pomodoro là màu đơn sắc đổi theo chế độ đồng hồ. Chọn một không gian để tinh chỉnh.",
+    "inUse": "Đang dùng",
+    "defaultHint": "Giấy kem là nền mặc định, đổi sắc nhẹ theo chế độ đồng hồ. Chọn một không gian để tinh chỉnh.",
     "brightnessHint": "Giảm xuống nếu bạn khó đọc chữ.",
     "animate": "Chuyển động",
     "animateHint": "Tắt để chỉ vẽ một khung hình tĩnh, đỡ tốn pin.",

@@ -1606,7 +1606,7 @@
       "minimal": "Minimal"
     },
     "names": {
-      "pomodoro": "Pomodoro",
+      "pomodoro": "Cream paper",
       "aurora": "Aurora",
       "rain": "Rainy window",
       "nebula": "Nebula",
@@ -1618,7 +1618,8 @@
       "planet": "Distant planet"
     },
     "followsTimer": "Follows timer",
-    "defaultHint": "Pomodoro is a solid colour that follows your timer mode. Pick a scene to adjust it.",
+    "inUse": "In use",
+    "defaultHint": "Cream paper is the default backdrop. It tints softly to match your timer mode. Pick a scene to adjust it.",
     "brightnessHint": "Lower it if text is hard to read.",
     "animate": "Animate",
     "animateHint": "Off draws a single still frame and saves battery.",

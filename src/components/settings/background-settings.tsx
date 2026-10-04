@@ -4,13 +4,14 @@ import { useEffect, useImperativeHandle, useRef, useState, type ChangeEvent, typ
 import Image from 'next/image';
 import { useReducedMotion } from 'motion/react';
 import { toast } from 'sonner';
-import { X, UploadSimple, Link, FolderStar, Info } from '@phosphor-icons/react/dist/ssr';
+import { X, UploadSimple, Link, FolderStar, Info, ImageSquare, WarningCircle } from '@phosphor-icons/react/dist/ssr';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { IconTile } from '@/components/ui/icon-tile';
 import { FilterChip, FilterChipGroup } from '@/components/ui/filter-chip';
 import { useBackground, type BackgroundSettings as BackgroundConfig } from '@/contexts/background-context';
 import { DEFAULT_BACKGROUND } from '@/data/background-migration';
@@ -92,6 +93,8 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange, ref }:
   const { images: customImages, addImage, addImageByUrl, canAddMore } = useCustomBackgrounds();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [urlInput, setUrlInput] = useState('');
+  // Why the last upload or link was refused (size, type, storage full, limit): shown in the My images tab
+  const [uploadError, setUploadError] = useState<CustomImageError | null>(null);
 
   // While a slider is dragged the dialog hides so the real background is visible; release ends it.
   useEffect(() => {
@@ -186,12 +189,15 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange, ref }:
   return (
     <div className={onClose ? 'flex h-full flex-col' : 'flex flex-col gap-6'}>
       {onClose && (
-        <div className={`flex shrink-0 items-center justify-between border-b border-border px-6 py-4 transition-opacity duration-150 ${dim}`}>
-          <h2 className="font-heading text-lg font-semibold leading-none tracking-tight text-ink">{t('scenes.title')}</h2>
-          <div className="flex items-center gap-2">
+        <div className={`flex shrink-0 items-center justify-between gap-3 border-b-[2.5px] border-outline px-4 py-3 transition-opacity duration-150 sm:px-6 sm:py-4 ${dim}`}>
+          <h2 className="flex min-w-0 items-center gap-3 font-heading text-xl font-bold leading-tight text-ink">
+            <IconTile icon={ImageSquare} tone="lilac" />
+            <span className="truncate">{t('scenes.title')}</span>
+          </h2>
+          <div className="flex shrink-0 items-center gap-2">
             {saveButton}
-            <Button variant="ghost" size="icon" onClick={cancel}>
-              <X size={16} />
+            <Button variant="secondary" size="icon" onClick={cancel}>
+              <X size={18} weight="bold" aria-hidden="true" />
               <span className="sr-only">{t('common.close')}</span>
             </Button>
           </div>
@@ -216,7 +222,7 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange, ref }:
                     </FilterChip>
                   ))}
                 </FilterChipGroup>
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                <div className="-mx-2 grid grid-cols-2 gap-5 p-2 sm:grid-cols-3">
                   {(category === 'all' || category === 'minimal') && (
                     <DefaultSceneCard
                       label={t('scenes.names.pomodoro')}
@@ -266,6 +272,8 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange, ref }:
                   onUploadClick={() => fileInputRef.current?.click()}
                   urlInput={urlInput}
                   setUrlInput={setUrlInput}
+                  uploadError={uploadError}
+                  setUploadError={setUploadError}
                   value={draft.type === 'image' ? draft.value : ''}
                   onSelect={selectImage}
                   t={t}
@@ -278,12 +286,13 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange, ref }:
                   onChange={async (e: ChangeEvent<HTMLInputElement>) => {
                     const file = e.target.files?.[0];
                     if (!file) return;
+                    setUploadError(null);
                     const result = await addImage(file);
                     if (result.success) {
                       selectImage(result.image.value);
                       toast.success(t('settings.background.customImages.uploadSuccess'));
                     } else {
-                      toast.error(t(`settings.background.customImages.${result.error}`));
+                      setUploadError(result.error);
                     }
                     e.target.value = '';
                   }}
@@ -291,11 +300,7 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange, ref }:
               </TabsContent>
             </div>
 
-            <div
-              className={`relative flex flex-col gap-5 rounded-lg border p-4 transition-colors duration-150 ${
-                isPreview ? 'border-border-strong bg-surface shadow-[0_4px_20px_-8px_rgba(0,0,0,0.06)]' : 'border-border bg-surface'
-              }`}
-            >
+            <div className="sticker relative flex flex-col gap-5 p-4">
               <div className="space-y-1">
                 <h3 className="font-heading text-[0.9375rem] font-bold tracking-[-0.01em] text-ink">{t('settingsUi.adjust')}</h3>
                 <p className="text-xs text-ink-muted">
@@ -397,7 +402,7 @@ function PackGrid({
   return (
     <div className="space-y-3">
       {pack.descriptionKey && <p className="text-[0.8125rem] text-ink-muted">{t(pack.descriptionKey)}</p>}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <div className="-mx-2 grid grid-cols-2 gap-5 p-2 sm:grid-cols-3">
         {pack.items.map((item) => {
           const name = label(item.nameKey);
           return (
@@ -442,6 +447,8 @@ function PersonalTab({
   onUploadClick,
   urlInput,
   setUrlInput,
+  uploadError,
+  setUploadError,
   value,
   onSelect,
   t,
@@ -452,29 +459,34 @@ function PersonalTab({
   onUploadClick: () => void;
   urlInput: string;
   setUrlInput: (v: string) => void;
+  uploadError: CustomImageError | null;
+  setUploadError: (error: CustomImageError | null) => void;
   value: string;
   onSelect: (v: string) => void;
   t: Translate;
 }) {
   const addFromUrl = async () => {
+    setUploadError(null);
     const result = await addImageByUrl(urlInput.trim());
     if (result.success) {
       onSelect(result.image.value);
       toast.success(t('settings.background.customImages.uploadSuccess'));
       setUrlInput('');
     } else {
-      toast.error(t(`settings.background.customImages.${result.error}`));
+      setUploadError(result.error);
     }
   };
   const current = customImages[0];
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-3 rounded-lg border border-dashed border-border-strong bg-surface-raised p-4">
+    <div className="space-y-5">
+      <div className="sticker flex flex-col gap-3 border-dashed bg-surface-raised p-4">
         <div className="flex gap-2">
           <Input
             type="url"
             placeholder={t('settings.background.customImages.urlPlaceholder')}
+            aria-label={t('settings.background.customImages.urlPlaceholder')}
+            aria-invalid={uploadError === 'invalidUrl' ? true : undefined}
             value={urlInput}
             onChange={(e) => setUrlInput(e.target.value)}
             onKeyDown={(e) => {
@@ -484,36 +496,47 @@ function PersonalTab({
             disabled={!canAddMore}
           />
           <Button
-            variant="outline"
+            variant="secondary"
             size="icon"
             disabled={!urlInput.trim()}
             onClick={() => void addFromUrl()}
             title={t('settings.background.customImages.addUrl')}
           >
-            <Link size={16} />
+            <Link size={18} weight="bold" aria-hidden="true" />
             <span className="sr-only">{t('settings.background.customImages.addUrl')}</span>
           </Button>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="h-px flex-1 bg-border" />
-          <span className="text-xs text-ink-muted">{t('settings.background.customImages.or')}</span>
-          <div className="h-px flex-1 bg-border" />
+          <div className="h-0.5 flex-1 rounded-full bg-border" />
+          <span className="text-xs font-semibold text-ink-muted">{t('settings.background.customImages.or')}</span>
+          <div className="h-0.5 flex-1 rounded-full bg-border" />
         </div>
 
-        <Button variant="outline" className="w-full" onClick={onUploadClick}>
-          <UploadSimple size={16} className="mr-2" />
+        <Button variant="secondary" className="w-full gap-2" onClick={onUploadClick}>
+          <UploadSimple size={18} weight="bold" aria-hidden="true" />
           {t('settings.background.customImages.uploadFile')}
         </Button>
-      </div>
 
-      <div className="flex items-start gap-3 rounded-lg bg-surface-raised p-3">
-        <Info size={16} className="mt-0.5 shrink-0" />
-        <p className="text-xs font-medium text-ink-secondary">{t('settings.background.customImages.limit2MB')}</p>
+        <p className="flex items-start gap-2 text-xs font-semibold text-ink-secondary">
+          <Info size={14} weight="bold" aria-hidden="true" className="mt-px shrink-0" />
+          {t('settings.background.customImages.limit2MB')}
+        </p>
+
+        {uploadError && (
+          <p
+            role="alert"
+            data-error={uploadError}
+            className="flex items-start gap-2 rounded-[10px] border-2 border-outline bg-danger-bg px-3 py-2 text-[0.8125rem] font-semibold text-danger-ink"
+          >
+            <WarningCircle size={16} weight="fill" aria-hidden="true" className="mt-px shrink-0" />
+            {t(`settings.background.customImages.${uploadError}`)}
+          </p>
+        )}
       </div>
 
       {current ? (
-        <div>
+        <div className="-mx-2 max-w-xs p-2">
           <GalleryCard
             label={t('settings.background.customImages.current')}
             selected={value === current.value}
@@ -522,12 +545,12 @@ function PersonalTab({
             {/* eslint-disable-next-line @next/next/no-img-element -- user-supplied blob or link */}
             <img src={current.previewUrl} alt={current.name} className="absolute inset-0 h-full w-full object-cover" />
           </GalleryCard>
-          <p className="mt-2 text-center text-xs text-ink-muted">{t('settings.background.customImages.replaceNotice')}</p>
+          <p className="mt-4 text-xs text-ink-muted">{t('settings.background.customImages.replaceNotice')}</p>
         </div>
       ) : (
-        <div className="py-12 text-center text-ink-muted">
-          <FolderStar size={48} className="mx-auto mb-3 opacity-50" />
-          <p className="text-sm">{t('settings.background.customImages.empty')}</p>
+        <div className="flex flex-col items-center gap-3 py-8 text-center">
+          <IconTile icon={FolderStar} tone="peach" size="lg" />
+          <p className="text-sm font-semibold text-ink-secondary">{t('settings.background.customImages.empty')}</p>
         </div>
       )}
     </div>
@@ -555,7 +578,7 @@ function SwitchRow({
         <Label htmlFor={id} className="text-sm">
           {label}
         </Label>
-        <p className="text-[11px] text-ink-muted">{description}</p>
+        <p className="text-xs text-ink-muted">{description}</p>
       </div>
       <Switch id={id} checked={checked} disabled={disabled} onCheckedChange={onChange} />
     </div>
@@ -591,7 +614,7 @@ function SliderControl({
         <Label htmlFor={id} className="text-sm">
           {label}
         </Label>
-        <span className="font-mono text-xs tabular-nums text-ink-muted">
+        <span aria-hidden="true" className="rounded-full border-2 border-outline bg-surface px-2 py-px text-xs font-bold tabular-nums text-ink">
           {value}
           {suffix}
         </span>
@@ -604,11 +627,13 @@ function SliderControl({
           step={1}
           value={[value]}
           disabled={disabled}
+          aria-label={label}
+          aria-valuetext={`${label} ${value}${suffix}`}
           onValueChange={(v) => onChange(v[0])}
           className="py-1"
         />
       </div>
-      {description && <p className="text-[11px] text-ink-muted">{description}</p>}
+      {description && <p className="text-xs text-ink-muted">{description}</p>}
     </div>
   );
 }
