@@ -51,3 +51,6 @@ public/backgrounds/manifest.json
 
 # local Postgres (PGlite) for dev/harness
 /.pglite
+
+# Brainstorming mockups (superpowers visual companion)
+.superpowers/
