@@ -3,10 +3,11 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const dayNumber = (isoDay: string) => Math.round(Date.parse(`${isoDay}T00:00:00Z`) / DAY_MS);
 
 /**
- * Current and longest run of consecutive active days. `activeDays` are
- * YYYY-MM-DD strings (any order, duplicates allowed). The current streak stays
- * alive through `today` until the day is over, so it counts if the last active
- * day is today or yesterday.
+ * Current and longest run of consecutive active days. `activeDays` and `today`
+ * are study-day keys (YYYY-MM-DD in the user's zone with the day starting at
+ * 04:00, see `study-day.ts`); activeDays may come in any order, with duplicates.
+ * The current streak stays alive through `today` until the day is over, so it
+ * counts if the last active day is today or yesterday.
  */
 export function computeStreaks(activeDays: string[], today: string) {
   const days = Array.from(new Set(activeDays.map(dayNumber))).sort((a, b) => a - b);

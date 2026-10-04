@@ -1,28 +1,21 @@
 import { NextResponse } from 'next/server';
-import { and, desc, eq, gte, lt, type SQL } from 'drizzle-orm';
+import { and, desc, eq, type SQL } from 'drizzle-orm';
 import { db } from '@/db';
 import { focusSessions, tasks } from '@/db/schema';
 import { getSessionUser } from '@/lib/auth/session-user';
 import { serverError, unauthorized } from '@/lib/api/responses';
+import { parseStudyQuery, windowConditions } from '@/lib/stats/study-query';
 
-const DAY_MS = 24 * 60 * 60 * 1000;
 const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 1000;
-
-function parseDay(value: string | null) {
-  return value && /^\d{4}-\d{2}-\d{2}$/.test(value) ? new Date(`${value}T00:00:00Z`) : null;
-}
 
 export async function GET(request: Request) {
   const user = await getSessionUser();
   if (!user) return unauthorized();
 
-  const { searchParams } = new URL(request.url);
-  const startDate = parseDay(searchParams.get('startDate'));
-  const endDate = parseDay(searchParams.get('endDate'));
-  const conditions: SQL[] = [eq(focusSessions.userId, user.id)];
-  if (startDate) conditions.push(gte(focusSessions.createdAt, startDate));
-  if (endDate) conditions.push(lt(focusSessions.createdAt, new Date(endDate.getTime() + DAY_MS)));
+  // startDate/endDate are study days (04:00 local) in the viewer's `tz`.
+  const { from, to } = parseStudyQuery(new URL(request.url).searchParams);
+  const conditions: SQL[] = [eq(focusSessions.userId, user.id), ...windowConditions(focusSessions.createdAt, { from, to })];
 
   try {
     const rows = await db
@@ -31,7 +24,7 @@ export async function GET(request: Request) {
       .leftJoin(tasks, eq(tasks.id, focusSessions.taskId))
       .where(and(...conditions))
       .orderBy(desc(focusSessions.createdAt))
-      .limit(startDate || endDate ? MAX_LIMIT : DEFAULT_LIMIT);
+      .limit(from || to ? MAX_LIMIT : DEFAULT_LIMIT);
 
     return NextResponse.json({
       sessions: rows.map(({ session, taskTitle }) => ({
