@@ -3,6 +3,7 @@ import { useTimerStore, CATCH_UP_GRACE_MS } from '@/stores/timer-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { useTasksStore } from '@/stores/task-store';
 import { useSessionRecorder } from '@/lib/timer/use-session-recorder';
+import { shouldFlushOnAuthChange } from '@/lib/timer/session-recorder';
 import { playAlarm } from '@/lib/timer/alarm';
 import { claimCompletion, completionKey } from '@/lib/timer/completion-claim';
 import { notifyPhaseComplete } from '@/lib/timer/notifications';
@@ -90,14 +91,14 @@ export function useTimerEngine() {
 
   const { record, flush } = useSessionRecorder();
 
-  // Retry sessions that failed to save (offline / 5xx): on mount and when back online
-  // and as soon as a user becomes available (auth resolves / login).
+  // Retry sessions that failed to save (offline / 5xx / guest sign-in refused):
+  // on mount, when back online, and as soon as auth resolves or the user changes.
   useEffect(() => {
     void flush();
     const onOnline = () => void flush();
     window.addEventListener('online', onOnline);
     const unsubAuth = useAuthStore.subscribe((state, prev) => {
-      if (state.user && state.user.id !== prev.user?.id) void flush();
+      if (shouldFlushOnAuthChange(state, prev)) void flush();
     });
     return () => {
       window.removeEventListener('online', onOnline);

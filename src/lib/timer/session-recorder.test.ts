@@ -1,10 +1,15 @@
 import { installMemoryStorage } from '@/test-utils/memory-storage';
 import { useAuthStore } from '@/stores/auth-store';
+import { ensureSession } from '@/lib/auth-client';
 import {
   recordSession,
   flushSessionQueue,
   normalizeDuration,
+  shouldFlushOnAuthChange,
 } from './session-recorder';
+
+vi.mock('@/lib/auth-client', () => ({ ensureSession: vi.fn() }));
+const ensureSessionMock = vi.mocked(ensureSession);
 
 const payload = { taskId: 't1', durationSec: 1500, mode: 'work' as const };
 const res = (status: number) => ({ ok: status >= 200 && status < 300, status });
@@ -17,6 +22,7 @@ describe('session-recorder', () => {
     mem = installMemoryStorage().mem;
     fetchMock = vi.fn();
     global.fetch = fetchMock as never;
+    ensureSessionMock.mockReset();
     useAuthStore.setState({ user: { id: 'u1', isAnonymous: false }, isLoading: false });
   });
 
@@ -56,11 +62,93 @@ describe('session-recorder', () => {
     expect(onRecorded).toHaveBeenCalledTimes(1);
   });
 
-  it('skips guests without calling the API', async () => {
-    useAuthStore.setState({ user: null, isLoading: false });
-    await expect(recordSession(payload)).resolves.toBe('skipped');
-    expect(fetchMock).not.toHaveBeenCalled();
-    expect(queue()).toHaveLength(0);
+  describe('guest without a session', () => {
+    beforeEach(() => {
+      useAuthStore.setState({ user: null, isLoading: false });
+    });
+
+    it('signs in anonymously once, then posts and reports recorded', async () => {
+      ensureSessionMock.mockResolvedValue({ id: 'guest-1', isAnonymous: true });
+      fetchMock.mockResolvedValue(res(200));
+      const onRecorded = vi.fn();
+
+      await expect(recordSession(payload, onRecorded)).resolves.toBe('recorded');
+
+      expect(ensureSessionMock).toHaveBeenCalledTimes(1);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(queue()).toHaveLength(0);
+      expect(onRecorded).toHaveBeenCalledTimes(1);
+    });
+
+    it('shares one sign-in between sessions recorded at the same time', async () => {
+      let resolveSignIn: (u: { id: string; isAnonymous: boolean }) => void = () => {};
+      ensureSessionMock.mockReturnValue(
+        new Promise((r) => {
+          resolveSignIn = r;
+        }),
+      );
+      fetchMock.mockResolvedValue(res(200));
+
+      const first = recordSession(payload);
+      const second = recordSession({ ...payload, durationSec: 60 });
+      resolveSignIn({ id: 'guest-1', isAnonymous: true });
+
+      await expect(Promise.all([first, second])).resolves.toEqual(['recorded', 'recorded']);
+      expect(ensureSessionMock).toHaveBeenCalledTimes(1);
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
+    it('keeps the session queued (never drops it) when anonymous sign-in fails', async () => {
+      ensureSessionMock.mockRejectedValue(new Error('429'));
+
+      await expect(recordSession(payload)).resolves.toBe('queued');
+
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(queue()).toHaveLength(1);
+      expect(queue()[0].userId).toBeNull();
+      expect(queue()[0].sendingAt).toBeUndefined();
+    });
+
+    it('a later flush signs in again and delivers the queued session', async () => {
+      ensureSessionMock.mockRejectedValueOnce(new Error('429'));
+      await recordSession(payload);
+
+      ensureSessionMock.mockResolvedValue({ id: 'guest-1', isAnonymous: true });
+      useAuthStore.setState({ user: { id: 'guest-1', isAnonymous: true }, isLoading: false });
+      fetchMock.mockResolvedValue(res(200));
+      await flushSessionQueue();
+
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(queue()).toHaveLength(0);
+    });
+
+    it('flush creates the guest session itself when nothing is signed in yet', async () => {
+      seedItem({ id: 'orphan', userId: null });
+      ensureSessionMock.mockResolvedValue({ id: 'guest-1', isAnonymous: true });
+      fetchMock.mockResolvedValue(res(200));
+
+      await flushSessionQueue();
+
+      expect(ensureSessionMock).toHaveBeenCalledTimes(1);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(queue()).toHaveLength(0);
+    });
+
+    it('flush never creates a guest just because stale items of other users exist', async () => {
+      seedItem({ id: 'theirs', userId: 'other' });
+      await flushSessionQueue();
+      expect(ensureSessionMock).not.toHaveBeenCalled();
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(queue()).toHaveLength(1);
+    });
+
+    it('flush keeps null-owner items when the sign-in still fails', async () => {
+      seedItem({ id: 'orphan', userId: null });
+      ensureSessionMock.mockRejectedValue(new Error('429'));
+      await flushSessionQueue();
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(queue()).toHaveLength(1);
+    });
   });
 
   it('queues (not skips) while auth is loading, then flushes once the user is known', async () => {
@@ -183,5 +271,37 @@ describe('session-recorder', () => {
     await flushSessionQueue();
     expect(fetchMock).not.toHaveBeenCalled();
     expect(queue().map((i: { id: string }) => i.id)).toEqual(['inflight']);
+  });
+
+  it("hands a guest's queued sessions to the real account the guest signs in to", async () => {
+    seedItem({ id: 'g', userId: 'guest-1', guest: true });
+    useAuthStore.setState({ user: { id: 'real-1', isAnonymous: false }, isLoading: false });
+    fetchMock.mockResolvedValue(res(200));
+    await flushSessionQueue();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(queue()).toHaveLength(0);
+  });
+
+  it("does not hand a guest's sessions to a different guest", async () => {
+    seedItem({ id: 'g', userId: 'guest-1', guest: true });
+    useAuthStore.setState({ user: { id: 'guest-2', isAnonymous: true }, isLoading: false });
+    await flushSessionQueue();
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(queue()).toHaveLength(1);
+  });
+
+  describe('shouldFlushOnAuthChange', () => {
+    const user = { id: 'u1', isAnonymous: false };
+    it('flushes when a user appears or changes', () => {
+      expect(shouldFlushOnAuthChange({ user, isLoading: false }, { user: null, isLoading: false })).toBe(true);
+      expect(shouldFlushOnAuthChange({ user: { ...user, id: 'u2' }, isLoading: false }, { user, isLoading: false })).toBe(true);
+    });
+    it('flushes when auth finishes loading without a user (guest whose sign-in must be retried)', () => {
+      expect(shouldFlushOnAuthChange({ user: null, isLoading: false }, { user: null, isLoading: true })).toBe(true);
+    });
+    it('ignores unrelated updates', () => {
+      expect(shouldFlushOnAuthChange({ user, isLoading: false }, { user, isLoading: false })).toBe(false);
+      expect(shouldFlushOnAuthChange({ user: null, isLoading: true }, { user: null, isLoading: true })).toBe(false);
+    });
   });
 });

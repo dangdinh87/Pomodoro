@@ -1,3 +1,4 @@
+import { ensureSession, type SessionUser } from '@/lib/auth-client';
 import { useAuthStore } from '@/stores/auth-store';
 import type { TimerMode } from '@/stores/timer-store';
 
@@ -15,8 +16,10 @@ export interface SessionPayload {
 interface QueuedSession {
   id: string;
   payload: SessionPayload;
-  /** null = queued while auth was still loading; stamped on first flush */
+  /** null = queued while auth was still loading or the guest sign-in failed; stamped on first flush */
   userId: string | null;
+  /** userId was a guest: re-homed when that guest signs in to a real account */
+  guest?: boolean;
   queuedAt: number;
   attempts: number;
   /** set while a request is in flight so a concurrent flush skips the item */
@@ -109,10 +112,26 @@ function markFailure(id: string, outcome: SendOutcome) {
   );
 }
 
+// One guest sign-in at a time: sessions finishing together share it, so a guest
+// never burns more than one of the per-IP sign-in allowance.
+let guestSignIn: Promise<SessionUser | null> | null = null;
+
+/** Creates (or finds) the session of a guest who has none yet; null on failure. */
+function startGuestSession(): Promise<SessionUser | null> {
+  guestSignIn ??= ensureSession()
+    .catch(() => null)
+    .finally(() => {
+      guestSignIn = null;
+    });
+  return guestSignIn;
+}
+
 /**
- * Records a finished focus/break segment. Guests are skipped; if auth is
- * still loading the session is queued until a user is known. `onRecorded`
- * runs only after the server accepted the session.
+ * Records a finished focus/break segment. A guest without a session gets an
+ * anonymous one first; if that fails (rate limit, offline) the item stays in
+ * the outbox with no owner and a later flush retries. While auth is still
+ * loading the session is queued until a user is known. `onRecorded` runs only
+ * after the server accepted the session.
  */
 export async function recordSession(
   payload: SessionPayload,
@@ -122,18 +141,27 @@ export async function recordSession(
   if (durationSec < 1) return 'skipped';
 
   const { user, isLoading } = useAuthStore.getState();
-  if (!user && !isLoading) return 'skipped';
-
   const item: QueuedSession = {
     id: newId(),
     payload: { ...payload, durationSec },
     userId: user?.id ?? null,
+    guest: user?.isAnonymous,
     queuedAt: Date.now(),
     attempts: 0,
-    sendingAt: user ? Date.now() : undefined,
+    // Mark in flight right away so a concurrent flush cannot send it twice
+    sendingAt: user || !isLoading ? Date.now() : undefined,
   };
   updateQueue((q) => [...q, item]);
-  if (!user) return 'queued'; // flushed once auth resolves
+  if (!user && isLoading) return 'queued'; // flushed once auth resolves
+
+  if (!user) {
+    const guest = await startGuestSession();
+    if (!guest) {
+      patchItem(item.id, { sendingAt: undefined });
+      return 'queued';
+    }
+    patchItem(item.id, { userId: guest.id, guest: true, sendingAt: Date.now() });
+  }
 
   const outcome = await send(item.payload);
   if (outcome === 'ok') {
@@ -151,10 +179,39 @@ export async function recordSession(
 
 let flushing = false;
 
-async function flushLocked(userId: string, onRecorded?: () => void) {
-  // Items queued before auth resolved belong to whoever is logged in now
+type AuthSnapshot = { user: { id: string } | null; isLoading: boolean };
+
+/**
+ * When to retry the outbox after the auth store changes: a user appeared or
+ * changed, or auth just resolved (a guest with nothing to sign in as needs a
+ * retry of the guest sign-in that failed earlier).
+ */
+export function shouldFlushOnAuthChange(state: AuthSnapshot, prev: AuthSnapshot): boolean {
+  const userChanged = Boolean(state.user) && state.user?.id !== prev.user?.id;
+  const authResolved = prev.isLoading && !state.isLoading;
+  return userChanged || authResolved;
+}
+
+async function flushLocked(onRecorded?: () => void) {
+  let current: SessionUser | null = useAuthStore.getState().user;
+  // A guest who finished sessions but never got a session (sign-in failed):
+  // try again now. Only for items that really have no owner, so stale items
+  // of other users never mint guest accounts.
+  if (!current && readQueue().some((i) => i.userId === null)) {
+    current = await startGuestSession();
+  }
+  if (!current) return;
+  const { id: userId, isAnonymous } = current;
+
+  // Items queued before auth resolved belong to whoever is logged in now. So do
+  // a guest's items once that guest signed in to a real account (the guest's
+  // data moved with them, so they must not be stranded under the old guest id).
   updateQueue((q) =>
-    q.map((i) => (i.userId === null ? { ...i, userId } : i)),
+    q.map((i) =>
+      i.userId === null || (i.guest && !isAnonymous && i.userId !== userId)
+        ? { ...i, userId, guest: isAnonymous }
+        : i,
+    ),
   );
 
   const candidates = readQueue().filter(
@@ -181,11 +238,11 @@ async function flushLocked(userId: string, onRecorded?: () => void) {
   if (sent) onRecorded?.();
 }
 
-/** Retries queued sessions of the current user. Safe to call often. */
+/** Retries queued sessions of the current user (or guest). Safe to call often. */
 export async function flushSessionQueue(onRecorded?: () => void) {
   if (flushing || typeof window === 'undefined') return;
-  const user = useAuthStore.getState().user;
-  if (!user || readQueue().length === 0) return;
+  const { user, isLoading } = useAuthStore.getState();
+  if (readQueue().length === 0 || (!user && isLoading)) return;
   flushing = true;
   try {
     // Prevent two tabs flushing the same queue (would duplicate sessions)
@@ -195,11 +252,11 @@ export async function flushSessionQueue(onRecorded?: () => void) {
         'session-queue-flush',
         { ifAvailable: true },
         async (lock) => {
-          if (lock) await flushLocked(user.id, onRecorded);
+          if (lock) await flushLocked(onRecorded);
         },
       );
     } else {
-      await flushLocked(user.id, onRecorded);
+      await flushLocked(onRecorded);
     }
   } finally {
     flushing = false;
