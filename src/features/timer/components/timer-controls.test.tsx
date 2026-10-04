@@ -58,12 +58,6 @@ vi.mock('@tanstack/react-query', () => ({
   }),
 }));
 
-vi.mock('@/hooks/use-confetti', () => ({
-  useConfetti: () => ({
-    fireWorkComplete: vi.fn(),
-  }),
-}));
-
 describe('TimerControls', () => {
   it('should have an accessible skip button', () => {
     render(<TimerControls />);

@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import confetti from 'canvas-confetti';
 import { useTimerStore } from '@/stores/timer-store';
 import { useTasksStore } from '@/stores/task-store';
 import { TimerControls } from './timer-controls';
@@ -13,7 +14,7 @@ vi.mock('@/lib/timer/use-session-recorder', () => ({
 }));
 vi.mock('@/lib/timer/alarm', () => ({ playAlarm: vi.fn() }));
 vi.mock('@/lib/timer/notifications', () => ({ requestNotificationPermission: vi.fn() }));
-vi.mock('@/hooks/use-confetti', () => ({ useConfetti: () => ({ fireWorkComplete: vi.fn() }) }));
+vi.mock('canvas-confetti', () => ({ default: vi.fn() }));
 
 describe('TimerControls skip', () => {
   beforeEach(() => {
@@ -40,5 +41,12 @@ describe('TimerControls skip', () => {
       mode: 'work',
       completedFullSession: false,
     });
+  });
+
+  it('does not fire confetti on a skip: only SessionCelebration celebrates, and only a natural end', () => {
+    render(<TimerControls />);
+    fireEvent.click(screen.getByTitle('timer.controls.skip_hint'));
+
+    expect(confetti).not.toHaveBeenCalled();
   });
 });

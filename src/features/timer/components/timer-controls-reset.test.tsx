@@ -11,7 +11,6 @@ vi.mock('@/lib/timer/use-session-recorder', () => ({
 }));
 vi.mock('@/lib/timer/alarm', () => ({ playAlarm: vi.fn() }));
 vi.mock('@/lib/timer/notifications', () => ({ requestNotificationPermission: vi.fn() }));
-vi.mock('@/hooks/use-confetti', () => ({ useConfetti: () => ({ fireWorkComplete: vi.fn() }) }));
 
 describe('TimerControls reset button', () => {
   beforeEach(() => {

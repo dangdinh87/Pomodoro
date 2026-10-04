@@ -20,7 +20,6 @@ import { toast } from 'sonner';
 import { useSessionRecorder } from '@/lib/timer/use-session-recorder';
 import { playAlarm } from '@/lib/timer/alarm';
 import { requestNotificationPermission } from '@/lib/timer/notifications';
-import { useConfetti } from '@/hooks/use-confetti';
 import { useTasksStore } from '@/stores/task-store';
 import { mayAutoChain } from '@/lib/timer/auto-chain';
 import { requestTimerReset } from '../lib/request-reset';
@@ -31,7 +30,6 @@ const MINIMUM_COMPLETION_PERCENT = 50;
 export const TimerControls = memo(function TimerControls() {
     const { t } = useTranslation();
     const { record } = useSessionRecorder();
-    const { fireWorkComplete } = useConfetti();
 
     // ATOMIC SUBSCRIPTION
     const isRunning = useTimerStore((state) => state.isRunning);
@@ -94,8 +92,6 @@ export const TimerControls = memo(function TimerControls() {
         if (mode === 'work') {
             if (isValidSession) {
                 incrementCompletedSessions();
-                // Fire confetti celebration
-                fireWorkComplete();
                 playAlarm();
 
                 // Record only the focus time since the last recorded segment
