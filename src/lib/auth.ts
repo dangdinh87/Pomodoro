@@ -25,8 +25,10 @@ export const auth = betterAuth({
   rateLimit: {
     enabled: true,
     storage: 'memory',
-    // Every guest sign-in creates a user row; a real visitor needs one.
-    customRules: { '/sign-in/anonymous': { window: 10 * 60, max: 5 } },
+    // Every guest sign-in creates a user row, and a guest's first session is
+    // recorded through one. Generous on purpose: a school or dorm shares one
+    // IP (NAT) between many first-time visitors.
+    customRules: { '/sign-in/anonymous': { window: 10 * 60, max: 30 } },
   },
   plugins: [
     emailOTP({

@@ -3,6 +3,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/stores/auth-store';
+import { ensureSession } from '@/lib/auth-client';
+import { I18nProvider } from '@/contexts/i18n-context';
+import { TooManyRequestsError } from '@/lib/api/too-many-requests-error';
+import en from '@/i18n/locales/en.json';
 import { useTasks } from './use-tasks';
 
 vi.mock('@/lib/auth-client', () => ({ ensureSession: vi.fn() }));
@@ -24,7 +28,9 @@ describe('useTasks optimistic updates', () => {
   let patchResult: { ok: boolean; status?: number; json?: () => unknown };
 
   const wrapper = ({ children }: { children: ReactNode }) => (
-    <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    <I18nProvider initialLang="en">
+      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    </I18nProvider>
   );
 
   beforeEach(() => {
@@ -161,5 +167,43 @@ describe('useTasks optimistic updates', () => {
       await p2;
     });
     await waitFor(() => expect(listCalls()).toBe(2));
+  });
+
+  describe('creating a task under rate limits', () => {
+    const create = async () => {
+      const { result } = await setup();
+      await act(async () => {
+        await result.current.createTask({ title: 'new' }).catch(() => undefined);
+      });
+    };
+
+    it('shows the specific toast when the tasks API answers 429', async () => {
+      const list = fetchMock.getMockImplementation()!;
+      fetchMock.mockImplementation((url: string, init?: { method?: string }) =>
+        init?.method === 'POST'
+          ? Promise.resolve({ ok: false, status: 429, json: () => ({}) })
+          : list(url, init),
+      );
+      await create();
+      expect(toast.error).toHaveBeenCalledWith(en.errors.tooManyRequests);
+      expect(toast.error).not.toHaveBeenCalledWith('Failed to create task');
+    });
+
+    it('shows the specific toast when the guest sign-in is rate limited', async () => {
+      vi.mocked(ensureSession).mockRejectedValueOnce(new TooManyRequestsError());
+      await create();
+      expect(toast.error).toHaveBeenCalledWith(en.errors.tooManyRequests);
+    });
+
+    it('keeps the generic toast for other failures', async () => {
+      const list = fetchMock.getMockImplementation()!;
+      fetchMock.mockImplementation((url: string, init?: { method?: string }) =>
+        init?.method === 'POST'
+          ? Promise.resolve({ ok: false, status: 500, statusText: '', json: () => ({}) })
+          : list(url, init),
+      );
+      await create();
+      expect(toast.error).toHaveBeenCalledWith('Failed to create task');
+    });
   });
 });

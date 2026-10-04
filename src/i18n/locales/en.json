@@ -704,6 +704,7 @@
     "notFound": "Not found",
     "unauthorized": "Unauthorized. Please sign in.",
     "forbidden": "You don't have permission to access this resource",
+    "tooManyRequests": "Too many requests right now. Please wait a few minutes and try again.",
     "boundary": {
       "title": "Something went wrong",
       "description": "An unexpected error occurred. Try again or go back.",

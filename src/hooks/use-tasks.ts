@@ -14,6 +14,8 @@ import {
 } from '@/stores/task-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { ensureSession } from '@/lib/auth-client';
+import { TooManyRequestsError } from '@/lib/api/too-many-requests-error';
+import { useI18n } from '@/contexts/i18n-context';
 import { toast } from 'sonner';
 import { startOfDay, endOfDay } from 'date-fns';
 
@@ -128,6 +130,7 @@ async function createTask(input: CreateTaskInput): Promise<Task> {
     body: JSON.stringify(body),
   });
 
+  if (res.status === 429) throw new TooManyRequestsError();
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
     const errorMessage =
@@ -255,6 +258,7 @@ function restoreCachedTasks(
 
 export function useTasks(filters: any = {}) {
   const queryClient = useQueryClient();
+  const { t } = useI18n();
   const user = useAuthStore((state) => state.user);
 
   const [page, setPage] = useState(1);
@@ -290,7 +294,11 @@ export function useTasks(filters: any = {}) {
       toast.success('Task created successfully');
     },
     onError: (error) => {
-      toast.error('Failed to create task');
+      toast.error(
+        error instanceof TooManyRequestsError
+          ? t('errors.tooManyRequests')
+          : 'Failed to create task',
+      );
       console.error(error);
     },
   });

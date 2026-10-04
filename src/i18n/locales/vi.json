@@ -704,6 +704,7 @@
     "notFound": "Không tìm thấy",
     "unauthorized": "Chưa đăng nhập. Vui lòng đăng nhập.",
     "forbidden": "Bạn không có quyền truy cập tài nguyên này",
+    "tooManyRequests": "Hiện có quá nhiều yêu cầu. Bạn hãy đợi vài phút rồi thử lại nhé.",
     "boundary": {
       "title": "Đã xảy ra sự cố",
       "description": "Có lỗi không mong muốn. Bạn có thể thử lại hoặc quay về trang trước.",
