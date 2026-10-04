@@ -52,7 +52,7 @@ const NowPlayingCompact = ({
       >
         {thumbnailUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={thumbnailUrl} alt="YouTube Thumbnail" className="h-full w-full object-cover" />
+          <img src={thumbnailUrl} alt="" className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-ink-faint">
             <Play size={16} weight="fill" aria-hidden="true" />
