@@ -206,7 +206,6 @@
       "longBreakInterval": "長い休憩までのセッション数",
       "autoStartBreaks": "休憩を自動で開始",
       "autoStartWork": "集中を自動で開始",
-      "showClock": "時計を表示",
       "clockType": "時計スタイル",
       "selectClockType": "時計スタイルを選択",
       "digital": "デジタル",

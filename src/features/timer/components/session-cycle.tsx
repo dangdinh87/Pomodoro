@@ -11,9 +11,8 @@ export const SessionCycle = memo(function SessionCycle() {
     const mode = useTimerStore((state) => state.mode);
     const sessionCount = useTimerStore((state) => state.sessionCount);
     const interval = useTimerStore((state) => state.settings.longBreakInterval);
-    const usePlan = useTimerStore((state) => state.usePlan);
 
-    if (usePlan || interval < 1) return null;
+    if (interval < 1) return null;
 
     const isWork = mode === 'work';
     // Same height as the full row, so switching modes doesn't shift the clock.

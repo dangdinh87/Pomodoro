@@ -41,7 +41,6 @@ describe('TimerSettings (saves as you change)', () => {
       timeLeft: 25 * 60,
       lastSessionTimeLeft: 25 * 60,
       deadlineAt: null,
-      usePlan: false,
       settings: { ...defaultSettings },
     });
   });

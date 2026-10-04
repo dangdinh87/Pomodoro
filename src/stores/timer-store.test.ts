@@ -1,6 +1,6 @@
 import { createJSONStorage } from 'zustand/middleware';
 import { installMemoryStorage } from '@/test-utils/memory-storage';
-import { useTimerStore } from './timer-store';
+import { migrateTimerState, useTimerStore } from './timer-store';
 
 // Study days depend on the viewer's zone; pin it so the 04:00 boundary is testable.
 vi.mock('@/lib/stats/study-day', async (importOriginal) => ({
@@ -26,7 +26,6 @@ const persistedSettings = {
   autoStartWork: false,
   clockType: 'flip',
   clockSize: 'large',
-  showClock: true,
   lowTimeWarningEnabled: false,
 };
 
@@ -45,7 +44,7 @@ describe('timer-store persistence', () => {
     expect(useTimerStore.getState().lastSessionTimeLeft).toBe(3000);
 
     const saved = JSON.parse(window.localStorage.getItem('timer-storage')!);
-    expect(saved.version).toBe(2);
+    expect(saved.version).toBe(3);
     expect(saved.state.lastSessionTimeLeft).toBe(3000);
 
     useTimerStore.setState({ lastSessionTimeLeft: 1500 }); // reset in memory
@@ -74,10 +73,6 @@ describe('timer-store persistence', () => {
     expect(s.isRunning).toBe(true);
     expect(s.deadlineAt).toBe(NOW + 90_000);
     expect(s.timeLeft).toBe(90);
-    expect(s.usePlan).toBe(false);
-    expect(s.plan).toEqual([]);
-    expect(s.currentStepIndex).toBe(0);
-    expect(s.repeatPlan).toBe(true);
     // Never persisted before: falls back to the full phase length
     expect(s.lastSessionTimeLeft).toBe(600);
   });
@@ -193,7 +188,7 @@ describe('timer-store auto-start defaults', () => {
     await useTimerStore.persist.rehydrate();
     useTimerStore.getState().updateSettings({ autoStartWork: true });
     const saved = JSON.parse(window.localStorage.getItem('timer-storage')!);
-    expect(saved.version).toBe(2);
+    expect(saved.version).toBe(3);
     expect(saved.state.settings.autoStartWork).toBe(true);
     await useTimerStore.persist.rehydrate();
     expect(useTimerStore.getState().settings.autoStartWork).toBe(true);
@@ -273,5 +268,67 @@ describe('timer-store daily session counter', () => {
     const saved = JSON.parse(window.localStorage.getItem('timer-storage')!);
     expect(saved.state.sessionCount).toBe(1);
     expect(saved.state.sessionCountDay).toBe('2027-01-15');
+  });
+});
+
+describe('timer-store v3 migration (custom plan and showClock removed)', () => {
+  beforeEach(() => {
+    installMemoryStorage();
+    vi.spyOn(Date, 'now').mockReturnValue(NOW);
+    useTimerStore.persist.setOptions({
+      storage: createJSONStorage(() => window.localStorage),
+    });
+  });
+  afterEach(() => vi.restoreAllMocks());
+
+  const v2State = {
+    mode: 'work',
+    timeLeft: 600,
+    lastSessionTimeLeft: 3000,
+    usePlan: true,
+    plan: [{ id: 'a', type: 'work', minutes: 35 }],
+    currentStepIndex: 0,
+    repeatPlan: false,
+    settings: { ...persistedSettings, showClock: true },
+  };
+
+  it('drops the plan fields and showClock from a v2 state, keeping everything else', () => {
+    const migrated = migrateTimerState(v2State, 2) as unknown as Record<string, unknown>;
+    for (const key of ['usePlan', 'plan', 'currentStepIndex', 'repeatPlan']) expect(migrated).not.toHaveProperty(key);
+    expect(migrated.settings).not.toHaveProperty('showClock');
+    expect(migrated).toMatchObject({ mode: 'work', timeLeft: 600, lastSessionTimeLeft: 3000, settings: persistedSettings });
+  });
+
+  it('does not mutate what it was given', () => {
+    migrateTimerState(v2State, 2);
+    expect(v2State.usePlan).toBe(true);
+    expect(v2State.settings.showClock).toBe(true);
+  });
+
+  it('survives an empty or settings-less state', () => {
+    expect(migrateTimerState(undefined, 2)).toEqual({});
+    expect(migrateTimerState({ mode: 'work' }, 2)).toEqual({ mode: 'work' });
+  });
+
+  it('leaves a v3 state alone', () => {
+    const v3 = { mode: 'work', settings: { ...persistedSettings } };
+    expect(migrateTimerState(v3, 3)).toEqual(v3);
+  });
+
+  it('rehydrates a v2 state without the removed fields, then persists v3', async () => {
+    seed(v2State, 2);
+    await useTimerStore.persist.rehydrate();
+    const s = useTimerStore.getState() as unknown as Record<string, unknown>;
+    for (const key of ['usePlan', 'plan', 'currentStepIndex', 'repeatPlan']) expect(s).not.toHaveProperty(key);
+    expect(s.settings).not.toHaveProperty('showClock');
+    // The 35-minute "plan" step is gone: the phase length comes from the settings again
+    useTimerStore.getState().resetTimer();
+    expect(useTimerStore.getState().timeLeft).toBe(3000);
+
+    useTimerStore.getState().updateSettings({ workDuration: 40 });
+    const saved = JSON.parse(window.localStorage.getItem('timer-storage')!);
+    expect(saved.version).toBe(3);
+    for (const key of ['usePlan', 'plan', 'currentStepIndex', 'repeatPlan']) expect(saved.state).not.toHaveProperty(key);
+    expect(saved.state.settings).not.toHaveProperty('showClock');
   });
 });

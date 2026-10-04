@@ -104,7 +104,7 @@ describe('TimerMascot', () => {
 
 describe('SessionCycle', () => {
   const state = (patch: object) =>
-    useTimerStore.setState({ mode: 'work', sessionCount: 0, usePlan: false, ...patch } as never);
+    useTimerStore.setState({ mode: 'work', sessionCount: 0, ...patch } as never);
 
   it('focus: filled tomatoes for finished sessions and "Session 3 of 4"', () => {
     state({ sessionCount: 2 });
@@ -135,14 +135,10 @@ describe('SessionCycle', () => {
     expect(container.querySelectorAll('svg[data-filled="true"]')).toHaveLength(4);
   });
 
-  it('renders nothing for a custom plan, and a spacer on a break before any session', () => {
-    state({ usePlan: true });
-    const { container, unmount } = renderIn(<SessionCycle />);
-    expect(container).toBeEmptyDOMElement();
-    unmount();
-    state({ usePlan: false, mode: 'shortBreak', sessionCount: 0 });
-    const second = renderIn(<SessionCycle />);
-    expect(second.container.firstElementChild).toHaveAttribute('aria-hidden', 'true');
+  it('renders a spacer on a break before any session', () => {
+    state({ mode: 'shortBreak', sessionCount: 0 });
+    const { container } = renderIn(<SessionCycle />);
+    expect(container.firstElementChild).toHaveAttribute('aria-hidden', 'true');
   });
 });
 

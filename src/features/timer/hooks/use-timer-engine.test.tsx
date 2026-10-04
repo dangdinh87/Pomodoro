@@ -37,7 +37,6 @@ const settings = {
   autoStartWork: true,
   clockType: 'digital' as const,
   clockSize: 'medium' as const,
-  showClock: false,
   lowTimeWarningEnabled: true,
   keepScreenOn: false,
 };
@@ -58,8 +57,6 @@ describe('useTimerEngine', () => {
       completedSessions: 0,
       lastSessionTimeLeft: 3000,
       settings,
-      usePlan: false,
-      plan: [],
     });
   });
   afterEach(() => vi.useRealTimers());
@@ -270,8 +267,6 @@ function resetStore(overrides: Record<string, unknown> = {}) {
     completedSessions: 0,
     lastSessionTimeLeft: 60,
     settings: quick,
-    usePlan: false,
-    plan: [],
     ...overrides,
   });
 }

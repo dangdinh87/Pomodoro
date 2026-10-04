@@ -210,8 +210,7 @@ export function useTimerEngine() {
       } else if (currentMode === 'work') {
         if (!catchUp) {
           // Hands the moment to the celebration (confetti included); the alarm and the notification stay here
-          const planStep = state.usePlan ? state.plan[state.currentStepIndex] : undefined;
-          announceFocusComplete((planStep ? planStep.minutes * 60 : configDuration) / 60);
+          announceFocusComplete(configDuration / 60);
         }
         incrementCompletedSessions();
         void record({

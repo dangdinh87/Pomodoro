@@ -206,7 +206,6 @@
       "longBreakInterval": "Sessions before long break",
       "autoStartBreaks": "Auto-start breaks",
       "autoStartWork": "Auto-start focus sessions",
-      "showClock": "Show clock",
       "clockType": "Clock style",
       "selectClockType": "Select clock style",
       "digital": "Digital",

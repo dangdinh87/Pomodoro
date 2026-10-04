@@ -26,7 +26,6 @@ const settings = {
   autoStartWork: false,
   clockType: 'digital' as const,
   clockSize: 'medium' as const,
-  showClock: false,
   lowTimeWarningEnabled: true,
   keepScreenOn: false,
 };
@@ -39,8 +38,6 @@ function seedTimer(overrides: Record<string, unknown> = {}) {
     isRunning: true,
     deadlineAt: Date.now() + 600_000,
     settings,
-    usePlan: false,
-    plan: [],
     ...overrides,
   });
 }

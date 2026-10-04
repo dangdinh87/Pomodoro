@@ -57,7 +57,6 @@ describe('TimerControls skip chain', () => {
         autoStartWork: true,
         clockType: 'digital',
         clockSize: 'medium',
-        showClock: false,
         lowTimeWarningEnabled: true,
         keepScreenOn: false,
       },

@@ -38,7 +38,6 @@ const settings = {
   autoStartWork: false,
   clockType: 'digital' as const,
   clockSize: 'medium' as const,
-  showClock: false,
   lowTimeWarningEnabled: true,
   keepScreenOn: false,
 };
@@ -96,8 +95,6 @@ describe('SessionCelebration', () => {
       completedSessions: 0,
       lastSessionTimeLeft: 3000,
       settings,
-      usePlan: false,
-      plan: [],
     });
   });
   afterEach(() => vi.useRealTimers());
@@ -118,14 +115,6 @@ describe('SessionCelebration', () => {
     expect(screen.getByRole('button', { name: 'Take a break' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Later' })).toBeInTheDocument();
     expect(confetti).toHaveBeenCalled();
-  });
-
-  it('uses the length of the phase in a custom plan', () => {
-    focusAboutToEnd();
-    useTimerStore.setState({ usePlan: true, plan: [{ id: 'a', type: 'work', minutes: 35 }], currentStepIndex: 0 });
-    renderStage();
-    advance(2500);
-    expect(screen.getByText('+35 min')).toBeInTheDocument();
   });
 
   it('counts today in the streak while the stats do not include this session yet', () => {
