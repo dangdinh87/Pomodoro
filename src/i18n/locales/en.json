@@ -305,7 +305,13 @@
       "noTemplates": "No templates yet",
       "createTemplateHint": "Save any task as a template to reuse it later",
       "empty": "No templates yet",
-      "emptyHint": "Open the more actions menu on a task and choose Save as template."
+      "emptyHint": "Open the more actions menu on a task and choose Save as template.",
+      "toasts": {
+        "saved": "Task saved as a template",
+        "saveFailed": "Couldn't save the template. Please try again.",
+        "removed": "Template removed",
+        "removeFailed": "Couldn't remove the template. Please try again."
+      }
     }
   },
   "history": {
@@ -632,6 +638,11 @@
       "nowPlaying": "Now playing",
       "soundSettings": "Sound settings",
       "status": {
+      "errors": {
+        "cannotPlay": "Couldn't play this video. Check the link and try again.",
+        "playerFailed": "Couldn't start the YouTube player. Please try again.",
+        "controlFailed": "Couldn't control playback. Please try again."
+      },
         "playing": "Playing",
         "paused": "Paused"
       },
@@ -1024,7 +1035,14 @@
     "tagSuggestions": "Suggestions",
     "noTagsHint": "Add a tag above to group related tasks.",
     "tagsUsed": "{count} of {max} tags used",
-    "templatesDescription": "Saved task setups you can reuse when creating a task."
+    "templatesDescription": "Saved task setups you can reuse when creating a task.",
+    "errors": {
+      "createFailed": "Couldn't create the task. Please try again.",
+      "updateFailed": "Couldn't update the task. Please try again.",
+      "deleteFailed": "Couldn't delete the task. Please try again.",
+      "reorderFailed": "Couldn't reorder the tasks. Please try again.",
+      "cloneFailed": "Couldn't duplicate the task. Please try again."
+    }
   },
   "timerUi": {
     "soundOff": "Off",

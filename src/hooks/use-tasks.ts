@@ -289,15 +289,15 @@ export function useTasks(filters: any = {}) {
 
   const createTaskMutation = useMutation({
     mutationFn: createTask,
+    // No success toast: the new row appearing in the list is the feedback
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast.success('Task created successfully');
     },
     onError: (error) => {
       toast.error(
         error instanceof TooManyRequestsError
           ? t('errors.tooManyRequests')
-          : 'Failed to create task',
+          : t('tasksUi.errors.createFailed'),
       );
       console.error(error);
     },
@@ -322,7 +322,7 @@ export function useTasks(filters: any = {}) {
       ),
     onError: (err, vars, context) => {
       restoreCachedTasks(queryClient, context);
-      toast.error('Failed to update task');
+      toast.error(t('tasksUi.errors.updateFailed'));
     },
     onSettled: () => {
       invalidateIfLastPending(queryClient);
@@ -338,10 +338,7 @@ export function useTasks(filters: any = {}) {
       ),
     onError: (err, id, context) => {
       restoreCachedTasks(queryClient, context);
-      toast.error('Failed to delete task');
-    },
-    onSuccess: () => {
-      toast.success('Task moved to trash');
+      toast.error(t('tasksUi.errors.deleteFailed'));
     },
     onSettled: () => {
       invalidateIfLastPending(queryClient);
@@ -357,10 +354,7 @@ export function useTasks(filters: any = {}) {
       ),
     onError: (err, id, context) => {
       restoreCachedTasks(queryClient, context);
-      toast.error('Failed to permanently delete task');
-    },
-    onSuccess: () => {
-      toast.success('Task permanently deleted');
+      toast.error(t('tasksUi.errors.deleteFailed'));
     },
     onSettled: () => {
       invalidateIfLastPending(queryClient);
@@ -381,7 +375,7 @@ export function useTasks(filters: any = {}) {
     },
     onError: (err, taskOrders, context) => {
       restoreCachedTasks(queryClient, context);
-      toast.error('Failed to reorder tasks');
+      toast.error(t('tasksUi.errors.reorderFailed'));
     },
     onSettled: () => {
       invalidateIfLastPending(queryClient);
@@ -392,10 +386,9 @@ export function useTasks(filters: any = {}) {
     mutationFn: cloneTask,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast.success('Task cloned successfully');
     },
     onError: () => {
-      toast.error('Failed to clone task');
+      toast.error(t('tasksUi.errors.cloneFailed'));
     },
   });
 

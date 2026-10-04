@@ -305,7 +305,13 @@
       "noTemplates": "Chưa có mẫu nào",
       "createTemplateHint": "Lưu bất kỳ việc nào làm mẫu để dùng lại sau",
       "empty": "Chưa có mẫu nào",
-      "emptyHint": "Mở menu thao tác khác của một việc và chọn Lưu làm mẫu."
+      "emptyHint": "Mở menu thao tác khác của một việc và chọn Lưu làm mẫu.",
+      "toasts": {
+        "saved": "Đã lưu việc làm mẫu",
+        "saveFailed": "Không lưu được mẫu. Bạn thử lại nhé.",
+        "removed": "Đã xoá mẫu",
+        "removeFailed": "Không xoá được mẫu. Bạn thử lại nhé."
+      }
     }
   },
   "history": {
@@ -632,6 +638,11 @@
       "nowPlaying": "Đang phát",
       "soundSettings": "Cài đặt âm thanh",
       "status": {
+      "errors": {
+        "cannotPlay": "Không phát được video này. Bạn kiểm tra lại liên kết nhé.",
+        "playerFailed": "Không khởi động được trình phát YouTube. Bạn thử lại nhé.",
+        "controlFailed": "Không điều khiển được trình phát. Bạn thử lại nhé."
+      },
         "playing": "Đang phát",
         "paused": "Tạm dừng"
       },
@@ -1024,7 +1035,14 @@
     "tagSuggestions": "Gợi ý",
     "noTagsHint": "Thêm thẻ ở trên để nhóm các việc liên quan.",
     "tagsUsed": "Đã dùng {count}/{max} thẻ",
-    "templatesDescription": "Các mẫu việc đã lưu, dùng lại khi tạo việc mới."
+    "templatesDescription": "Các mẫu việc đã lưu, dùng lại khi tạo việc mới.",
+    "errors": {
+      "createFailed": "Không tạo được việc. Bạn thử lại nhé.",
+      "updateFailed": "Không cập nhật được việc. Bạn thử lại nhé.",
+      "deleteFailed": "Không xoá được việc. Bạn thử lại nhé.",
+      "reorderFailed": "Không sắp xếp lại được các việc. Bạn thử lại nhé.",
+      "cloneFailed": "Không nhân bản được việc. Bạn thử lại nhé."
+    }
   },
   "timerUi": {
     "soundOff": "Tắt",

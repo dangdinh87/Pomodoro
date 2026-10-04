@@ -95,10 +95,10 @@ describe('useTasks optimistic updates', () => {
     await waitFor(() =>
       expect(result.current.tasks.find((t) => t.id === 'a')?.status).toBe('todo'),
     );
-    expect(toast.error).toHaveBeenCalledWith('Failed to update task');
+    expect(toast.error).toHaveBeenCalledWith(en.tasksUi.errors.updateFailed);
   });
 
-  it('removes the task optimistically on soft delete and toasts only on success', async () => {
+  it('removes the task optimistically on soft delete without a success toast', async () => {
     patchResult = { ok: true, json: () => ({}) };
     const { result } = await setup();
     let promise!: Promise<unknown>;
@@ -110,7 +110,8 @@ describe('useTasks optimistic updates', () => {
     await act(async () => {
       await promise;
     });
-    expect(toast.success).toHaveBeenCalledWith('Task moved to trash');
+    // The row vanishing is the feedback; a toast for a routine delete is noise
+    expect(toast.success).not.toHaveBeenCalled();
   });
 
   it('does not show a success toast when delete fails and restores the list', async () => {
@@ -125,7 +126,7 @@ describe('useTasks optimistic updates', () => {
     });
     await waitFor(() => expect(result.current.tasks).toHaveLength(2));
     expect(toast.success).not.toHaveBeenCalled();
-    expect(toast.error).toHaveBeenCalledWith('Failed to permanently delete task');
+    expect(toast.error).toHaveBeenCalledWith(en.tasksUi.errors.deleteFailed);
   });
 
   it('decrements total optimistically on delete', async () => {
@@ -186,7 +187,7 @@ describe('useTasks optimistic updates', () => {
       );
       await create();
       expect(toast.error).toHaveBeenCalledWith(en.errors.tooManyRequests);
-      expect(toast.error).not.toHaveBeenCalledWith('Failed to create task');
+      expect(toast.error).not.toHaveBeenCalledWith(en.tasksUi.errors.createFailed);
     });
 
     it('shows the specific toast when the guest sign-in is rate limited', async () => {
@@ -203,7 +204,43 @@ describe('useTasks optimistic updates', () => {
           : list(url, init),
       );
       await create();
-      expect(toast.error).toHaveBeenCalledWith('Failed to create task');
+      expect(toast.error).toHaveBeenCalledWith(en.tasksUi.errors.createFailed);
     });
+
+    it('stays quiet when the task is created, the new row is the feedback', async () => {
+      const list = fetchMock.getMockImplementation() as (url: string, init?: { method?: string }) => unknown;
+      fetchMock.mockImplementation((url: string, init?: { method?: string }) =>
+        init?.method === 'POST'
+          ? Promise.resolve({ ok: true, status: 201, json: () => ({ task: apiTask('c') }) })
+          : list(url, init),
+      );
+      await create();
+      expect(toast.success).not.toHaveBeenCalled();
+      expect(toast.error).not.toHaveBeenCalled();
+    });
+  });
+
+  it('toasts translated errors for reorder and clone failures and nothing on clone success', async () => {
+    const list = fetchMock.getMockImplementation() as (url: string, init?: { method?: string }) => unknown;
+    let ok = false;
+    fetchMock.mockImplementation((url: string, init?: { method?: string }) =>
+      init?.method === 'POST'
+        ? Promise.resolve({ ok, status: ok ? 201 : 500, json: () => ({ task: apiTask('c') }) })
+        : list(url, init),
+    );
+    const { result } = await setup();
+
+    await act(async () => {
+      await result.current.cloneTask('a').catch(() => undefined);
+      await result.current.reorderTasks([{ id: 'a', displayOrder: 1 }]).catch(() => undefined);
+    });
+    expect(toast.error).toHaveBeenCalledWith(en.tasksUi.errors.cloneFailed);
+    expect(toast.error).toHaveBeenCalledWith(en.tasksUi.errors.reorderFailed);
+
+    ok = true;
+    await act(async () => {
+      await result.current.cloneTask('a');
+    });
+    expect(toast.success).not.toHaveBeenCalled();
   });
 });

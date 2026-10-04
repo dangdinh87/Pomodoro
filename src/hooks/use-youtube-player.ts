@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useI18n } from '@/contexts/i18n-context';
 import { toast } from 'sonner';
 import { useAudioStore } from '@/stores/audio-store';
 import { fetchYouTubeOEmbed } from '@/lib/youtube-utils';
@@ -196,6 +197,7 @@ const updateAudioStoreForYouTube = (
 
 // Main YouTube player hook
 export const useYouTubePlayer = () => {
+  const { t } = useI18n();
   const setCurrentlyPlaying = useAudioStore((state) => state.setCurrentlyPlaying);
   const updatePlayingStatus = useAudioStore((state) => state.updatePlayingStatus);
   const clearCurrentlyPlaying = useAudioStore((state) => state.clearCurrentlyPlaying);
@@ -278,7 +280,7 @@ export const useYouTubePlayer = () => {
             setPlayerState({ status: 'stopped', currentSource: null });
             setGlobalYTSource(null);
             clearCurrentlyPlaying();
-            toast.error('Không thể phát video này. Vui lòng kiểm tra lại link.');
+            toast.error(t('audio.youtube.errors.cannotPlay'));
           }
           // Clear the timeout reference after it fires
           clearGlobalYTTimeout();
@@ -339,9 +341,9 @@ export const useYouTubePlayer = () => {
       updateAudioStoreForYouTube(source, autoPlay, setCurrentlyPlaying);
     } catch (error) {
       console.error('Failed to create or update YouTube player:', error);
-      toast.error('Không thể tạo trình phát YouTube. Vui lòng thử lại.');
+      toast.error(t('audio.youtube.errors.playerFailed'));
     }
-  }, [setCurrentlyPlaying]);
+  }, [setCurrentlyPlaying, t]);
 
   // Toggle playback - only toggle if same source, otherwise play new source
   const togglePlayback = useCallback(async (videoId?: string, listId?: string, isChannel?: boolean) => {
@@ -382,9 +384,9 @@ export const useYouTubePlayer = () => {
       }
     } catch (error) {
       console.error('Failed to toggle playback:', error);
-      toast.error('Không thể điều khiển trình phát. Vui lòng thử lại.');
+      toast.error(t('audio.youtube.errors.controlFailed'));
     }
-  }, [createOrUpdatePlayer, updatePlayingStatus]);
+  }, [createOrUpdatePlayer, updatePlayingStatus, t]);
 
   // Stop playback
   const stopPlayback = useCallback(() => {
