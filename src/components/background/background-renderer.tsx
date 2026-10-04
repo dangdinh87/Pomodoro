@@ -1,7 +1,10 @@
 'use client';
 
 import { useBackground } from '@/contexts/background-context';
+import { DEFAULT_BACKGROUND } from '@/data/background-migration';
 import { findImageById } from '@/data/background-packs';
+import { useCustomImageUrl } from '@/hooks/use-custom-image-url';
+import { parseCustomImageValue } from '@/lib/custom-background/image-store';
 import { getBestImageUrl } from '@/lib/format-detection';
 import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
@@ -18,7 +21,7 @@ function resolveBackgroundUrl(value: string): string {
   // Video paths pass through
   if (value.endsWith('.mp4')) return value;
 
-  // Custom images (data URLs or http URLs) pass through
+  // Custom images (http URLs, or data URLs saved before images moved to IndexedDB) pass through
   if (value.startsWith('data:') || value.startsWith('http')) return value;
 
   // Old-style paths (safety fallback if migration missed something)
@@ -33,17 +36,25 @@ function resolveBackgroundUrl(value: string): string {
 }
 
 export function BackgroundRenderer() {
-  const { background, isLoading } = useBackground();
+  const { background, isLoading, setBackground } = useBackground();
   const [loaded, setLoaded] = useState(false);
 
   const pathname = usePathname();
   // The timer stage lives on `/`; content pages keep the plain theme background.
   const isTimerPage = pathname === '/';
 
+  // The user's own upload lives in IndexedDB: read it, show nothing until it is ready
+  const customImage = useCustomImageUrl(background.type === 'image' ? background.value : '');
+  const isStoredUpload = background.type === 'image' && parseCustomImageValue(background.value) !== null;
+  // Site data was cleared: the picture is gone for good, so fall back to the default scene
+  useEffect(() => {
+    if (customImage.missing) setBackground({ ...DEFAULT_BACKGROUND });
+  }, [customImage.missing, setBackground]);
+
   // Resolve media src (ID → best format URL)
   const resolvedSrc = useMemo(
-    () => resolveBackgroundUrl(background.value),
-    [background.value],
+    () => (isStoredUpload ? (customImage.url ?? '') : resolveBackgroundUrl(background.value)),
+    [background.value, isStoredUpload, customImage.url],
   );
 
   const isVideo =

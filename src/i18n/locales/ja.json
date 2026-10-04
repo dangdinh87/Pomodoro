@@ -536,6 +536,7 @@
         "invalidUrl": "画像のURLが正しくありません。",
         "limitReached": "カスタム画像は最大5枚まで追加できます。",
         "processingError": "画像を処理できませんでした。",
+        "storageFull": "この端末の空き容量が足りず、画像を保存できませんでした。",
         "uploadSuccess": "画像を追加しました",
         "deleteSuccess": "画像を削除しました",
         "urlPlaceholder": "画像URLを貼り付け…",

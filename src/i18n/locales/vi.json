@@ -536,6 +536,7 @@
         "invalidUrl": "URL ảnh không hợp lệ.",
         "limitReached": "Bạn chỉ có thể thêm tối đa 5 ảnh.",
         "processingError": "Không thể xử lý ảnh.",
+        "storageFull": "Thiết bị không còn đủ dung lượng để lưu ảnh này.",
         "uploadSuccess": "Đã thêm ảnh",
         "deleteSuccess": "Đã xoá ảnh",
         "urlPlaceholder": "Dán liên kết ảnh…",

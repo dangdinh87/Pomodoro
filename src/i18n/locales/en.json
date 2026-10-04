@@ -536,6 +536,7 @@
         "invalidUrl": "Invalid image URL.",
         "limitReached": "You can add up to 5 custom images.",
         "processingError": "Could not process the image.",
+        "storageFull": "Not enough storage space left on this device to keep this image.",
         "uploadSuccess": "Image added",
         "deleteSuccess": "Image deleted",
         "urlPlaceholder": "Paste image URL…",

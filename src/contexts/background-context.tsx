@@ -8,6 +8,7 @@ import React, {
   ReactNode,
 } from 'react';
 import { detectFormatSupport } from '@/lib/format-detection';
+import { migrateLegacyCustomImages } from '@/lib/custom-background/image-store';
 import {
   DEFAULT_BACKGROUND,
   migrateBackground,
@@ -67,6 +68,8 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
     async function init() {
       // Detect AVIF/WebP support before resolving URLs
       await detectFormatSupport();
+      // Older versions kept the uploaded image as base64 in localStorage (twice)
+      await migrateLegacyCustomImages().catch(() => {});
 
       const saved = localStorage.getItem('background-settings');
 

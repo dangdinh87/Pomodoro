@@ -16,7 +16,8 @@ import { useBackground, type BackgroundSettings as BackgroundConfig } from '@/co
 import { DEFAULT_BACKGROUND } from '@/data/background-migration';
 import { backgroundPacks, findImageById, type BackgroundImage, type BackgroundPack } from '@/data/background-packs';
 import { useI18n } from '@/contexts/i18n-context';
-import { useCustomBackgrounds } from '@/hooks/use-custom-backgrounds';
+import { useCustomBackgrounds, type CustomImage, type CustomImageError } from '@/hooks/use-custom-backgrounds';
+import { parseCustomImageValue } from '@/lib/custom-background/image-store';
 import { getBestImageUrl } from '@/lib/format-detection';
 import { DefaultSceneCard, GalleryCard, SceneCard } from '@/features/scenes/components/scene-card';
 import {
@@ -137,8 +138,9 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange, ref }:
     const done = () => setLoadingValue((prev) => (prev === id ? null : prev));
     preloader.onload = done;
     preloader.onerror = done;
-    // Videos have no still to preload; the renderer fades them in on canplay.
-    if (photo?.kind === 'video') done();
+    // Videos have no still to preload (the renderer fades them in on canplay), and a stored
+    // upload is read from IndexedDB by the renderer, not fetched.
+    if (photo?.kind === 'video' || parseCustomImageValue(id) !== null) done();
     else preloader.src = photo?.sources ? getBestImageUrl(photo.sources) : id;
   };
 
@@ -278,7 +280,7 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange, ref }:
                     if (!file) return;
                     const result = await addImage(file);
                     if (result.success) {
-                      if (result.image) selectImage(result.image.dataUrl);
+                      selectImage(result.image.value);
                       toast.success(t('settings.background.customImages.uploadSuccess'));
                     } else {
                       toast.error(t(`settings.background.customImages.${result.error}`));
@@ -444,9 +446,9 @@ function PersonalTab({
   onSelect,
   t,
 }: {
-  customImages: { dataUrl: string; name: string }[];
+  customImages: CustomImage[];
   canAddMore: boolean;
-  addImageByUrl: (url: string) => Promise<{ success: boolean; error?: string; image?: { dataUrl: string } }>;
+  addImageByUrl: (url: string) => Promise<{ success: true; image: CustomImage } | { success: false; error: CustomImageError }>;
   onUploadClick: () => void;
   urlInput: string;
   setUrlInput: (v: string) => void;
@@ -457,7 +459,7 @@ function PersonalTab({
   const addFromUrl = async () => {
     const result = await addImageByUrl(urlInput.trim());
     if (result.success) {
-      if (result.image) onSelect(result.image.dataUrl);
+      onSelect(result.image.value);
       toast.success(t('settings.background.customImages.uploadSuccess'));
       setUrlInput('');
     } else {
@@ -514,11 +516,11 @@ function PersonalTab({
         <div>
           <GalleryCard
             label={t('settings.background.customImages.current')}
-            selected={value === current.dataUrl}
-            onSelect={() => onSelect(current.dataUrl)}
+            selected={value === current.value}
+            onSelect={() => onSelect(current.value)}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element -- user-supplied data URL */}
-            <img src={current.dataUrl} alt={current.name} className="absolute inset-0 h-full w-full object-cover" />
+            {/* eslint-disable-next-line @next/next/no-img-element -- user-supplied blob or link */}
+            <img src={current.previewUrl} alt={current.name} className="absolute inset-0 h-full w-full object-cover" />
           </GalleryCard>
           <p className="mt-2 text-center text-xs text-ink-muted">{t('settings.background.customImages.replaceNotice')}</p>
         </div>
