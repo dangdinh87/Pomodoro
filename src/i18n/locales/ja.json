@@ -35,6 +35,9 @@
   "skipLink": {
     "label": "メインコンテンツへスキップ"
   },
+  "tomoBubble": {
+    "dismiss": "このメッセージを閉じる"
+  },
   "nav": {
     "navigation": "ナビゲーション",
     "system": "システム",

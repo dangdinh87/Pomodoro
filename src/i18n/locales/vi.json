@@ -35,6 +35,9 @@
   "skipLink": {
     "label": "Chuyển đến nội dung chính"
   },
+  "tomoBubble": {
+    "dismiss": "Ẩn lời nhắn này"
+  },
   "nav": {
     "navigation": "Điều hướng",
     "system": "Hệ thống",

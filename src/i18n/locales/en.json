@@ -35,6 +35,9 @@
   "skipLink": {
     "label": "Skip to main content"
   },
+  "tomoBubble": {
+    "dismiss": "Hide this message"
+  },
   "nav": {
     "navigation": "Navigation",
     "system": "System",
