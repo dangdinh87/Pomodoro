@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useAuth } from '@/hooks/use-auth';
 import { useI18n } from '@/contexts/i18n-context';
+import { localePath } from '@/lib/i18n/locale-path';
 import { SettingsRow, SettingsSection } from '@/components/settings/settings-section';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DownloadSimple, SignOut, Trash, UserCircle } from '@phosphor-icons/react/dist/ssr';
@@ -23,7 +24,7 @@ import { openPanel } from '@/features/app-shell/panel-store';
 import { getBrowserTimeZone, studyDayOf } from '@/lib/stats/study-day';
 
 export function AccountSettings() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { user, isAuthenticated, isLoading, signOut } = useAuth();
 
   const [exporting, setExporting] = useState(false);
@@ -110,7 +111,7 @@ export function AccountSettings() {
       } catch {
         // The account is already gone; a failed local sign-out must not look like a failed delete.
       }
-      window.location.assign('/');
+      window.location.assign(localePath(lang, '/'));
     } catch {
       setDeleteError(t('settings.account.delete.error'));
     } finally {

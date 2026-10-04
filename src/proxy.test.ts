@@ -1,28 +1,75 @@
-/** @vitest-environment node */
+// @vitest-environment node
 import { NextRequest } from 'next/server';
-import { proxy } from './proxy';
+import { getRedirectUrl, getRewrittenUrl, isRewrite, unstable_doesMiddlewareMatch } from 'next/experimental/testing/server';
+import { config, proxy } from './proxy';
 
-function req(path: string, headers: Record<string, string> = {}) {
-  return new NextRequest(`http://localhost${path}`, { headers });
-}
+const req = (path: string) => new NextRequest(`https://studywithbro.com${path}`);
+const path = (url: string | null) => (url ? url.replace('https://studywithbro.com', '') : url);
 
-describe('proxy locale cookie', () => {
-  it('sets the cookie from Accept-Language', () => {
-    const res = proxy(req('/guide', { 'accept-language': 'vi-VN,vi;q=0.9' }));
-    expect(res.cookies.get('app.lang')?.value).toBe('vi');
+describe('proxy', () => {
+  it('rewrites English page paths into the /en tree, keeping the query', () => {
+    const home = proxy(req('/'));
+    expect(isRewrite(home)).toBe(true);
+    expect(path(getRewrittenUrl(home))).toBe('/en');
+
+    const guide = proxy(req('/guide?x=1'));
+    expect(path(getRewrittenUrl(guide))).toBe('/en/guide?x=1');
   });
 
-  it('defaults to en', () => {
-    expect(proxy(req('/')).cookies.get('app.lang')?.value).toBe('en');
+  it('serves /vi and /ja as they are', () => {
+    for (const p of ['/vi', '/vi/guide', '/ja', '/ja/privacy?panel=tasks']) {
+      const res = proxy(req(p));
+      expect(isRewrite(res)).toBe(false);
+      expect(res.status).toBe(200);
+      expect(getRedirectUrl(res)).toBeNull();
+    }
   });
 
-  it('keeps an existing valid cookie untouched', () => {
-    const res = proxy(req('/', { cookie: 'app.lang=ja', 'accept-language': 'vi' }));
-    expect(res.cookies.get('app.lang')).toBeUndefined();
+  it('308s /en/* to the unprefixed URL and keeps the query', () => {
+    const res = proxy(req('/en/guide?x=1'));
+    expect(res.status).toBe(308);
+    expect(path(getRedirectUrl(res))).toBe('/guide?x=1');
+    expect(path(getRedirectUrl(proxy(req('/en'))))).toBe('/');
   });
 
-  it('replaces an invalid cookie', () => {
-    const res = proxy(req('/', { cookie: 'app.lang=xx', 'accept-language': 'ja' }));
-    expect(res.cookies.get('app.lang')?.value).toBe('ja');
+  it('leaves an unsupported locale alone so the [lang] route answers 404', () => {
+    const res = proxy(req('/fr'));
+    expect(isRewrite(res)).toBe(false);
+    expect(getRedirectUrl(res)).toBeNull();
+  });
+
+  it('sends a former page to its panel in the same language', () => {
+    const res = proxy(req('/vi/timer'));
+    expect(res.status).toBe(308);
+    expect(path(getRedirectUrl(res))).toBe('/vi?panel=timer');
+    expect(path(getRedirectUrl(proxy(req('/ja/leaderboard'))))).toBe('/ja');
+  });
+
+  it('does not set or read the language cookie, and ignores Accept-Language', () => {
+    const request = new NextRequest('https://studywithbro.com/', { headers: { 'accept-language': 'vi', cookie: 'app.lang=ja' } });
+    const res = proxy(request);
+    expect(path(getRewrittenUrl(res))).toBe('/en');
+    expect(res.headers.get('set-cookie')).toBeNull();
+  });
+});
+
+describe('proxy matcher', () => {
+  const runsOn = (url: string) => unstable_doesMiddlewareMatch({ config, url });
+
+  it.each(['/', '/guide', '/vi', '/vi/guide', '/en/guide', '/fr', '/device', '/apis'])('runs on %s', (url) => {
+    expect(runsOn(url)).toBe(true);
+  });
+
+  it.each([
+    '/api/tasks',
+    '/_next/static/chunks/a.js',
+    '/favicon.ico',
+    '/robots.txt',
+    '/sitemap.xml',
+    '/manifest.json',
+    '/icons/icon-192x192.png',
+    '/dev/ui',
+  ])('skips %s', (url) => {
+    expect(runsOn(url)).toBe(false);
   });
 });

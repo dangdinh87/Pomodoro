@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { Lightning } from '@phosphor-icons/react/dist/ssr';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { I18nProvider, type Lang } from '@/contexts/i18n-context';
+import { I18nProvider, type Lang } from '@/test-utils/i18n';
 import { useTimerStore } from '@/stores/timer-store';
 import { ArcadeMiniTimer } from './arcade-mini-timer';
 import { useGameSession } from './game-kit';

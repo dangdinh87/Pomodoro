@@ -4,7 +4,8 @@
  * them into every page's bundle. title, retry, goHome and reference mirror errors.boundary.*
  * (global-error-copy.test.ts keeps them in step).
  */
-import { DEFAULT_LANG, LOCALE_COOKIE, isLang, type Lang } from './negotiate-locale';
+import { splitLocalePath } from './locale-path';
+import { DEFAULT_LANG, type Lang } from './negotiate-locale';
 
 export interface GlobalErrorCopy {
   title: string;
@@ -42,15 +43,7 @@ export function globalErrorCopy(lang: Lang): GlobalErrorCopy {
   return COPY[lang];
 }
 
-/** Saved language cookie first, then the browser language, else English. */
-export function detectErrorLang(cookie: string, browserLanguage: string | undefined): Lang {
-  const saved = cookie
-    .split(';')
-    .map((part) => part.trim())
-    .find((part) => part.startsWith(`${LOCALE_COOKIE}=`))
-    ?.slice(LOCALE_COOKIE.length + 1);
-  if (isLang(saved)) return saved;
-
-  const primary = browserLanguage?.toLowerCase().split('-')[0];
-  return isLang(primary) ? primary : DEFAULT_LANG;
+/** The language of the URL being viewed (`/vi/...`, `/ja/...`); every unprefixed URL is English. */
+export function detectErrorLang(pathname: string): Lang {
+  return splitLocalePath(pathname).lang ?? DEFAULT_LANG;
 }

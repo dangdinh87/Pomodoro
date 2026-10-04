@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { I18nProvider, type Lang } from '@/contexts/i18n-context';
+import { I18nProvider, type Lang } from '@/test-utils/i18n';
 import { TomoBubble } from './tomo-bubble';
 
 const wrap = (ui: React.ReactElement, lang: Lang = 'en') => <I18nProvider initialLang={lang}>{ui}</I18nProvider>;

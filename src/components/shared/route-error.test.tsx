@@ -1,12 +1,17 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { RouteError } from './route-error';
 
+const state = vi.hoisted(() => ({ lang: 'en' }));
 vi.mock('@/contexts/i18n-context', () => ({
-  useI18n: () => ({ t: (key: string, vars?: Record<string, string>) => (vars ? `${key} ${Object.values(vars).join(',')}` : key) }),
+  useI18n: () => ({
+    lang: state.lang,
+    t: (key: string, vars?: Record<string, string>) => (vars ? `${key} ${Object.values(vars).join(',')}` : key),
+  }),
 }));
 
 describe('RouteError', () => {
   beforeEach(() => {
+    state.lang = 'en';
     vi.spyOn(console, 'error').mockImplementation(() => {});
   });
   afterEach(() => vi.restoreAllMocks());
@@ -27,6 +32,13 @@ describe('RouteError', () => {
     expect(reset).toHaveBeenCalledTimes(1);
     expect(screen.getByRole('button', { name: 'errors.boundary.retry' })).toHaveClass('btn--primary');
     expect(screen.getByRole('link', { name: 'errors.boundary.goTimer' })).toHaveAttribute('href', '/');
+  });
+
+  it('keeps the home link inside the visitor language', () => {
+    state.lang = 'ja';
+    render(<RouteError error={new Error('boom')} reset={vi.fn()} homeHref="/" homeLabelKey="errors.boundary.goTimer" />);
+
+    expect(screen.getByRole('link', { name: 'errors.boundary.goTimer' })).toHaveAttribute('href', '/ja');
   });
 
   it('prints the digest as a reference only when there is one', () => {

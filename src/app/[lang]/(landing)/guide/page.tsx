@@ -7,12 +7,16 @@ import { Kbd } from '@/components/ui/kbd';
 import { DocLayout, OL, P, UL, type DocSection } from '@/components/landing/doc-layout';
 import { PanelLink } from '@/components/landing/panel-link';
 import type { PanelId } from '@/features/app-shell/panel-store';
+import { localePath } from '@/lib/i18n/locale-path';
+import { routeLang, type LangParams } from '@/lib/i18n/route-lang';
 import { buildPageMetadata } from '@/lib/seo/page-metadata';
 import { getT } from '@/lib/server-translations';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getT();
+export async function generateMetadata({ params }: LangParams): Promise<Metadata> {
+  const lang = await routeLang(params);
+  const t = getT(lang);
   return buildPageMetadata({
+    lang,
     path: '/guide',
     title: t('site.meta.guide.title'),
     description: t('site.meta.guide.description'),
@@ -44,8 +48,9 @@ function Go({ panel, children }: { panel: PanelId; children: ReactNode }) {
   );
 }
 
-export default async function GuidePage() {
-  const t = await getT();
+export default async function GuidePage({ params }: LangParams) {
+  const lang = await routeLang(params);
+  const t = getT(lang);
   const list = (prefix: string, n: number) => Array.from({ length: n }, (_, i) => t(`${prefix}.${i + 1}`));
   const steps = list('guide2.session.steps', SESSION_STEPS);
 
@@ -223,7 +228,7 @@ export default async function GuidePage() {
             <h2 className="font-heading text-2xl font-bold leading-[1.2] tracking-[-0.02em] text-ink">{t('guide2.cta.title')}</h2>
             <p className="mt-3 text-base leading-[1.75] text-ink-secondary [&:lang(ja)]:leading-[1.95]">{t('guide2.cta.text')}</p>
             <Button asChild size="lg" className="mt-6">
-              <Link href="/">{t('guide2.cta.button')}</Link>
+              <Link href={localePath(lang, '/')}>{t('guide2.cta.button')}</Link>
             </Button>
           </section>
         }

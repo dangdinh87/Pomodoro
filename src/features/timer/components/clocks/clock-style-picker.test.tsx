@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { I18nProvider, type Lang } from '@/contexts/i18n-context';
+import { I18nProvider, type Lang } from '@/test-utils/i18n';
 import { ClockStylePicker } from './clock-style-picker';
 import { CLOCK_STYLES, type SelectableClockType } from './clock-registry';
 

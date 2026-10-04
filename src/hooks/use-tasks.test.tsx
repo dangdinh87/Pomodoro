@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/stores/auth-store';
 import { ensureSession } from '@/lib/auth-client';
-import { I18nProvider } from '@/contexts/i18n-context';
+import { I18nProvider } from '@/test-utils/i18n';
 import { TooManyRequestsError } from '@/lib/api/too-many-requests-error';
 import en from '@/i18n/locales/en.json';
 import { useTasks } from './use-tasks';

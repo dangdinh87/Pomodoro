@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { I18nProvider, type Lang } from '@/contexts/i18n-context';
+import { I18nProvider, type Lang } from '@/test-utils/i18n';
 import { soundCategories } from '@/lib/audio/sound-catalog';
 import { useAudioStore } from '@/stores/audio-store';
 import { AudioSidebar } from './audio-sidebar';

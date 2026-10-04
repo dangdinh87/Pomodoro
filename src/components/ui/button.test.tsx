@@ -34,7 +34,7 @@ describe('Button', () => {
   it('keeps asChild so links can look like buttons', () => {
     render(
       <Button asChild variant="fun">
-        <a href="/x">Link</a>
+        <a href="https://example.com/x">Link</a>
       </Button>,
     );
     expect(screen.getByRole('link', { name: 'Link' })).toHaveClass('btn', 'btn--fun');

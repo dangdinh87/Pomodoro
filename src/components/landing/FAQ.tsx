@@ -1,12 +1,13 @@
 import { CaretDown } from '@phosphor-icons/react/dist/ssr';
 import { Tomo } from '@/components/brand/tomo';
+import type { Lang } from '@/lib/i18n/negotiate-locale';
 import { getT } from '@/lib/server-translations';
 import { getFaqItems } from './faq-items';
 import { PanelLink } from './panel-link';
 
 /** Native <details> keeps every answer in the HTML for search engines, with no client JS. */
-export async function FAQ() {
-  const t = await getT();
+export function FAQ({ lang }: { lang: Lang }) {
+  const t = getT(lang);
   const items = getFaqItems(t);
 
   return (

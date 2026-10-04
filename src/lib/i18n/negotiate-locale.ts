@@ -1,11 +1,12 @@
 /**
- * Pure locale helpers shared by middleware (edge), server components and the
- * client provider. Keep this file free of Next/React imports.
+ * Pure locale helpers shared by the proxy, server components and the client provider.
+ * Keep this file free of Next/React imports.
  */
 export type Lang = 'en' | 'vi' | 'ja';
 
 export const SUPPORTED_LANGS: readonly Lang[] = ['en', 'vi', 'ja'];
 export const DEFAULT_LANG: Lang = 'en';
+/** Remembers a language the visitor picked on purpose. Only the suggestion banner reads it. */
 export const LOCALE_COOKIE = 'app.lang';
 export const LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
 
@@ -13,36 +14,24 @@ export function isLang(value: unknown): value is Lang {
   return value === 'en' || value === 'vi' || value === 'ja';
 }
 
-/** Coerce an arbitrary cookie/storage value to a supported Lang (default en). */
-export function normalizeLang(value: string | null | undefined): Lang {
-  return isLang(value) ? value : DEFAULT_LANG;
+/** The language saved in the `app.lang` cookie, from a `document.cookie`-style string; null when absent or unsupported. */
+export function readLangCookie(cookie: string): Lang | null {
+  const saved = cookie
+    .split(';')
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${LOCALE_COOKIE}=`))
+    ?.slice(LOCALE_COOKIE.length + 1);
+  return isLang(saved) ? saved : null;
 }
 
 /**
- * Pick the best supported language from an Accept-Language header.
- * Honors q-values; matches on primary subtag (vi-VN -> vi). Defaults to en.
+ * First supported language in an ordered preference list such as `navigator.languages`
+ * (`['vi-VN', 'en']` -> 'vi'); matches on the primary subtag. Null when none is supported.
  */
-export function negotiateLocale(acceptLanguage: string | null | undefined): Lang {
-  if (!acceptLanguage) return DEFAULT_LANG;
-
-  const candidates = acceptLanguage
-    .split(',')
-    .map((part, index) => {
-      const [range, ...params] = part.trim().split(';');
-      const qParam = params.find((p) => p.trim().startsWith('q='));
-      const q = qParam ? Number.parseFloat(qParam.trim().slice(2)) : 1;
-      return {
-        tag: range.trim().toLowerCase(),
-        q: Number.isNaN(q) ? 0 : q,
-        index,
-      };
-    })
-    .filter((c) => c.tag && c.q > 0)
-    .sort((a, b) => b.q - a.q || a.index - b.index);
-
-  for (const { tag } of candidates) {
-    const primary = tag.split('-')[0];
+export function firstSupportedLang(languages: readonly string[]): Lang | null {
+  for (const tag of languages) {
+    const primary = tag.trim().toLowerCase().split('-')[0];
     if (isLang(primary)) return primary;
   }
-  return DEFAULT_LANG;
+  return null;
 }

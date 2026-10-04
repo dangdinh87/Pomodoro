@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import confetti from 'canvas-confetti';
-import { I18nProvider, type Lang } from '@/contexts/i18n-context';
+import { I18nProvider, type Lang } from '@/test-utils/i18n';
 import { installMemoryStorage } from '@/test-utils/memory-storage';
 import { useTimerStore } from '@/stores/timer-store';
 import { useTasksStore } from '@/stores/task-store';

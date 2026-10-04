@@ -1,6 +1,7 @@
 import { Armchair, Coffee, Timer } from '@phosphor-icons/react/dist/ssr';
 import { IconTile, type IconTileTone } from '@/components/ui/icon-tile';
 import { StickerCard } from '@/components/ui/sticker-card';
+import type { Lang } from '@/lib/i18n/negotiate-locale';
 import { getT } from '@/lib/server-translations';
 
 // Mode colours match the timer stage (spec §3.1): focus tomato, short break mint, long break sky.
@@ -23,8 +24,8 @@ const CYCLE = [
   { fill: MODES[2].fill, min: 20, label: '15–30' },
 ];
 
-export async function HowItWorks() {
-  const t = await getT();
+export function HowItWorks({ lang }: { lang: Lang }) {
+  const t = getT(lang);
   return (
     <section id="how-it-works" className="scroll-mt-24 px-[clamp(16px,4vw,32px)] pb-16 lg:pb-24">
       <div className="mx-auto max-w-[1180px]">

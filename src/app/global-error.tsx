@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Tomo } from '@/components/brand/tomo';
+import { localePath } from '@/lib/i18n/locale-path';
 import { DEFAULT_LANG, type Lang } from '@/lib/i18n/negotiate-locale';
 import { detectErrorLang, globalErrorCopy } from '@/lib/i18n/global-error-copy';
 
@@ -65,11 +66,11 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  // English and light on the server and first paint, then the visitor's language and theme once the browser is known
+  // English and light on the server and first paint, then the language of the URL and the saved theme once the browser is known
   const [lang, setLang] = useState<Lang>(DEFAULT_LANG);
   const [theme, setTheme] = useState<SavedTheme>('light');
   useEffect(() => {
-    setLang(detectErrorLang(document.cookie, navigator.language));
+    setLang(detectErrorLang(window.location.pathname));
     setTheme(readSavedTheme());
   }, []);
   const copy = globalErrorCopy(lang);
@@ -94,7 +95,7 @@ export default function GlobalError({
             </button>
             {/* Plain anchor: the router may be unusable at this level */}
             {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-            <a href="/" className="ge-btn ge-secondary">
+            <a href={localePath(lang, '/')} className="ge-btn ge-secondary">
               {copy.goHome}
             </a>
           </div>

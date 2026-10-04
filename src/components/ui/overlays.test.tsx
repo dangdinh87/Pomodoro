@@ -1,6 +1,6 @@
 import { act, render, screen } from '@testing-library/react';
 import { toast } from 'sonner';
-import { I18nProvider, type Lang } from '@/contexts/i18n-context';
+import { I18nProvider, type Lang } from '@/test-utils/i18n';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from './alert-dialog';
 import { Command, CommandGroup, CommandInput, CommandItem, CommandList } from './command';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from './dialog';

@@ -6,11 +6,12 @@ import { Tomo } from '@/components/brand/tomo';
 import { Button } from '@/components/ui/button';
 import { StickerCard } from '@/components/ui/sticker-card';
 import { useI18n } from '@/contexts/i18n-context';
+import { localePath } from '@/lib/i18n/locale-path';
 
 interface RouteErrorProps {
   error: Error & { digest?: string };
   reset: () => void;
-  /** Where the secondary link points. */
+  /** Page path of the secondary link, without a language prefix. */
   homeHref: string;
   homeLabelKey: 'errors.boundary.goHome' | 'errors.boundary.goTimer';
 }
@@ -26,7 +27,7 @@ export function RouteError({
   homeHref,
   homeLabelKey,
 }: RouteErrorProps) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
 
   useEffect(() => {
     console.error(error);
@@ -51,7 +52,7 @@ export function RouteError({
             {t('errors.boundary.retry')}
           </Button>
           <Button asChild size="lg" variant="secondary">
-            <Link href={homeHref}>{t(homeLabelKey)}</Link>
+            <Link href={localePath(lang, homeHref)}>{t(homeLabelKey)}</Link>
           </Button>
         </div>
         {error.digest && (

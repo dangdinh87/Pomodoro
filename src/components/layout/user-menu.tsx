@@ -22,6 +22,7 @@ import { IconTile } from '@/components/ui/icon-tile';
 import { useAuth } from '@/hooks/use-auth';
 import { useI18n, LANGS, type Lang } from '@/contexts/i18n-context';
 import { openPanel } from '@/features/app-shell/panel-store';
+import { localePath } from '@/lib/i18n/locale-path';
 
 export function UserMenu() {
   const router = useRouter();
@@ -84,7 +85,7 @@ export function UserMenu() {
           <IconTile icon={Gear} tone="surface" size="sm" />
           {t('nav.settings')}
         </DropdownMenuItem>
-        <DropdownMenuItem className="cursor-pointer gap-3" onClick={() => router.push('/guide')}>
+        <DropdownMenuItem className="cursor-pointer gap-3" onClick={() => router.push(localePath(lang, '/guide'))}>
           <IconTile icon={BookOpen} tone="butter" size="sm" />
           {t('nav.guide')}
         </DropdownMenuItem>

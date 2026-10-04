@@ -31,7 +31,6 @@ import { Label } from '@/components/ui/label';
 import Loader from '@/components/ui/loader';
 import { PageContainer, PageHeader, SectionHeading } from '@/components/ui/page-header';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Separator } from '@/components/ui/separator';
 import { SessionTomatoes } from '@/components/ui/session-tomatoes';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Slider } from '@/components/ui/slider';
@@ -42,7 +41,6 @@ import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { I18nProvider, useI18n, LANGS } from '@/contexts/i18n-context';
 
 const TONES: IconTileTone[] = ['tomato', 'mint', 'butter', 'lilac', 'sky', 'peach', 'surface'];
 const FACES: TomoFace[] = ['happy', 'focus', 'party', 'sleepy', 'worried'];
@@ -58,18 +56,11 @@ function Block({ title, children }: { title: string; children: ReactNode }) {
 
 function Toolbar() {
   const { theme, setTheme } = useTheme();
-  const { lang, setLang } = useI18n();
   return (
     <div className="mb-6 flex flex-wrap items-center gap-2">
       {(['light', 'dark'] as const).map((value) => (
         <FilterChip key={value} active={theme === value} onClick={() => setTheme(value)}>
           {value}
-        </FilterChip>
-      ))}
-      <Separator orientation="vertical" className="mx-1 h-6" decorative />
-      {LANGS.map(({ code, label }) => (
-        <FilterChip key={code} active={lang === code} onClick={() => setLang(code)}>
-          {label}
         </FilterChip>
       ))}
     </div>
@@ -349,9 +340,7 @@ function Showcase() {
 export function UiShowcase() {
   return (
     <ThemeProvider attribute="data-theme" defaultTheme="light" enableSystem disableTransitionOnChange>
-      <I18nProvider>
-        <Showcase />
-      </I18nProvider>
+      <Showcase />
     </ThemeProvider>
   );
 }

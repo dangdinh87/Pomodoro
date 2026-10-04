@@ -1,39 +1,41 @@
-import { isLang, negotiateLocale, normalizeLang } from './negotiate-locale';
+import { firstSupportedLang, isLang, readLangCookie } from './negotiate-locale';
 
-describe('negotiateLocale', () => {
-  it('defaults to en when header missing or empty', () => {
-    expect(negotiateLocale(undefined)).toBe('en');
-    expect(negotiateLocale(null)).toBe('en');
-    expect(negotiateLocale('')).toBe('en');
+describe('firstSupportedLang', () => {
+  it('is null when nothing is supported or the list is empty', () => {
+    expect(firstSupportedLang([])).toBeNull();
+    expect(firstSupportedLang(['fr-FR', 'de'])).toBeNull();
   });
 
-  it('matches primary subtag', () => {
-    expect(negotiateLocale('vi-VN,vi;q=0.9')).toBe('vi');
-    expect(negotiateLocale('ja-JP')).toBe('ja');
-    expect(negotiateLocale('EN-us')).toBe('en');
+  it('matches on the primary subtag, case-insensitively', () => {
+    expect(firstSupportedLang(['vi-VN'])).toBe('vi');
+    expect(firstSupportedLang(['JA-jp'])).toBe('ja');
+    expect(firstSupportedLang(['en-US'])).toBe('en');
   });
 
-  it('honors q-values', () => {
-    expect(negotiateLocale('en;q=0.5,ja;q=0.9')).toBe('ja');
-    expect(negotiateLocale('fr,vi;q=0.8,en;q=0.7')).toBe('vi');
-  });
-
-  it('skips unsupported and q=0 languages', () => {
-    expect(negotiateLocale('fr-FR,de')).toBe('en');
-    expect(negotiateLocale('vi;q=0,ja;q=0.1')).toBe('ja');
-  });
-
-  it('tolerates malformed q', () => {
-    expect(negotiateLocale('vi;q=abc,ja')).toBe('ja');
+  it('keeps the order of the list: the first supported one wins', () => {
+    expect(firstSupportedLang(['fr', 'vi', 'en'])).toBe('vi');
+    expect(firstSupportedLang(['en-GB', 'vi'])).toBe('en');
   });
 });
 
-describe('normalizeLang / isLang', () => {
-  it('validates values', () => {
+describe('readLangCookie', () => {
+  it('reads the saved language among other cookies', () => {
+    expect(readLangCookie('a=1; app.lang=ja; b=2')).toBe('ja');
+    expect(readLangCookie('app.lang=vi')).toBe('vi');
+  });
+
+  it('is null when missing or unsupported', () => {
+    expect(readLangCookie('')).toBeNull();
+    expect(readLangCookie('theme=dark')).toBeNull();
+    expect(readLangCookie('app.lang=fr')).toBeNull();
+    expect(readLangCookie('xapp.lang=vi')).toBeNull();
+  });
+});
+
+describe('isLang', () => {
+  it('accepts only supported codes', () => {
     expect(isLang('vi')).toBe(true);
     expect(isLang('fr')).toBe(false);
-    expect(normalizeLang('ja')).toBe('ja');
-    expect(normalizeLang('xx')).toBe('en');
-    expect(normalizeLang(undefined)).toBe('en');
+    expect(isLang(undefined)).toBe(false);
   });
 });

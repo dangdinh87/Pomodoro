@@ -26,6 +26,7 @@ import { IconTile, type IconTileTone } from '@/components/ui/icon-tile';
 import { Kbd } from '@/components/ui/kbd';
 import { isFeatureEnabled } from '@/config/feature-flags';
 import { LANGS, useI18n } from '@/contexts/i18n-context';
+import { localePath } from '@/lib/i18n/locale-path';
 import { requestTimerReset } from '@/features/timer/lib/request-reset';
 import { switchTimerMode, timerHasProgress } from '@/features/timer/lib/timer-mode';
 import { useAuth } from '@/hooks/use-auth';
@@ -161,7 +162,7 @@ export function CommandPalette() {
                     </Row>
                   );
                 })}
-                <Row icon={BookOpen} tone="butter" onSelect={() => run(() => router.push('/guide'))}>
+                <Row icon={BookOpen} tone="butter" onSelect={() => run(() => router.push(localePath(lang, '/guide')))}>
                   {t('shell.palette.guide')}
                 </Row>
                 <Row icon={Keyboard} tone="surface" shortcut="?" onSelect={() => run(openShortcutHelp)}>

@@ -1,31 +1,27 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import {
-    LOCALE_COOKIE,
-    LOCALE_COOKIE_MAX_AGE,
-    isLang,
-    negotiateLocale,
-} from '@/lib/i18n/negotiate-locale'
+import { resolveLocaleRoute } from '@/lib/i18n/locale-routing'
 
 /**
- * Ensures the `app.lang` cookie exists. It is also written onto the incoming
- * request so server components rendering this very request (first visit) can
- * read it. Auth is checked per API route, not here.
+ * Language lives in the URL: English is unprefixed (`/`, `/guide`) and served from the `/en`
+ * tree by an internal rewrite, `/vi` and `/ja` are real prefixes, `/en/*` is a 308 to the
+ * unprefixed URL. There is deliberately no redirect by cookie or Accept-Language (crawlers
+ * must see one URL per language); the client only suggests another language with a banner.
+ * The rules and their reasons are in `@/lib/i18n/locale-routing`.
  */
 export function proxy(request: NextRequest) {
-    if (isLang(request.cookies.get(LOCALE_COOKIE)?.value)) return NextResponse.next()
+    const { pathname, search } = request.nextUrl
+    const route = resolveLocaleRoute(pathname, search)
+    if (route.action === 'next') return NextResponse.next()
 
-    const lang = negotiateLocale(request.headers.get('accept-language'))
-    request.cookies.set(LOCALE_COOKIE, lang)
-    const response = NextResponse.next({ request: { headers: request.headers } })
-    response.cookies.set(LOCALE_COOKIE, lang, {
-        path: '/',
-        maxAge: LOCALE_COOKIE_MAX_AGE,
-        sameSite: 'lax',
-    })
-    return response
+    const url = request.nextUrl.clone()
+    url.pathname = route.pathname
+    if (route.action === 'rewrite') return NextResponse.rewrite(url)
+
+    url.search = route.search
+    return NextResponse.redirect(url, 308)
 }
 
 export const config = {
-    // All page requests, minus API, Next internals and static files (any path with an extension).
-    matcher: ['/((?!api|_next|.*\\..*).*)'],
+    // Page requests only: not the API, Next internals, /dev or anything with an extension (static files).
+    matcher: ['/((?!api(?:/|$)|_next(?:/|$)|dev(?:/|$)|.*\\..*).*)'],
 }

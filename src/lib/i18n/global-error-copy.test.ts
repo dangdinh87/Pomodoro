@@ -5,18 +5,15 @@ import ja from '@/i18n/locales/ja.json';
 import { detectErrorLang, globalErrorCopy } from './global-error-copy';
 
 describe('detectErrorLang', () => {
-  it('prefers the saved language cookie', () => {
-    expect(detectErrorLang('a=1; app.lang=ja; b=2', 'vi-VN')).toBe('ja');
+  it('follows the language prefix of the URL', () => {
+    expect(detectErrorLang('/vi')).toBe('vi');
+    expect(detectErrorLang('/ja/guide')).toBe('ja');
   });
 
-  it('falls back to the browser language', () => {
-    expect(detectErrorLang('', 'vi-VN')).toBe('vi');
-    expect(detectErrorLang('theme=dark', 'ja')).toBe('ja');
-  });
-
-  it('defaults to English for anything else', () => {
-    expect(detectErrorLang('app.lang=fr', 'fr-FR')).toBe('en');
-    expect(detectErrorLang('', undefined)).toBe('en');
+  it('is English for unprefixed URLs, whatever else is known about the visitor', () => {
+    expect(detectErrorLang('/')).toBe('en');
+    expect(detectErrorLang('/guide')).toBe('en');
+    expect(detectErrorLang('/fr/guide')).toBe('en');
   });
 });
 

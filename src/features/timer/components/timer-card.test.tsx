@@ -1,5 +1,5 @@
 import { act, render, screen } from '@testing-library/react';
-import { I18nProvider, type Lang } from '@/contexts/i18n-context';
+import { I18nProvider, type Lang } from '@/test-utils/i18n';
 import { useTimerStore } from '@/stores/timer-store';
 import { useSystemStore } from '@/stores/system-store';
 import { useCelebrationStore } from '@/features/mascot/celebration-store';

@@ -8,6 +8,7 @@ import { parseCustomImageValue } from '@/lib/custom-background/image-store';
 import { getBestImageUrl } from '@/lib/format-detection';
 import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
+import { pathWithoutLocale } from '@/lib/i18n/locale-path';
 import { useEffect, useMemo, useState } from 'react';
 
 // Scene shaders only download once a scene is actually selected.
@@ -41,7 +42,7 @@ export function BackgroundRenderer() {
 
   const pathname = usePathname();
   // The timer stage lives on `/`; content pages keep the plain theme background.
-  const isTimerPage = pathname === '/';
+  const isTimerPage = pathWithoutLocale(pathname) === '/';
 
   // The user's own upload lives in IndexedDB: read it, show nothing until it is ready
   const customImage = useCustomImageUrl(background.type === 'image' ? background.value : '');

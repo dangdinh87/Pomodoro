@@ -1,11 +1,14 @@
 import type { Metadata } from 'next';
 import { LegalPage, type LegalSectionSpec } from '@/components/landing/legal-page';
+import { routeLang, type LangParams } from '@/lib/i18n/route-lang';
 import { buildPageMetadata } from '@/lib/seo/page-metadata';
 import { getT } from '@/lib/server-translations';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getT();
+export async function generateMetadata({ params }: LangParams): Promise<Metadata> {
+  const lang = await routeLang(params);
+  const t = getT(lang);
   return buildPageMetadata({
+    lang,
     path: '/terms',
     title: t('site.meta.terms.title'),
     description: t('site.meta.terms.description'),
@@ -23,6 +26,6 @@ const SPECS: LegalSectionSpec[] = [
   { id: 'changes', intro: true },
 ];
 
-export default async function TermsPage() {
-  return <LegalPage t={await getT()} ns="terms" specs={SPECS} />;
+export default async function TermsPage({ params }: LangParams) {
+  return <LegalPage t={getT(await routeLang(params))} ns="terms" specs={SPECS} />;
 }

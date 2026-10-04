@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { I18nProvider } from '@/contexts/i18n-context';
+import { I18nProvider } from '@/test-utils/i18n';
 import { WeekChart } from './week-chart';
 
 beforeEach(() => {

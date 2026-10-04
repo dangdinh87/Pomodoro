@@ -12,6 +12,7 @@ import type { Icon } from '@phosphor-icons/react';
 import { Tomo } from '@/components/brand/tomo';
 import { IconTile, type IconTileTone } from '@/components/ui/icon-tile';
 import { StickerCard } from '@/components/ui/sticker-card';
+import type { Lang } from '@/lib/i18n/negotiate-locale';
 import { getT } from '@/lib/server-translations';
 import type { PanelId } from '@/features/app-shell/panel-store';
 import { PanelLink } from './panel-link';
@@ -28,8 +29,8 @@ const FEATURES: { key: string; icon: Icon; panel: PanelId; tone: IconTileTone }[
 ];
 
 /** What's inside: sticker cards tilted in turn (decorative, so the tilt is allowed), Tomo beside the heading. */
-export async function FeaturesSSR() {
-  const t = await getT();
+export function FeaturesSSR({ lang }: { lang: Lang }) {
+  const t = getT(lang);
   return (
     <section id="features" className="scroll-mt-24 px-[clamp(16px,4vw,32px)] py-16 lg:py-24">
       <div className="mx-auto max-w-[1180px]">
