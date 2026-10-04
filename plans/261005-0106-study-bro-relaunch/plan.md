@@ -34,11 +34,11 @@ Bốn file `phase-0N-*.md` dự kiến ban đầu không được viết: viết
 | 2.1 | Nền móng: token sáng/tối, `.btn*`/`.sticker*`, nền giấy kem, font Baloo 2 + Nunito, Sáng/Tối/Hệ thống, 6 preset + test tương phản | 1C | **xong** cdd85b0…a7198ba |
 | 2.2 | Thương hiệu: Tomo SVG 5 mặt, Logo, favicon, icon PWA, manifest, OG `next/og`, gỡ sói + `card.jpg` | 1C | **xong** ac18c60…5d6c5f9 |
 | 2.3 | Primitive: mọi `components/ui/*` + IconTile, StickerCard, StreakPill, SessionTomatoes, TomoBubble; `text-white` → `text-on-accent` — tách 2.3a (overlay) và 2.3b (control + primitive mới, thêm `--control-edge` cho dark) | 1D, 1E | **xong** 56b34c1…815704d |
-| 2.4 | Khung app + timer — 2.4a (status bar, dock, tab bar mobile, ⌘K + `?`, H1 + SSR 25:00) và 2.4b (thẻ đồng hồ, đồng hồ 2D, `pickTomoMood`, bong bóng, SessionCelebration — **xong** 164ed1f…536d804) | 2.5 | 2.4a đang làm |
+| 2.4 | Khung app + timer — 2.4a (status bar, dock, tab bar mobile, ⌘K + `?`, H1 + SSR 25:00) và 2.4b (thẻ đồng hồ, đồng hồ 2D, `pickTomoMood`, bong bóng, SessionCelebration — **xong** 164ed1f…536d804) | 2.5 | **xong** (2.4a 27f1ba0…b1618ea) |
 | 2.5 | Panel — 2.5a (việc, thống kê, cài đặt, góp ý) **xong** 67010d4…215a747; 2.5b (âm thanh, không gian, đồng hồ, arcade + mini timer) **xong** c14cd5c…2e84d9b | 2.4 | **xong** |
-| 2.7 | Dọn dẹp sau rebrand: mini player YouTube hiển thị (P1-8), timer/bell settings, follow-up #1 #8 #16 #18 #19 | 3a | chưa làm |
+| 2.7 | Dọn dẹp sau rebrand: mini player YouTube hiển thị (P1-8), timer/bell settings, follow-up #1 #8 #16 #18 #19 + co giãn stage theo dvh | 3a | **xong** 9d1e1c5…e56289f |
 | 2.6 | Trang ngoài app: landing, guide/legal, 404/lỗi/đăng nhập; viết lại `docs/design-system.md` | 2.4a, 2.5b | **xong** 7695916…ab61843 |
-| 3.x | `[lang]` routing + hreflang + metadata theo locale + static/ISR + JSON-LD + locale tải động + PGlite động | — | chưa làm |
+| 3.x | 3a **xong** caaaaf3, 9cc6d7d, 37914e1; 3b đang làm (routing `[lang]`, proxy, getT(locale), switcher, banner, locale tải động); 3b sau: metadata/hreflang/sitemap/JSON-LD/OG theo locale + PGlite động. Nội dung gốc: `[lang]` routing + hreflang + metadata theo locale + static/ISR + JSON-LD + locale tải động + PGlite động | — | chưa làm |
 | 4.x | migrate action, error tracking, rate limit OTP, CSP report, DB hardening, ratchet, dọn code chết, push + PR nháp + CI xanh | — | chưa làm |
 
 Thứ tự: 1A ∥ 1B → 1C → 1D → 2.x → 3.x → 4.x. Batch nào sửa locale JSON thì không chạy song song với batch khác cũng sửa locale, trừ khi cả hai chỉ thêm key ở namespace riêng.

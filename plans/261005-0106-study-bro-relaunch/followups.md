@@ -22,3 +22,8 @@
 | 18 | **P1-8 YouTube vẫn phát qua iframe ẩn** (rủi ro ToS); `floating-player-bar.tsx` bị comment trong `app-providers.tsx`, `youtube-suggestions.tsx` không ai render, còn chuỗi cứng | audit, 2.5b | Batch 2.7: mini player hiển thị, thu gọn được, `onError` |
 | 19 | `timer-settings.tsx` + `bell-notifications*` chưa batch nào restyle chủ động (chỉ ăn theo `SettingsSection`) | 2.5a, 2.5b | Batch 2.7 |
 | 20 | 2048: ô trống gần trùng màu bàn cờ ở chế độ sáng (màu in-game) | 2.5b | Bỏ qua (luật: không đổi màu trong game) |
+| 21 | Lệnh ⌘K "Skip" bấm nút theo aria-label (dễ gãy) | 2.4a | Gọi store action (đã nhờ 2.7 nếu đơn giản) |
+| 22 | `app-home.tsx` (WIP thời tiết) còn ghi cứng `data-theme="dark"` — vô hại vì selector là `:root[data-theme]` | 2.4a | Dọn khi WIP thời tiết commit |
+| 23 | Mobile: thẻ YouTube (sàn 200×200 theo ToS) che nửa dưới thẻ timer | 2.7 | Mobile: đặt player trong luồng trang dưới thẻ timer (không overlay), hoặc trong khay trên tab bar có chừa chỗ |
+| 24 | Thẻ YouTube `z-40` bị panel/dialog `z-50` che khi mở | 2.7 | Cân nhắc: khi panel mở, đưa player vào góc panel hoặc chấp nhận (ghi lý do) |
+| 25 | 404 lồng (`/vi/nope`) HTML là vỏ lỗi Next, UI VI dựng sau hydrate | 3a | Kiểm ở preview; noindex nên SEO không ảnh hưởng |
