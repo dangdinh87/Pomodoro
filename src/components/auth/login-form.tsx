@@ -50,7 +50,8 @@ export function LoginForm({ googleEnabled, onSignedIn }: { googleEnabled: boolea
     });
     setBusy(false);
     if (sendError) {
-      setError(t('login.errors.sendFailed'));
+      // 429: Better Auth's per-IP limit or our per-address limit (src/lib/auth/otp-limits.ts)
+      setError(t(sendError.status === 429 ? 'login.errors.tooManyCodes' : 'login.errors.sendFailed'));
       return;
     }
     setCode('');

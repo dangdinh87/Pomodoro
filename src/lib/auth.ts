@@ -7,7 +7,10 @@ import { db } from '@/db';
 import * as schema from '@/db/schema';
 import { sendOtpEmail } from '@/lib/email/send-otp-email';
 import { moveGuestData } from '@/lib/auth/move-guest-data';
+import { otpEmailLimitHook, otpSendIpRateRules } from '@/lib/auth/otp-limits';
 import { getGoogleCredentials } from '@/lib/auth/providers';
+import { buildServerErrorReport } from '@/lib/observability/error-reporter';
+import { scheduleReport } from '@/lib/observability/schedule-report';
 
 const google = getGoogleCredentials();
 
@@ -28,14 +31,28 @@ export const auth = betterAuth({
     // Every guest sign-in creates a user row, and a guest's first session is
     // recorded through one. Generous on purpose: a school or dorm shares one
     // IP (NAT) between many first-time visitors.
-    customRules: { '/sign-in/anonymous': { window: 10 * 60, max: 30 } },
+    customRules: {
+      '/sign-in/anonymous': { window: 10 * 60, max: 30 },
+      // Sign-in codes cost an email each: 3 per 10 minutes per IP (the per-address limit is the hook below)
+      ...otpSendIpRateRules,
+    },
   },
+  hooks: { before: otpEmailLimitHook },
   plugins: [
     emailOTP({
       otpLength: 6,
       expiresIn: 10 * 60,
       storeOTP: 'hashed',
-      sendVerificationOTP: ({ email, otp }) => sendOtpEmail(email, otp),
+      sendVerificationOTP: async ({ email, otp }) => {
+        try {
+          await sendOtpEmail(email, otp);
+        } catch (error) {
+          // Better Auth logs and swallows what this throws; report it so a broken Resend setup is not silent.
+          const report = buildServerErrorReport(error);
+          scheduleReport({ ...report, message: `Sending the sign-in code failed: ${report.message}` });
+          throw error;
+        }
+      },
     }),
     // Guests get a session lazily on their first write; signing in later
     // re-homes their data onto the real account before the guest row is dropped.

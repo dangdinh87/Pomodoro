@@ -904,7 +904,8 @@
     "errors": {
       "googleConnectionFailed": "Không thể kết nối Google. Thử lại sau.",
       "sendFailed": "Chưa gửi được mã. Thử lại sau ít phút.",
-      "invalidCode": "Mã không đúng hoặc đã hết hạn."
+      "invalidCode": "Mã không đúng hoặc đã hết hạn.",
+      "tooManyCodes": "Bạn đã xin mã quá nhiều lần. Đợi khoảng 10 phút rồi thử lại nhé."
     },
     "guestNote": "Việc và phiên bạn tạo khi chưa đăng nhập sẽ được chuyển vào tài khoản."
   },
