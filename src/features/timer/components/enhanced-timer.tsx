@@ -8,6 +8,7 @@ import { usePageTitle } from '../hooks/use-page-title';
 import { TimerModeSelector } from './timer-mode-selector';
 import { TimerClockDisplay } from './timer-clock-display';
 import { TimerControls } from './timer-controls';
+import { ResetTimerDialog } from './reset-timer-dialog';
 import { DailyProgress } from './daily-progress';
 import { TimerLiveAnnouncer } from './timer-live-announcer';
 
@@ -30,6 +31,7 @@ export function EnhancedTimer() {
         <DailyProgress />
       </div>
       <TimerLiveAnnouncer />
+      <ResetTimerDialog />
     </div>
   );
 }

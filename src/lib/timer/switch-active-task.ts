@@ -1,5 +1,6 @@
 import { useTasksStore } from '@/stores/task-store';
 import { useTimerStore } from '@/stores/timer-store';
+import { recordPendingFocus } from './partial-segment';
 import type { SessionPayload } from './session-recorder';
 
 type Recorder = (payload: SessionPayload) => unknown;
@@ -18,18 +19,9 @@ export function switchActiveTask(nextTaskId: string | null, record: Recorder) {
   if (activeTaskId === nextTaskId) return;
 
   if (activeTaskId) {
-    const { mode, timeLeft, lastSessionTimeLeft, setLastSessionTimeLeft } =
-      useTimerStore.getState();
+    const { mode, timeLeft, setLastSessionTimeLeft } = useTimerStore.getState();
     if (mode === 'work') {
-      const durationSec = Math.max(0, lastSessionTimeLeft - timeLeft);
-      if (durationSec > 0) {
-        void record({
-          taskId: activeTaskId,
-          durationSec,
-          mode: 'work',
-          completedFullSession: false,
-        });
-      }
+      recordPendingFocus(activeTaskId, record);
       setLastSessionTimeLeft(timeLeft);
     }
   }

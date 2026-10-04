@@ -2,12 +2,12 @@ import { useEffect } from 'react';
 import { useTimerStore } from '@/stores/timer-store';
 import { requestNotificationPermission } from '@/lib/timer/notifications';
 import { shouldIgnoreShortcut } from '@/features/app-shell/keyboard-guard';
+import { requestTimerReset } from '../lib/request-reset';
 
 export function useTimerHotkeys() {
     const isRunning = useTimerStore((state) => state.isRunning);
     const resumeTimer = useTimerStore((state) => state.resumeTimer);
     const pauseTimer = useTimerStore((state) => state.pauseTimer);
-    const resetTimer = useTimerStore((state) => state.resetTimer);
     const timeLeft = useTimerStore((state) => state.timeLeft);
 
     useEffect(() => {
@@ -26,10 +26,10 @@ export function useTimerHotkeys() {
                 }
             } else if (e.key === 'r' || e.key === 'R') {
                 e.preventDefault();
-                resetTimer();
+                requestTimerReset();
             }
         };
         window.addEventListener('keydown', onKey);
         return () => window.removeEventListener('keydown', onKey);
-    }, [isRunning, timeLeft, resumeTimer, pauseTimer, resetTimer]);
+    }, [isRunning, timeLeft, resumeTimer, pauseTimer]);
 }

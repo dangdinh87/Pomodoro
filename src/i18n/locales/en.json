@@ -129,6 +129,13 @@
       "description": "This session has already started. Switching mode discards its progress.",
       "confirm": "Switch anyway"
     },
+    "reset_confirm": {
+      "title": "Reset timer?",
+      "description_save": "You've focused for {time} so far. Save that time before resetting, or start over without it.",
+      "description": "The clock goes back to the start of this phase.",
+      "save": "Save what you did",
+      "discard": "Reset without saving"
+    },
     "doneAt": "Done at",
     "breakTask": "Next up"
   },

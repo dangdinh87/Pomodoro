@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Kbd } from '@/components/ui/kbd';
 import { isFeatureEnabled } from '@/config/feature-flags';
 import { LANGS, useI18n } from '@/contexts/i18n-context';
+import { requestTimerReset } from '@/features/timer/lib/request-reset';
 import { switchTimerMode, timerHasProgress } from '@/features/timer/lib/timer-mode';
 import { useAuth } from '@/hooks/use-auth';
 import { useTimerStore, type TimerMode } from '@/stores/timer-store';
@@ -65,7 +66,7 @@ export function CommandPalette() {
                 {isRunning ? t('shell.palette.pause') : t('shell.palette.start')}
                 <Kbd className="ml-auto">Space</Kbd>
               </CommandItem>
-              <CommandItem onSelect={() => run(() => useTimerStore.getState().resetTimer())}>
+              <CommandItem onSelect={() => run(requestTimerReset)}>
                 <ArrowCounterClockwise size={16} />
                 {t('shell.palette.reset')}
                 <Kbd className="ml-auto">R</Kbd>

@@ -22,6 +22,8 @@ import { playAlarm } from '@/lib/timer/alarm';
 import { requestNotificationPermission } from '@/lib/timer/notifications';
 import { useConfetti } from '@/hooks/use-confetti';
 import { useTasksStore } from '@/stores/task-store';
+import { mayAutoChain } from '@/lib/timer/auto-chain';
+import { requestTimerReset } from '../lib/request-reset';
 
 // Minimum completion percentage to count as a valid pomodoro
 const MINIMUM_COMPLETION_PERCENT = 50;
@@ -39,7 +41,6 @@ export const TimerControls = memo(function TimerControls() {
 
     // Actions
     const setIsRunning = useTimerStore((state) => state.setIsRunning);
-    const resetTimer = useTimerStore((state) => state.resetTimer);
     const pauseTimer = useTimerStore((state) => state.pauseTimer);
     const resumeTimer = useTimerStore((state) => state.resumeTimer);
 
@@ -153,7 +154,8 @@ export const TimerControls = memo(function TimerControls() {
                 const newDuration = settings.workDuration * 60;
                 setTimeLeft(newDuration);
                 useTimerStore.getState().setLastSessionTimeLeft(newDuration);
-                if (settings.autoStartWork && !skipWithoutRecording) {
+                // Skipping a long break ends the chain: the next focus waits for a click
+                if (settings.autoStartWork && mayAutoChain(mode, 0) && !skipWithoutRecording) {
                     requestAnimationFrame(() => setIsRunning(true));
                 }
             }
@@ -207,7 +209,7 @@ export const TimerControls = memo(function TimerControls() {
             <div className="flex flex-col items-center gap-3">
                 <div className="flex items-center justify-center gap-3">
                     <Button
-                        onClick={resetTimer}
+                        onClick={requestTimerReset}
                         disabled={isProcessing}
                         aria-label={t('timer.controls.aria.reset')}
                         title={t('timer.controls.reset_hint')}

@@ -129,6 +129,13 @@
       "description": "Phiên này đã bắt đầu. Chuyển chế độ sẽ làm mất tiến độ của phiên.",
       "confirm": "Vẫn chuyển"
     },
+    "reset_confirm": {
+      "title": "Đặt lại đồng hồ?",
+      "description_save": "Bạn đã tập trung được {time}. Hãy lưu lại trước khi đặt lại, hoặc bắt đầu lại mà không lưu.",
+      "description": "Đồng hồ sẽ quay về đầu giai đoạn này.",
+      "save": "Lưu phần đã làm",
+      "discard": "Đặt lại, không lưu"
+    },
     "doneAt": "Xong lúc",
     "breakTask": "Tiếp theo"
   },
