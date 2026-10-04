@@ -33,15 +33,27 @@ describe('POST /api/tasks/session-complete', () => {
     expect((await record({ mode: 'work', durationSec: 60 })).status).toBe(401);
   });
 
-  it('records a work session and credits the linked task', async () => {
-    const res = await record({ taskId, mode: 'work', durationSec: 1500 });
+  const taskRow = async () => (await mockDb.select().from(tasks)).find((t) => t.id === taskId)!;
+
+  it('records a full work session: +1 pomodoro and the time', async () => {
+    const res = await record({ taskId, mode: 'work', durationSec: 1500, completedFullSession: true });
     expect(res.status).toBe(200);
-    const task = (await mockDb.select().from(tasks)).find((t) => t.id === taskId);
-    expect(task).toMatchObject({ actualPomodoros: 1, timeSpentMs: 1_500_000 });
+    expect(await taskRow()).toMatchObject({ actualPomodoros: 1, timeSpentMs: 1_500_000 });
+  });
+
+  it('adds the time but no pomodoro for a partial segment', async () => {
+    await record({ taskId, mode: 'work', durationSec: 70, completedFullSession: false });
+    await record({ taskId, mode: 'work', durationSec: 30 }); // flag omitted = partial
+    expect(await taskRow()).toMatchObject({ actualPomodoros: 0, timeSpentMs: 100_000 });
+    expect(await mockDb.select().from(focusSessions)).toHaveLength(2);
+  });
+
+  it('rejects a non-boolean completedFullSession', async () => {
+    expect((await record({ taskId, mode: 'work', durationSec: 60, completedFullSession: 'yes' })).status).toBe(400);
   });
 
   it('does not credit a task for breaks', async () => {
-    await record({ taskId, mode: 'shortBreak', durationSec: 300 });
+    await record({ taskId, mode: 'shortBreak', durationSec: 300, completedFullSession: true });
     const rows = await mockDb.select().from(tasks);
     expect(rows.find((t) => t.id === taskId)?.actualPomodoros).toBe(0);
   });

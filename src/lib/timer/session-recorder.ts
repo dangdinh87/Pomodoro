@@ -6,6 +6,13 @@ export interface SessionPayload {
   taskId: string | null;
   durationSec: number;
   mode: TimerMode;
+  /**
+   * The focus segment ran to its natural end (deadline reached): the only kind
+   * that earns the task a pomodoro. Stop, task switch and skip leave it unset.
+   */
+  completedFullSession?: boolean;
+  /** When the segment ended (epoch ms). Defaults to the moment it is recorded. */
+  endedAt?: number;
 }
 
 // Outbox: every session is written to the queue BEFORE it is sent and removed
@@ -90,7 +97,12 @@ async function send(payload: SessionPayload): Promise<SendOutcome> {
     const res = await fetch(ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        taskId: payload.taskId,
+        durationSec: payload.durationSec,
+        mode: payload.mode,
+        completedFullSession: payload.completedFullSession === true,
+      }),
       keepalive: true, // let the request survive tab close / reload
     });
     if (res.ok) return 'ok';

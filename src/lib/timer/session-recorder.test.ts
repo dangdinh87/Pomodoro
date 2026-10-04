@@ -57,7 +57,11 @@ describe('session-recorder', () => {
     await expect(recordSession(payload, onRecorded)).resolves.toBe('recorded');
     expect(queuedDuringSend).toBe(1); // outbox: persisted before the request
     expect(fetchMock.mock.calls[0][1].keepalive).toBe(true);
-    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual(payload);
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toMatchObject({
+      taskId: 't1',
+      durationSec: 1500,
+      mode: 'work',
+    });
     expect(queue()).toHaveLength(0);
     expect(onRecorded).toHaveBeenCalledTimes(1);
   });
@@ -162,6 +166,15 @@ describe('session-recorder', () => {
     await flushSessionQueue();
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(queue()).toHaveLength(0);
+  });
+
+  it('sends completedFullSession only when the segment ran to its natural end', async () => {
+    fetchMock.mockResolvedValue(res(200));
+    const sent = () => fetchMock.mock.calls.map(([, init]) => JSON.parse(init.body).completedFullSession);
+    await recordSession({ ...payload, completedFullSession: true });
+    await recordSession({ ...payload, completedFullSession: false });
+    await recordSession(payload); // omitted = partial
+    expect(sent()).toEqual([true, false, false]);
   });
 
   it('never sends durations below 1 second', async () => {

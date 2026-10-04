@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   if (body === undefined) return badRequest('Request body must be valid JSON');
   const parsed = validateSessionCompletion(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error }, { status: 400 });
-  const { taskId, durationSec, mode } = parsed.data;
+  const { taskId, durationSec, mode, completedFullSession } = parsed.data;
 
   try {
     const since = new Date(Date.now() - ONE_DAY_MS);
@@ -50,7 +50,8 @@ export async function POST(request: Request) {
         await tx
           .update(tasks)
           .set({
-            actualPomodoros: sql`${tasks.actualPomodoros} + 1`,
+            // Only a focus period that ran to its end counts as a pomodoro
+            ...(completedFullSession && { actualPomodoros: sql`${tasks.actualPomodoros} + 1` }),
             timeSpentMs: sql`${tasks.timeSpentMs} + ${durationSec * 1000}`,
           })
           .where(eq(tasks.id, ownedTask.id));

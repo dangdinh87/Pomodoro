@@ -108,6 +108,8 @@ export const TimerControls = memo(function TimerControls() {
                     taskId: useTasksStore.getState().activeTaskId || null,
                     durationSec: segmentDuration,
                     mode: 'work',
+                    // A skip is a partial segment: time counts, the pomodoro does not
+                    completedFullSession: false,
                 });
             } else {
                 toast.info(t('timer.skipped_not_recorded') || 'Session skipped - not recorded');

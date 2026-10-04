@@ -186,6 +186,10 @@ export function useTimerEngine() {
           ? state.lastSessionTimeLeft
           : configDuration;
 
+      // The phase really ended at its deadline, even if this tab noticed late
+      // (throttled in the background, or reopened within the grace window)
+      const endedAt = state.deadlineAt ?? undefined;
+
       if (stale) {
         // Too old to be a real session: no record, no counters, no streak
       } else if (currentMode === 'work') {
@@ -195,9 +199,12 @@ export function useTimerEngine() {
           taskId: useTasksStore.getState().activeTaskId || null,
           durationSec: duration,
           mode: 'work',
+          // Ran to its deadline: the only way to earn the task a pomodoro
+          completedFullSession: true,
+          endedAt,
         });
       } else {
-        void record({ taskId: null, durationSec: duration, mode: currentMode });
+        void record({ taskId: null, durationSec: duration, mode: currentMode, endedAt });
       }
 
       // Auto-Transition (new phase starts a fresh baseline)

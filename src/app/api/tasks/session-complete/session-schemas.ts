@@ -9,6 +9,11 @@ export interface SessionCompletionPayload {
   taskId: string | null
   durationSec: number
   mode: SessionMode
+  /**
+   * The focus segment ran to its natural end, so it earns the task a pomodoro.
+   * Partial segments (stop, task switch, skip) only add time.
+   */
+  completedFullSession: boolean
 }
 
 type ValidationResult =
@@ -25,7 +30,7 @@ export function validateSessionCompletion(body: unknown): ValidationResult {
     return { success: false, error: 'Request body must be an object' }
   }
 
-  const { taskId, durationSec, mode } = body as Record<string, unknown>
+  const { taskId, durationSec, mode, completedFullSession } = body as Record<string, unknown>
 
   if (typeof mode !== 'string' || !sessionModes.includes(mode as SessionMode)) {
     return { success: false, error: 'Invalid session mode' }
@@ -33,6 +38,10 @@ export function validateSessionCompletion(body: unknown): ValidationResult {
 
   if (typeof durationSec !== 'number' || !Number.isFinite(durationSec)) {
     return { success: false, error: 'durationSec must be a number' }
+  }
+
+  if (completedFullSession !== undefined && typeof completedFullSession !== 'boolean') {
+    return { success: false, error: 'completedFullSession must be a boolean' }
   }
 
   const roundedDuration = Math.round(durationSec)
@@ -49,6 +58,7 @@ export function validateSessionCompletion(body: unknown): ValidationResult {
       taskId: isUuid(taskId) ? taskId : null,
       durationSec: roundedDuration,
       mode: mode as SessionMode,
+      completedFullSession: completedFullSession === true,
     },
   }
 }

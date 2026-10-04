@@ -73,6 +73,8 @@ describe('useTimerEngine', () => {
       taskId: 'task-1',
       durationSec: 1200,
       mode: 'work',
+      completedFullSession: true, // ran to its deadline: earns the pomodoro
+      endedAt: NOW + 2000,
     });
     expect(mockPlayAlarm).toHaveBeenCalledTimes(1);
     expect(mockNotify).toHaveBeenCalledWith('work');
@@ -101,6 +103,8 @@ describe('useTimerEngine', () => {
       taskId: 'task-1',
       durationSec: 3000,
       mode: 'work',
+      completedFullSession: true,
+      endedAt: NOW - 5000, // the real end, not the moment the app reopened
     });
     expect(mockPlayAlarm).not.toHaveBeenCalled();
     const s = useTimerStore.getState();
@@ -218,6 +222,7 @@ describe('useTimerEngine', () => {
       taskId: null,
       durationSec: 300,
       mode: 'shortBreak',
+      endedAt: NOW + 1000,
     });
     expect(useTimerStore.getState().mode).toBe('work');
   });
