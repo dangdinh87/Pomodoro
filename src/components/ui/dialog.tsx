@@ -2,9 +2,9 @@
 
 import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
-import { X } from '@phosphor-icons/react/dist/ssr';
 
 import { cn } from "@/lib/utils"
+import { OVERLAY_SCRIM, OverlayClose, POP_IN_MODAL } from "@/components/ui/overlay-parts"
 
 const Dialog = DialogPrimitive.Root
 
@@ -20,10 +20,7 @@ const DialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
-    className={cn(
-      "fixed inset-0 z-50 bg-black/60 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 data-[state=open]:duration-200 data-[state=closed]:duration-150",
-      className
-    )}
+    className={cn(OVERLAY_SCRIM, className)}
     {...props}
   />
 ))
@@ -40,16 +37,15 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-border bg-surface p-6 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.4)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 data-[state=open]:zoom-in-96 data-[state=closed]:zoom-out-96 data-[state=open]:duration-200 data-[state=closed]:duration-150 data-[state=open]:ease-[cubic-bezier(0.16,1,0.3,1)] data-[state=closed]:ease-in sm:rounded-lg",
+        // Sticker card: outline + hard shadow + --radius-xl come from `.sticker-lg` (spec §3.3).
+        "sticker-lg fixed left-[50%] top-[50%] z-50 grid w-[calc(100%-2rem)] max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 p-6",
+        POP_IN_MODAL,
         className
       )}
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-border-strong focus-visible:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-        <X size={16} />
-        <span className="sr-only">Close</span>
-      </DialogPrimitive.Close>
+      <OverlayClose />
     </DialogPrimitive.Content>
   </DialogPortal>
 ))
@@ -75,7 +71,8 @@ const DialogFooter = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
+      // gap (not space-*) so stacked sticker buttons never touch their hard shadows
+      "flex flex-col-reverse gap-3 sm:flex-row sm:justify-end",
       className
     )}
     {...props}
@@ -90,7 +87,7 @@ const DialogTitle = React.forwardRef<
   <DialogPrimitive.Title
     ref={ref}
     className={cn(
-      "font-heading text-lg font-bold leading-none tracking-tight text-ink",
+      "font-heading text-xl font-bold leading-tight text-ink",
       className
     )}
     {...props}
