@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { getBrowserTimeZone, studyDayOf } from '@/lib/stats/study-day';
 
 export type TimerMode = 'work' | 'shortBreak' | 'longBreak';
 export type ClockType =
@@ -24,6 +25,7 @@ export interface TimerSettings {
   clockSize: 'small' | 'medium' | 'large';
   showClock: boolean;
   lowTimeWarningEnabled: boolean; // enable glow/shake effects under 10s
+  keepScreenOn: boolean; // hold a screen wake lock while a focus session runs
 }
 
 export interface TimerPlanStep {
@@ -36,7 +38,9 @@ interface TimerState {
   mode: TimerMode;
   timeLeft: number; // in seconds
   isRunning: boolean;
+  /** Focus sessions finished today (cycle dots); belongs to study day `sessionCountDay` */
   sessionCount: number;
+  sessionCountDay: string | null;
   completedSessions: number;
   totalFocusTime: number; // in seconds
   settings: TimerSettings;
@@ -57,6 +61,8 @@ interface TimerState {
   setIsRunning: (running: boolean) => void;
   setDeadlineAt: (deadline: number | null) => void;
   incrementSessionCount: () => void;
+  /** Zeroes the cycle count when the study day changed since it was counted. */
+  syncSessionDay: (now?: number) => void;
   incrementCompletedSessions: () => void;
   setTotalFocusTime: (time: number) => void;
   updateSettings: (settings: Partial<TimerSettings>) => void;
@@ -78,16 +84,38 @@ const defaultSettings: TimerSettings = {
   shortBreakDuration: 5,
   longBreakDuration: 15,
   longBreakInterval: 4,
-  // Default to automatically move to the next step (auto-start next session)
+  // A finished focus session rolls into its break on its own; a finished break
+  // waits for the user, so an unattended app never farms sessions.
   autoStartBreak: true,
-  autoStartWork: true,
+  autoStartWork: false,
   clockType: 'digital',
   clockSize: 'medium',
   showClock: false,
   lowTimeWarningEnabled: true,
+  keepScreenOn: false,
 };
 
-const TIMER_STORE_VERSION = 1;
+// v1 -> v2: autoStartWork stopped defaulting to true (see migrateTimerState)
+const TIMER_STORE_VERSION = 2;
+
+/** Study day (`YYYY-MM-DD`, 04:00 local boundary) of an instant, in the viewer's zone. */
+function currentStudyDay(now: number): string {
+  return studyDayOf(new Date(now), getBrowserTimeZone());
+}
+
+/**
+ * One-time upgrade of persisted state. Before v2 `autoStartWork` defaulted to
+ * true, and stored settings cannot tell a default from a choice, so every
+ * stored `true` is flipped once; users who want it back can switch it on again
+ * (the v2 state is then kept as is).
+ */
+export function migrateTimerState(persisted: unknown, version: number): TimerState {
+  const state = (persisted ?? {}) as Partial<TimerState>;
+  if (version < 2 && state.settings?.autoStartWork === true) {
+    return { ...state, settings: { ...state.settings, autoStartWork: false } } as TimerState;
+  }
+  return state as TimerState;
+}
 
 /**
  * How late a phase may have finished (tab closed/crashed/reloaded) and still
@@ -145,6 +173,14 @@ export function mergePersistedTimerState(
       typeof p.currentStepIndex === 'number' ? p.currentStepIndex : 0,
     repeatPlan: typeof p.repeatPlan === 'boolean' ? p.repeatPlan : true,
   };
+
+  // The cycle dots count today's sessions only (older versions never stored the day)
+  // (read from `persisted`, not `merged`, so a stale in-memory day is never trusted)
+  const today = currentStudyDay(now);
+  if (p.sessionCountDay !== today) {
+    merged.sessionCount = 0;
+    merged.sessionCountDay = today;
+  }
 
   if (merged.isRunning && merged.deadlineAt) {
     merged.timeLeft = Math.ceil(Math.max(0, merged.deadlineAt - now) / 1000);
@@ -206,6 +242,7 @@ export const useTimerStore = create<TimerState>()(
       isRunning: false,
       deadlineAt: null,
       sessionCount: 0,
+      sessionCountDay: null,
       completedSessions: 0,
       totalFocusTime: 0,
       lastSessionTimeLeft: 25 * 60,
@@ -227,7 +264,17 @@ export const useTimerStore = create<TimerState>()(
       setIsRunning: (isRunning: boolean) => set({ isRunning }),
       setDeadlineAt: (deadlineAt) => set({ deadlineAt }),
       incrementSessionCount: () =>
-        set((state: TimerState) => ({ sessionCount: state.sessionCount + 1 })),
+        set((state: TimerState) => {
+          const today = currentStudyDay(Date.now());
+          const base = state.sessionCountDay === today ? state.sessionCount : 0;
+          return { sessionCount: base + 1, sessionCountDay: today };
+        }),
+      syncSessionDay: (now: number = Date.now()) =>
+        set((state: TimerState) => {
+          const today = currentStudyDay(now);
+          if (state.sessionCountDay === today) return {};
+          return { sessionCount: 0, sessionCountDay: today };
+        }),
       incrementCompletedSessions: () =>
         set((state: TimerState) => ({
           completedSessions: state.completedSessions + 1,
@@ -412,10 +459,9 @@ export const useTimerStore = create<TimerState>()(
     {
       name: 'timer-storage',
       version: TIMER_STORE_VERSION,
-      // v0 -> v1: lastSessionTimeLeft is now persisted. Nothing to rewrite
-      // here: mode/settings/deadlineAt/isRunning are kept as-is and missing
-      // fields are defaulted in mergePersistedTimerState.
-      migrate: (persistedState: unknown) => persistedState as TimerState,
+      // v0 -> v1: lastSessionTimeLeft is now persisted; missing fields are
+      // defaulted in mergePersistedTimerState. v1 -> v2: see migrateTimerState.
+      migrate: migrateTimerState,
       merge: (persisted: unknown, current: TimerState) =>
         mergePersistedTimerState(persisted, current),
       partialize: (state: TimerState) => ({
@@ -424,6 +470,7 @@ export const useTimerStore = create<TimerState>()(
         timeLeft: state.timeLeft,
         isRunning: state.isRunning,
         sessionCount: state.sessionCount,
+        sessionCountDay: state.sessionCountDay,
         deadlineAt: state.deadlineAt,
         settings: state.settings,
         completedSessions: state.completedSessions,

@@ -2,6 +2,12 @@ import { createJSONStorage } from 'zustand/middleware';
 import { installMemoryStorage } from '@/test-utils/memory-storage';
 import { useTimerStore } from './timer-store';
 
+// Study days depend on the viewer's zone; pin it so the 04:00 boundary is testable.
+vi.mock('@/lib/stats/study-day', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/stats/study-day')>()),
+  getBrowserTimeZone: () => 'Asia/Saigon',
+}));
+
 const NOW = 1_800_000_000_000;
 
 function seed(state: Record<string, unknown>, version: number) {
@@ -39,7 +45,7 @@ describe('timer-store persistence', () => {
     expect(useTimerStore.getState().lastSessionTimeLeft).toBe(3000);
 
     const saved = JSON.parse(window.localStorage.getItem('timer-storage')!);
-    expect(saved.version).toBe(1);
+    expect(saved.version).toBe(2);
     expect(saved.state.lastSessionTimeLeft).toBe(3000);
 
     useTimerStore.setState({ lastSessionTimeLeft: 1500 }); // reset in memory
@@ -64,7 +70,7 @@ describe('timer-store persistence', () => {
     await useTimerStore.persist.rehydrate();
     const s = useTimerStore.getState();
     expect(s.mode).toBe('shortBreak');
-    expect(s.settings).toEqual(persistedSettings);
+    expect(s.settings).toMatchObject(persistedSettings);
     expect(s.isRunning).toBe(true);
     expect(s.deadlineAt).toBe(NOW + 90_000);
     expect(s.timeLeft).toBe(90);
@@ -143,5 +149,129 @@ describe('timer-store persistence', () => {
     useTimerStore.getState().resetTimer();
     expect(useTimerStore.getState().timeLeft).toBe(3000);
     expect(useTimerStore.getState().lastSessionTimeLeft).toBe(3000);
+  });
+});
+
+describe('timer-store auto-start defaults', () => {
+  beforeEach(() => {
+    installMemoryStorage();
+    vi.spyOn(Date, 'now').mockReturnValue(NOW);
+    useTimerStore.persist.setOptions({
+      storage: createJSONStorage(() => window.localStorage),
+    });
+  });
+  afterEach(() => vi.restoreAllMocks());
+
+  const withAutoStart = { ...persistedSettings, autoStartBreak: true, autoStartWork: true };
+
+  it('new installs auto-start breaks but not focus sessions', async () => {
+    vi.resetModules();
+    const { useTimerStore: fresh } = await import('./timer-store');
+    const { settings } = fresh.getState();
+    expect(settings.autoStartBreak).toBe(true);
+    expect(settings.autoStartWork).toBe(false);
+  });
+
+  it.each([0, 1])('flips a stored autoStartWork:true to false once (from v%i)', async (version) => {
+    seed({ mode: 'work', timeLeft: 600, settings: withAutoStart }, version);
+    await useTimerStore.persist.rehydrate();
+    const { settings } = useTimerStore.getState();
+    expect(settings.autoStartWork).toBe(false);
+    // everything else the user chose is untouched
+    expect(settings.autoStartBreak).toBe(true);
+    expect(settings.workDuration).toBe(50);
+  });
+
+  it('keeps autoStartWork:true once the user turned it back on (v2)', async () => {
+    seed({ mode: 'work', timeLeft: 600, settings: withAutoStart }, 2);
+    await useTimerStore.persist.rehydrate();
+    expect(useTimerStore.getState().settings.autoStartWork).toBe(true);
+  });
+
+  it('writes the new version so the flip never runs again', async () => {
+    seed({ mode: 'work', timeLeft: 600, settings: withAutoStart }, 1);
+    await useTimerStore.persist.rehydrate();
+    useTimerStore.getState().updateSettings({ autoStartWork: true });
+    const saved = JSON.parse(window.localStorage.getItem('timer-storage')!);
+    expect(saved.version).toBe(2);
+    expect(saved.state.settings.autoStartWork).toBe(true);
+    await useTimerStore.persist.rehydrate();
+    expect(useTimerStore.getState().settings.autoStartWork).toBe(true);
+  });
+
+  it('survives storage without settings', async () => {
+    seed({ mode: 'work', timeLeft: 600 }, 1);
+    await useTimerStore.persist.rehydrate();
+    expect(useTimerStore.getState().settings.autoStartWork).toBe(false);
+  });
+});
+
+// NOW (1_800_000_000_000) is 2027-01-15 15:00 in Asia/Saigon.
+const SAIGON = (iso: string) => new Date(`${iso}+07:00`).getTime();
+
+describe('timer-store daily session counter', () => {
+  beforeEach(() => {
+    installMemoryStorage();
+    vi.spyOn(Date, 'now').mockReturnValue(NOW);
+    useTimerStore.persist.setOptions({
+      storage: createJSONStorage(() => window.localStorage),
+    });
+  });
+  afterEach(() => vi.restoreAllMocks());
+
+  it('keeps today\'s count across a reload', async () => {
+    seed(
+      { mode: 'work', timeLeft: 600, sessionCount: 3, sessionCountDay: '2027-01-15', settings: persistedSettings },
+      2,
+    );
+    await useTimerStore.persist.rehydrate();
+    expect(useTimerStore.getState().sessionCount).toBe(3);
+  });
+
+  it('resets the count when the stored day is not today', async () => {
+    seed(
+      { mode: 'work', timeLeft: 600, sessionCount: 3, sessionCountDay: '2027-01-14', settings: persistedSettings },
+      2,
+    );
+    await useTimerStore.persist.rehydrate();
+    expect(useTimerStore.getState().sessionCount).toBe(0);
+    expect(useTimerStore.getState().sessionCountDay).toBe('2027-01-15');
+  });
+
+  it('resets a count from before the day was tracked', async () => {
+    seed({ mode: 'work', timeLeft: 600, sessionCount: 3, settings: persistedSettings }, 1);
+    await useTimerStore.persist.rehydrate();
+    expect(useTimerStore.getState().sessionCount).toBe(0);
+  });
+
+  it('rolls over at the 04:00 study-day boundary, not at midnight', () => {
+    useTimerStore.setState({ sessionCount: 3, sessionCountDay: '2027-01-15' });
+    const { syncSessionDay } = useTimerStore.getState();
+
+    syncSessionDay(SAIGON('2027-01-16T00:30:00'));
+    expect(useTimerStore.getState().sessionCount).toBe(3);
+    syncSessionDay(SAIGON('2027-01-16T03:59:00'));
+    expect(useTimerStore.getState().sessionCount).toBe(3);
+
+    syncSessionDay(SAIGON('2027-01-16T04:00:00'));
+    expect(useTimerStore.getState().sessionCount).toBe(0);
+    expect(useTimerStore.getState().sessionCountDay).toBe('2027-01-16');
+  });
+
+  it('incrementing on a new day starts from 1, never from yesterday\'s total', () => {
+    useTimerStore.setState({ sessionCount: 3, sessionCountDay: '2027-01-14' });
+    useTimerStore.getState().incrementSessionCount();
+    expect(useTimerStore.getState().sessionCount).toBe(1);
+    expect(useTimerStore.getState().sessionCountDay).toBe('2027-01-15');
+    useTimerStore.getState().incrementSessionCount();
+    expect(useTimerStore.getState().sessionCount).toBe(2);
+  });
+
+  it('persists the day with the count', () => {
+    useTimerStore.setState({ sessionCount: 0, sessionCountDay: null });
+    useTimerStore.getState().incrementSessionCount();
+    const saved = JSON.parse(window.localStorage.getItem('timer-storage')!);
+    expect(saved.state.sessionCount).toBe(1);
+    expect(saved.state.sessionCountDay).toBe('2027-01-15');
   });
 });
