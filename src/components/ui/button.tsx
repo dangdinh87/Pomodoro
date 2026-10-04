@@ -4,8 +4,9 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
-// Visuals live in globals.css (.btn*) — docs/design-system.md §7.1.
-// shadcn variant names are kept so existing call sites keep working.
+// Visuals live in globals.css (.btn*), the single source of truth (spec §5). Sticker pop: outline + hard
+// shadow, hover lifts 1px, press sinks by the shadow depth. Labels are Baloo 2 700, sentence case.
+// shadcn variant names are kept so existing call sites keep working; `fun` (butter) is additive.
 const buttonVariants = cva("btn [&_svg]:size-4", {
   variants: {
     variant: {
@@ -13,6 +14,7 @@ const buttonVariants = cva("btn [&_svg]:size-4", {
       destructive: "btn--danger",
       outline: "btn--secondary",
       secondary: "btn--secondary",
+      fun: "btn--fun",
       ghost: "btn--ghost",
       link: "btn--link",
     },

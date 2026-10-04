@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 
 // `block`: Tailwind v4's space-y-* spaces siblings with margin-bottom, which an inline label ignores.
 const labelVariants = cva(
-  "block text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+  "block text-sm font-bold leading-tight text-ink peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
 )
 
 const Label = React.forwardRef<

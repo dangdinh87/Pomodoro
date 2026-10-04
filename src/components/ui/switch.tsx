@@ -5,13 +5,14 @@ import * as SwitchPrimitives from "@radix-ui/react-switch"
 
 import { cn } from "@/lib/utils"
 
+// Pill track with an outline; on = candy mint. The white knob is outlined too (28px track, 20px knob).
 const Switch = React.forwardRef<
   React.ElementRef<typeof SwitchPrimitives.Root>,
   React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>
 >(({ className, ...props }, ref) => (
   <SwitchPrimitives.Root
     className={cn(
-      "peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-border-strong focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-border-strong",
+      "focus-ring peer inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full border-2 border-control-edge shadow-sticker-sm transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-candy-mint data-[state=unchecked]:bg-surface-raised",
       className
     )}
     {...props}
@@ -19,7 +20,7 @@ const Switch = React.forwardRef<
   >
     <SwitchPrimitives.Thumb
       className={cn(
-        "pointer-events-none block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0"
+        "pointer-events-none block size-5 rounded-full border-2 border-outline bg-white transition-transform duration-150 data-[state=checked]:translate-x-[22px] data-[state=unchecked]:translate-x-0.5"
       )}
     />
   </SwitchPrimitives.Root>
