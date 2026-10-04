@@ -10,7 +10,7 @@ export default function robots(): MetadataRoute.Robots {
         // Only non-page paths are disallowed. App/auth pages carry
         // `robots: { index: false }` metadata, which crawlers must be able to
         // fetch to see.
-        disallow: ['/api/', '/auth/'],
+        disallow: ['/api/', '/auth/', '/dev/'],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
