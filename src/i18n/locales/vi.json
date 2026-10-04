@@ -633,6 +633,15 @@
     "natureSounds": "Âm thanh thiên nhiên",
     "connectSpotify": "Kết nối Spotify",
     "connectYouTube": "Kết nối YouTube",
+    "scrollLeft": "Cuộn sang trái",
+    "scrollRight": "Cuộn sang phải",
+    "mute": "Tắt toàn bộ âm thanh",
+    "unmute": "Bật lại âm thanh",
+    "master": {
+      "label": "Âm lượng chung",
+      "valueText": "Âm lượng chung {value}%",
+      "muted": "Âm lượng chung, đang tắt tiếng"
+    },
     "tabs": {
       "ambient": "Âm thanh nền",
       "youtube": "YouTube"
@@ -642,6 +651,8 @@
       "playing": "đang phát",
       "stopAll": "Dừng tất cả",
       "active": "đang bật",
+      "valueText": "{name} {value}%",
+      "valueTextOff": "{name}, đang tắt",
       "mixedLabel": "Âm thanh hỗn hợp ({count} âm)",
       "pausedAlert": {
         "title": "YouTube đang phát",
@@ -665,6 +676,10 @@
       "newNamePlaceholder": "Tên mới cho bản phối",
       "rename": "Đổi tên",
       "delete": "Xoá",
+      "renameDescription": "Nhập tên mới cho \"{name}\".",
+      "savedMixes": "Bản phối đã lưu",
+      "savedEmpty": "Chưa có bản phối nào. Bật vài âm thanh rồi bấm Lưu bản phối nhé.",
+      "mixOptions": "Tuỳ chọn cho {name}",
       "builtIn": {
         "cafe": "Quán cà phê",
         "rain": "Mưa",

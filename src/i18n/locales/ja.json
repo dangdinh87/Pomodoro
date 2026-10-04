@@ -633,6 +633,15 @@
     "natureSounds": "自然音",
     "connectSpotify": "Spotifyに接続",
     "connectYouTube": "YouTubeに接続",
+    "scrollLeft": "左へスクロール",
+    "scrollRight": "右へスクロール",
+    "mute": "すべての音をミュート",
+    "unmute": "ミュート解除",
+    "master": {
+      "label": "マスター音量",
+      "valueText": "マスター音量 {value}%",
+      "muted": "マスター音量、ミュート中"
+    },
     "tabs": {
       "ambient": "環境音",
       "youtube": "YouTube"
@@ -642,6 +651,8 @@
       "playing": "再生中",
       "stopAll": "すべて停止",
       "active": "有効",
+      "valueText": "{name} {value}%",
+      "valueTextOff": "{name}、オフ",
       "mixedLabel": "ミックス環境音（{count}種類）",
       "pausedAlert": {
         "title": "YouTubeが有効です",
@@ -665,6 +676,10 @@
       "newNamePlaceholder": "新しいプリセット名",
       "rename": "名前変更",
       "delete": "削除",
+      "renameDescription": "「{name}」の新しい名前を入力してください。",
+      "savedMixes": "保存したミックス",
+      "savedEmpty": "保存したミックスはまだありません。サウンドをいくつかオンにして「ミックスを保存」をタップしてください。",
+      "mixOptions": "{name}のオプション",
       "builtIn": {
         "cafe": "カフェ",
         "rain": "雨",

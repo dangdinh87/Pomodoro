@@ -14,24 +14,13 @@ import {
 } from '@/data/youtube-suggestions';
 import { YouTubeInputSection } from './youtube-input-section';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { FilterChip } from '@/components/ui/filter-chip';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { Play, Pause, DiceThree, CircleNotch, CaretLeft, CaretRight, Flag, Headphones, Coffee, PianoKeys, Planet, Leaf, Code, Timer, Brain, Folder } from '@phosphor-icons/react/dist/ssr';
 import type { Icon } from '@phosphor-icons/react';
 import { MusicVisualizer } from './music-visualizer';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/contexts/i18n-context';
-
-const YouTubeIcon = ({ className }: { className?: string }) => (
-  <svg
-    role="img"
-    viewBox="0 0 24 24"
-    xmlns="http://www.w3.org/2000/svg"
-    className={className}
-    fill="currentColor"
-  >
-    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-  </svg>
-);
 
 const categoryIcons: Record<string, Icon> = {
   'Chill VN': Flag,
@@ -216,8 +205,6 @@ const YouTubePane = memo(() => {
     };
   }, [checkScroll]);
 
-  // Check if something is currently playing
-  const isCurrentlyPlaying = playerState.currentSource && playerState.status !== 'stopped';
   const currentThumbnail = playerState.currentSource?.videoId
     ? getYouTubeThumbnailUrl(playerState.currentSource.videoId)
     : undefined;
@@ -225,7 +212,7 @@ const YouTubePane = memo(() => {
   return (
     <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="flex flex-col h-full min-h-0">
       {/* Fixed Header - URL Input + Library (no scroll) */}
-      <div className="shrink-0 space-y-3 pb-3">
+      <div className="shrink-0 space-y-3 px-1.5 pb-3 pt-1 -mx-1.5">
         {/* URL Input / Now Playing - Sticky at top */}
         <YouTubeInputSection
           youtubeUrl={youtubeUrl}
@@ -239,23 +226,22 @@ const YouTubePane = memo(() => {
           thumbnailUrl={currentThumbnail || undefined}
         />
 
-        {/* Library Card - Preset Style */}
-        <div className="bg-surface border border-border rounded-lg overflow-hidden">
-          {/* Header */}
-          <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-border">
+        {/* Library card: category chips (same pattern as the sound presets) */}
+        <section aria-label={t('audio.youtube.library')} className="sticker-sm overflow-hidden">
+          <div className="flex items-center justify-between gap-2 px-3 pb-1 pt-3">
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-bold text-ink-secondary">{t('audio.youtube.library')}</h3>
-              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-surface-raised text-ink-secondary font-semibold tabular-nums">
+              <h3 className="font-heading text-[1.0625rem] font-bold text-ink">{t('audio.youtube.library')}</h3>
+              <span className="rounded-full bg-surface-raised px-2 py-0.5 text-xs font-bold tabular-nums text-ink-secondary">
                 {youtubeSuggestions.length}
               </span>
             </div>
             <Button
-              variant="ghost"
+              variant="secondary"
               size="sm"
               onClick={handlePickRandomSuggestion}
-              className="h-6 gap-1 text-[10px] font-semibold px-2"
+              className="gap-1"
             >
-              <DiceThree size={12} />
+              <DiceThree size={14} weight="bold" aria-hidden="true" />
               {t('audio.youtube.random')}
             </Button>
           </div>
@@ -263,55 +249,48 @@ const YouTubePane = memo(() => {
           <div className="relative">
             {canScrollLeft && (
               <Button
-                variant="ghost"
+                variant="secondary"
                 size="icon"
                 onClick={scrollLeft}
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-surface hover:bg-surface-hover border border-border"
+                aria-label={t('audio.scrollLeft')}
+                className="absolute left-1 top-1/2 z-10 size-8 -translate-y-1/2"
               >
-                <CaretLeft size={16} />
+                <CaretLeft size={16} weight="bold" aria-hidden="true" />
               </Button>
             )}
             {canScrollRight && (
               <Button
-                variant="ghost"
+                variant="secondary"
                 size="icon"
                 onClick={scrollRight}
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-surface hover:bg-surface-hover border border-border"
+                aria-label={t('audio.scrollRight')}
+                className="absolute right-1 top-1/2 z-10 size-8 -translate-y-1/2"
               >
-                <CaretRight size={16} />
+                <CaretRight size={16} weight="bold" aria-hidden="true" />
               </Button>
             )}
             <div
               ref={scrollRef}
-              className="overflow-x-auto p-1.5 scroll-smooth"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
+              role="group"
+              aria-label={t('audio.youtube.library')}
+              className="flex items-center gap-2 overflow-x-auto scroll-smooth px-3 py-2.5 scrollbar-hide"
             >
-              <div className="flex gap-2">
-                {categories.map((cat) => {
-                  const CatIcon = categoryIcons[cat] || Folder;
-                  const isActive = selectedCategory === cat;
-                  return (
-                    <button
-                      key={cat}
-                      type="button"
-                      aria-pressed={isActive}
-                      onClick={() => setSelectedCategory(cat)}
-                      className={cn(
-                        "inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-3 text-sm outline-hidden transition-colors duration-140 focus-visible:ring-2 focus-visible:ring-brand",
-                        isActive
-                          ? "border-transparent bg-primary font-semibold text-white"
-                          : "border-border text-ink-secondary hover:bg-surface-hover"
-                      )}
-                    >
-                      <CatIcon size={16} aria-hidden="true" />
-                      <span>{t(`audio.youtube.categories.${cat}`)}</span>
-                    </button>
-                  );
-                })}
-              </div>
+              {categories.map((cat) => {
+                const CatIcon = categoryIcons[cat] || Folder;
+                return (
+                  <FilterChip
+                    key={cat}
+                    active={selectedCategory === cat}
+                    onClick={() => setSelectedCategory(cat)}
+                  >
+                    <CatIcon size={16} aria-hidden="true" />
+                    <span>{t(`audio.youtube.categories.${cat}`)}</span>
+                  </FilterChip>
+                );
+              })}
             </div>
           </div>
-        </div>
+        </section>
       </div>
 
       {/* Scrollable Content: Video List */}
@@ -320,93 +299,96 @@ const YouTubePane = memo(() => {
           {categories.map((cat) => (
             cat === selectedCategory && (
               <TabsContent key={cat} value={cat} className="h-full min-h-0 m-0 p-0 flex flex-col">
-                <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden custom-scrollbar min-h-[120px]">
-                  <div className="m-2 overflow-hidden rounded-lg border border-border bg-surface divide-y divide-border">
-                    {filteredSuggestions.map((item, index) => {
+                <div className="-mx-1.5 min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-1.5 pb-3 pt-1 custom-scrollbar">
+                  <ul className="sticker-sm divide-y-2 divide-border overflow-hidden">
+                    {filteredSuggestions.map((item) => {
                       const isMatch = isSuggestionPlaying(item.url);
                       const isPlaying = isMatch && playerState.status === 'playing';
                       const isBuffering = isMatch && playerState.status === 'buffering';
                       const parsed = parseYouTubeUrl(item.url);
                       const thumbnailUrl = parsed.videoId ? getYouTubeThumbnailUrl(parsed.videoId) : null;
+                      const rowLabel = isPlaying ? `${t('common.pause')}: ${item.label}` : `${t('common.play')}: ${item.label}`;
 
                       return (
-                        <div
-                          key={item.url}
-                          onClick={() => handlePlaySuggestion(item)}
-                          className={cn(
-                            "flex items-center gap-2 px-2 py-2 cursor-pointer group relative overflow-hidden",
-                            "transition-colors duration-150",
-                            isMatch ? "bg-surface-raised" : "hover:bg-surface-hover"
-                          )}
-                        >
-                          {/* Thumbnail */}
-                          <div className={cn(
-                            "relative w-16 h-9 shrink-0 rounded-md overflow-hidden bg-surface-raised flex items-center justify-center",
-                            isMatch && "ring-2 ring-brand"
-                          )}>
-                            {thumbnailUrl ? (
-                              <img
-                                src={thumbnailUrl}
-                                alt={item.label}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <span className="text-[8px] font-mono text-ink-faint">YT</span>
-                            )}
-
-                            {/* Animated overlay when playing */}
-                            {isPlaying && (
-                              <div className="absolute inset-0 z-10 bg-black/30 pointer-events-none text-white">
-                                <MusicVisualizer
-                                  isPlaying={true}
-                                  barCount={3}
-                                  className="items-end pb-0.5 h-full w-full px-1.5 opacity-90"
-                                />
-                              </div>
-                            )}
-
-                            {isBuffering && (
-                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                                <CircleNotch size={16} className="text-white animate-spin" />
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Info */}
-                          <div className="flex-1 min-w-0">
-                            <p className={cn(
-                              "text-sm font-medium truncate leading-tight transition-colors duration-200",
-                              isMatch ? "text-ink font-semibold" : "text-ink-secondary group-hover:text-ink"
-                            )}>
-                              {item.label}
-                            </p>
-                            <p className="text-[11px] text-ink-faint truncate">
-                              {stripTrailingEmoji(item.description)}
-                            </p>
-                          </div>
-
-                          {/* Play/Loading button */}
-                          <div
+                        <li key={item.url}>
+                          <button
+                            type="button"
+                            onClick={() => handlePlaySuggestion(item)}
+                            aria-label={rowLabel}
+                            aria-pressed={isMatch}
                             className={cn(
-                              "flex items-center justify-center w-6 h-6 rounded-full shrink-0",
+                              "focus-ring group relative flex w-full items-center gap-3 px-3 py-2.5 text-left focus-visible:outline-offset-[-3px]",
                               "transition-colors duration-150",
-                              isMatch
-                                ? "bg-primary text-white"
-                                : "opacity-0 group-hover:opacity-100 bg-surface-raised text-ink-secondary"
+                              isMatch ? "bg-surface-raised" : "hover:bg-surface-hover"
                             )}
                           >
-                            {isBuffering ? (
-                              <CircleNotch size={12} className="animate-spin" />
-                            ) : isPlaying ? (
-                              <Pause size={12} weight="fill" />
-                            ) : (
-                              <Play size={12} weight="fill" />
-                            )}
-                          </div>
-                        </div>
+                            {/* Thumbnail */}
+                            <div className="relative flex h-9 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[8px] border-2 border-outline bg-surface-raised">
+                              {thumbnailUrl ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                  src={thumbnailUrl}
+                                  alt=""
+                                  className="h-full w-full object-cover"
+                                />
+                              ) : (
+                                <span className="font-mono text-[8px] text-ink-muted">YT</span>
+                              )}
+
+                              {/* Animated overlay when playing */}
+                              {isPlaying && (
+                                <div className="pointer-events-none absolute inset-0 z-10 bg-black/40 text-white">
+                                  <MusicVisualizer
+                                    isPlaying={true}
+                                    barCount={3}
+                                    className="h-full w-full items-end px-1.5 pb-0.5 opacity-90"
+                                  />
+                                </div>
+                              )}
+
+                              {isBuffering && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                                  <CircleNotch size={16} className="animate-spin text-white" />
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Info */}
+                            <div className="min-w-0 flex-1">
+                              <p className={cn(
+                                "truncate text-sm leading-tight",
+                                isMatch ? "font-bold text-ink" : "font-semibold text-ink-secondary group-hover:text-ink"
+                              )}>
+                                {item.label}
+                              </p>
+                              <p className="truncate text-xs text-ink-muted">
+                                {stripTrailingEmoji(item.description)}
+                              </p>
+                            </div>
+
+                            {/* Play/Loading state */}
+                            <span
+                              aria-hidden="true"
+                              className={cn(
+                                "flex size-8 shrink-0 items-center justify-center rounded-full border-2 border-outline transition-colors duration-150",
+                                isMatch
+                                  ? "bg-primary text-on-accent shadow-sticker-sm"
+                                  : "bg-surface text-ink-secondary"
+                              )}
+                            >
+                              {isBuffering ? (
+                                <CircleNotch size={14} className="animate-spin" />
+                              ) : isPlaying ? (
+                                <Pause size={14} weight="fill" />
+                              ) : (
+                                <Play size={14} weight="fill" />
+                              )}
+                            </span>
+                          </button>
+                        </li>
                       );
                     })}
-                  </div>
+                  </ul>
                 </div>
               </TabsContent>
             )

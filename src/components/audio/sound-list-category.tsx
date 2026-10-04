@@ -3,11 +3,25 @@
 import { memo } from 'react'
 import { cn } from '@/lib/utils'
 import { Slider } from '@/components/ui/slider'
+import { IconTile, type IconTileTone } from '@/components/ui/icon-tile'
 import { useAudioStore } from '@/stores/audio-store'
 import type { SoundItem } from '@/lib/audio/sound-catalog'
 import { useTranslation } from '@/contexts/i18n-context'
 import { getSoundIcon } from './sound-icons'
 import type { SoundCategory } from '@/lib/audio/sound-catalog'
+
+// Candy colour per category: pure identity, never state (an active row is also shown by the
+// filled icon, the 40% readout and the slider range, so colour is not the only cue).
+const CATEGORY_TONE: Record<SoundCategory, IconTileTone> = {
+    nature: 'mint',
+    rain: 'sky',
+    noise: 'lilac',
+    study: 'butter',
+    cozy: 'peach',
+    transport: 'tomato',
+    city: 'sky',
+    machine: 'lilac',
+}
 
 interface SoundListCategoryProps {
     categoryKey: SoundCategory
@@ -30,21 +44,22 @@ export const SoundListCategory = memo(function SoundListCategory({
         const state = getActiveState(s.id)
         return state && state.volume > 0
     }).length
+    const tone = CATEGORY_TONE[categoryKey]
 
     return (
         <section aria-label={t(`audio.categories.${categoryKey}`)}>
-            <div className="flex items-baseline justify-between pb-2">
-                <h4 className="text-[0.8125rem] font-semibold text-ink">
+            <div className="flex items-center justify-between gap-2 pb-2">
+                <h4 className="font-heading text-[0.9375rem] font-bold text-ink">
                     {t(`audio.categories.${categoryKey}`)}
                 </h4>
                 {activeCount > 0 && (
-                    <span className="text-xs font-medium text-brand">
+                    <span className="rounded-full bg-brand-soft px-2 py-0.5 text-xs font-bold text-brand-ink">
                         {activeCount} {t('audio.ambient.active')}
                     </span>
                 )}
             </div>
 
-            <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-surface">
+            <ul className="sticker-sm divide-y-2 divide-border overflow-hidden">
                 {sounds.map((sound) => {
                     const activeState = getActiveState(sound.id)
                     const isActive = !!activeState
@@ -56,7 +71,7 @@ export const SoundListCategory = memo(function SoundListCategory({
                         <li
                             key={sound.id}
                             className={cn(
-                                'flex items-center gap-3 px-3 py-2 transition-colors',
+                                'flex items-center gap-3 px-3 py-2.5 transition-colors',
                                 isActive && 'bg-surface-raised'
                             )}
                         >
@@ -65,18 +80,20 @@ export const SoundListCategory = memo(function SoundListCategory({
                                 onClick={() => toggleAmbient(sound.id)}
                                 aria-pressed={isActive}
                                 aria-label={label}
-                                className={cn(
-                                    'flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-surface-raised transition-colors hover:text-ink focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand',
-                                    isActive ? 'text-brand' : 'text-ink-secondary'
-                                )}
+                                className="focus-ring shrink-0 rounded-[12px] transition-transform duration-100 hover:-translate-y-px active:translate-y-px"
                             >
-                                <SoundIcon size={18} weight={isActive ? 'fill' : 'regular'} aria-hidden="true" />
+                                <IconTile
+                                    icon={SoundIcon}
+                                    tone={isActive ? tone : 'surface'}
+                                    weight={isActive ? 'fill' : 'bold'}
+                                    className={cn(isActive && 'shadow-sticker-sm')}
+                                />
                             </button>
 
                             <span
                                 className={cn(
-                                    'w-[96px] shrink-0 truncate text-[0.8125rem]',
-                                    isActive ? 'font-medium text-ink' : 'text-ink-secondary'
+                                    'line-clamp-2 w-24 shrink-0 break-words text-[0.875rem] leading-tight sm:w-28',
+                                    isActive ? 'font-bold text-ink' : 'font-semibold text-ink-secondary'
                                 )}
                                 title={label}
                             >
@@ -89,6 +106,11 @@ export const SoundListCategory = memo(function SoundListCategory({
                                 max={100}
                                 step={1}
                                 aria-label={label}
+                                aria-valuetext={
+                                    isActive
+                                        ? t('audio.ambient.valueText', { name: label, value: volume })
+                                        : t('audio.ambient.valueTextOff', { name: label })
+                                }
                                 onValueChange={(v) => {
                                     if (!isActive && v[0] > 0) {
                                         playAmbient(sound.id, v[0])
@@ -96,13 +118,13 @@ export const SoundListCategory = memo(function SoundListCategory({
                                         setSoundVolume(sound.id, v[0])
                                     }
                                 }}
-                                className={cn(
-                                    'min-w-[60px] flex-1',
-                                    !isActive && 'opacity-50 **:[[role=slider]]:border-border-strong **:[[role=slider]]:bg-surface-raised'
-                                )}
+                                className={cn('min-w-[60px] flex-1', !isActive && 'opacity-60')}
                             />
 
-                            <span className={cn('w-8 shrink-0 text-right text-xs tabular-nums', isActive ? 'text-ink-secondary' : 'text-ink-faint')}>
+                            <span
+                                aria-hidden="true"
+                                className={cn('w-9 shrink-0 text-right text-xs tabular-nums', isActive ? 'font-bold text-ink' : 'font-semibold text-ink-muted')}
+                            >
                                 {isActive ? `${volume}%` : t('timerUi.soundOff')}
                             </span>
                         </li>

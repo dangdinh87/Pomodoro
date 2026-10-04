@@ -633,6 +633,15 @@
     "natureSounds": "Nature sounds",
     "connectSpotify": "Connect Spotify",
     "connectYouTube": "Connect YouTube",
+    "scrollLeft": "Scroll left",
+    "scrollRight": "Scroll right",
+    "mute": "Mute all sound",
+    "unmute": "Unmute",
+    "master": {
+      "label": "Master volume",
+      "valueText": "Master volume {value}%",
+      "muted": "Master volume, muted"
+    },
     "tabs": {
       "ambient": "Ambient",
       "youtube": "YouTube"
@@ -642,6 +651,8 @@
       "playing": "playing",
       "stopAll": "Stop all",
       "active": "active",
+      "valueText": "{name} {value}%",
+      "valueTextOff": "{name}, off",
       "mixedLabel": "Mixed ambient ({count} sounds)",
       "pausedAlert": {
         "title": "YouTube is active",
@@ -665,6 +676,10 @@
       "newNamePlaceholder": "New preset name",
       "rename": "Rename",
       "delete": "Delete",
+      "renameDescription": "Enter a new name for \"{name}\".",
+      "savedMixes": "Saved mixes",
+      "savedEmpty": "No saved mixes yet. Turn on a few sounds, then tap Save mix.",
+      "mixOptions": "Options for {name}",
       "builtIn": {
         "cafe": "Cafe",
         "rain": "Rain",

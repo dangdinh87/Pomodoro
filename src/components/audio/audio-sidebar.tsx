@@ -5,9 +5,10 @@ import {
   Sheet,
   SheetContent,
   SheetDescription,
+  SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { SpeakerHigh, SpeakerX } from '@phosphor-icons/react/dist/ssr';
+import { MusicNotes, SpeakerHigh, SpeakerX } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -25,7 +26,7 @@ interface AudioSidebarProps {
 
 const YouTubeIcon = ({ className }: { className?: string }) => (
   <svg
-    role="img"
+    aria-hidden="true"
     viewBox="0 0 24 24"
     xmlns="http://www.w3.org/2000/svg"
     className={className}
@@ -54,6 +55,8 @@ export function AudioSidebar({ open, onOpenChange }: AudioSidebarProps) {
   }, [open])
 
   const currentTab = audioSettings.activeSource === 'youtube' ? 'youtube' : 'ambient'
+  const { isMuted, masterVolume } = audioSettings
+  const shownVolume = isMuted ? 0 : masterVolume
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -75,16 +78,16 @@ export function AudioSidebar({ open, onOpenChange }: AudioSidebarProps) {
           className="flex-1 flex flex-col overflow-hidden"
         >
           <div className="shrink-0 px-4 pt-4">
-            <SheetTitle className="pe-8 font-heading text-[1.0625rem] font-bold tracking-[-0.01em] text-ink">
-              {t('timerUi.dock.sounds')}
-            </SheetTitle>
-            <SheetDescription className="sr-only">{t('audio.selectAudio')}</SheetDescription>
-            <TabsList className="mt-3">
+            <SheetHeader icon={<MusicNotes weight="fill" />} iconTileClassName="bg-candy-sky" className="pe-12">
+              <SheetTitle>{t('timerUi.dock.sounds')}</SheetTitle>
+              <SheetDescription className="sr-only">{t('audio.selectAudio')}</SheetDescription>
+            </SheetHeader>
+            <TabsList className="mt-4">
               <TabsTrigger value="ambient">{t('audio.tabs.ambient')}</TabsTrigger>
               <TabsTrigger value="youtube">
                 <YouTubeIcon className={cn(
                   "h-4 w-4 transition-colors",
-                  currentTab === 'youtube' ? "text-danger" : "text-ink-muted"
+                  currentTab === 'youtube' ? "text-danger-ink" : "text-ink-muted"
                 )} />
                 {t('audio.tabs.youtube')}
               </TabsTrigger>
@@ -95,7 +98,7 @@ export function AudioSidebar({ open, onOpenChange }: AudioSidebarProps) {
           <div className="flex-1 min-h-0 overflow-hidden flex flex-col relative">
             <div
               className={cn(
-                "h-full min-h-0 flex flex-col transition-opacity duration-200 px-4 pb-2 pt-2",
+                "h-full min-h-0 flex flex-col transition-opacity duration-200 px-4 pb-2 pt-3",
                 currentTab === 'ambient'
                   ? "relative z-10 opacity-100"
                   : "absolute inset-0 z-0 opacity-0 pointer-events-none"
@@ -105,7 +108,7 @@ export function AudioSidebar({ open, onOpenChange }: AudioSidebarProps) {
             </div>
             <div
               className={cn(
-                "h-full min-h-0 flex flex-col transition-opacity duration-200 px-4 pb-2 pt-2",
+                "h-full min-h-0 flex flex-col transition-opacity duration-200 px-4 pb-2 pt-3",
                 currentTab === 'youtube'
                   ? "relative z-10 opacity-100"
                   : "absolute inset-0 z-0 opacity-0 pointer-events-none h-full w-full"
@@ -118,37 +121,44 @@ export function AudioSidebar({ open, onOpenChange }: AudioSidebarProps) {
           </div>
         </Tabs>
 
-        {/* Fixed footer: master volume */}
-        <div className="border-t border-border px-4 py-3 shrink-0">
+        {/* Fixed footer: mute + master volume, always in view */}
+        <div className="shrink-0 border-t-[2.5px] border-outline bg-surface-raised px-4 py-3">
           <div className="flex items-center gap-3">
             <Button
-              variant="ghost"
+              variant={isMuted ? 'destructive' : 'secondary'}
               size="icon"
-              className="h-8 w-8 shrink-0"
+              className="shrink-0"
               onClick={toggleMute}
+              aria-label={isMuted ? t('audio.unmute') : t('audio.mute')}
             >
-              {audioSettings.isMuted ? (
-                <SpeakerX size={16} className="text-ink-muted" />
-              ) : (
-                <SpeakerHigh size={16} />
-              )}
+              {isMuted ? <SpeakerX size={20} weight="fill" /> : <SpeakerHigh size={20} weight="fill" />}
             </Button>
-            <Slider
-              value={[audioSettings.isMuted ? 0 : audioSettings.masterVolume]}
-              min={0}
-              max={100}
-              step={1}
-              onValueChange={(v) => {
-                if (audioSettings.isMuted && v[0] > 0) {
-                  toggleMute()
-                }
-                updateVolume(v[0])
-              }}
-              className="flex-1"
-            />
-            <span className="text-xs text-ink-muted w-8 text-right tabular-nums">
-              {audioSettings.isMuted ? 0 : audioSettings.masterVolume}%
-            </span>
+            <div className="min-w-0 flex-1 space-y-1">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-heading text-[0.9375rem] font-bold text-ink">{t('audio.master.label')}</span>
+                <span
+                  aria-hidden="true"
+                  className="rounded-full border-2 border-outline bg-surface px-2 py-px text-xs font-bold tabular-nums text-ink"
+                >
+                  {shownVolume}%
+                </span>
+              </div>
+              <Slider
+                value={[shownVolume]}
+                min={0}
+                max={100}
+                step={1}
+                aria-label={t('audio.master.label')}
+                aria-valuetext={isMuted ? t('audio.master.muted') : t('audio.master.valueText', { value: masterVolume })}
+                onValueChange={(v) => {
+                  if (isMuted && v[0] > 0) {
+                    toggleMute()
+                  }
+                  updateVolume(v[0])
+                }}
+                className="flex-1"
+              />
+            </div>
           </div>
         </div>
       </SheetContent>
