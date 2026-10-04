@@ -80,6 +80,36 @@ describe('TimerControls skip', () => {
     expect(mockRecord).toHaveBeenCalledTimes(1);
   });
 
+  it('closes the confirmation when the phase ends by itself, so a late Confirm cannot skip the next phase', () => {
+    useTimerStore.setState({ isRunning: true, deadlineAt: Date.now() + 600_000 });
+    render(<TimerControls />);
+    act(() => {
+      requestTimerSkip();
+    });
+    expect(screen.getByText('timer.skip_confirm.title')).toBeInTheDocument();
+
+    // what the engine does at the deadline: next phase, timeLeft is the full break (never 0)
+    act(() => {
+      useTimerStore.setState({ mode: 'shortBreak', timeLeft: 300, lastSessionTimeLeft: 300, isRunning: false, deadlineAt: null });
+    });
+
+    expect(screen.queryByText('timer.skip_confirm.title')).not.toBeInTheDocument();
+    expect(mockRecord).not.toHaveBeenCalled();
+    expect(useTimerStore.getState().mode).toBe('shortBreak');
+  });
+
+  it('keeps the confirmation open while the same phase simply keeps counting down', () => {
+    useTimerStore.setState({ isRunning: true, deadlineAt: Date.now() + 600_000 });
+    render(<TimerControls />);
+    act(() => {
+      requestTimerSkip();
+    });
+    act(() => {
+      useTimerStore.setState({ timeLeft: 599 });
+    });
+    expect(screen.getByText('timer.skip_confirm.title')).toBeInTheDocument();
+  });
+
   it('stops answering once the controls unmount', () => {
     const { unmount } = render(<TimerControls />);
     unmount();

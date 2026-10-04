@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Pause, Play, ArrowCounterClockwise, SkipForward } from '@phosphor-icons/react/dist/ssr';
 import { Kbd } from '@/components/ui/kbd';
 import { useTranslation } from '@/contexts/i18n-context';
-import { useTimerStore } from '@/stores/timer-store';
+import { useTimerStore, type TimerMode } from '@/stores/timer-store';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -51,7 +51,10 @@ export const TimerControls = memo(function TimerControls() {
     const setDeadlineAt = useTimerStore((state) => state.setDeadlineAt);
 
     // Local state
-    const [skipConfirmOpen, setSkipConfirmOpen] = useState(false);
+    // The phase the skip confirmation was asked about (null = closed), like the reset dialog's `askedMode`
+    const [skipAskedMode, setSkipAskedMode] = useState<TimerMode | null>(null);
+    const skipConfirmOpen = skipAskedMode !== null;
+    const setSkipConfirmOpen = (open: boolean) => setSkipAskedMode(open ? mode : null);
     const [isProcessing, setIsProcessing] = useState(false);
 
     // Helper to calculate total time for current mode to determine progress
@@ -71,12 +74,11 @@ export const TimerControls = memo(function TimerControls() {
         return Math.min(100, Math.max(0, (completed / total) * 100));
     };
 
-    // BUG-04 FIX: Close skip dialog when timer completes (timeLeft reaches 0)
+    // The phase ended by itself while the dialog was open (the engine moves on to the next phase and never
+    // leaves timeLeft at 0): Confirm would now skip the NEXT phase, which nobody asked about.
     useEffect(() => {
-        if (timeLeft <= 0 && skipConfirmOpen) {
-            setSkipConfirmOpen(false);
-        }
-    }, [timeLeft, skipConfirmOpen]);
+        if (skipAskedMode !== null && skipAskedMode !== mode) setSkipAskedMode(null);
+    }, [skipAskedMode, mode]);
 
     const handleSessionComplete = (skipWithoutRecording: boolean = false) => {
         if (isProcessing) return;
