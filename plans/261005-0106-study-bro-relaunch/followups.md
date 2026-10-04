@@ -31,3 +31,6 @@
 | 27 | `.Jules/palette.md` vs `.jules/palette.md` trùng tên trên đĩa không phân biệt hoa thường; chỉ khác 3 dòng trống, sửa bằng `git rm --cached .Jules/palette.md` | 4a | Một commit riêng khi phiên khác đã commit xong `.Jules/palette.md` |
 | 28 | `NEXT_PUBLIC_FEATURE_HISTORY` chỉ ẩn UI, không chặn `/api/history` và `/api/stats` (`feature-gate.ts` chưa từng được nối, đã xoá) | 4a | Nối cờ vào 2 route hoặc bỏ cờ |
 | 29 | Video gợi ý `04RM0CQPLHQ` trong `src/data/youtube-suggestions.ts` trả 404 thumbnail | 4a | Thay bằng video còn sống |
+| 30 | Xoá `migrations/`, `supabase_schema.sql`, `fix_sessions_rls.sql`, `public/images/` (0 tham chiếu) — **bị bộ kiểm quyền chặn**, không lách | 4a | Chủ dự án tự chạy `git rm -r …` hoặc cấp quyền |
+| 31 | `.Jules/palette.md` vs `.jules/palette.md` va chạm hoa/thường | 4a | `git rm --cached .Jules/palette.md` (chủ dự án quyết) |
+| 32 | Video gợi ý YouTube `04RM0CQPLHQ` trả 404 thumbnail | 4a | Kiểm và thay id trong danh sách gợi ý/preset |
