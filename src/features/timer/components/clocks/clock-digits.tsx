@@ -4,6 +4,10 @@ import { cn } from '@/lib/utils';
  * Digits of a countdown. Every digit sits in a fixed-width cell (1ch of the heading font, Baloo 2), so the
  * row keeps the same width whatever the digits are and nothing jitters when a second ticks over. The colon is
  * two CSS dots. Sized by the font-size of the parent.
+ *
+ * The row is display only and `pointer-events-none`: Baloo 2 has tall ascent/descent metrics, so with
+ * `leading-none` the glyph boxes spill ~40px above the line box and, in hit-testing, covered the mode chips above
+ * the clock (their centre could not be clicked at >= 768px).
  */
 export function ClockDigits({
   minutes,
@@ -20,7 +24,11 @@ export function ClockDigits({
   const mm = String(Math.max(0, minutes)).padStart(2, '0');
   const ss = String(Math.max(0, seconds)).padStart(2, '0');
   return (
-    <span className={cn('inline-flex items-center whitespace-nowrap leading-none', className)} data-clock-digits aria-hidden="true">
+    <span
+      className={cn('pointer-events-none inline-flex select-none items-center whitespace-nowrap leading-none', className)}
+      data-clock-digits
+      aria-hidden="true"
+    >
       {[...mm].map((digit, i) => (
         <Digit key={`m${i}`} digit={digit} />
       ))}

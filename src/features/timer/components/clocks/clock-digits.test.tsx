@@ -31,6 +31,12 @@ describe('ClockDigits', () => {
     expect(container.querySelector('[data-clock-digits]')).toHaveAttribute('aria-hidden', 'true');
   });
 
+  it('never takes pointer events: its tall glyph boxes spill over the mode chips above the clock', () => {
+    const { container } = render(<ClockDigits minutes={1} seconds={2} />);
+    const row = container.querySelector('[data-clock-digits]')!;
+    expect(row).toHaveClass('pointer-events-none', 'select-none');
+  });
+
   it('colours the dots (mode accent by default, a warning colour on request)', () => {
     const { container, rerender } = render(<ClockDigits minutes={1} seconds={2} />);
     const dot = () => container.querySelector<HTMLElement>('[data-clock-colon] i')!;

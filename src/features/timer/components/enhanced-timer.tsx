@@ -32,7 +32,8 @@ export function EnhancedTimer() {
     <div className="z-10 w-full max-w-140">
       <section className="stage-card sticker-lg flex flex-col items-center p-(--stage-pad)">
         <TimerMascot />
-        <div data-chrome>
+        {/* z-10: belt and braces so no clock face (tall glyph boxes, 3D canvas) can ever sit over the mode chips */}
+        <div data-chrome className="relative z-10">
           <TimerModeSelector />
         </div>
         <TimerClockDisplay />

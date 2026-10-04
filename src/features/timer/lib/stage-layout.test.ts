@@ -44,4 +44,11 @@ describe('timer stage sizing', () => {
     const skeleton = used(read(SKELETON));
     for (const name of live) expect(skeleton, `${name} missing in the skeleton`).toContain(name);
   });
+
+  // jsdom has no hit-testing, so the real check (elementFromPoint on the centre of each chip at 768-1920px, all
+  // three locales) is a browser probe; this keeps the two pieces of the fix from being dropped by accident.
+  it('keeps the mode chips clickable: chip row above the clock, clock digits ignore the pointer', () => {
+    expect(read('src/features/timer/components/enhanced-timer.tsx')).toMatch(/data-chrome className="[^"]*\brelative\b[^"]*\bz-10\b/);
+    expect(read('src/features/timer/components/clocks/clock-digits.tsx')).toContain('pointer-events-none');
+  });
 });
