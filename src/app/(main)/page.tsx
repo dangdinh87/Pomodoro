@@ -59,9 +59,12 @@ export default async function HomePage() {
 
   return (
     <>
+      {/* The one H1 of the page, in the server HTML. Visually hidden: the timer card is the first thing people see. */}
+      <h1 className="sr-only">{t('shell.homeHeading')}</h1>
       <AppHomeClientOnly googleEnabled={Boolean(getGoogleCredentials())} />
+      {/* Below the app: the same paper as the body (stage tint + doodle), opaque so a scene behind never shows through the text. */}
       {!isMember && (
-        <div className="relative z-10 bg-surface-page">
+        <div className="paper-bg relative z-10 bg-(--stage-tint)">
           <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqStructuredData) }} />
           <FeaturesSSR />
           <HowItWorks />
