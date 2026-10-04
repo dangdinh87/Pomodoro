@@ -1020,7 +1020,18 @@
     "title": "Arcade",
     "description": "Short games for your break.",
     "runningNote": "Games interrupt your focus. Finish the session first.",
-    "best": "Best score {score}"
+    "best": "Best score {score}",
+    "miniTimer": {
+      "label": "{phase}: {time} left",
+      "labelPaused": "{phase}: {time} left, timer paused"
+    },
+    "phaseChanged": {
+      "toWork": "Break's over. Time to get back to focus.",
+      "toBreak": "Focus is done. Enjoy your break.",
+      "gamePaused": "The game is paused.",
+      "backToTimer": "Back to the timer",
+      "dismiss": "Got it"
+    }
   },
   "settingsUi": {
     "unitMin": "min",

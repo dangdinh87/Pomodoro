@@ -1020,7 +1020,18 @@
     "title": "ゲーム",
     "description": "休憩時間にぴったりの短いゲーム。",
     "runningNote": "ゲームをすると集中が中断されます。先にセッションを終えましょう。",
-    "best": "ベストスコア {score}"
+    "best": "ベストスコア {score}",
+    "miniTimer": {
+      "label": "{phase}：残り{time}",
+      "labelPaused": "{phase}：残り{time}、タイマー一時停止中"
+    },
+    "phaseChanged": {
+      "toWork": "休憩が終わりました。集中に戻りましょう。",
+      "toBreak": "集中セッションが終わりました。ゆっくり休みましょう。",
+      "gamePaused": "ゲームは一時停止中です。",
+      "backToTimer": "タイマーに戻る",
+      "dismiss": "OK"
+    }
   },
   "settingsUi": {
     "unitMin": "分",

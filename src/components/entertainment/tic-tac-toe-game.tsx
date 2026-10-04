@@ -189,7 +189,7 @@ export function TicTacToeGame(props: GameProps) {
               )}
             >
               {cell === 'X' && <X size={size === 3 ? 56 : 40} weight="bold" className="text-brand" />}
-              {cell === 'O' && <Circle size={size === 3 ? 52 : 36} weight="bold" className="text-info" />}
+              {cell === 'O' && <Circle size={size === 3 ? 52 : 36} weight="bold" className="text-info-ink" />}
             </button>
           ))}
         </div>

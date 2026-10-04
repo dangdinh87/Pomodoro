@@ -9,7 +9,6 @@ import {
   Crosshair,
   Cube,
   DeviceMobile,
-  GameController,
   GridNine,
   Hash,
   Info,
@@ -22,15 +21,20 @@ import {
   Stack,
   Trophy,
   Wall,
+  Warning,
   X,
 } from '@phosphor-icons/react/dist/ssr';
 import type { Icon as PhosphorIcon } from '@phosphor-icons/react';
 
 import { Button } from '@/components/ui/button';
+import { FilterChip, FilterChipGroup } from '@/components/ui/filter-chip';
+import { IconTile, type IconTileTone } from '@/components/ui/icon-tile';
+import Loader from '@/components/ui/loader';
 import { PageHeader, PanelBody } from '@/components/ui/page-header';
 import { useI18n } from '@/contexts/i18n-context';
 import { cn } from '@/lib/utils';
 import { useTimerStore } from '@/stores/timer-store';
+import { ArcadeMiniTimer } from '@/components/entertainment/arcade-mini-timer';
 import { GamePreview } from '@/components/entertainment/game-previews';
 import { EMPTY_SCORES, readScores, recordScore, type GameScores } from '@/components/entertainment/game-scores';
 import type { GameProps } from '@/components/entertainment/game-kit';
@@ -38,11 +42,8 @@ import type { GameProps } from '@/components/entertainment/game-kit';
 function GameLoading() {
   const { t } = useI18n();
   return (
-    <div role="status" className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-surface-page">
-      <GameController size={40} className="text-ink-faint" />
-      <span className="text-sm text-ink-muted" suppressHydrationWarning>
-        {t('arcadeKit.loading')}
-      </span>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-surface-page">
+      <Loader size="md" title={t('arcadeKit.loading')} subtitle="" />
     </div>
   );
 }
@@ -80,6 +81,8 @@ type Control = 'keyboard' | 'mouse' | 'touch';
 interface GameConfig {
   id: GameId;
   icon: PhosphorIcon;
+  /** Candy colour of the game's icon tile (identity only). */
+  tone: IconTileTone;
   storageKey: string;
   i18nKey: string;
   category: Category;
@@ -88,16 +91,16 @@ interface GameConfig {
 }
 
 const GAMES: GameConfig[] = [
-  { id: 'snake', icon: Lightning, storageKey: 'snake-scores', i18nKey: 'snake', category: 'action', minutes: 3, controls: ['keyboard', 'touch'] },
-  { id: 'game-2048', icon: Hash, storageKey: 'game-2048-scores', i18nKey: 'game2048', category: 'puzzle', minutes: 5, controls: ['keyboard', 'touch'] },
-  { id: 'minesweeper', icon: Bomb, storageKey: 'minesweeper-scores', i18nKey: 'minesweeper', category: 'puzzle', minutes: 4, controls: ['mouse', 'touch'] },
-  { id: 'stack', icon: Cube, storageKey: 'stack-scores', i18nKey: 'stack', category: 'skill', minutes: 2, controls: ['keyboard', 'mouse', 'touch'] },
-  { id: 'typing-sprint', icon: Keyboard, storageKey: 'typing-sprint-scores', i18nKey: 'typingSprint', category: 'skill', minutes: 1, controls: ['keyboard'] },
-  { id: 'aim-trainer', icon: Crosshair, storageKey: 'aim-trainer-scores', i18nKey: 'aimTrainer', category: 'skill', minutes: 1, controls: ['mouse', 'touch'] },
-  { id: 'brick-breaker', icon: Wall, storageKey: 'brick-breaker-scores', i18nKey: 'brickBreaker', category: 'action', minutes: 4, controls: ['keyboard', 'mouse', 'touch'] },
-  { id: 'space-shooter', icon: Rocket, storageKey: 'space-shooter-scores', i18nKey: 'spaceShooter', category: 'action', minutes: 3, controls: ['keyboard', 'mouse', 'touch'] },
-  { id: 'neon-flip', icon: Stack, storageKey: 'memory-match-scores', i18nKey: 'memoryMatch', category: 'puzzle', minutes: 2, controls: ['mouse', 'touch'] },
-  { id: 'tic-tac-toe', icon: GridNine, storageKey: 'tic-tac-toe-scores', i18nKey: 'ticTacToe', category: 'puzzle', minutes: 2, controls: ['mouse', 'touch'] },
+  { id: 'snake', tone: 'mint', icon: Lightning, storageKey: 'snake-scores', i18nKey: 'snake', category: 'action', minutes: 3, controls: ['keyboard', 'touch'] },
+  { id: 'game-2048', tone: 'butter', icon: Hash, storageKey: 'game-2048-scores', i18nKey: 'game2048', category: 'puzzle', minutes: 5, controls: ['keyboard', 'touch'] },
+  { id: 'minesweeper', tone: 'sky', icon: Bomb, storageKey: 'minesweeper-scores', i18nKey: 'minesweeper', category: 'puzzle', minutes: 4, controls: ['mouse', 'touch'] },
+  { id: 'stack', tone: 'lilac', icon: Cube, storageKey: 'stack-scores', i18nKey: 'stack', category: 'skill', minutes: 2, controls: ['keyboard', 'mouse', 'touch'] },
+  { id: 'typing-sprint', tone: 'peach', icon: Keyboard, storageKey: 'typing-sprint-scores', i18nKey: 'typingSprint', category: 'skill', minutes: 1, controls: ['keyboard'] },
+  { id: 'aim-trainer', tone: 'tomato', icon: Crosshair, storageKey: 'aim-trainer-scores', i18nKey: 'aimTrainer', category: 'skill', minutes: 1, controls: ['mouse', 'touch'] },
+  { id: 'brick-breaker', tone: 'butter', icon: Wall, storageKey: 'brick-breaker-scores', i18nKey: 'brickBreaker', category: 'action', minutes: 4, controls: ['keyboard', 'mouse', 'touch'] },
+  { id: 'space-shooter', tone: 'lilac', icon: Rocket, storageKey: 'space-shooter-scores', i18nKey: 'spaceShooter', category: 'action', minutes: 3, controls: ['keyboard', 'mouse', 'touch'] },
+  { id: 'neon-flip', tone: 'peach', icon: Stack, storageKey: 'memory-match-scores', i18nKey: 'memoryMatch', category: 'puzzle', minutes: 2, controls: ['mouse', 'touch'] },
+  { id: 'tic-tac-toe', tone: 'mint', icon: GridNine, storageKey: 'tic-tac-toe-scores', i18nKey: 'ticTacToe', category: 'puzzle', minutes: 2, controls: ['mouse', 'touch'] },
 ];
 
 const CATEGORIES: ('all' | Category)[] = ['all', 'action', 'puzzle', 'skill'];
@@ -111,9 +114,21 @@ function MetaLine({ game }: { game: GameConfig }) {
       <span>{t(`arcadeKit.category.${game.category}`)}</span>
       <span aria-hidden className="size-0.5 rounded-full bg-ink-faint" />
       <span className="inline-flex items-center gap-1">
-        <Clock size={12} />
+        <Clock size={12} aria-hidden />
         {t('arcadeKit.minutes', { min: game.minutes })}
       </span>
+    </span>
+  );
+}
+
+function BestPill({ score }: { score: number }) {
+  return (
+    <span
+      className="inline-flex items-center gap-1 rounded-full border-2 border-outline bg-candy-butter px-2 py-0.5 text-xs font-bold tabular-nums leading-none text-on-accent"
+      suppressHydrationWarning
+    >
+      <Trophy size={12} weight="fill" aria-hidden />
+      {score.toLocaleString()}
     </span>
   );
 }
@@ -124,30 +139,24 @@ function GameCard({ game, best, onClick }: { game: GameConfig; best: number; onC
     <button
       type="button"
       onClick={onClick}
-      className={cn(
-        'group flex h-full flex-col overflow-hidden rounded-lg border border-border bg-surface text-left',
-        'transition-colors duration-150 hover:border-border-strong',
-        'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface-page',
-      )}
+      className="sticker sticker-press focus-ring group flex h-full flex-col overflow-hidden text-left"
     >
-      <div className="border-b border-border bg-surface-raised px-4 py-3 transition-colors duration-150 group-hover:bg-surface-hover">
-        <GamePreview id={game.id} className="mx-auto h-[72px] w-full max-w-[130px]" />
+      <div className="border-b-2 border-outline bg-surface-raised px-4 py-3 transition-colors duration-150 group-hover:bg-surface-hover">
+        <GamePreview id={game.id} className="mx-auto h-[72px] w-full max-w-[130px] md:h-24 md:max-w-[170px]" />
       </div>
-      <div className="flex flex-1 flex-col gap-1.5 p-3.5 sm:p-4">
-        <h2 className="font-heading text-base font-bold leading-tight text-ink" suppressHydrationWarning>
-          {t(`arcadeGames.${game.i18nKey}.title`)}
-        </h2>
+      <div className="flex flex-1 flex-col gap-2 p-3 sm:p-4">
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          <IconTile icon={game.icon} tone={game.tone} size="sm" />
+          <h2 className="line-clamp-2 min-w-0 break-words font-heading text-[0.9375rem] font-extrabold leading-tight text-ink sm:text-base" suppressHydrationWarning>
+            {t(`arcadeGames.${game.i18nKey}.title`)}
+          </h2>
+        </div>
         <p className="line-clamp-2 text-[0.8125rem] leading-snug text-ink-muted" suppressHydrationWarning>
           {t(`arcadeGames.${game.i18nKey}.description`)}
         </p>
-        <div className="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-1 pt-2">
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 pt-1">
           <MetaLine game={game} />
-          {best > 0 && (
-            <span className="inline-flex items-center gap-1 text-xs font-medium tabular-nums text-ink-secondary" suppressHydrationWarning>
-              <Trophy size={12} weight="fill" className="text-gold" />
-              {best.toLocaleString()}
-            </span>
-          )}
+          {best > 0 && <BestPill score={best} />}
         </div>
       </div>
     </button>
@@ -157,7 +166,6 @@ function GameCard({ game, best, onClick }: { game: GameConfig; best: number; onC
 function InstructionSheet({ game, best, onStart, onClose }: { game: GameConfig; best: number; onStart: () => void; onClose: () => void }) {
   const { t } = useI18n();
   const reduceMotion = useReducedMotion();
-  const Icon = game.icon;
 
   // Captured on window so Esc closes this sheet, not the dialog the panel lives in.
   useEffect(() => {
@@ -174,7 +182,7 @@ function InstructionSheet({ game, best, onStart, onClose }: { game: GameConfig; 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4">
       <motion.div
-        className="absolute inset-0 bg-black/60"
+        className="absolute inset-0 bg-outline/60"
         onClick={onClose}
         initial={reduceMotion ? false : { opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -184,29 +192,30 @@ function InstructionSheet({ game, best, onStart, onClose }: { game: GameConfig; 
         role="dialog"
         aria-modal="true"
         aria-label={t(`arcadeGames.${game.i18nKey}.title`)}
-        className="relative max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-t-lg border border-border bg-surface sm:rounded-lg"
-        initial={reduceMotion ? false : { y: 24, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 320, damping: 30 }}
+        className="sticker-lg relative max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-b-none sm:rounded-b-xl"
+        initial={reduceMotion ? false : { y: 24, scale: 0.96, opacity: 0 }}
+        animate={{ y: 0, scale: 1, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 420, damping: 26 }}
       >
-        <button
-          type="button"
+        <Button
+          variant="secondary"
+          size="icon"
           onClick={onClose}
           aria-label={t('arcadeKit.close')}
-          className="absolute right-3 top-3 rounded-md p-2 text-ink-muted transition-colors hover:bg-surface-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand"
+          className="absolute right-3 top-3 z-10 size-9"
         >
-          <X size={18} />
-        </button>
+          <X size={18} weight="bold" />
+        </Button>
 
-        <div className="border-b border-border bg-surface-raised px-6 py-4">
+        <div className="border-b-2 border-outline bg-surface-raised px-6 py-4">
           <GamePreview id={game.id} className="mx-auto h-[84px] w-full max-w-[150px]" />
         </div>
 
         <div className="space-y-4 p-5 sm:p-6">
           <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-              <Icon size={22} className="shrink-0 text-ink-secondary" />
-              <h2 className="font-heading text-xl font-bold text-ink" suppressHydrationWarning>
+            <div className="flex items-center gap-2.5">
+              <IconTile icon={game.icon} tone={game.tone} />
+              <h2 className="font-heading text-2xl font-extrabold leading-tight text-ink" suppressHydrationWarning>
                 {t(`arcadeGames.${game.i18nKey}.title`)}
               </h2>
             </div>
@@ -214,8 +223,8 @@ function InstructionSheet({ game, best, onStart, onClose }: { game: GameConfig; 
           </div>
 
           <section>
-            <h3 className="mb-1 flex items-center gap-1.5 text-sm font-semibold text-ink" suppressHydrationWarning>
-              <Play size={13} weight="fill" className="text-ink-muted" />
+            <h3 className="mb-1 flex items-center gap-1.5 font-heading text-[0.9375rem] font-bold text-ink" suppressHydrationWarning>
+              <Play size={13} weight="fill" aria-hidden className="text-ink-muted" />
               {t('arcadeKit.howToPlay')}
             </h3>
             <p className="text-sm leading-relaxed text-ink-secondary" suppressHydrationWarning>
@@ -224,8 +233,8 @@ function InstructionSheet({ game, best, onStart, onClose }: { game: GameConfig; 
           </section>
 
           <section>
-            <h3 className="mb-1 flex items-center gap-1.5 text-sm font-semibold text-ink" suppressHydrationWarning>
-              <Lightbulb size={14} className="text-ink-muted" />
+            <h3 className="mb-1 flex items-center gap-1.5 font-heading text-[0.9375rem] font-bold text-ink" suppressHydrationWarning>
+              <Lightbulb size={14} weight="fill" aria-hidden className="text-ink-muted" />
               {t('arcadeKit.tip')}
             </h3>
             <p className="text-sm leading-relaxed text-ink-secondary" suppressHydrationWarning>
@@ -234,14 +243,14 @@ function InstructionSheet({ game, best, onStart, onClose }: { game: GameConfig; 
           </section>
 
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-sm font-semibold text-ink" suppressHydrationWarning>
+            <span className="font-heading text-[0.9375rem] font-bold text-ink" suppressHydrationWarning>
               {t('arcadeKit.controls')}
             </span>
             {game.controls.map((control) => {
               const ControlIcon = CONTROL_ICONS[control];
               return (
-                <span key={control} className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs text-ink-secondary" suppressHydrationWarning>
-                  <ControlIcon size={14} className="text-ink-muted" />
+                <span key={control} className="inline-flex items-center gap-1.5 rounded-full border-2 border-outline bg-surface px-2.5 py-1 text-xs font-semibold text-ink-secondary" suppressHydrationWarning>
+                  <ControlIcon size={14} aria-hidden />
                   {t(`arcadeKit.control.${control}`)}
                 </span>
               );
@@ -249,8 +258,8 @@ function InstructionSheet({ game, best, onStart, onClose }: { game: GameConfig; 
           </div>
 
           {best > 0 && (
-            <p className="flex items-center gap-2 text-sm text-ink-secondary" suppressHydrationWarning>
-              <Trophy size={16} weight="fill" className="text-gold" />
+            <p className="flex items-center gap-2 text-sm font-semibold text-ink-secondary" suppressHydrationWarning>
+              <IconTile icon={Trophy} tone="butter" size="sm" />
               {t('arcadeKit.yourBest', { score: best.toLocaleString() })}
             </p>
           )}
@@ -303,39 +312,33 @@ export default function ArcadePanel() {
       <PageHeader
         title={<span suppressHydrationWarning>{t('arcadeUi.title')}</span>}
         description={<span suppressHydrationWarning>{t('arcadeKit.subtitle')}</span>}
+        actions={<ArcadeMiniTimer />}
       />
 
       <p
-        className="mb-5 flex items-start gap-2 rounded-lg border border-border bg-surface px-4 py-3 text-sm text-ink-secondary"
+        className={cn(
+          'sticker-sm mb-6 flex items-start gap-2.5 px-4 py-3 text-sm font-semibold',
+          isFocusRunning ? 'bg-warning-bg text-warning-ink' : 'bg-info-bg text-info-ink',
+        )}
         suppressHydrationWarning
       >
-        <Info size={16} className="mt-0.5 shrink-0 text-ink-muted" />
+        {isFocusRunning ? (
+          <Warning size={18} weight="fill" aria-hidden className="mt-px shrink-0" />
+        ) : (
+          <Info size={18} weight="fill" aria-hidden className="mt-px shrink-0" />
+        )}
         {isFocusRunning ? t('arcadeUi.runningNote') : t('arcadeKit.breakNote')}
       </p>
 
-      <div role="group" aria-label={t('arcadeKit.filterLabel')} className="mb-5 flex flex-wrap gap-1.5">
-        {CATEGORIES.map((category) => {
-          const active = filter === category;
-          return (
-            <button
-              key={category}
-              type="button"
-              aria-pressed={active}
-              onClick={() => setFilter(category)}
-              className={cn(
-                'rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150',
-                'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface-page',
-                active ? 'border-transparent bg-primary text-primary-foreground' : 'border-border text-ink-secondary hover:bg-surface-hover',
-              )}
-              suppressHydrationWarning
-            >
-              {t(`arcadeKit.category.${category}`)}
-            </button>
-          );
-        })}
-      </div>
+      <FilterChipGroup label={t('arcadeKit.filterLabel')} className="mb-6">
+        {CATEGORIES.map((category) => (
+          <FilterChip key={category} active={filter === category} onClick={() => setFilter(category)} suppressHydrationWarning>
+            {t(`arcadeKit.category.${category}`)}
+          </FilterChip>
+        ))}
+      </FilterChipGroup>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-4 pb-1 pr-1 lg:grid-cols-3">
         {visible.map((game) => (
           <GameCard key={game.id} game={game} best={scores[game.id]?.highScore ?? 0} onClick={() => setSelected(game.id)} />
         ))}

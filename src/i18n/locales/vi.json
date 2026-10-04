@@ -1020,7 +1020,18 @@
     "title": "Trò chơi",
     "description": "Trò chơi ngắn cho giờ nghỉ.",
     "runningNote": "Chơi trò chơi sẽ làm gián đoạn phiên tập trung. Hãy hoàn thành phiên trước.",
-    "best": "Điểm cao nhất {score}"
+    "best": "Điểm cao nhất {score}",
+    "miniTimer": {
+      "label": "{phase}: còn {time}",
+      "labelPaused": "{phase}: còn {time}, đồng hồ đang tạm dừng"
+    },
+    "phaseChanged": {
+      "toWork": "Hết giờ nghỉ rồi. Đến lúc quay lại tập trung.",
+      "toBreak": "Xong phiên tập trung. Nghỉ ngơi chút nhé.",
+      "gamePaused": "Trò chơi đã tạm dừng.",
+      "backToTimer": "Về đồng hồ",
+      "dismiss": "Đã hiểu"
+    }
   },
   "settingsUi": {
     "unitMin": "phút",

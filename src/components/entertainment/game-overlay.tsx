@@ -6,8 +6,10 @@ import { ArrowClockwise, ArrowLeft, Pause, Play, Trophy, X } from '@phosphor-ico
 import type { Icon as PhosphorIcon } from '@phosphor-icons/react';
 
 import { Button } from '@/components/ui/button';
+import { IconTile } from '@/components/ui/icon-tile';
 import { useI18n } from '@/contexts/i18n-context';
 import { cn } from '@/lib/utils';
+import { ArcadeMiniTimer, ArcadePhaseNotice, useArcadePhaseNotice } from './arcade-mini-timer';
 import type { GameSession } from './game-kit';
 
 export interface FrameStat {
@@ -17,11 +19,16 @@ export interface FrameStat {
 
 function StatChip({ label, value, strong }: FrameStat & { strong?: boolean }) {
   return (
-    <div className="min-w-[36px] text-right leading-tight">
-      <div className="text-[0.625rem] font-medium uppercase tracking-wide text-ink-muted" suppressHydrationWarning>
+    <div
+      className={cn(
+        'min-w-[3.25rem] rounded-[10px] border-2 border-outline px-2 py-0.5 text-center leading-tight',
+        strong ? 'bg-candy-butter text-on-accent' : 'bg-surface text-ink',
+      )}
+    >
+      <div className={cn('text-[0.6875rem] font-semibold', strong ? 'text-on-accent' : 'text-ink-muted')} suppressHydrationWarning>
         {label}
       </div>
-      <div className={cn('font-heading text-base font-bold tabular-nums', strong ? 'text-ink' : 'text-ink-secondary')}>{value}</div>
+      <div className="font-heading text-base font-extrabold tabular-nums">{value}</div>
     </div>
   );
 }
@@ -31,7 +38,7 @@ interface SegmentedOption<T extends string | number> {
   label: string;
 }
 
-/** Filter-style pill group (filled when active) used for difficulty / size pickers in the ready overlay. */
+/** Filter-chip style pill group (accent fill when active) used for difficulty / size pickers in the ready overlay. */
 export function OptionPills<T extends string | number>({
   label,
   value,
@@ -45,7 +52,7 @@ export function OptionPills<T extends string | number>({
 }) {
   return (
     <div className="flex flex-col items-center gap-1.5">
-      <span className="text-xs font-medium text-ink-muted" suppressHydrationWarning>
+      <span className="text-xs font-semibold text-ink-muted" suppressHydrationWarning>
         {label}
       </span>
       <div role="radiogroup" aria-label={label} className="flex flex-wrap justify-center gap-1.5">
@@ -59,11 +66,10 @@ export function OptionPills<T extends string | number>({
               aria-checked={active}
               onClick={() => onChange(option.value)}
               className={cn(
-                'rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150',
-                'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface-page',
+                'focus-ring h-9 rounded-full border-2 border-outline px-3.5 font-heading text-[0.875rem] font-bold leading-none transition-[background-color,color,box-shadow,transform] duration-100 active:translate-y-px',
                 active
-                  ? 'border-transparent bg-primary text-primary-foreground'
-                  : 'border-border bg-transparent text-ink-secondary hover:bg-surface-hover',
+                  ? 'bg-primary text-on-accent shadow-sticker-sm'
+                  : 'bg-surface text-ink-secondary hover:bg-surface-hover hover:text-ink',
               )}
               suppressHydrationWarning
             >
@@ -76,7 +82,7 @@ export function OptionPills<T extends string | number>({
   );
 }
 
-/** Centered card of content laid over the play area (also usable inside a game for custom states). */
+/** Centered sticker card laid over the play area (also usable inside a game for custom states). */
 export function GameOverlay({
   title,
   description,
@@ -93,13 +99,18 @@ export function GameOverlay({
     <motion.div
       role="group"
       aria-label={title}
-      className={cn('absolute inset-0 z-20 flex items-center justify-center overflow-y-auto bg-surface-page/92 p-5', className)}
+      className={cn('absolute inset-0 z-20 flex items-center justify-center overflow-y-auto bg-surface-page/85 p-5', className)}
       initial={reduceMotion ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.15 }}
     >
-      <div className="my-auto flex w-full max-w-sm flex-col items-center gap-4 text-center">
-        <h2 className="font-heading text-3xl font-bold text-ink" suppressHydrationWarning>
+      <motion.div
+        className="sticker-lg my-auto flex w-full max-w-sm flex-col items-center gap-4 px-6 py-7 text-center"
+        initial={reduceMotion ? false : { scale: 0.92, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 420, damping: 22 }}
+      >
+        <h2 className="font-heading text-3xl font-extrabold leading-tight text-ink" suppressHydrationWarning>
           {title}
         </h2>
         {description && (
@@ -108,20 +119,20 @@ export function GameOverlay({
           </p>
         )}
         {children}
-      </div>
+      </motion.div>
     </motion.div>
   );
 }
 
 export function SummaryRow({ items }: { items: FrameStat[] }) {
   return (
-    <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 rounded-lg border border-border bg-surface px-5 py-3">
+    <div className="sticker-sm flex flex-wrap justify-center gap-x-6 gap-y-2 px-5 py-3">
       {items.map((item) => (
         <div key={item.label} className="text-center leading-tight">
-          <div className="text-[0.6875rem] uppercase tracking-wide text-ink-muted" suppressHydrationWarning>
+          <div className="text-xs font-semibold text-ink-muted" suppressHydrationWarning>
             {item.label}
           </div>
-          <div className="font-heading text-lg font-bold tabular-nums text-ink">{item.value}</div>
+          <div className="font-heading text-lg font-extrabold tabular-nums text-ink">{item.value}</div>
         </div>
       ))}
     </div>
@@ -172,27 +183,31 @@ export function GameFrame({
   const best = Math.max(initialBest, score);
   const isNewBest = finalScore > 0 && finalScore > initialBest;
   const canPause = status === 'playing' || status === 'paused';
+  // A phase change (break over, focus over) pauses the run and says so, instead of letting a
+  // focus session start unnoticed underneath the game.
+  const phase = useArcadePhaseNotice(session.pause);
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-surface-page pb-[env(safe-area-inset-bottom)]">
-      <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border bg-surface px-3 sm:px-5">
-        <div className="hidden min-w-0 items-center gap-2 sm:flex">
-          <Icon size={20} className="shrink-0 text-ink-secondary" />
-          <h1 className="truncate font-heading text-base font-bold text-ink" suppressHydrationWarning>
+      <header className="flex min-h-14 shrink-0 items-center gap-2 border-b-[2.5px] border-outline bg-surface px-3 py-2 sm:px-5">
+        <div className="hidden min-w-0 items-center gap-2.5 sm:flex">
+          <IconTile icon={Icon} tone="peach" size="sm" />
+          <h1 className="truncate font-heading text-base font-extrabold text-ink" suppressHydrationWarning>
             {title}
           </h1>
         </div>
-        <div className="flex flex-1 items-center justify-start gap-3 sm:justify-center sm:gap-6">
+        <div className="flex flex-1 items-center justify-start gap-2 sm:justify-center sm:gap-4">
           <StatChip label={scoreLabel ?? t('arcadeKit.score')} value={score.toLocaleString()} strong />
           <StatChip label={t('arcadeKit.best')} value={best.toLocaleString()} />
           {stats.map((s) => (
             <StatChip key={s.label} {...s} />
           ))}
         </div>
-        <div className="flex shrink-0 items-center gap-1">
+        <div className="flex shrink-0 items-center gap-1.5">
           <Button
-            variant="ghost"
+            variant="secondary"
             size="icon"
+            className="size-9 sm:size-10"
             disabled={!canPause}
             onClick={(e) => {
               e.currentTarget.blur();
@@ -203,21 +218,28 @@ export function GameFrame({
             {status === 'paused' ? <Play size={18} weight="fill" /> : <Pause size={18} weight="fill" />}
           </Button>
           <Button
-            variant="ghost"
+            variant="secondary"
             size="icon"
+            className="size-9 sm:size-10"
             onClick={(e) => {
               e.currentTarget.blur();
               onRestart();
             }}
             aria-label={t('arcadeKit.restart')}
           >
-            <ArrowClockwise size={18} />
+            <ArrowClockwise size={18} weight="bold" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={session.close} aria-label={t('arcadeKit.close')}>
-            <X size={18} />
+          <Button variant="secondary" size="icon" className="size-9 sm:size-10" onClick={session.close} aria-label={t('arcadeKit.close')}>
+            <X size={18} weight="bold" />
           </Button>
         </div>
       </header>
+
+      <div className="flex shrink-0 items-center justify-between gap-2 border-b-2 border-border bg-surface-raised px-3 py-1.5 sm:px-5">
+        <ArcadeMiniTimer />
+      </div>
+
+      {phase.changedTo && <ArcadePhaseNotice to={phase.changedTo} gamePaused={status === 'paused'} onDismiss={phase.dismiss} />}
 
       <div className="relative flex min-h-0 flex-1 flex-col">
         {children}
@@ -237,18 +259,18 @@ export function GameFrame({
 
         {status === 'paused' && (
           <GameOverlay title={t('arcadeKit.paused')} description={t('arcadeKit.pausedHint')}>
-            <div className="flex flex-wrap justify-center gap-2">
+            <div className="flex flex-wrap justify-center gap-3">
               <Button size="lg" className="gap-2" autoFocus onClick={session.resume}>
                 <Play size={18} weight="fill" />
                 <span suppressHydrationWarning>{t('arcadeKit.resume')}</span>
               </Button>
               <Button size="lg" variant="secondary" className="gap-2" onClick={onRestart}>
-                <ArrowClockwise size={18} />
+                <ArrowClockwise size={18} weight="bold" />
                 <span suppressHydrationWarning>{t('arcadeKit.restart')}</span>
               </Button>
             </div>
             <Button variant="ghost" size="sm" className="gap-1.5" onClick={session.close}>
-              <ArrowLeft size={14} />
+              <ArrowLeft size={14} weight="bold" />
               <span suppressHydrationWarning>{t('arcadeKit.backToGames')}</span>
             </Button>
           </GameOverlay>
@@ -257,23 +279,23 @@ export function GameFrame({
         {status === 'over' && (
           <GameOverlay title={overTitle ?? t('arcadeKit.gameOver')}>
             <div className="flex flex-col items-center gap-1">
-              <span className="text-xs font-medium uppercase tracking-wide text-ink-muted" suppressHydrationWarning>
+              <span className="text-sm font-semibold text-ink-muted" suppressHydrationWarning>
                 {scoreLabel ?? t('arcadeKit.score')}
               </span>
-              <span className="font-heading text-5xl font-bold tabular-nums text-ink">{finalScore.toLocaleString()}</span>
-              <span className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-ink-secondary" suppressHydrationWarning>
-                <Trophy size={16} weight="fill" className="text-gold" />
+              <span className="font-heading text-5xl font-extrabold tabular-nums text-ink">{finalScore.toLocaleString()}</span>
+              <span className="mt-2 inline-flex items-center gap-2 text-sm font-bold text-ink-secondary" suppressHydrationWarning>
+                <IconTile icon={Trophy} tone="butter" size="sm" />
                 {isNewBest ? t('arcadeKit.newBest') : t('arcadeKit.bestIs', { score: Math.max(initialBest, finalScore).toLocaleString() })}
               </span>
             </div>
             {overSummary}
-            <div className="flex flex-wrap justify-center gap-2">
+            <div className="flex flex-wrap justify-center gap-3">
               <Button size="lg" className="gap-2" autoFocus onClick={onRestart}>
-                <ArrowClockwise size={18} />
+                <ArrowClockwise size={18} weight="bold" />
                 <span suppressHydrationWarning>{t('arcadeKit.playAgain')}</span>
               </Button>
               <Button size="lg" variant="secondary" className="gap-2" onClick={session.close}>
-                <ArrowLeft size={16} />
+                <ArrowLeft size={16} weight="bold" />
                 <span suppressHydrationWarning>{t('arcadeKit.backToGames')}</span>
               </Button>
             </div>
@@ -303,7 +325,7 @@ export function GameCanvas({
 } & React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div ref={stage.containerRef} className={cn('flex min-h-0 flex-1 touch-none select-none items-center justify-center', className)} {...handlers}>
-      <canvas ref={stage.canvasRef} className={cn('rounded-lg border border-border bg-surface', canvasClassName)} />
+      <canvas ref={stage.canvasRef} className={cn('rounded-lg bg-surface ring-[2.5px] ring-outline shadow-sticker-sm', canvasClassName)} />
     </div>
   );
 }

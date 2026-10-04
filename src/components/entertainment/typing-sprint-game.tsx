@@ -111,14 +111,14 @@ export function TypingSprintGame(props: GameProps) {
                 key={wordIndex}
                 className={cn(
                   'mr-2.5 inline-block rounded px-1',
-                  done && (results[wordIndex] ? 'text-success' : 'text-danger line-through decoration-1'),
+                  done && (results[wordIndex] ? 'text-success-ink' : 'text-danger-ink line-through decoration-1'),
                   !done && !isCurrent && 'text-ink-muted',
                   isCurrent && 'bg-surface-raised text-ink',
                 )}
               >
                 {isCurrent
                   ? word.split('').map((ch, ci) => (
-                      <span key={ci} className={ci < typed.length ? (ci < matched ? 'text-ink' : 'text-danger') : 'text-ink-muted'}>
+                      <span key={ci} className={ci < typed.length ? (ci < matched ? 'text-ink' : 'text-danger-ink') : 'text-ink-muted'}>
                         {ch}
                       </span>
                     ))

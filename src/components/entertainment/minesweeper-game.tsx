@@ -262,7 +262,7 @@ export function MinesweeperGame(props: GameProps) {
           className={cn(
             'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors duration-150',
             'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface-page',
-            flagMode ? 'border-transparent bg-primary text-primary-foreground' : 'border-border text-ink-secondary hover:bg-surface-hover',
+            flagMode ? 'border-transparent bg-primary text-on-accent' : 'border-border text-ink-secondary hover:bg-surface-hover',
           )}
           suppressHydrationWarning
         >
