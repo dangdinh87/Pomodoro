@@ -76,6 +76,7 @@ export default function StatsPanel() {
     if (!hasSession) {
         return (
             <PanelBody>
+                <PageHeader title={t("historyUi.title")} description={t("historyUi.description")} />
                 <EmptyState
                     title={t("auth.signInToViewStats")}
                     action={
