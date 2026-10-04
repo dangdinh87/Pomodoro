@@ -12,7 +12,7 @@ import { ImageResponse } from 'next/og';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { TOMO_LIGHT_PALETTE, tomoSvg } from '@/components/brand/tomo-art';
-import { DEFAULT_LANG, isLang, type Lang } from '@/lib/i18n/negotiate-locale';
+import { DEFAULT_LANG, SUPPORTED_LANGS, isLang, type Lang } from '@/lib/i18n/negotiate-locale';
 import type { LangParams } from '@/lib/i18n/route-lang';
 import { SHARE_IMAGE_SIZE } from '@/lib/seo/share-image';
 import { getT } from '@/lib/server-translations';
@@ -20,6 +20,12 @@ import { getT } from '@/lib/server-translations';
 export const alt = getT(DEFAULT_LANG)('site.meta.og.alt');
 export const size = SHARE_IMAGE_SIZE;
 export const contentType = 'image/png';
+
+// Without this the route is a function (`ƒ`) that redraws the PNG on every request, with
+// `max-age=0`: the layout's generateStaticParams does not reach a metadata route.
+export function generateStaticParams() {
+  return SUPPORTED_LANGS.map((lang) => ({ lang }));
+}
 
 // Static assets: read once at module scope (see the next/og "Custom fonts" guide).
 const baloo800 = await readFile(join(process.cwd(), 'assets/fonts/Baloo2-ExtraBold.ttf'));

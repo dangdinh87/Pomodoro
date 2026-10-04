@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { getT } from '@/lib/server-translations';
-import Image, { alt, contentType, size } from './opengraph-image';
+import Image, { alt, contentType, generateStaticParams, size } from './opengraph-image';
 
 const font = (name: string) => readFileSync(join(process.cwd(), 'assets/fonts', name));
 
@@ -52,6 +52,10 @@ describe('share image', () => {
     expect(size).toEqual({ width: 1200, height: 630 });
     expect(contentType).toBe('image/png');
     expect(alt).toBe(getT('en')('site.meta.og.alt'));
+  });
+
+  it('is prerendered once per supported language (otherwise it is a function that redraws on every request)', () => {
+    expect(generateStaticParams()).toEqual([{ lang: 'en' }, { lang: 'vi' }, { lang: 'ja' }]);
   });
 
   it.each(['en', 'vi', 'ja'])('renders a PNG of the right size for %s', async (lang) => {
