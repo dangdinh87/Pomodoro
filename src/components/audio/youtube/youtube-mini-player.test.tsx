@@ -57,6 +57,7 @@ class FakePlayer {
   mute = vi.fn();
   unMute = vi.fn();
   destroy = vi.fn(() => this.iframe.remove());
+  getIframe = () => this.iframe;
 }
 
 const lastPlayer = () => FakePlayer.instances[FakePlayer.instances.length - 1];
@@ -213,6 +214,8 @@ describe('YouTube mini player: the page tree is replaced while it plays', () => 
     view.unmount();
 
     expect(player.destroy).toHaveBeenCalled();
+    // the iframe left the page with the card: calling into it only makes YouTube warn "not attached to the DOM"
+    expect(player.stopVideo).not.toHaveBeenCalled();
     expect(useYouTubeStore.getState()).toMatchObject({ status: 'stopped', source: null });
     expect(useAudioStore.getState().currentlyPlaying).toBeNull();
     expect(document.querySelector('iframe')).toBeNull();

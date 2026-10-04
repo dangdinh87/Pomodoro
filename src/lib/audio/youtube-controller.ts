@@ -32,6 +32,7 @@ interface YTPlayer {
   mute?: () => void;
   unMute?: () => void;
   getPlayerState?: () => number;
+  getIframe?: () => HTMLIFrameElement | null;
   destroy?: () => void;
 }
 
@@ -256,7 +257,9 @@ export function stopYouTube(errorKey?: string): void {
   player = null;
   window.__globalYTPlayer = null;
   try {
-    current?.stopVideo?.();
+    // An iframe that already left the page (its card unmounted) cannot be told to stop, and YouTube warns
+    // "not attached to the DOM" if asked; destroying it is still fine.
+    if (current?.getIframe?.()?.isConnected !== false) current?.stopVideo?.();
     current?.destroy?.();
   } catch {
     // The player may already be gone (tab closed it, API reloaded)
