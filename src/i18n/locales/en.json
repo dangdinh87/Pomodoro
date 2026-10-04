@@ -174,7 +174,6 @@
       "cancel": "Cancel"
     },
     "toasts": {
-      "saved": "Timer settings saved",
       "reset": "Timer settings restored to defaults"
     },
     "presets": {

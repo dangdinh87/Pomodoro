@@ -50,7 +50,9 @@ export function useTimerEngine() {
   const { t } = useI18n();
   // The loop closures outlive renders; keep the language they notify in current
   const tRef = useRef(t);
-  tRef.current = t;
+  useEffect(() => {
+    tRef.current = t;
+  }, [t]);
   const isRunning = useTimerStore((state) => state.isRunning);
   // Re-arm the interval when only the deadline changes (pause/resume coalesced
   // across tabs, or adopting another tab's state)
