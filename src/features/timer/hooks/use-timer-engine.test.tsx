@@ -604,3 +604,103 @@ describe('useTimerEngine deadline timeout (throttled background tab)', () => {
     expect(mockPreloadAlarm).toHaveBeenCalled();
   });
 });
+
+// The engine lives in (main): leaving it by client navigation (/guide, /privacy, /terms)
+// unmounts it while the store keeps its in-memory (now stale) `timeLeft`.
+describe('useTimerEngine remount after client navigation', () => {
+  beforeEach(() => {
+    installMemoryStorage();
+    vi.useFakeTimers();
+    nextInstant();
+    vi.clearAllMocks();
+  });
+  afterEach(() => vi.useRealTimers());
+
+  const away = (ms: number) => vi.setSystemTime(Date.now() + ms);
+  const advance = (ms: number) =>
+    act(() => {
+      vi.advanceTimersByTime(ms);
+    });
+  const runningFiveMinutes = () =>
+    resetStore({
+      timeLeft: 300,
+      lastSessionTimeLeft: 300,
+      isRunning: true,
+      deadlineAt: T + 5 * MINUTE,
+      settings: { ...quick, autoStartBreak: false },
+    });
+
+  it('keeps the original deadline: 3 minutes away take 3 minutes off the clock', () => {
+    runningFiveMinutes();
+    const first = renderHook(() => useTimerEngine());
+    advance(1000);
+    first.unmount(); // user opens /guide
+    away(3 * MINUTE); // the store still says timeLeft ~299
+
+    renderHook(() => useTimerEngine()); // and comes back
+    const s = useTimerStore.getState();
+    expect(s.deadlineAt).toBe(T + 5 * MINUTE);
+    expect(s.timeLeft).toBe(300 - 1 - 180); // original minus the 1 s it ran and the 3 minutes away
+    expect(s.isRunning).toBe(true);
+
+    // still completes at the ORIGINAL deadline, once
+    advance(2 * MINUTE);
+    expect(mockRecord).toHaveBeenCalledTimes(1);
+    expect(mockRecord).toHaveBeenCalledWith(expect.objectContaining({ mode: 'work', endedAt: T + 5 * MINUTE }));
+  });
+
+  it('is exact when the engine was unmounted from the very start of the run', () => {
+    runningFiveMinutes();
+    renderHook(() => useTimerEngine()).unmount();
+    away(2 * MINUTE);
+    renderHook(() => useTimerEngine());
+    expect(useTimerStore.getState().timeLeft).toBe(180);
+    expect(useTimerStore.getState().deadlineAt).toBe(T + 5 * MINUTE);
+  });
+
+  it('completes exactly once when the deadline passed while away (recorded at the real end, no late alarm)', () => {
+    runningFiveMinutes();
+    renderHook(() => useTimerEngine()).unmount();
+    away(5 * MINUTE + 2 * MINUTE); // deadline passed 2 minutes ago
+
+    renderHook(() => useTimerEngine());
+    advance(5000);
+
+    expect(mockRecord).toHaveBeenCalledTimes(1);
+    expect(mockRecord).toHaveBeenCalledWith(
+      expect.objectContaining({ mode: 'work', completedFullSession: true, endedAt: T + 5 * MINUTE }),
+    );
+    expect(mockPlayAlarm).not.toHaveBeenCalled();
+    expect(useTimerStore.getState()).toMatchObject({ mode: 'shortBreak', isRunning: false, deadlineAt: null });
+
+    advance(10 * MINUTE);
+    expect(mockRecord).toHaveBeenCalledTimes(1);
+  });
+
+  it('completes once under StrictMode when the deadline passed while away', () => {
+    runningFiveMinutes();
+    renderHook(() => useTimerEngine()).unmount();
+    away(6 * MINUTE);
+    renderHook(() => useTimerEngine(), { wrapper: StrictMode });
+    advance(5000);
+    expect(mockRecord).toHaveBeenCalledTimes(1);
+  });
+
+  it('leaves the completion to the other tab that already claimed it', () => {
+    runningFiveMinutes();
+    renderHook(() => useTimerEngine()).unmount();
+    away(6 * MINUTE);
+    window.localStorage.setItem('timer-completion-claim', `work:${T + 5 * MINUTE}|some-other-tab`);
+    renderHook(() => useTimerEngine());
+    advance(5000);
+    expect(mockRecord).not.toHaveBeenCalled();
+  });
+
+  it('does not touch a paused timer on remount', () => {
+    resetStore({ timeLeft: 123, isRunning: false, deadlineAt: null });
+    renderHook(() => useTimerEngine()).unmount();
+    away(10 * MINUTE);
+    renderHook(() => useTimerEngine());
+    expect(useTimerStore.getState()).toMatchObject({ timeLeft: 123, isRunning: false, deadlineAt: null });
+  });
+});

@@ -66,6 +66,19 @@ export function useTimerEngine() {
     return () => unsub();
   }, []);
 
+  // A running timer is defined by its deadline, never by the in-memory countdown.
+  // Leaving (main) by client navigation (/guide, /privacy, /terms) unmounts this
+  // engine while the store keeps the `timeLeft` of the moment it left; without
+  // this the arming below would see a deadline that disagrees with that stale
+  // value and push the deadline forward by the time spent away. A deadline that
+  // already passed gives 0, which the main loop then completes (catch-up).
+  useEffect(() => {
+    const { isRunning: running, deadlineAt, timeLeft } = useTimerStore.getState();
+    if (!running || deadlineAt === null) return;
+    const remaining = Math.ceil(Math.max(0, deadlineAt - Date.now()) / 1000);
+    if (remaining !== timeLeft) setTimeLeft(remaining);
+  }, [setTimeLeft]);
+
   // Presence (pointer / key / focus / tab visible) feeds the auto-chain guard;
   // coming back to the tab also rolls the daily session counter over.
   useEffect(() => {
