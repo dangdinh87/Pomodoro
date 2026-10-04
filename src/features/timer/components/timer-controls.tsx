@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useState, useEffect } from 'react';
+import { memo, useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Pause, Play, ArrowCounterClockwise, SkipForward } from '@phosphor-icons/react/dist/ssr';
 import { Kbd } from '@/components/ui/kbd';
@@ -23,6 +23,7 @@ import { requestNotificationPermission } from '@/lib/timer/notifications';
 import { useTasksStore } from '@/stores/task-store';
 import { mayAutoChain } from '@/lib/timer/auto-chain';
 import { requestTimerReset } from '../lib/request-reset';
+import { registerTimerSkip, requestTimerSkip } from '../lib/request-skip';
 
 // Minimum completion percentage to count as a valid pomodoro
 const MINIMUM_COMPLETION_PERCENT = 50;
@@ -175,6 +176,13 @@ export const TimerControls = memo(function TimerControls() {
         handleSessionComplete(skipWithoutRecording);
     };
 
+    // Let requestTimerSkip() (the ⌘K command) reach the latest handler: same rules as the button
+    const skipRef = useRef(handleSkipClick);
+    useEffect(() => {
+        skipRef.current = handleSkipClick;
+    });
+    useEffect(() => registerTimerSkip(() => skipRef.current()), []);
+
     const toggleTimer = () => {
         if (isProcessing) return;
         if (!isRunning) {
@@ -233,7 +241,7 @@ export const TimerControls = memo(function TimerControls() {
                     </Button>
 
                     <Button
-                        onClick={handleSkipClick}
+                        onClick={requestTimerSkip}
                         disabled={isProcessing}
                         variant="secondary"
                         size="icon"

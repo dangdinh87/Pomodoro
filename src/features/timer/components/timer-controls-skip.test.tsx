@@ -1,7 +1,8 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { act, render, screen, fireEvent } from '@testing-library/react';
 import confetti from 'canvas-confetti';
 import { useTimerStore } from '@/stores/timer-store';
 import { useTasksStore } from '@/stores/task-store';
+import { requestTimerSkip } from '../lib/request-skip';
 import { TimerControls } from './timer-controls';
 
 const mockRecord = vi.fn();
@@ -48,5 +49,41 @@ describe('TimerControls skip', () => {
     fireEvent.click(screen.getByTitle('timer.controls.skip_hint'));
 
     expect(confetti).not.toHaveBeenCalled();
+  });
+
+  it('requestTimerSkip (the command palette) skips exactly like the button: records, never earns a pomodoro', () => {
+    render(<TimerControls />);
+    act(() => {
+      expect(requestTimerSkip()).toBe(true);
+    });
+
+    expect(mockRecord).toHaveBeenCalledTimes(1);
+    expect(mockRecord).toHaveBeenCalledWith({
+      taskId: 'task-1',
+      durationSec: 900,
+      mode: 'work',
+      completedFullSession: false,
+    });
+  });
+
+  it('requestTimerSkip on a running timer asks first and records only after confirming', () => {
+    useTimerStore.setState({ isRunning: true, deadlineAt: Date.now() + 600_000 });
+    render(<TimerControls />);
+    act(() => {
+      requestTimerSkip();
+    });
+
+    expect(screen.getByText('timer.skip_confirm.title')).toBeInTheDocument();
+    expect(mockRecord).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByText('timer.skip_confirm.confirm'));
+    expect(mockRecord).toHaveBeenCalledTimes(1);
+  });
+
+  it('stops answering once the controls unmount', () => {
+    const { unmount } = render(<TimerControls />);
+    unmount();
+    expect(requestTimerSkip()).toBe(false);
+    expect(mockRecord).not.toHaveBeenCalled();
   });
 });

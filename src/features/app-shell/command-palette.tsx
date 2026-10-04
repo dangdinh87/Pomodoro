@@ -28,12 +28,13 @@ import { isFeatureEnabled } from '@/config/feature-flags';
 import { LANGS, useI18n } from '@/contexts/i18n-context';
 import { localePath } from '@/lib/i18n/locale-path';
 import { requestTimerReset } from '@/features/timer/lib/request-reset';
+import { requestTimerSkip } from '@/features/timer/lib/request-skip';
 import { switchTimerMode, timerHasProgress } from '@/features/timer/lib/timer-mode';
 import { useAuth } from '@/hooks/use-auth';
 import { useAudioStore } from '@/stores/audio-store';
 import { useTimerStore, type TimerMode } from '@/stores/timer-store';
 import { canFullscreen, toggleFullscreen } from './fullscreen';
-import { openTaskQuickAdd, pressSkipButton } from './palette-actions';
+import { openTaskQuickAdd } from './palette-actions';
 import { PANELS } from './panel-registry';
 import { openPanel, PANEL_IDS } from './panel-store';
 import { openShortcutHelp, ShortcutHelp } from './shortcut-help';
@@ -121,7 +122,7 @@ export function CommandPalette() {
                 <Row
                   icon={SkipForward}
                   tone="surface"
-                  onSelect={() => run(() => pressSkipButton(t('timer.controls.skip_hint')))}
+                  onSelect={() => run(requestTimerSkip)}
                 >
                   {t('shell.palette.skip')}
                 </Row>

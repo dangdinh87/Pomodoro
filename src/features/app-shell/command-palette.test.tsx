@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useAudioStore } from '@/stores/audio-store';
 import { useTimerStore } from '@/stores/timer-store';
 import { useResetDialogStore } from '@/features/timer/lib/request-reset';
+import { registerTimerSkip } from '@/features/timer/lib/request-skip';
 import { CommandPalette, usePaletteStore } from './command-palette';
 import { usePanelStore } from './panel-store';
 import { useShortcutHelpStore } from './shortcut-help';
@@ -66,7 +67,6 @@ describe('CommandPalette commands', () => {
   });
   afterEach(() => {
     Reflect.deleteProperty(document.documentElement, 'requestFullscreen');
-    document.body.querySelectorAll('[data-test-skip]').forEach((el) => el.remove());
   });
 
   const pick = async (label: string) => {
@@ -104,17 +104,20 @@ describe('CommandPalette commands', () => {
     expect(toggleMute).toHaveBeenCalledTimes(2);
   });
 
-  it('Skip presses the timer\'s own skip button, so its confirmation and recording rules still apply', async () => {
-    const skip = document.createElement('button');
-    skip.setAttribute('aria-label', 'timer.controls.skip_hint');
-    skip.setAttribute('data-test-skip', '');
-    const onClick = vi.fn();
-    skip.addEventListener('click', onClick);
-    document.body.appendChild(skip);
+  it('Skip goes through requestTimerSkip, the same entry point as the skip button', async () => {
+    const onSkip = vi.fn();
+    const unregister = registerTimerSkip(onSkip);
 
     render(<CommandPalette />);
     await pick('shell.palette.skip');
-    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(onSkip).toHaveBeenCalledTimes(1);
+    expect(usePaletteStore.getState().open).toBe(false);
+    unregister();
+  });
+
+  it('Skip with no timer mounted just closes the palette', async () => {
+    render(<CommandPalette />);
+    await pick('shell.palette.skip');
     expect(usePaletteStore.getState().open).toBe(false);
   });
 
