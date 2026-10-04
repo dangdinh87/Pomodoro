@@ -2,9 +2,10 @@
 
 import { useRef, useState, type Ref } from 'react'
 import { Button } from '@/components/ui/button'
+import { FilterChip, FilterChipGroup } from '@/components/ui/filter-chip'
+import { IconTile } from '@/components/ui/icon-tile'
 import { Switch } from '@/components/ui/switch'
-import { Minus, Plus, X } from '@phosphor-icons/react/dist/ssr';
-import { cn } from '@/lib/utils'
+import { ArrowsClockwise, Clock, Minus, Plus, Timer, X } from '@phosphor-icons/react/dist/ssr';
 import { defaultSettings, useTimerStore, type TimerSettings as TimerSettingsData } from '@/stores/timer-store'
 import { useAudioStore } from '@/stores/audio-store'
 import { toast } from 'sonner'
@@ -51,14 +52,15 @@ function DurationStepper({
     decLabel: string
     incLabel: string
 }) {
-    const stepBtn = 'flex w-10 shrink-0 items-center justify-center text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink focus-visible:outline-hidden focus-visible:bg-surface-hover'
+    // Outlined number field like Input and Select: control edge, small hard shadow, accent shadow and ring on focus.
+    const stepBtn = 'flex w-11 shrink-0 items-center justify-center text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink focus-visible:bg-surface-hover focus-visible:text-ink focus-visible:outline-hidden'
     return (
         <div className="min-w-0 space-y-1.5">
-            <label htmlFor={id} className="block truncate text-[0.8125rem] font-semibold text-ink">
+            <label htmlFor={id} className="block text-[0.8125rem] font-semibold leading-snug text-ink">
                 {label}
-                <span className="ml-1 font-normal text-ink-muted">· {unit}</span>
+                <span className="ml-1 whitespace-nowrap font-normal text-ink-muted">· {unit}</span>
             </label>
-            <div className="flex h-11 items-stretch divide-x divide-border overflow-hidden rounded-md border border-border bg-surface focus-within:border-transparent focus-within:ring-2 focus-within:ring-brand sm:h-10">
+            <div className="flex h-[42px] items-stretch divide-x-2 divide-control-edge overflow-hidden rounded-md border-[length:var(--outline-w)] border-control-edge bg-surface shadow-sticker-sm transition-shadow duration-100 focus-within:shadow-[2px_2px_0_var(--accent-solid)] focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-ring">
                 <button type="button" className={stepBtn} onClick={() => onStep(-1)} aria-label={decLabel}>
                     <Minus size={14} weight="bold" aria-hidden />
                 </button>
@@ -79,7 +81,7 @@ function DurationStepper({
                         if (e.key === 'ArrowDown') { e.preventDefault(); onStep(-1) }
                         if (e.key === 'Enter') onCommit()
                     }}
-                    className="min-w-0 flex-1 bg-transparent text-center text-base font-semibold tabular-nums text-ink outline-hidden"
+                    className="min-w-0 flex-1 bg-transparent text-center font-heading text-lg font-bold tabular-nums text-ink outline-hidden"
                 />
                 <button type="button" className={stepBtn} onClick={() => onStep(1)} aria-label={incLabel}>
                     <Plus size={14} weight="bold" aria-hidden />
@@ -88,10 +90,6 @@ function DurationStepper({
         </div>
     )
 }
-
-const pillBase = 'inline-flex h-9 items-center justify-center rounded-full px-3.5 text-[0.8125rem] font-semibold tabular-nums transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface'
-const pillOn = 'bg-primary text-primary-foreground'
-const pillOff = 'bg-surface-raised text-ink-secondary hover:bg-surface-hover hover:text-ink'
 
 export function TimerSettings({ onClose }: { onClose?: () => void }) {
     const { t } = useI18n()
@@ -174,33 +172,27 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
 
     const body = (
         <div className="space-y-8">
-            <SettingsSection title={t('timerSettings.labels.timerDurations')}>
-                <div className="space-y-3 px-5 py-4">
-                    <p id="duration-presets-label" className="text-[0.9375rem] font-semibold text-ink">{t('timerSettings.presets.title')}</p>
-                    <div role="group" aria-labelledby="duration-presets-label" className="flex flex-wrap gap-2">
+            <SettingsSection title={t('timerSettings.labels.timerDurations')} icon={Timer} tone="mint">
+                <div className="space-y-3 px-4 py-4 sm:px-5">
+                    <p className="text-[0.9375rem] font-bold text-ink">{t('timerSettings.presets.title')}</p>
+                    <FilterChipGroup label={t('timerSettings.presets.title')} className="flex-wrap overflow-visible">
                         {DURATION_PRESETS.map((p, i) => (
-                            <button
+                            <FilterChip
                                 key={`${p.workDuration}-${p.shortBreakDuration}`}
-                                type="button"
-                                aria-pressed={activePreset === i}
+                                active={activePreset === i}
                                 aria-label={t('timerSettings.presets.label', { focus: p.workDuration, rest: p.shortBreakDuration })}
                                 onClick={() => applyPreset(i)}
-                                className={cn(pillBase, activePreset === i ? pillOn : pillOff)}
+                                className="tabular-nums"
                             >
                                 {p.workDuration} / {p.shortBreakDuration}
-                            </button>
+                            </FilterChip>
                         ))}
-                        <button
-                            type="button"
-                            aria-pressed={activePreset === -1}
-                            onClick={() => workInput.current?.focus()}
-                            className={cn(pillBase, activePreset === -1 ? pillOn : pillOff)}
-                        >
+                        <FilterChip active={activePreset === -1} onClick={() => workInput.current?.focus()}>
                             {t('timerSettings.presets.custom')}
-                        </button>
-                    </div>
+                        </FilterChip>
+                    </FilterChipGroup>
                 </div>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-4 px-5 py-4 lg:grid-cols-4">
+                <div className="grid grid-cols-2 items-end gap-x-4 gap-y-4 px-4 py-4 sm:px-5 lg:grid-cols-4">
                     {durationFields.map((f) => (
                         <DurationStepper
                             key={f.key}
@@ -217,12 +209,12 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                         />
                     ))}
                 </div>
-                <p className="px-5 py-3 text-[0.8125rem] text-ink-muted">
+                <p className="px-4 py-3 text-[0.8125rem] text-ink-muted sm:px-5">
                     {t('timerSettings.cycleSummary', { sessions: live.longBreakInterval, total: cycleMinutes(live) })}
                 </p>
             </SettingsSection>
 
-            <SettingsSection title={t('timerSettings.labels.behavior')}>
+            <SettingsSection title={t('timerSettings.labels.behavior')} icon={ArrowsClockwise} tone="butter">
                 {toggleRow('auto-start-break', t('timerSettings.labels.autoStartBreaks'), t('settingsUi.autoStartBreakHint'), 'autoStartBreak')}
                 {toggleRow('auto-start-work', t('timerSettings.labels.autoStartWork'), t('settingsUi.autoStartWorkHint'), 'autoStartWork')}
                 {toggleRow('low-time-warning', t('timerSettings.labels.lowTimeWarning'), t('settingsUi.lowTimeWarningHint'), 'lowTimeWarningEnabled')}
@@ -230,10 +222,10 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
 
             <BellNotificationsSection onChange={flash} />
 
-            <SettingsSection title={t('timerSettings.labels.clockDisplay')}>
-                <div className="space-y-3 px-5 py-4">
+            <SettingsSection title={t('timerSettings.labels.clockDisplay')} icon={Clock} tone="lilac">
+                <div className="space-y-3 px-4 py-4 sm:px-5">
                     <div className="space-y-0.5">
-                        <p id="clock-style-label" className="text-[0.9375rem] font-semibold text-ink">{t('timerSettings.labels.clockStyle')}</p>
+                        <p id="clock-style-label" className="text-[0.9375rem] font-bold text-ink">{t('timerSettings.labels.clockStyle')}</p>
                         <p className="text-[0.8125rem] text-ink-muted">{t('settingsUi.clockStyleHint')}</p>
                     </div>
                     <ClockStylePicker
@@ -248,18 +240,20 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                     )}
                 </div>
                 <SettingsRow label={t('timerSettings.labels.clockSize')} description={t('settingsUi.clockSizeHint')}>
+                    {/* One choice of three: radios by role, chips by look (FilterChip's aria-pressed is dropped) */}
                     <div role="radiogroup" aria-label={t('timerSettings.labels.clockSize')} className="flex gap-2 sm:justify-end">
                         {SIZES.map((size) => (
-                            <button
+                            <FilterChip
                                 key={size}
-                                type="button"
                                 role="radio"
                                 aria-checked={settings.clockSize === size}
+                                aria-pressed={undefined}
+                                active={settings.clockSize === size}
                                 onClick={() => save({ clockSize: size })}
-                                className={cn(pillBase, 'flex-1 sm:flex-none', settings.clockSize === size ? pillOn : pillOff)}
+                                className="flex-1 justify-center sm:flex-none"
                             >
                                 {sizeLabels[size]}
-                            </button>
+                            </FilterChip>
                         ))}
                     </div>
                 </SettingsRow>
@@ -271,8 +265,8 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
         return (
             <div className="space-y-6">
                 {body}
-                <div className="flex items-center justify-between border-t border-border pt-4">
-                    <Button variant="outline" onClick={resetToDefaults}>{t('timerSettings.actions.resetDefaults')}</Button>
+                <div className="flex items-center justify-between border-t-2 border-border pt-4">
+                    <Button variant="secondary" onClick={resetToDefaults}>{t('timerSettings.actions.resetDefaults')}</Button>
                     <SavedIndicator show={saved} />
                 </div>
             </div>
@@ -281,22 +275,23 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
 
     return (
         <div className="flex h-full flex-col">
-            <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border bg-surface px-4 py-3 sm:px-6 sm:py-4">
+            <div className="flex shrink-0 items-center justify-between gap-3 border-b-2 border-border bg-surface px-4 py-3 sm:px-6">
                 <div className="flex min-w-0 items-center gap-3">
-                    <h2 className="truncate font-heading text-lg font-semibold text-ink">{t('timerSettings.title')}</h2>
+                    <IconTile icon={Timer} tone="mint" size="lg" className="max-sm:size-9" />
+                    <h2 className="truncate font-heading text-xl font-extrabold tracking-[-0.01em] text-ink">{t('timerSettings.title')}</h2>
                     <SavedIndicator show={saved} />
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
-                    <Button variant="outline" onClick={resetToDefaults} size="sm" className="hidden sm:inline-flex">{t('timerSettings.actions.resetDefaults')}</Button>
-                    <Button variant="ghost" size="icon" onClick={onClose}>
-                        <X size={16} />
+                    <Button variant="secondary" onClick={resetToDefaults} size="sm" className="hidden sm:inline-flex">{t('timerSettings.actions.resetDefaults')}</Button>
+                    <Button variant="secondary" size="icon" onClick={onClose} className="size-9 rounded-full">
+                        <X size={16} weight="bold" aria-hidden="true" />
                         <span className="sr-only">{t('common.close')}</span>
                     </Button>
                 </div>
             </div>
             <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6">
                 {body}
-                <Button variant="outline" onClick={resetToDefaults} className="mt-8 w-full sm:hidden">{t('timerSettings.actions.resetDefaults')}</Button>
+                <Button variant="secondary" onClick={resetToDefaults} className="mt-8 w-full sm:hidden">{t('timerSettings.actions.resetDefaults')}</Button>
             </div>
         </div>
     )

@@ -1,6 +1,8 @@
 "use client"
 
 import { useSyncExternalStore } from 'react'
+import { BellRinging } from '@phosphor-icons/react/dist/ssr'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Slider } from '@/components/ui/slider'
@@ -51,7 +53,7 @@ export function BellNotificationsSection({ onChange }: { onChange?: () => void }
     const current = notificationStatus[notificationState]
 
     return (
-        <SettingsSection title={t('timerSettings.bell.title')}>
+        <SettingsSection title={t('timerSettings.bell.title')} icon={BellRinging} tone="peach">
             <SettingsRow label={t('timerSettings.bell.sound')} description={t('timerSettings.bell.soundHint')}>
                 <Select
                     value={sound}
@@ -77,6 +79,7 @@ export function BellNotificationsSection({ onChange }: { onChange?: () => void }
                 <div className="flex items-center gap-3">
                     <Slider
                         aria-label={t('timerSettings.bell.volume')}
+                        aria-valuetext={`${volume}%`}
                         min={MIN_VOLUME}
                         max={100}
                         step={5}
@@ -86,27 +89,33 @@ export function BellNotificationsSection({ onChange }: { onChange?: () => void }
                         onValueCommit={() => onChange?.()}
                         className="py-1"
                     />
-                    <span className="w-10 shrink-0 text-right text-[0.8125rem] tabular-nums text-ink-muted">{volume}%</span>
+                    {/* The same value chip as the master volume in the Sounds panel */}
+                    <span
+                        aria-hidden="true"
+                        className="w-12 shrink-0 rounded-full border-2 border-outline bg-surface px-2 py-px text-center text-xs font-bold tabular-nums text-ink"
+                    >
+                        {volume}%
+                    </span>
                 </div>
             </SettingsRow>
 
             <SettingsRow label={t('timerSettings.bell.previewLabel')} description={t('timerSettings.bell.previewHint')}>
-                <Button variant="outline" size="sm" onClick={playAlarm} disabled={silent} className="w-full sm:w-auto">
+                <Button variant="secondary" size="sm" onClick={playAlarm} disabled={silent} className="w-full sm:w-auto">
                     {t('timerSettings.bell.preview')}
                 </Button>
             </SettingsRow>
 
             <SettingsRow label={t('timerSettings.bell.notifications')} description={current.hint}>
                 {notificationState === 'default' ? (
-                    <Button variant="outline" size="sm" onClick={() => void ask()} className="w-full sm:w-auto">
+                    <Button variant="secondary" size="sm" onClick={() => void ask()} className="w-full sm:w-auto">
                         {t('timerSettings.bell.notificationsTurnOn')}
                     </Button>
                 ) : (
-                    <p
-                        className={`text-[0.8125rem] font-semibold sm:text-right ${notificationState === 'granted' ? 'text-success-ink' : 'text-ink-muted'}`}
-                    >
-                        {current.status}
-                    </p>
+                    <div className="flex sm:justify-end">
+                        <Badge variant={notificationState === 'granted' ? 'success' : 'default'} className="text-[0.8125rem]">
+                            {current.status}
+                        </Badge>
+                    </div>
                 )}
             </SettingsRow>
 
