@@ -117,6 +117,7 @@
     "signOutUnexpectedError": "Something went wrong while signing out"
   },
   "timer": {
+    "staleEnded": "The timer ended while you were away, so it was not counted.",
     "outbox": {
       "dropped": "Some offline sessions were too old to save."
     },

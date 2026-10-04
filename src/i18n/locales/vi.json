@@ -117,6 +117,7 @@
     "signOutUnexpectedError": "Đã xảy ra lỗi khi đăng xuất"
   },
   "timer": {
+    "staleEnded": "Bộ đếm giờ đã kết thúc khi bạn không có mặt nên không được tính.",
     "outbox": {
       "dropped": "Một số phiên học ngoại tuyến đã quá cũ nên không lưu được."
     },

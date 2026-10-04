@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { toast } from 'sonner';
 import { useTimerStore, CATCH_UP_GRACE_MS } from '@/stores/timer-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { useTasksStore } from '@/stores/task-store';
@@ -156,6 +157,9 @@ export function useTimerEngine() {
   // `catchUp` = the deadline elapsed while the app was closed: no alarm/confetti
   // and never auto-start. Recent (<= CATCH_UP_GRACE_MS) completions are still
   // recorded; older ones just advance the phase without crediting anything.
+  // The same holds whatever the caller says when the deadline is that far in the
+  // past (laptop slept, tab frozen, clock jumped): a phase that ended hours ago
+  // must not ring, record or earn a pomodoro "now".
   const handleLoopComplete = (catchUp = false) => {
     // BUG-05 FIX: Prevent concurrent completion calls
     if (isCompletingRef.current) return;
@@ -187,15 +191,16 @@ export function useTimerEngine() {
       useTimerStore.getState().syncSessionDay();
 
       const stale =
-        catchUp &&
         state.deadlineAt !== null &&
         Date.now() - state.deadlineAt > CATCH_UP_GRACE_MS;
+      // Quiet: no alarm / notification / celebration / auto-start
+      const quiet = catchUp || stale;
 
       const currentMode = state.mode;
       const currentSettings = state.settings;
       const currentSessionCount = useTimerStore.getState().sessionCount;
 
-      if (!catchUp) {
+      if (!quiet) {
         playAlarm();
         notifyPhaseComplete(currentMode, tRef.current);
       }
@@ -220,8 +225,9 @@ export function useTimerEngine() {
 
       if (stale) {
         // Too old to be a real session: no record, no counters, no streak
+        toast.info(tRef.current('timer.staleEnded'), { id: 'timer-stale-ended' });
       } else if (currentMode === 'work') {
-        if (!catchUp) {
+        if (!quiet) {
           // Hands the moment to the celebration (confetti included); the alarm and the notification stay here
           announceFocusComplete(configDuration / 60);
         }
@@ -241,7 +247,7 @@ export function useTimerEngine() {
       // Auto-Transition (new phase starts a fresh baseline). A break only rolls
       // into the next focus if somebody was around since the previous focus began,
       // and never out of a long break; otherwise it waits on the start screen.
-      const autoStart = !catchUp && mayAutoChain(currentMode, interactedRef.current);
+      const autoStart = !quiet && mayAutoChain(currentMode, interactedRef.current);
       const next = (
         nextMode: 'work' | 'shortBreak' | 'longBreak',
         minutes: number,

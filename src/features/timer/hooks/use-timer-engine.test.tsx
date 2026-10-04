@@ -11,6 +11,7 @@ const mockFlush = vi.fn();
 const mockPlayAlarm = vi.fn();
 const mockPreloadAlarm = vi.fn();
 const mockNotify = vi.fn();
+const mockToastInfo = vi.fn();
 
 vi.mock('@/lib/timer/use-session-recorder', () => ({
   useSessionRecorder: () => ({ record: mockRecord, flush: mockFlush }),
@@ -26,6 +27,7 @@ vi.mock('@/contexts/i18n-context', () => ({
   useI18n: () => ({ t: (key: string) => key }),
 }));
 vi.mock('canvas-confetti', () => ({ default: vi.fn() }));
+vi.mock('sonner', () => ({ toast: { info: (...args: unknown[]) => mockToastInfo(...args) } }));
 
 const NOW = 1_800_000_000_000;
 const settings = {
@@ -702,5 +704,125 @@ describe('useTimerEngine remount after client navigation', () => {
     away(10 * MINUTE);
     renderHook(() => useTimerEngine());
     expect(useTimerStore.getState()).toMatchObject({ timeLeft: 123, isRunning: false, deadlineAt: null });
+  });
+});
+
+// Sleep / wake: the clock jumps while no timer can run. A phase that ended long ago
+// must not ring, record or earn a pomodoro "now"; a quiet notice says what happened.
+describe('useTimerEngine late completion (sleep / wake)', () => {
+  beforeEach(() => {
+    installMemoryStorage();
+    vi.useFakeTimers();
+    nextInstant();
+    vi.clearAllMocks();
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  const HOUR = 60 * MINUTE;
+  const advance = (ms: number) =>
+    act(() => {
+      vi.advanceTimersByTime(ms);
+    });
+  const startWork = (overrides: Record<string, unknown> = {}) =>
+    resetStore({
+      timeLeft: 60,
+      isRunning: true,
+      deadlineAt: T + MINUTE,
+      settings: { ...quick, autoStartBreak: true },
+      ...overrides,
+    });
+
+  it('a phase that ended hours ago (laptop slept) is not credited, not rung, not auto-started', () => {
+    startWork();
+    renderHook(() => useTimerEngine());
+    advance(1000);
+    vi.setSystemTime(T + 14 * HOUR); // lid reopened the next afternoon, same tab
+    advance(500); // first tick after wake
+
+    expect(mockRecord).not.toHaveBeenCalled();
+    expect(mockPlayAlarm).not.toHaveBeenCalled();
+    expect(mockNotify).not.toHaveBeenCalled();
+    const s = useTimerStore.getState();
+    expect(s).toMatchObject({ mode: 'shortBreak', isRunning: false, deadlineAt: null, timeLeft: 60 });
+    expect(s.completedSessions).toBe(0);
+    expect(s.sessionCount).toBe(0);
+    expect(mockToastInfo).toHaveBeenCalledTimes(1);
+    expect(mockToastInfo).toHaveBeenCalledWith('timer.staleEnded', expect.anything());
+
+    advance(10 * MINUTE);
+    expect(mockRecord).not.toHaveBeenCalled(); // and nothing fires later either
+    expect(mockToastInfo).toHaveBeenCalledTimes(1);
+  });
+
+  it('a break that ended hours ago is not recorded either', () => {
+    startWork({ mode: 'shortBreak', lastSessionTimeLeft: 60 });
+    renderHook(() => useTimerEngine());
+    vi.setSystemTime(T + 3 * HOUR);
+    advance(500);
+    expect(mockRecord).not.toHaveBeenCalled();
+    expect(mockPlayAlarm).not.toHaveBeenCalled();
+    expect(useTimerStore.getState()).toMatchObject({ mode: 'work', isRunning: false });
+    expect(mockToastInfo).toHaveBeenCalledTimes(1);
+  });
+
+  it('also catches a wake-up that surfaces through visibilitychange or the deadline timeout', () => {
+    vi.useRealTimers();
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] });
+    vi.spyOn(globalThis, 'setInterval').mockImplementation((() => 0) as never);
+    vi.spyOn(globalThis, 'clearInterval').mockImplementation(() => {});
+    nextInstant();
+    startWork({ settings: { ...quick, autoStartBreak: false } });
+    renderHook(() => useTimerEngine());
+    vi.setSystemTime(T + 5 * HOUR);
+    act(() => {
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    expect(mockRecord).not.toHaveBeenCalled();
+    expect(mockPlayAlarm).not.toHaveBeenCalled();
+    expect(useTimerStore.getState().mode).toBe('shortBreak');
+    expect(mockToastInfo).toHaveBeenCalledTimes(1);
+  });
+
+  it('a few minutes late (throttled / briefly suspended) is still a real, rung completion at the true end', () => {
+    startWork();
+    renderHook(() => useTimerEngine());
+    vi.setSystemTime(T + MINUTE + 10 * MINUTE);
+    advance(500);
+
+    expect(mockRecord).toHaveBeenCalledTimes(1);
+    expect(mockRecord).toHaveBeenCalledWith(
+      expect.objectContaining({ mode: 'work', completedFullSession: true, endedAt: T + MINUTE }),
+    );
+    expect(mockPlayAlarm).toHaveBeenCalledTimes(1);
+    expect(mockToastInfo).not.toHaveBeenCalled();
+  });
+
+  it('a reload after the grace window gets the same quiet notice (and still no credit)', () => {
+    startWork({ timeLeft: 0, deadlineAt: T - 16 * MINUTE });
+    renderHook(() => useTimerEngine());
+    advance(1000);
+    expect(mockRecord).not.toHaveBeenCalled();
+    expect(mockToastInfo).toHaveBeenCalledTimes(1);
+  });
+
+  it('a reload inside the grace window is credited quietly, without a notice', () => {
+    startWork({ timeLeft: 0, deadlineAt: T - 2 * MINUTE });
+    renderHook(() => useTimerEngine());
+    advance(1000);
+    expect(mockRecord).toHaveBeenCalledTimes(1);
+    expect(mockToastInfo).not.toHaveBeenCalled();
+  });
+
+  it('the tab that lost the completion claim shows no notice', () => {
+    window.localStorage.setItem('timer-completion-claim', `work:${T + MINUTE}|some-other-tab`);
+    startWork();
+    renderHook(() => useTimerEngine());
+    vi.setSystemTime(T + 14 * HOUR);
+    advance(500);
+    expect(mockToastInfo).not.toHaveBeenCalled();
+    expect(mockRecord).not.toHaveBeenCalled();
   });
 });
