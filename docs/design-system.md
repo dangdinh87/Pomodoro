@@ -161,6 +161,12 @@ Props và tên variant **không đổi**; chỉ thêm. Thấy primitive làm s�
 
 Quy tắc bố cục: trang nội dung `max-w-[1180px]` với lề `px-[clamp(16px,4vw,32px)]`; lưới dùng `minmax(0,1fr)`; **kiểm mọi màn ở 390px, không tràn ngang**. Chừa chỗ cho bóng cứng và vòng focus (không để `overflow-hidden` hoặc `overflow-auto` sát mép sticker: nó cắt viền và bóng).
 
+### 7a. Mini player YouTube và thẻ timer vừa một màn hình
+
+- **Mini player** (`components/audio/youtube/youtube-mini-player.tsx`, gắn một lần trong `AppProviders`): thẻ `.sticker` ghim góc dưới trái, trên dock (desktop) hoặc thanh tab (mobile), `z-40` (trên dock, dưới panel và dialog). YouTube yêu cầu player nhúng **nhìn thấy được, ≥ 200×200 px, không bị che**, nên iframe chỉ được tạo trong `#youtube-player-slot` của thẻ này (không còn container ẩn); đóng thẻ là xoá iframe. Thu gọn = bỏ tiêu đề và thanh âm lượng, video giữ đúng 200×200 và **vẫn phát** (không bao giờ tạm dừng chỉ vì thu gọn). Slot không có viền hay padding riêng (border-box sẽ ăn vào 200px). Khi timer chạy và chuột đứng yên, thẻ **mờ còn 50%** (`[data-mini-player]` trong `globals.css`) chứ không ẩn như `[data-chrome]`.
+- **Thẻ timer vừa một màn hình**: section quanh thẻ chừa 160px (thanh trạng thái + dock) nên thẻ cao tối đa `100dvh - 160px`. `.stage-card` (`globals.css`) có biến `--stage-*` co theo `--stage-t` (1 khi cao ≥ 820px, về 0 ở 640px): Tomo, khoảng cách, chữ số (160 → 108px), nút chính (56 → 48px); gợi ý phím ẩn khi cao ≤ 700px. Thẻ thật và khung SSR 25:00 (`app-home-skeleton.tsx`) đọc **cùng** biến, `stage-layout.test.ts` canh điều đó. Thêm khối vào thẻ thì phải dùng biến, rồi đo lại ở 1366×657, 1366×768, 1440×789, 1440×900, 390×664 (thẻ không chạm dock, CLS = 0).
+- **Vỏ cuộn trong suốt**: hộp thoại chỉ làm khung cho một thẻ sticker (đăng nhập, `DialogPanel bare` trong `panel-host.tsx`) chừa `p-2` quanh thẻ; `overflow-y-auto` trên vỏ vẫn cần cho màn thấp, nhưng nó cắt mọi thứ nhô ra khỏi padding box, nên chừa chỗ cho viền 2.5px và bóng 6px. Panel là chính một thẻ (Cài đặt, Góp ý) thì để `p-0` và tràn mép.
+
 ---
 
 ## 8. Tomo
@@ -267,7 +273,7 @@ Câu chữ nằm ở `src/i18n/locales/{en,vi,ja}.json`; mọi khoá phải có 
 ## 13. Việc còn nợ (đã biết)
 
 - Tooltip thật của dock là `animate-ui/components/animate/tooltip.tsx`, chưa theo kiểu `bg-ink`; `animate-ui/components/buttons/button.tsx` có `buttonVariants` riêng chưa theo sticker.
-- Hoạ tiết giấy: quả cà chua nhỏ còn giống giọt nước; khối landing dưới app (`(main)/page.tsx`) đang tô `bg-surface-page` đặc nên mất hoạ tiết.
-- `DialogPanel id="login"` trong `panel-host.tsx` có `overflow-y-auto` nên cắt viền thẻ đăng nhập; `LoginForm` tạm chừa `m-1.5`.
+- Khối landing dưới app (`(main)/page.tsx`) đang tô `bg-surface-page` đặc nên mất hoạ tiết.
+- Mini player YouTube trên điện thoại (390px) che nửa dưới thẻ timer vì video phải ≥ 200×200 (xem mục 7a); chưa có cách kéo đi chỗ khác.
 - Tiêu đề tab của 404 và trang lỗi là "Study Bro App" (từ metadata root).
 - Khi chuyển trang ngoài app xuống `src/app/[lang]` (giai đoạn 3), `not-found`, `global-error` và layout `(landing)` cần xem lại cách lấy ngôn ngữ và theme.
