@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { Logo } from '@/components/brand/logo';
 import Link from 'next/link';
 import { ArrowRight } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '@/components/ui/button';
@@ -11,8 +11,7 @@ export async function SiteHeader() {
     <header className="sticky top-0 z-20 border-b border-border bg-surface-page">
       <div className="mx-auto flex h-14 max-w-[1180px] items-center justify-between gap-4 px-[clamp(16px,4vw,32px)]">
         <Link href="/" className="flex items-center gap-2 rounded-md focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand">
-          <Image src="/images/logo.png" alt="" width={26} height={26} className="size-[26px]" />
-          <span className="font-heading text-[0.9375rem] font-bold tracking-[-0.02em] text-ink">{t('brand.title')}</span>
+          <Logo size={26} />
         </Link>
         <nav aria-label={t('site.header.nav')} className="flex items-center gap-1 sm:gap-3">
           <Link

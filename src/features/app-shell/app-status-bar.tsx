@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import { Logo } from '@/components/brand/logo';
 import { Fire, Gear, MagnifyingGlass } from '@phosphor-icons/react/dist/ssr';
 import { Kbd } from '@/components/ui/kbd';
 import { UserMenu } from '@/components/layout/user-menu';
@@ -43,8 +43,7 @@ export function AppStatusBar() {
       className="absolute inset-x-0 top-0 z-20 flex h-14 items-center gap-3 px-[clamp(16px,4vw,32px)] pt-[env(safe-area-inset-top)]"
     >
       <div className="flex min-w-0 items-center gap-2">
-        <Image src="/images/logo.png" alt="" width={26} height={26} className="size-[26px]" priority />
-        <span className="font-heading text-[0.9375rem] font-bold tracking-[-0.02em] text-ink">{t('brand.title')}</span>
+        <Logo size={26} />
       </div>
 
       <div className="ml-auto flex items-center gap-1">

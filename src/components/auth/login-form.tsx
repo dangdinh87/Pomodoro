@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import { Logo } from '@/components/brand/logo';
 import { useEffect, useState } from 'react';
 import { CircleNotch, EnvelopeSimple, SignIn } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '@/components/ui/button';
@@ -84,7 +84,7 @@ export function LoginForm({ googleEnabled, onSignedIn }: { googleEnabled: boolea
     <Card className="w-full max-w-md">
       <CardHeader className="space-y-2 text-center">
         <CardTitle className="flex flex-col items-center gap-3 font-heading text-2xl font-bold">
-          <Image src="/images/logo.svg" alt={t('brand.title')} width={52} height={52} />
+          <Logo variant="mark" size={56} />
           {t('login.title')}
         </CardTitle>
         <CardDescription className="text-sm text-ink-muted">

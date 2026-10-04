@@ -2,7 +2,7 @@
  * Site footer: server-rendered links (SEO) with the language switcher as the only client island.
  * Used on `/` below the timer and on the standalone content pages.
  */
-import Image from 'next/image';
+import { Logo } from '@/components/brand/logo';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { getT } from '@/lib/server-translations';
@@ -29,8 +29,7 @@ export async function Footer() {
         <div className="grid gap-10 py-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
           <div className="max-w-sm">
             <Link href="/" className="inline-flex items-center gap-2.5 rounded focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand">
-              <Image src="/images/logo.png" alt="" width={28} height={28} className="size-7" />
-              <span className="font-heading text-lg font-bold tracking-[-0.02em] text-ink">{t('brand.title')}</span>
+              <Logo size={28} />
             </Link>
             <p className="mt-3 text-sm leading-relaxed text-ink-muted">{t('site.footer.tagline')}</p>
           </div>
