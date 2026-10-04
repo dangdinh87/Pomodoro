@@ -742,6 +742,7 @@
     "notFound": "見つかりません",
     "unauthorized": "認証されていません。ログインしてください。",
     "forbidden": "このリソースにアクセスする権限がありません",
+    "fieldRequired": "この項目を入力してください",
     "tooManyRequests": "リクエストが集中しています。数分待ってからもう一度お試しください。",
     "boundary": {
       "title": "問題が発生しました",
@@ -834,6 +835,12 @@
       "switchConfirm": {
         "title": "タスクを切り替えますか？",
         "description": "別のタスクに集中中です。このタスクに切り替えますか？"
+      },
+      "taskComplete": {
+        "title": "予定のポモドーロを達成しました！",
+        "description": "は予定していたポモドーロをすべて使い切りました。完了にしますか？",
+        "skip": "あとで",
+        "markDone": "完了にする"
       }
     },
     "enhancedTimer": {

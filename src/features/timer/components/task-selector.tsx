@@ -241,27 +241,28 @@ export function TaskSelector({ className }: TaskSelectorProps) {
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <Confetti size={20} className="text-gold" />
-              {t('timerComponents.taskSelector.taskComplete.title') || 'Task complete!'}
+              {t('timerComponents.taskSelector.taskComplete.title')}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {completedTaskRef.current && (
                 <>
                   <span className="font-semibold text-ink">{completedTaskRef.current.title}</span>
                   {' '}
-                  {t('timerComponents.taskSelector.taskComplete.description') || 'has reached all planned pomodoros. Mark as done?'}
+                  {t('timerComponents.taskSelector.taskComplete.description')}
                 </>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => {
+          {/* Wraps instead of overflowing when the labels are long (vi/ja) or the screen is narrow */}
+          <AlertDialogFooter className="gap-2 sm:flex-wrap sm:space-x-0">
+            <AlertDialogCancel className="mt-0 h-auto min-h-9 whitespace-normal" onClick={() => {
               setTaskCompleteOpen(false);
               switchActiveTask(null);
               completedTaskRef.current = null;
             }}>
-              {t('timerComponents.taskSelector.taskComplete.skip') || 'Skip'}
+              {t('timerComponents.taskSelector.taskComplete.skip')}
             </AlertDialogCancel>
-            <AlertDialogAction onClick={() => {
+            <AlertDialogAction className="h-auto min-h-9 whitespace-normal" onClick={() => {
               if (completedTaskRef.current) {
                 updateTask({ id: completedTaskRef.current.id, input: { status: 'done' } });
               }
@@ -270,7 +271,7 @@ export function TaskSelector({ className }: TaskSelectorProps) {
               completedTaskRef.current = null;
             }}>
               <CheckCircle size={16} className="mr-1.5" />
-              {t('timerComponents.taskSelector.taskComplete.markDone') || 'Mark as done'}
+              {t('timerComponents.taskSelector.taskComplete.markDone')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -742,6 +742,7 @@
     "notFound": "Không tìm thấy",
     "unauthorized": "Chưa đăng nhập. Vui lòng đăng nhập.",
     "forbidden": "Bạn không có quyền truy cập tài nguyên này",
+    "fieldRequired": "Vui lòng nhập thông tin này",
     "tooManyRequests": "Hiện có quá nhiều yêu cầu. Bạn hãy đợi vài phút rồi thử lại nhé.",
     "boundary": {
       "title": "Đã xảy ra sự cố",
@@ -834,6 +835,12 @@
       "switchConfirm": {
         "title": "Đổi việc?",
         "description": "Bạn đang tập trung vào một việc khác. Đổi sang việc này?"
+      },
+      "taskComplete": {
+        "title": "Đã đủ số Pomodoro dự kiến!",
+        "description": "đã dùng hết số Pomodoro dự kiến. Đánh dấu hoàn thành nhé?",
+        "skip": "Để sau",
+        "markDone": "Đánh dấu hoàn thành"
       }
     },
     "enhancedTimer": {

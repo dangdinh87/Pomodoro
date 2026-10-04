@@ -742,6 +742,7 @@
     "notFound": "Not found",
     "unauthorized": "Unauthorized. Please sign in.",
     "forbidden": "You don't have permission to access this resource",
+    "fieldRequired": "Please fill in this field",
     "tooManyRequests": "Too many requests right now. Please wait a few minutes and try again.",
     "boundary": {
       "title": "Something went wrong",
@@ -834,6 +835,12 @@
       "switchConfirm": {
         "title": "Switch task?",
         "description": "You are focusing on another task. Switch to this one?"
+      },
+      "taskComplete": {
+        "title": "Pomodoro goal reached!",
+        "description": "has used all its planned Pomodoros. Mark it as done?",
+        "skip": "Not yet",
+        "markDone": "Mark as done"
       }
     },
     "enhancedTimer": {
