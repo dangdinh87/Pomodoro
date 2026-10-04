@@ -7,6 +7,6 @@ export default function MainError(props: {
   reset: () => void;
 }) {
   return (
-    <RouteError {...props} homeHref="/timer" homeLabelKey="errors.boundary.goTimer" />
+    <RouteError {...props} homeHref="/" homeLabelKey="errors.boundary.goTimer" />
   );
 }

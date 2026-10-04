@@ -92,6 +92,9 @@ const nextConfig: NextConfig = {
       { source: '/login', destination: '/?panel=login', permanent: true },
       { source: '/signup', destination: '/?panel=login', permanent: true },
       { source: '/reset-password', destination: '/?panel=login', permanent: true },
+      // Pages that were cut for good: old links and search results land on the app
+      { source: '/leaderboard', destination: '/', permanent: true },
+      { source: '/chat', destination: '/', permanent: true },
     ];
   },
 };
