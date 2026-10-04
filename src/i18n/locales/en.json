@@ -368,30 +368,20 @@
         },
         "themes": {
           "recommended": "Recommended",
-          "default": "Default",
-          "blue": "Blue",
-          "rose": "Rose",
-          "emerald": "Forest",
-          "indigo": "Midnight",
-          "violet": "Lavender",
-          "amber": "Autumn",
-          "cyan": "Mint",
-          "teal": "Ocean",
-          "pink": "Sakura",
-          "mono": "Monochrome"
+          "default": "Tomato",
+          "mint": "Mint",
+          "butter": "Butter",
+          "lavender": "Lavender",
+          "sky": "Sky",
+          "peach": "Peach"
         },
         "themeDescriptions": {
           "default": "Classic tomato",
-          "blue": "Calm and focused",
-          "rose": "Romantic",
-          "emerald": "Natural and calm",
-          "indigo": "Deep focus",
-          "violet": "Soft and calm",
-          "amber": "Warm vintage",
-          "cyan": "Fresh and clean",
-          "teal": "Deep blue",
-          "pink": "Soft spring tones",
-          "mono": "Minimal"
+          "mint": "Fresh and calm",
+          "butter": "Warm and sunny",
+          "lavender": "Dreamy and soft",
+          "sky": "Open and clear",
+          "peach": "Gentle and cosy"
         }
       },
       "notifications": {

@@ -368,30 +368,20 @@
         },
         "themes": {
           "recommended": "Khuyên dùng",
-          "default": "Mặc định",
-          "blue": "Xanh dương",
-          "rose": "Hoa hồng",
-          "emerald": "Rừng xanh",
-          "indigo": "Nửa đêm",
-          "violet": "Oải hương",
-          "amber": "Thu vàng",
-          "cyan": "Bạc hà",
-          "teal": "Đại dương",
-          "pink": "Hoa đào",
-          "mono": "Đơn sắc"
+          "default": "Cà chua",
+          "mint": "Bạc hà",
+          "butter": "Bơ",
+          "lavender": "Oải hương",
+          "sky": "Trời",
+          "peach": "Đào"
         },
         "themeDescriptions": {
           "default": "Cà chua cổ điển",
-          "blue": "Điềm tĩnh, tập trung",
-          "rose": "Lãng mạn",
-          "emerald": "Thiên nhiên, thư thái",
-          "indigo": "Tập trung sâu",
-          "violet": "Nhẹ nhàng, êm dịu",
-          "amber": "Ấm, hoài cổ",
-          "cyan": "Tươi mát, sạch sẽ",
-          "teal": "Xanh biển sâu",
-          "pink": "Sắc xuân dịu nhẹ",
-          "mono": "Tối giản"
+          "mint": "Tươi mát, dịu mắt",
+          "butter": "Ấm áp như nắng",
+          "lavender": "Mơ màng, nhẹ nhàng",
+          "sky": "Thoáng đãng, trong trẻo",
+          "peach": "Dịu dàng, ấm cúng"
         }
       },
       "notifications": {

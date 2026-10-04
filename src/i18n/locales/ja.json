@@ -368,30 +368,20 @@
         },
         "themes": {
           "recommended": "推奨",
-          "default": "デフォルト",
-          "blue": "ブルー",
-          "rose": "ローズ",
-          "emerald": "フォレスト",
-          "indigo": "ミッドナイト",
-          "violet": "ラベンダー",
-          "amber": "オータム",
-          "cyan": "ミント",
-          "teal": "オーシャン",
-          "pink": "桜",
-          "mono": "モノクロ"
+          "default": "トマト",
+          "mint": "ミント",
+          "butter": "バター",
+          "lavender": "ラベンダー",
+          "sky": "スカイ",
+          "peach": "ピーチ"
         },
         "themeDescriptions": {
           "default": "定番のトマト",
-          "blue": "落ち着いて集中",
-          "rose": "ロマンチック",
-          "emerald": "自然で穏やか",
-          "indigo": "深い集中",
-          "violet": "穏やか",
-          "amber": "温かいビンテージ",
-          "cyan": "爽やかでクリーン",
-          "teal": "深いブルー",
-          "pink": "柔らかな春の色合い",
-          "mono": "ミニマル"
+          "mint": "爽やかで穏やか",
+          "butter": "あたたかく明るい",
+          "lavender": "夢見心地でやわらか",
+          "sky": "広々として澄んだ色",
+          "peach": "やさしく心地よい"
         }
       },
       "notifications": {

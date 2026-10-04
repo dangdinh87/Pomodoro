@@ -1,107 +1,178 @@
 /**
- * Colour presets — each one only swaps the PRIMARY block of the design system
- * (docs/design-system.md §0). Neutrals, surfaces and semantic tones stay shared.
+ * Colour presets — Sticker pop (docs/superpowers/specs/2026-10-05-sticker-pop-rebrand-design.md §8).
+ * Each preset only swaps the PRIMARY block (accent*, applied through <style id="app-theme-vars">
+ * by src/lib/ui-preferences.ts). Neutrals, surfaces, candy colours and tones stay shared.
  *
- * Step choice follows the AA rule: white text on `--accent-solid` must reach 4.5:1,
- * so emerald/amber/cyan/teal/mono use step 700; indigo/violet use 400 as dark-mode text.
+ * Text on every solid fill is `--on-accent` (#2A1A14), so a preset must satisfy two rules,
+ * enforced by themes.test.ts for light and dark:
+ *  - --on-accent on --accent-solid >= 4.5:1
+ *  - --accent (text, links, focus ring) on --surface-page >= 4.5:1
+ * Dark mode keeps the solid fill of light mode; only the text/soft steps change.
  */
 
-type Step = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
-type Ramp = Partial<Record<Step, string>>;
-
 export type AccentTokens = {
+  /** Text, links, focus ring. */
   accent: string;
   'accent-hover': string;
+  /** Pale panel carrying the primary colour. */
   'accent-soft': string;
+  /** Text on `accent-soft`. */
   'accent-ink': string;
+  /** Solid fill (primary button, selected chip). Text on it is --on-accent. */
   'accent-solid': string;
   'accent-solid-hover': string;
-  'accent-edge': string;
 };
 
 export type ColorPreset = {
   key: string;
   name: string;
-  emoji: string;
   description: string;
-  /** Swatch shown in pickers (light-mode solid). */
+  /** Swatch shown in pickers. */
   swatch: string;
   light: AccentTokens;
   dark: AccentTokens;
 };
 
-const DARK_SURFACE = '#18181b';
-
-function fromRamp(
-  ramp: Ramp,
-  { solid, darkAccent = 500 }: { solid: 600 | 700; darkAccent?: 300 | 400 | 500 },
-): Pick<ColorPreset, 'swatch' | 'light' | 'dark'> {
-  const step = (s: number) => ramp[s as Step] as string;
-  return {
-    swatch: step(solid),
-    light: {
-      accent: step(solid),
-      'accent-hover': step(solid + 100),
-      'accent-soft': step(100),
-      'accent-ink': step(800),
-      'accent-solid': step(solid),
-      'accent-solid-hover': step(solid + 100),
-      'accent-edge': step(solid + 100),
-    },
-    dark: {
-      accent: step(darkAccent),
-      'accent-hover': step(darkAccent - 100),
-      'accent-soft': `color-mix(in srgb, ${step(500)} 30%, ${DARK_SURFACE})`,
-      'accent-ink': step(300),
-      'accent-solid': step(solid),
-      'accent-solid-hover': step(solid + 100),
-      'accent-edge': step(solid + 200),
-    },
-  };
-}
-
-const RAMPS = {
-  tomato: { 100: '#FFE2D8', 300: '#FF9C7D', 400: '#FB7350', 500: '#F0532D', 600: '#D93A16', 700: '#B42E10', 800: '#8F2711', 900: '#742413' },
-  blue: { 100: '#DBEAFE', 300: '#93C5FD', 400: '#60A5FA', 500: '#3B82F6', 600: '#2563EB', 700: '#1D4ED8', 800: '#1E40AF', 900: '#1E3A8A' },
-  rose: { 100: '#FFE4E6', 300: '#FDA4AF', 400: '#FB7185', 500: '#F43F5E', 600: '#E11D48', 700: '#BE123C', 800: '#9F1239', 900: '#881337' },
-  emerald: { 100: '#D1FAE5', 300: '#6EE7B7', 400: '#34D399', 500: '#10B981', 600: '#059669', 700: '#047857', 800: '#065F46', 900: '#064E3B' },
-  indigo: { 100: '#E0E7FF', 300: '#A5B4FC', 400: '#818CF8', 500: '#6366F1', 600: '#4F46E5', 700: '#4338CA', 800: '#3730A3', 900: '#312E81' },
-  violet: { 100: '#EDE9FE', 300: '#C4B5FD', 400: '#A78BFA', 500: '#8B5CF6', 600: '#7C3AED', 700: '#6D28D9', 800: '#5B21B6', 900: '#4C1D95' },
-  amber: { 100: '#FEF3C7', 300: '#FCD34D', 400: '#FBBF24', 500: '#F59E0B', 600: '#D97706', 700: '#B45309', 800: '#92400E', 900: '#78350F' },
-  cyan: { 100: '#CFFAFE', 300: '#67E8F9', 400: '#22D3EE', 500: '#06B6D4', 600: '#0891B2', 700: '#0E7490', 800: '#155E75', 900: '#164E63' },
-  teal: { 100: '#CCFBF1', 300: '#5EEAD4', 400: '#2DD4BF', 500: '#14B8A6', 600: '#0D9488', 700: '#0F766E', 800: '#115E59', 900: '#134E4A' },
-  pink: { 100: '#FCE7F3', 300: '#F9A8D4', 400: '#F472B6', 500: '#EC4899', 600: '#DB2777', 700: '#BE185D', 800: '#9D174D', 900: '#831843' },
-  zinc: { 100: '#F4F4F5', 200: '#E4E4E7', 300: '#D4D4D8', 400: '#A1A1AA', 500: '#71717A', 600: '#52525B', 700: '#3F3F46', 800: '#27272A', 900: '#18181B' },
-} satisfies Record<string, Ramp>;
-
 /** Matches the PRIMARY block in globals.css — applying it means removing any override. */
 export const defaultTheme: ColorPreset = {
   key: 'default',
   name: 'Tomato',
-  emoji: '🍅',
   description: 'Classic tomato',
-  ...fromRamp(RAMPS.tomato, { solid: 600 }),
+  swatch: '#FF5A36',
+  light: {
+    accent: '#C2330F',
+    'accent-hover': '#9E290B',
+    'accent-soft': '#FFD9CC',
+    'accent-ink': '#8F2711',
+    'accent-solid': '#FF5A36',
+    'accent-solid-hover': '#FF7050',
+  },
+  dark: {
+    accent: '#FF8A6B',
+    'accent-hover': '#FFA38A',
+    'accent-soft': '#5C2E22',
+    'accent-ink': '#FFB09C',
+    'accent-solid': '#FF5A36',
+    'accent-solid-hover': '#FF7050',
+  },
 };
 
 export const themePresets: ColorPreset[] = [
-  { key: 'mono', name: 'Monochrome', emoji: '🖤', description: 'Minimal & pro', ...fromRamp(RAMPS.zinc, { solid: 700, darkAccent: 300 }) },
-  { key: 'blue', name: 'Blue', emoji: '💙', description: 'Calm & focused', ...fromRamp(RAMPS.blue, { solid: 600 }) },
-  { key: 'rose', name: 'Rose', emoji: '🌹', description: 'Romantic & love vibe', ...fromRamp(RAMPS.rose, { solid: 600 }) },
-  { key: 'emerald', name: 'Forest', emoji: '🌲', description: 'Nature & chill', ...fromRamp(RAMPS.emerald, { solid: 700 }) },
-  { key: 'indigo', name: 'Midnight', emoji: '🌌', description: 'Deep focus mode', ...fromRamp(RAMPS.indigo, { solid: 600, darkAccent: 400 }) },
-  { key: 'violet', name: 'Lavender', emoji: '💜', description: 'Dreamy & calm', ...fromRamp(RAMPS.violet, { solid: 600, darkAccent: 400 }) },
-  { key: 'amber', name: 'Autumn', emoji: '🍂', description: 'Warm vintage mood', ...fromRamp(RAMPS.amber, { solid: 700 }) },
-  { key: 'cyan', name: 'Mint', emoji: '🌿', description: 'Fresh & clean', ...fromRamp(RAMPS.cyan, { solid: 700 }) },
-  { key: 'teal', name: 'Ocean', emoji: '🌊', description: 'Deep blue energy', ...fromRamp(RAMPS.teal, { solid: 700 }) },
-  { key: 'pink', name: 'Sakura', emoji: '🌸', description: 'Soft spring vibe', ...fromRamp(RAMPS.pink, { solid: 600 }) },
+  {
+    key: 'mint',
+    name: 'Mint',
+    description: 'Fresh and calm',
+    swatch: '#7BDCB5',
+    light: {
+      accent: '#1E7A57',
+      'accent-hover': '#17634A',
+      'accent-soft': '#D2F3E4',
+      'accent-ink': '#13603F',
+      'accent-solid': '#7BDCB5',
+      'accent-solid-hover': '#8FE3C1',
+    },
+    dark: {
+      accent: '#7BDCB5',
+      'accent-hover': '#9BE8C8',
+      'accent-soft': '#1F3A2D',
+      'accent-ink': '#A6EBCF',
+      'accent-solid': '#7BDCB5',
+      'accent-solid-hover': '#8FE3C1',
+    },
+  },
+  {
+    key: 'butter',
+    name: 'Butter',
+    description: 'Warm and sunny',
+    swatch: '#FFD45C',
+    light: {
+      accent: '#8A5C00',
+      'accent-hover': '#6E4900',
+      'accent-soft': '#FFF0BF',
+      'accent-ink': '#7A5200',
+      'accent-solid': '#FFD45C',
+      'accent-solid-hover': '#FFDE80',
+    },
+    dark: {
+      accent: '#FFD45C',
+      'accent-hover': '#FFE08A',
+      'accent-soft': '#40330F',
+      'accent-ink': '#FFE58F',
+      'accent-solid': '#FFD45C',
+      'accent-solid-hover': '#FFDE80',
+    },
+  },
+  {
+    key: 'lavender',
+    name: 'Lavender',
+    description: 'Dreamy and soft',
+    swatch: '#C9B6FF',
+    light: {
+      accent: '#5E3DBE',
+      'accent-hover': '#4B2C9E',
+      'accent-soft': '#E9E0FF',
+      'accent-ink': '#4B2C9E',
+      'accent-solid': '#C9B6FF',
+      'accent-solid-hover': '#D6C8FF',
+    },
+    dark: {
+      accent: '#C9B6FF',
+      'accent-hover': '#DDD0FF',
+      'accent-soft': '#33284F',
+      'accent-ink': '#DDD0FF',
+      'accent-solid': '#C9B6FF',
+      'accent-solid-hover': '#D6C8FF',
+    },
+  },
+  {
+    key: 'sky',
+    name: 'Sky',
+    description: 'Open and clear',
+    swatch: '#7CC8FF',
+    light: {
+      accent: '#1A5F99',
+      'accent-hover': '#144D7D',
+      'accent-soft': '#D6ECFF',
+      'accent-ink': '#0F4C81',
+      'accent-solid': '#7CC8FF',
+      'accent-solid-hover': '#94D3FF',
+    },
+    dark: {
+      accent: '#7CC8FF',
+      'accent-hover': '#9DD7FF',
+      'accent-soft': '#1B3347',
+      'accent-ink': '#A9DCFF',
+      'accent-solid': '#7CC8FF',
+      'accent-solid-hover': '#94D3FF',
+    },
+  },
+  {
+    key: 'peach',
+    name: 'Peach',
+    description: 'Gentle and cosy',
+    swatch: '#FFB38A',
+    light: {
+      accent: '#A8481A',
+      'accent-hover': '#8A3C12',
+      'accent-soft': '#FFE3D3',
+      'accent-ink': '#8A3C12',
+      'accent-solid': '#FFB38A',
+      'accent-solid-hover': '#FFC3A1',
+    },
+    dark: {
+      accent: '#FFB38A',
+      'accent-hover': '#FFC3A1',
+      'accent-soft': '#4A2A1A',
+      'accent-ink': '#FFCFB4',
+      'accent-solid': '#FFB38A',
+      'accent-solid-hover': '#FFC3A1',
+    },
+  },
 ];
 
 export const allColorPresets: ColorPreset[] = [defaultTheme, ...themePresets];
 
-// Older builds had two pink presets that only differed in background tint.
-const LEGACY_KEYS: Record<string, string> = { 'pink-light': 'pink', 'pink-mild': 'pink' };
-
+/** Unknown or retired saved keys (the old 10 presets) fall back to Tomato. */
 export function findColorPreset(key: string | null | undefined): ColorPreset {
-  const resolved = key ? LEGACY_KEYS[key] ?? key : 'default';
-  return allColorPresets.find((p) => p.key === resolved) ?? defaultTheme;
+  return allColorPresets.find((p) => p.key === key) ?? defaultTheme;
 }
