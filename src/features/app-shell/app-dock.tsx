@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { ArrowsIn, ArrowsOut } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '@/components/ui/button';
@@ -96,20 +96,23 @@ export function AppDock() {
   const { t } = useTranslation();
   const isFocusMode = useSystemStore((s) => s.isFocusMode);
   const setFocusMode = useSystemStore((s) => s.setFocusMode);
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  // Focus mode is fullscreen: the browser is the source of truth, because Esc (or the
+  // OS) can leave fullscreen without a click on this button.
+  const isFullscreen = isFocusMode;
   const panels = DOCK_PANELS.filter((id) => id !== 'stats' || isFeatureEnabled('history'));
+
+  useEffect(() => {
+    const sync = () => setFocusMode(Boolean(document.fullscreenElement));
+    sync();
+    document.addEventListener('fullscreenchange', sync);
+    return () => document.removeEventListener('fullscreenchange', sync);
+  }, [setFocusMode]);
 
   const toggleFullscreen = async () => {
     try {
-      if (document.fullscreenElement) {
-        await document.exitFullscreen();
-        setIsFullscreen(false);
-        setFocusMode(false);
-      } else {
-        await document.documentElement.requestFullscreen();
-        setIsFullscreen(true);
-        setFocusMode(true);
-      }
+      // `fullscreenchange` updates the state once the browser has actually switched
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else await document.documentElement.requestFullscreen();
     } catch (error) {
       console.error('Fullscreen toggle failed', error);
     }
