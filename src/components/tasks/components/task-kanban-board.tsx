@@ -54,7 +54,7 @@ export function TaskKanbanBoard({
     return (
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {STATUSES.map((status) => (
-          <Skeleton key={status} className="h-[240px] w-full rounded-[20px]" />
+          <Skeleton key={status} className="h-[240px] w-full rounded-lg" />
         ))}
       </div>
     )
