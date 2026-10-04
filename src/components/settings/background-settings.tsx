@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type ChangeEvent } from 'react';
+import { useEffect, useImperativeHandle, useRef, useState, type ChangeEvent, type Ref } from 'react';
 import Image from 'next/image';
 import { useReducedMotion } from 'motion/react';
 import { toast } from 'sonner';
@@ -27,10 +27,16 @@ import {
   type SceneMeta,
 } from '@/features/scenes/lib/scene-registry';
 
+export interface BackgroundSettingsHandle {
+  /** Undo any unsaved preview and close, exactly like the Close button. */
+  cancel: () => void;
+}
+
 interface BackgroundSettingsProps {
   onClose?: () => void;
   isPreview?: boolean;
   onPreviewChange?: (preview: boolean) => void;
+  ref?: Ref<BackgroundSettingsHandle>;
 }
 
 type Group = 'scenes' | 'photos' | 'mine';
@@ -54,13 +60,27 @@ function locate(bg: BackgroundConfig): { group: Group; packId: string } {
   return { group: 'scenes', packId: firstPack };
 }
 
-export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: BackgroundSettingsProps) {
+export function BackgroundSettings({ onClose, isPreview, onPreviewChange, ref }: BackgroundSettingsProps) {
   const { t } = useI18n();
   const reducedMotion = useReducedMotion();
   const { background, setBackground, setBackgroundTemp } = useBackground();
 
   // Snapshot the persisted background on mount so we can revert on cancel.
   const savedBackground = useRef(background);
+  // Set once the session ended on purpose (saved or cancelled)
+  const settled = useRef(false);
+  const setTempRef = useRef(setBackgroundTemp);
+  useEffect(() => {
+    setTempRef.current = setBackgroundTemp;
+  });
+  // Whatever closes the picker without Save (Esc, overlay, browser Back, leaving the
+  // panel) must not leave the preview on screen while localStorage still holds the saved look.
+  useEffect(
+    () => () => {
+      if (!settled.current) setTempRef.current(savedBackground.current);
+    },
+    [],
+  );
   const [draft, setDraft] = useState<BackgroundConfig>(background);
   const [initial] = useState(() => locate(background));
   const [group, setGroup] = useState<Group>(initial.group);
@@ -134,15 +154,18 @@ export function BackgroundSettings({ onClose, isPreview, onPreviewChange }: Back
   };
 
   const apply = () => {
+    settled.current = true;
     setBackground(draft);
     toast.success(t('settings.background.toasts.saved'));
     onClose?.();
   };
 
   const cancel = () => {
+    settled.current = true;
     setBackgroundTemp(savedBackground.current);
     onClose?.();
   };
+  useImperativeHandle(ref, () => ({ cancel }));
 
   const startPreview = () => {
     if (!isDefault) onPreviewChange?.(true);
