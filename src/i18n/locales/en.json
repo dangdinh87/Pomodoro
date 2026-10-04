@@ -1184,13 +1184,13 @@
   },
   "shell": {
     "dock": "App panels",
-    "openTimer": "Open the timer",
-    "streak": "{count}-day streak",
-    "panels": {
     "panelError": {
       "title": "This panel didn't load",
       "description": "Check your connection and try again."
     },
+    "openTimer": "Open the timer",
+    "streak": "{count}-day streak",
+    "panels": {
       "tasks": "Tasks",
       "sound": "Sounds",
       "scene": "Scene",

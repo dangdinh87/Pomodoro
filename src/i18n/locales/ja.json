@@ -1184,13 +1184,13 @@
   },
   "shell": {
     "dock": "パネル",
-    "openTimer": "タイマーを開く",
-    "streak": "{count}日連続",
-    "panels": {
     "panelError": {
       "title": "このパネルを読み込めませんでした",
       "description": "接続を確認して、もう一度お試しください。"
     },
+    "openTimer": "タイマーを開く",
+    "streak": "{count}日連続",
+    "panels": {
       "tasks": "タスク",
       "sound": "サウンド",
       "scene": "シーン",

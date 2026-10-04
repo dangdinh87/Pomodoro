@@ -1184,13 +1184,13 @@
   },
   "shell": {
     "dock": "Các bảng chức năng",
-    "openTimer": "Mở đồng hồ",
-    "streak": "Chuỗi {count} ngày",
-    "panels": {
     "panelError": {
       "title": "Không tải được bảng này",
       "description": "Hãy kiểm tra kết nối mạng rồi thử lại."
     },
+    "openTimer": "Mở đồng hồ",
+    "streak": "Chuỗi {count} ngày",
+    "panels": {
       "tasks": "Việc cần làm",
       "sound": "Âm thanh",
       "scene": "Không gian",
