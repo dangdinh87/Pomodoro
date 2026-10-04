@@ -65,6 +65,9 @@
     "signOutUnexpectedError": "Something went wrong while signing out"
   },
   "timer": {
+    "outbox": {
+      "dropped": "Some offline sessions were too old to save."
+    },
     "modes": {
       "work": "Focus",
       "shortBreak": "Short break",

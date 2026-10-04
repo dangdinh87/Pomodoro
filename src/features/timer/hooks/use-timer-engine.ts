@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import { useTasksStore } from '@/stores/task-store';
 import { useSessionRecorder } from '@/lib/timer/use-session-recorder';
 import { shouldFlushOnAuthChange } from '@/lib/timer/session-recorder';
+import { useOutboxDropNotice } from '@/lib/timer/use-outbox-drop-notice';
 import { playAlarm, preloadAlarm } from '@/lib/timer/alarm';
 import { mayAutoChain } from '@/lib/timer/auto-chain';
 import { claimCompletion, completionKey } from '@/lib/timer/completion-claim';
@@ -127,6 +128,8 @@ export function useTimerEngine() {
   }, [mode]);
 
   const { record, flush } = useSessionRecorder();
+  // Declared before the flush below, so a drop found on startup has a listener
+  useOutboxDropNotice();
 
   // Retry sessions that failed to save (offline / 5xx / guest sign-in refused):
   // on mount, when back online, and as soon as auth resolves or the user changes.

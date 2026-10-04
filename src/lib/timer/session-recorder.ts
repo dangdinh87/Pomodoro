@@ -44,6 +44,39 @@ const MAX_ATTEMPTS = 5;
 const SENDING_GRACE_MS = 30_000;
 const MAX_DURATION_SEC = 4 * 60 * 60; // server rejects > 14400
 
+// Sessions the outbox had to give up on (older than 24 h, or pushed out by a full
+// queue) are announced once through this: the recorder has no UI, so a hook
+// (use-outbox-drop-notice) subscribes and shows the toast.
+type DropListener = (count: number) => void;
+const dropListeners = new Set<DropListener>();
+const NOTICE_COOLDOWN_MS = 10 * 60 * 1000;
+let undelivered = 0;
+let noticedAt = 0;
+
+function notifyDropped(count: number) {
+  // Nobody to tell yet (app still starting): hand it over when someone subscribes
+  if (dropListeners.size === 0) {
+    undelivered += count;
+    return;
+  }
+  // A queue that stays full would otherwise toast on every session
+  const now = Date.now();
+  if (now - noticedAt < NOTICE_COOLDOWN_MS) return;
+  noticedAt = now;
+  dropListeners.forEach((listener) => listener(count));
+}
+
+/** Calls `listener` with how many sessions were just dropped as too old / over capacity. */
+export function onSessionsDropped(listener: DropListener): () => void {
+  dropListeners.add(listener);
+  if (undelivered > 0) {
+    const count = undelivered;
+    undelivered = 0;
+    notifyDropped(count);
+  }
+  return () => void dropListeners.delete(listener);
+}
+
 function newId(): string {
   return (
     globalThis.crypto?.randomUUID?.() ??
@@ -67,14 +100,18 @@ function readQueue(): QueuedSession[] {
  * other tabs) are not lost.
  */
 function updateQueue(fn: (queue: QueuedSession[]) => QueuedSession[]) {
+  let dropped = 0;
   try {
-    const next = fn(readQueue())
+    const wanted = fn(readQueue());
+    const next = wanted
       .filter((q) => Date.now() - q.queuedAt < MAX_AGE_MS)
       .slice(-MAX_QUEUE);
     window.localStorage.setItem(QUEUE_KEY, JSON.stringify(next));
+    dropped = wanted.length - next.length;
   } catch {
     // Storage full/unavailable: lose the retry, not the app
   }
+  if (dropped > 0) notifyDropped(dropped);
 }
 
 const patchItem = (id: string, patch: Partial<QueuedSession>) =>

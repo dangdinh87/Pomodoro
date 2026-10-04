@@ -65,6 +65,9 @@
     "signOutUnexpectedError": "ログアウト中にエラーが発生しました"
   },
   "timer": {
+    "outbox": {
+      "dropped": "古くなったオフラインのセッションがあり、保存できませんでした。"
+    },
     "modes": {
       "work": "集中",
       "shortBreak": "短い休憩",

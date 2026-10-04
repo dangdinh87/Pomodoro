@@ -65,6 +65,9 @@
     "signOutUnexpectedError": "Đã xảy ra lỗi khi đăng xuất"
   },
   "timer": {
+    "outbox": {
+      "dropped": "Một số phiên học ngoại tuyến đã quá cũ nên không lưu được."
+    },
     "modes": {
       "work": "Tập trung",
       "shortBreak": "Nghỉ ngắn",
