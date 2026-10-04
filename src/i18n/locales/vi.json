@@ -38,6 +38,58 @@
   "tomoBubble": {
     "dismiss": "Ẩn lời nhắn này"
   },
+  "tomo": {
+    "celebration": {
+      "takeBreak": "Nghỉ ngay",
+      "later": "Để sau",
+      "minutes": "+{count} phút",
+      "summary": "Bạn vừa tập trung {count} phút."
+    },
+    "lines": {
+      "celebration": {
+        "1": "Xong phiên rồi!",
+        "2": "Quá đỉnh luôn!",
+        "3": "Tập trung tốt lắm!",
+        "4": "Thêm một quả cà chua vào giỏ rồi!"
+      },
+      "breakTip": {
+        "1": "Đứng dậy vươn vai một chút nhé, lưng bạn sẽ cảm ơn đó.",
+        "2": "Uống chút nước đi bạn. Một ly là đủ rồi.",
+        "3": "Nhìn ra xa một lát cho mắt được nghỉ nhé.",
+        "4": "Hít thở thật chậm vài hơi. Lúc này chưa cần làm gì cả."
+      },
+      "keepStreak": {
+        "1": "Chuỗi ngày đang chờ bạn hôm nay đó. Một phiên ngắn là giữ được rồi!",
+        "2": "Hôm nay vẫn còn trống nè. Chỉ cần một phiên là giữ được chuỗi.",
+        "3": "Mình không muốn chuỗi của bạn bị đứt đâu. Làm một phiên nhé?",
+        "4": "Vẫn chưa muộn đâu! Một phiên thôi là chuỗi ngày vẫn còn nguyên."
+      },
+      "sleep": {
+        "1": "Khuya rồi. Ngủ là lúc não ghi nhớ những gì bạn vừa học đó.",
+        "2": "Đến giờ đi ngủ rồi! Nghỉ ngơi đi, mai mình học tiếp nhé.",
+        "3": "Mình buồn ngủ quá… Dừng ở đây thôi nhé, mai bạn sẽ cảm ơn mình.",
+        "4": "Ngủ đủ giấc thì mai học mới vào. Đi ngủ sớm nhé bạn!"
+      },
+      "greetingMorning": {
+        "1": "Chào buổi sáng! Mình bắt đầu một phiên nhé?",
+        "2": "Sáng rồi, chọn một việc rồi mình cùng làm nhé.",
+        "3": "Ngày mới bắt đầu rồi. Làm một phiên cho ấm máy nha?",
+        "4": "Chào bạn! Sáng nay mình tập trung vào một việc thôi nhé."
+      },
+      "greetingAfternoon": {
+        "1": "Chiều rồi! Mình làm thêm một phiên nhé?",
+        "2": "Ăn trưa xong rồi hả? Vào việc nhẹ nhàng với một phiên nha.",
+        "3": "Buổi chiều dễ buồn ngủ lắm. Một phiên ngắn sẽ tỉnh táo hơn đó!",
+        "4": "Hôm nay bạn làm tới đâu rồi? Mình cùng tập trung tiếp nhé."
+      },
+      "greetingEvening": {
+        "1": "Chào buổi tối! Làm một phiên nhẹ nhàng trước khi nghỉ nhé?",
+        "2": "Tối rồi, mình chốt nốt một việc cho hôm nay nha.",
+        "3": "Một phiên nhỏ buổi tối vẫn tính là có học đó!",
+        "4": "Tối nay bạn muốn xong việc nào? Chọn một việc nhỏ thôi cũng được."
+      }
+    }
+  },
   "nav": {
     "navigation": "Điều hướng",
     "system": "Hệ thống",

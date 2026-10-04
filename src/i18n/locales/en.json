@@ -38,6 +38,58 @@
   "tomoBubble": {
     "dismiss": "Hide this message"
   },
+  "tomo": {
+    "celebration": {
+      "takeBreak": "Take a break",
+      "later": "Later",
+      "minutes": "+{count} min",
+      "summary": "You just focused for {count} min."
+    },
+    "lines": {
+      "celebration": {
+        "1": "Session complete!",
+        "2": "Nailed it!",
+        "3": "Great focus!",
+        "4": "One more tomato in the basket!"
+      },
+      "breakTip": {
+        "1": "Stand up and stretch. Your back will thank you.",
+        "2": "Grab some water. One glass is plenty.",
+        "3": "Look out the window and rest your eyes on something far away.",
+        "4": "Take a few slow breaths. There's nothing to do right now."
+      },
+      "keepStreak": {
+        "1": "Your streak is waiting for today. One short session keeps it going!",
+        "2": "Psst, today is still empty. Even one session saves your streak.",
+        "3": "I'd hate to see your streak end. Just one session?",
+        "4": "It's not too late! One session and your streak lives on."
+      },
+      "sleep": {
+        "1": "It's late. Sleep is how your brain keeps what you studied.",
+        "2": "Past bedtime! Rest now and we'll pick this up tomorrow.",
+        "3": "Yawn... Maybe call it a night? Tomorrow-you will thank you.",
+        "4": "Your brain does its best filing while you sleep. Time for bed?"
+      },
+      "greetingMorning": {
+        "1": "Good morning! Ready for a first session?",
+        "2": "Morning! Pick one thing and let's get started.",
+        "3": "A fresh day. Shall we begin with one session?",
+        "4": "Morning! Got your coffee? Then let's focus."
+      },
+      "greetingAfternoon": {
+        "1": "Afternoon! A good time for a session.",
+        "2": "Back from lunch? Let's ease in with one session.",
+        "3": "Feeling the afternoon slump? A short session helps.",
+        "4": "How's the day going? Let's keep the momentum."
+      },
+      "greetingEvening": {
+        "1": "Good evening! One calm session before you wind down?",
+        "2": "Evening! Let's finish one last thing for today.",
+        "3": "A small session tonight still counts.",
+        "4": "What's one small thing to finish tonight?"
+      }
+    }
+  },
   "nav": {
     "navigation": "Navigation",
     "system": "System",
