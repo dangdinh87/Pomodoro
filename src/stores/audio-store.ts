@@ -35,9 +35,8 @@ export interface CurrentlyPlayingAudio {
 }
 
 export interface AudioSettings {
-  masterVolume: number; // 0-100 (renamed from 'volume')
+  masterVolume: number; // 0-100
   isMuted: boolean;
-  fadeInOut: boolean;
   activeSource: 'ambient' | 'youtube' | 'none';
   alarmType: string; // 'bell' | 'chime' | 'gong' | 'digital' | 'soft'
   alarmVolume: number; // 0-100
@@ -75,31 +74,19 @@ export function sanitizeAmbientMix(raw: unknown): AmbientSoundState[] {
 // --- State ---
 
 /** What reaches localStorage (see `partialize`). */
-type PersistedAudio = Pick<
-  AudioState,
-  | 'audioHistory'
-  | 'audioSettings'
-  | 'favorites'
-  | 'recentlyPlayed'
-  | 'presets'
-  | 'savedAmbientState'
-  | 'activeAmbientSounds'
-> & { ambientPaused: boolean };
+type PersistedAudio = Pick<AudioState, 'audioSettings' | 'presets' | 'activeAmbientSounds'> & {
+  ambientPaused: boolean;
+};
 
 interface AudioState {
   currentlyPlaying: CurrentlyPlayingAudio | null;
-  audioHistory: CurrentlyPlayingAudio[];
   audioSettings: AudioSettings;
-  favorites: string[];
-  recentlyPlayed: string[];
-  activeAmbientSounds: AmbientSoundState[]; // changed from string[]
+  activeAmbientSounds: AmbientSoundState[];
   presets: SoundPreset[];
-  savedAmbientState: AmbientSoundState[];
   ambientRestore: AmbientRestore; // runtime only
 
   // Actions
   setCurrentlyPlaying: (audio: CurrentlyPlayingAudio | null) => void;
-  addToHistory: (audio: CurrentlyPlayingAudio) => void;
   clearCurrentlyPlaying: () => void;
   updatePlayingStatus: (isPlaying: boolean) => void;
 
@@ -112,8 +99,6 @@ interface AudioState {
   startRestoredAmbient: (opts?: { force?: boolean }) => Promise<boolean>;
   /** Give up on restored sounds that never started, so the sliders match what plays. */
   dropUnstartedAmbient: () => void;
-  updateCurrentlyPlayingForAmbients: () => void;
-  playAudio: (source: AudioSource) => Promise<void>;
   togglePlayPause: () => Promise<void>;
   stop: () => Promise<void>;
 
@@ -121,32 +106,16 @@ interface AudioState {
   updateVolume: (volume: number) => void;
   toggleMute: () => void;
   updateAudioSettings: (settings: Partial<AudioSettings>) => void;
-  resetAudioSettings: () => void;
   setSoundVolume: (soundId: string, volume: number) => void;
 
   // Source switching
   setActiveSource: (source: 'ambient' | 'youtube' | 'none') => Promise<void>;
-  saveAmbientState: () => void;
-  restoreAmbientState: () => Promise<void>;
 
   // Preset management
   loadPreset: (preset: SoundPreset) => Promise<void>;
   savePreset: (name: string, icon?: string) => void;
   deletePreset: (presetId: string) => void;
   renamePreset: (presetId: string, newName: string) => void;
-
-  // Favorites/History
-  addToFavorites: (soundId: string) => void;
-  removeFromFavorites: (soundId: string) => void;
-  toggleFavorite: (soundId: string) => void;
-  addToRecentlyPlayed: (soundId: string) => void;
-
-  getAudioStats: () => {
-    totalPlayTime: number;
-    favoriteCount: number;
-    mostPlayedType: string;
-    recentActivity: string[];
-  };
 }
 
 function mixedAmbientPlaying(count: number, masterVolume: number): CurrentlyPlayingAudio {
@@ -165,24 +134,23 @@ function mixedAmbientPlaying(count: number, masterVolume: number): CurrentlyPlay
 const defaultAudioSettings: AudioSettings = {
   masterVolume: 50,
   isMuted: false,
-  fadeInOut: true,
   activeSource: 'none',
   alarmType: 'bell',
   alarmVolume: 70,
   youtubeUrl: '',
 };
 
+// v3 -> v4: favorites, recently played, history and the saved mix were dropped (see `migrate`)
+const AUDIO_STORE_VERSION = 4;
+const REMOVED_STATE_KEYS = ['audioHistory', 'favorites', 'recentlyPlayed', 'savedAmbientState'] as const;
+
 export const useAudioStore = create<AudioState>()(
   persist(
     (set, get) => ({
       currentlyPlaying: null,
-      audioHistory: [],
       audioSettings: defaultAudioSettings,
-      favorites: [],
-      recentlyPlayed: [],
       activeAmbientSounds: [],
       presets: [],
-      savedAmbientState: [],
       ambientRestore: 'none',
 
       setCurrentlyPlaying: (audio) => {
@@ -205,24 +173,6 @@ export const useAudioStore = create<AudioState>()(
         const audioWithTimestamp = audio ? { ...audio, timestamp } : null;
 
         set({ currentlyPlaying: audioWithTimestamp });
-
-        // Only add to history if it's a new item or if history is empty
-        if (
-          audioWithTimestamp &&
-          (!current || current.id !== audioWithTimestamp.id)
-        ) {
-          get().addToHistory(audioWithTimestamp);
-          get().addToRecentlyPlayed(audioWithTimestamp.id);
-        }
-      },
-
-      addToHistory: (audio) => {
-        set((state) => ({
-          audioHistory: [
-            audio,
-            ...state.audioHistory.filter((item) => item.id !== audio.id),
-          ].slice(0, 20),
-        }));
       },
 
       clearCurrentlyPlaying: () => {
@@ -295,26 +245,10 @@ export const useAudioStore = create<AudioState>()(
           }
 
           // BATCH all updates into single set() to prevent multiple re-renders
-          set((state) => ({
+          set({
             activeAmbientSounds: newActiveAmbientSounds,
             currentlyPlaying: newCurrentlyPlaying,
-            audioHistory: newCurrentlyPlaying
-              ? [
-                  newCurrentlyPlaying,
-                  ...state.audioHistory.filter(
-                    (item) => item.id !== newCurrentlyPlaying!.id,
-                  ),
-                ].slice(0, 20)
-              : state.audioHistory,
-            recentlyPlayed: newCurrentlyPlaying
-              ? [
-                  newCurrentlyPlaying.id,
-                  ...state.recentlyPlayed.filter(
-                    (id) => id !== newCurrentlyPlaying!.id,
-                  ),
-                ].slice(0, 10)
-              : state.recentlyPlayed,
-          }));
+          });
         }
       },
 
@@ -410,67 +344,6 @@ export const useAudioStore = create<AudioState>()(
           ),
           ambientRestore: 'none',
         }));
-      },
-
-      updateCurrentlyPlayingForAmbients: () => {
-        const { activeAmbientSounds, currentlyPlaying } = get();
-
-        // If playing main source, do NOT override it with ambient info
-        if (currentlyPlaying && currentlyPlaying.type !== 'ambient') {
-          return;
-        }
-
-        // Filter only sounds with volume > 0
-        const activeWithVolume = activeAmbientSounds.filter(s => s.volume > 0);
-
-        if (activeWithVolume.length === 0) {
-          get().clearCurrentlyPlaying();
-        } else if (activeWithVolume.length === 1) {
-          const sound = soundCatalog.ambient.find(
-            (s) => s.id === activeWithVolume[0].id,
-          );
-          if (sound) {
-            get().setCurrentlyPlaying({
-              type: 'ambient',
-              id: sound.id,
-              name: sound.label,
-              vn: sound.vn,
-              volume: get().audioSettings.masterVolume,
-              isPlaying: true,
-            });
-          }
-        } else {
-          // Multiple ambients - show mixed status
-          get().setCurrentlyPlaying(
-            mixedAmbientPlaying(activeWithVolume.length, get().audioSettings.masterVolume),
-          );
-        }
-      },
-
-      playAudio: async (source) => {
-        const { audioSettings } = get();
-
-        // Ensure volume matches global settings
-        source.volume = audioSettings.masterVolume;
-
-        const success = await audioManager.play(source);
-
-        if (success) {
-          get().setCurrentlyPlaying({
-            type: source.type as 'ambient' | 'youtube',
-            id: source.id,
-            name: source.name,
-            vn: source.vn,
-            volume: source.volume,
-            isPlaying: true,
-            source: source,
-          });
-
-          // Apply mute state if needed
-          if (audioSettings.isMuted) {
-            audioManager.setMute(true);
-          }
-        }
       },
 
       togglePlayPause: async () => {
@@ -585,22 +458,6 @@ export const useAudioStore = create<AudioState>()(
         }));
       },
 
-      saveAmbientState: () => {
-        const { activeAmbientSounds } = get();
-        set({ savedAmbientState: [...activeAmbientSounds] });
-      },
-
-      restoreAmbientState: async () => {
-        const { savedAmbientState } = get();
-        // Stop current ambients
-        await get().stopAllAmbient();
-        // Replay saved sounds (filter out 0% volume sounds)
-        for (const sound of savedAmbientState.filter(s => s.volume > 0)) {
-          await get().playAmbient(sound.id, sound.volume);
-        }
-        set({ savedAmbientState: [] });
-      },
-
       // --- Preset Management ---
 
       loadPreset: async (preset) => {
@@ -672,80 +529,12 @@ export const useAudioStore = create<AudioState>()(
           audioSettings: { ...state.audioSettings, ...settings },
         }));
       },
-
-      resetAudioSettings: () => {
-        set({ audioSettings: defaultAudioSettings });
-        audioManager.setVolume(defaultAudioSettings.masterVolume);
-        audioManager.setMute(defaultAudioSettings.isMuted);
-      },
-
-      addToFavorites: (soundId) => {
-        set((state) => ({
-          favorites: [...state.favorites, soundId],
-        }));
-      },
-
-      removeFromFavorites: (soundId) => {
-        set((state) => ({
-          favorites: state.favorites.filter((id) => id !== soundId),
-        }));
-      },
-
-      toggleFavorite: (soundId) => {
-        const { favorites } = get();
-        if (favorites.includes(soundId)) {
-          get().removeFromFavorites(soundId);
-        } else {
-          get().addToFavorites(soundId);
-        }
-      },
-
-      addToRecentlyPlayed: (soundId) => {
-        set((state) => ({
-          recentlyPlayed: [
-            soundId,
-            ...state.recentlyPlayed.filter((id) => id !== soundId),
-          ].slice(0, 10),
-        }));
-      },
-
-      getAudioStats: () => {
-        const { audioHistory, favorites } = get();
-
-        const totalPlayTime = audioHistory.reduce((total, audio) => {
-          if (audio.timestamp) {
-            const playTime = audio.duration || 0;
-            return total + playTime;
-          }
-          return total;
-        }, 0);
-
-        const typeCounts: Record<string, number> = {};
-        audioHistory.forEach((audio) => {
-          typeCounts[audio.type] = (typeCounts[audio.type] || 0) + 1;
-        });
-
-        const mostPlayedType = Object.keys(typeCounts).reduce(
-          (a, b) => (typeCounts[a] > typeCounts[b] ? a : b),
-          'ambient',
-        );
-
-        const recentActivity = audioHistory
-          .slice(0, 5)
-          .map((audio) => `${audio.name} (${audio.type})`);
-
-        return {
-          totalPlayTime,
-          favoriteCount: favorites.length,
-          mostPlayedType,
-          recentActivity,
-        };
-      },
     }),
     {
       name: 'audio-storage-v2',
-      version: 3,
-      migrate: (persistedState: any, version: number) => {
+      version: AUDIO_STORE_VERSION,
+      migrate: (storedState: any, version: number) => {
+        const persistedState = storedState ?? {};
         if (version < 3) {
           // Convert string[] to AmbientSoundState[]
           if (Array.isArray(persistedState.activeAmbientSounds)) {
@@ -774,18 +563,17 @@ export const useAudioStore = create<AudioState>()(
           delete persistedState.audioSettings?.notificationVolume;
           // Init new state
           if (!persistedState.presets) persistedState.presets = [];
-          if (!persistedState.savedAmbientState)
-            persistedState.savedAmbientState = [];
+        }
+        if (version < 4) {
+          // Favorites, recently played, play history, the saved mix and the fade flag had no UI
+          for (const key of REMOVED_STATE_KEYS) delete persistedState[key];
+          delete persistedState.audioSettings?.fadeInOut;
         }
         return persistedState as PersistedAudio;
       },
       partialize: (state) => ({
-        audioHistory: state.audioHistory,
         audioSettings: state.audioSettings,
-        favorites: state.favorites,
-        recentlyPlayed: state.recentlyPlayed,
         presets: state.presets,
-        savedAmbientState: state.savedAmbientState,
         // The mix (ids + per-sound volume) survives a reload; playback restarts on a gesture
         activeAmbientSounds: state.activeAmbientSounds,
         ambientPaused:
@@ -817,12 +605,3 @@ export const useAudioStore = create<AudioState>()(
     },
   ),
 );
-
-// Export audio manager functions
-export {
-  audioManager,
-  playAmbientSound,
-  stopAllAudio,
-  setAudioVolume,
-  setAudioMute,
-} from '@/lib/audio/audio-manager';

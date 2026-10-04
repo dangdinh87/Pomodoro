@@ -28,8 +28,8 @@ import { soundCatalog } from '@/lib/audio/sound-catalog';
 const [A, B, C] = soundCatalog.ambient.map((s) => s.id);
 const KEY = 'audio-storage-v2';
 
-function seed(state: Record<string, unknown>) {
-  window.localStorage.setItem(KEY, JSON.stringify({ state, version: 3 }));
+function seed(state: Record<string, unknown>, version = 4) {
+  window.localStorage.setItem(KEY, JSON.stringify({ state, version }));
 }
 
 beforeEach(() => {
@@ -237,5 +237,52 @@ describe('playAmbient races', () => {
     const ids = useAudioStore.getState().activeAmbientSounds.map((s) => s.id).sort();
     expect(ids).toEqual([A, B].sort());
     expect(useAudioStore.getState().currentlyPlaying).toMatchObject({ id: 'mixed-ambient', count: 2 });
+  });
+});
+
+describe('storage v3 -> v4 (favorites, history, saved mix and fadeInOut dropped)', () => {
+  const v3 = {
+    activeAmbientSounds: [{ id: A, volume: 30 }],
+    audioSettings: { masterVolume: 80, isMuted: true, fadeInOut: true, activeSource: 'ambient', alarmType: 'chime', alarmVolume: 40 },
+    presets: [{ id: 'user-1', name: 'Mine', sounds: [{ id: A, volume: 30 }], isBuiltIn: false }],
+    audioHistory: [{ type: 'ambient', id: A, name: 'Rain', volume: 50, isPlaying: true }],
+    favorites: [A],
+    recentlyPlayed: [A],
+    savedAmbientState: [{ id: B, volume: 20 }],
+  };
+
+  it('keeps the mix, settings and presets and drops the dead fields on rehydrate', async () => {
+    seed(v3, 3);
+    await useAudioStore.persist.rehydrate();
+
+    const s = useAudioStore.getState() as unknown as Record<string, unknown>;
+    for (const key of ['audioHistory', 'favorites', 'recentlyPlayed', 'savedAmbientState']) expect(s).not.toHaveProperty(key);
+    expect(s.audioSettings).not.toHaveProperty('fadeInOut');
+    expect(s.audioSettings).toMatchObject({ masterVolume: 80, isMuted: true, activeSource: 'ambient', alarmType: 'chime', alarmVolume: 40 });
+    expect(s.activeAmbientSounds).toEqual([{ id: A, volume: 30 }]);
+    expect(s.presets).toEqual(v3.presets);
+  });
+
+  it('writes v4 without the dead fields on the next save', async () => {
+    seed(v3, 3);
+    await useAudioStore.persist.rehydrate();
+    useAudioStore.getState().updateAudioSettings({ masterVolume: 60 });
+
+    const saved = JSON.parse(window.localStorage.getItem(KEY)!);
+    expect(saved.version).toBe(4);
+    for (const key of ['audioHistory', 'favorites', 'recentlyPlayed', 'savedAmbientState']) expect(saved.state).not.toHaveProperty(key);
+    expect(saved.state.audioSettings).not.toHaveProperty('fadeInOut');
+    expect(saved.state.audioSettings.masterVolume).toBe(60);
+  });
+
+  it('still upgrades a v2 payload (string ids, old volume key) all the way', async () => {
+    seed({ activeAmbientSounds: [A], audioSettings: { volume: 65, fadeInOut: false }, favorites: [A] }, 2);
+    await useAudioStore.persist.rehydrate();
+
+    const s = useAudioStore.getState();
+    expect(s.activeAmbientSounds).toEqual([{ id: A, volume: 50 }]);
+    expect(s.audioSettings.masterVolume).toBe(65);
+    expect(s.audioSettings).not.toHaveProperty('fadeInOut');
+    expect(s).not.toHaveProperty('favorites');
   });
 });

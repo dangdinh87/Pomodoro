@@ -1,7 +1,5 @@
 "use client"
 
-import { soundCatalog } from './sound-catalog'
-
 export type PlayOptions = {
   loop?: boolean;
   volume?: number;
@@ -437,33 +435,3 @@ export class AudioManager {
 // Singleton instance
 export const audioManager = new AudioManager()
 export default audioManager
-
-// Helper functions for common operations
-export const playAmbientSound = async (soundId: string, volume = 50): Promise<boolean> => {
-  const sound = soundCatalog.ambient.find((s: any) => s.id === soundId)
-  if (!sound) return false
-
-  const source: AudioSource = {
-    id: sound.id,
-    type: 'ambient',
-    name: sound.label,
-    vn: sound.vn,
-    url: sound.url,
-    volume,
-    loop: true
-  }
-
-  return await audioManager.play(source)
-}
-
-export const stopAllAudio = async (): Promise<void> => {
-  await audioManager.stop()
-}
-
-export const setAudioVolume = (volume: number): void => {
-  audioManager.setVolume(volume)
-}
-
-export const setAudioMute = (muted: boolean): void => {
-  audioManager.setMute(muted)
-}
