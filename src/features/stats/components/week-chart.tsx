@@ -32,29 +32,32 @@ export function WeekChart({ data }: WeekChartProps) {
         >
             {days.map((day) => {
                 const isToday = day.key === todayKey
-                const height = day.minutes === 0 ? 3 : Math.max(6, Math.round((day.minutes / max) * CHART_HEIGHT))
+                const height = day.minutes === 0 ? 6 : Math.max(14, Math.round((day.minutes / max) * CHART_HEIGHT))
                 return (
                     <li
                         key={day.key}
                         aria-label={`${day.full}: ${t('historyUi.minutesShort', { minutes: day.minutes })}`}
                         className="flex min-w-0 flex-col items-center gap-2"
                     >
-                        <span className={cn('text-xs tabular-nums', day.minutes ? 'text-ink-secondary' : 'text-ink-faint')}>
+                        <span className={cn('font-heading text-sm font-bold tabular-nums', day.minutes ? 'text-ink' : 'text-ink-muted')}>
                             {day.minutes}
                         </span>
-                        <div className="flex items-end border-b border-border-strong" style={{ height: CHART_HEIGHT }}>
+                        <div className="flex items-end border-b-2 border-border" style={{ height: CHART_HEIGHT }}>
+                            {/* Rounded, outlined bar: today is the accent colour, other days butter, an empty day a flat raised stub. */}
                             <div
-                                className="w-6 rounded-t-sm transition-[height] duration-500 ease-out motion-reduce:transition-none sm:w-9"
-                                style={{
-                                    height,
-                                    background: isToday
-                                        ? 'var(--accent-solid)'
-                                        : 'var(--border-strong)',
-                                    opacity: day.minutes === 0 ? 0.5 : 1,
-                                }}
+                                data-today={isToday}
+                                className={cn(
+                                    'w-6 rounded-t-xl border-2 border-b-0 transition-[height] duration-500 ease-out motion-reduce:transition-none sm:w-9',
+                                    day.minutes === 0
+                                        ? 'rounded-t-md border-control-edge bg-surface-raised'
+                                        : isToday
+                                          ? 'border-outline bg-primary'
+                                          : 'border-outline bg-candy-butter',
+                                )}
+                                style={{ height }}
                             />
                         </div>
-                        <span className={cn('text-xs', isToday ? 'font-semibold text-ink' : 'text-ink-muted')}>{day.label}</span>
+                        <span className={cn('text-xs', isToday ? 'font-semibold text-ink' : 'font-medium text-ink-muted')}>{day.label}</span>
                     </li>
                 )
             })}

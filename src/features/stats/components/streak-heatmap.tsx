@@ -11,9 +11,11 @@ export function heatmapRange(today = studyTodayDate()) {
     return { from: startOfWeek(subWeeks(today, WEEKS - 1), { weekStartsOn: 1 }), to: today }
 }
 
-const LEVEL_MIX = [0, 30, 55, 80, 100]
+/** Share of the accent colour mixed into the empty-cell colour, per level (0 = no focus ... 4 = 2h+). */
+export const HEATMAP_LEVEL_MIX = [0, 30, 55, 80, 100] as const;
 
-function levelFor(minutes: number): number {
+/** Bucket a day's focus minutes into a colour level 0-4. */
+export function levelFor(minutes: number): number {
     if (minutes <= 0) return 0
     if (minutes < 25) return 1
     if (minutes < 60) return 2
@@ -21,11 +23,18 @@ function levelFor(minutes: number): number {
     return 4
 }
 
+// Cream (the raised surface) to the accent colour (tomato by default; follows the chosen colour set).
+// Both ends are theme tokens, so the same scale works in light and dark.
 function levelColor(level: number): string {
     return level === 0
         ? 'var(--surface-raised)'
-        : `color-mix(in srgb, var(--accent-solid) ${LEVEL_MIX[level]}%, var(--surface-raised))`
+        : `color-mix(in srgb, var(--accent-solid) ${HEATMAP_LEVEL_MIX[level]}%, var(--surface-raised))`
 }
+
+// Thin outline on every cell; empty cells get the quiet divider colour so they read as slots.
+const CELL = 'aspect-square min-w-3.5 rounded-[4px] border'
+const LEGEND_CELL = 'size-3.5 shrink-0 rounded-[4px] border'
+const cellBorder = (level: number) => (level === 0 ? 'var(--border)' : 'var(--outline)')
 
 interface StreakHeatmapProps {
     data: { date: string; duration: number }[]
@@ -53,37 +62,42 @@ export function StreakHeatmap({ data }: StreakHeatmapProps) {
     return (
         <div>
             <div className="flex gap-2">
-                <div className="grid shrink-0 grid-rows-7 gap-[3px] pr-1 text-[0.6875rem] leading-3 text-ink-faint" aria-hidden>
+                {/* same 7 rows and 3px gap as the cells, so each weekday label lines up with its row */}
+                <div className="grid shrink-0 grid-rows-7 gap-[3px] pr-1 text-[0.6875rem] font-semibold leading-none text-ink-muted" aria-hidden>
                     {Array.from({ length: 7 }, (_, r) => (
-                        <span key={r} className="h-3">
+                        <span key={r} className="flex items-center">
                             {r % 2 === 0 ? weekdayLabel(r) : ''}
                         </span>
                     ))}
                 </div>
-                <div role="list" className="grid grid-flow-col grid-rows-7 gap-[3px]" style={{ gridTemplateColumns: `repeat(${WEEKS}, 12px)` }}>
+                <div role="list" className="grid min-w-0 flex-1 grid-flow-col grid-rows-7 gap-[3px]" style={{ gridTemplateColumns: `repeat(${WEEKS}, minmax(14px, 1fr))` }}>
                     {columns.flat().map((cell) =>
                         cell.future ? (
-                            <span key={cell.key} className="size-3" aria-hidden />
+                            <span key={cell.key} className="aspect-square" aria-hidden />
                         ) : (
                             <span
                                 key={cell.key}
                                 role="listitem"
+                                data-level={levelFor(cell.minutes)}
                                 title={cellLabel(cell.minutes, cell.date)}
                                 aria-label={cellLabel(cell.minutes, cell.date)}
-                                className="size-3 rounded-[3px]"
+                                className={CELL}
                                 style={{
                                     background: levelColor(levelFor(cell.minutes)),
-                                    boxShadow: cell.key === todayKey ? 'inset 0 0 0 1px var(--ink-secondary)' : undefined,
+                                    borderColor: cellBorder(levelFor(cell.minutes)),
+                                    // today: a ring outside the cell, so it shows even on the darkest level
+                                    outline: cell.key === todayKey ? '2px solid var(--ink)' : undefined,
+                                    outlineOffset: cell.key === todayKey ? 1 : undefined,
                                 }}
                             />
                         ),
                     )}
                 </div>
             </div>
-            <div className="mt-3 flex items-center gap-1.5 text-xs text-ink-muted">
+            <div className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-ink-muted">
                 <span>{t('historyUi.heatmap.less')}</span>
-                {LEVEL_MIX.map((_, level) => (
-                    <span key={level} className="size-3 rounded-[3px]" style={{ background: levelColor(level) }} aria-hidden />
+                {HEATMAP_LEVEL_MIX.map((_, level) => (
+                    <span key={level} className={LEGEND_CELL} style={{ background: levelColor(level), borderColor: cellBorder(level) }} aria-hidden />
                 ))}
                 <span>{t('historyUi.heatmap.more')}</span>
             </div>

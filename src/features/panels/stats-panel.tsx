@@ -8,6 +8,8 @@ import { EmptyState } from "@/components/ui/empty-state"
 import { FilterChip, FilterChipGroup } from "@/components/ui/filter-chip"
 import { PanelBody, PageHeader, SectionHeading } from "@/components/ui/page-header"
 import { StatStrip } from "@/components/ui/stat-strip"
+import { StreakPill } from "@/components/ui/streak-pill"
+import { Fire, Target, Timer, Trophy } from "@phosphor-icons/react/dist/ssr"
 import { useAuth } from "@/hooks/use-auth"
 import { useStats } from "@/hooks/use-stats"
 import { useHistory } from "@/hooks/use-history"
@@ -41,18 +43,23 @@ export default function StatsPanel() {
     const { data: trendData, isLoading: isTrendLoading } = useStats(trendRange)
     const { data: historyData, isLoading: isHistoryLoading, isError: isHistoryError } = useHistory(dateRange)
 
+    const currentStreak = statsData?.summary.streak.current ?? 0
+
     const header = (
         <PageHeader
             title={t("historyUi.title")}
             description={t("historyUi.description")}
             actions={
-                <FilterChipGroup label={t("historyUi.rangeLabel")}>
-                    {RANGE_KEYS.map((key) => (
-                        <FilterChip key={key} active={rangeKey === key} onClick={() => setRangeKey(key)}>
-                            {t(`historyUi.ranges.${key}`)}
-                        </FilterChip>
-                    ))}
-                </FilterChipGroup>
+                <>
+                    {currentStreak > 0 && <StreakPill count={currentStreak} />}
+                    <FilterChipGroup label={t("historyUi.rangeLabel")}>
+                        {RANGE_KEYS.map((key) => (
+                            <FilterChip key={key} active={rangeKey === key} onClick={() => setRangeKey(key)}>
+                                {t(`historyUi.ranges.${key}`)}
+                            </FilterChip>
+                        ))}
+                    </FilterChipGroup>
+                </>
             }
         />
     )
@@ -104,47 +111,47 @@ export default function StatsPanel() {
             {isLoading ? (
                 <HistoryLoading />
             ) : isStatsError || isHistoryError || !statsData || !historyData ? (
-                <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-lg border border-border bg-surface text-center">
-                    <p className="text-sm text-ink-secondary">{t("historyUi.error")}</p>
-                    <Button variant="outline" onClick={() => window.location.reload()}>
-                        {t("common.retry")}
-                    </Button>
-                </div>
+                <EmptyState
+                    face="worried"
+                    title={t("historyUi.error")}
+                    action={
+                        <Button variant="secondary" onClick={() => window.location.reload()}>
+                            {t("common.retry")}
+                        </Button>
+                    }
+                />
             ) : !hasAnyActivity ? (
-                <div className="rounded-lg border border-border bg-surface">
-                    <EmptyState
-                        title={t("historyUi.empty.title")}
-                        description={t("historyUi.empty.description")}
-                        action={
-                            <Button onClick={closePanel}>{t("historyUi.empty.action")}</Button>
-                        }
-                    />
-                </div>
+                <EmptyState
+                    face="sleepy"
+                    title={t("historyUi.empty.title")}
+                    description={t("historyUi.empty.description")}
+                    action={<Button onClick={closePanel}>{t("historyUi.empty.action")}</Button>}
+                />
             ) : (
                 <div className="space-y-10">
                     <StatStrip
                         items={[
-                            { label: t("historyUi.stats.focusTime"), value: formatFocus(statsData.summary.totalFocusTime) },
-                            { label: t("historyUi.stats.sessions"), value: statsData.summary.completedSessions },
-                            { label: t("historyUi.stats.currentStreak"), value: formatDays(statsData.summary.streak.current) },
-                            { label: t("historyUi.stats.bestStreak"), value: formatDays(statsData.summary.streak.longest) },
+                            { label: t("historyUi.stats.focusTime"), value: formatFocus(statsData.summary.totalFocusTime), icon: Timer, tone: "tomato" },
+                            { label: t("historyUi.stats.sessions"), value: statsData.summary.completedSessions, icon: Target, tone: "mint" },
+                            { label: t("historyUi.stats.currentStreak"), value: formatDays(statsData.summary.streak.current), icon: Fire, tone: "butter" },
+                            { label: t("historyUi.stats.bestStreak"), value: formatDays(statsData.summary.streak.longest), icon: Trophy, tone: "lilac" },
                         ]}
                     />
 
                     <div className="grid gap-x-8 gap-y-10 lg:grid-cols-[minmax(0,1fr)_auto]">
                         <section>
-                            <SectionHeading action={<span className="text-xs text-ink-muted">{t("historyUi.chart.subtitle")}</span>}>
+                            <SectionHeading action={<span className="text-xs font-semibold text-ink-muted">{t("historyUi.chart.subtitle")}</span>}>
                                 {t("historyUi.chart.title")}
                             </SectionHeading>
-                            <div className="rounded-lg border border-border bg-surface p-4 sm:p-5">
+                            <div className="sticker p-4 sm:p-5">
                                 <WeekChart data={trend} />
                             </div>
                         </section>
                         <section>
-                            <SectionHeading action={<span className="text-xs text-ink-muted">{t("historyUi.heatmap.subtitle")}</span>}>
+                            <SectionHeading action={<span className="text-xs font-semibold text-ink-muted">{t("historyUi.heatmap.subtitle")}</span>}>
                                 {t("historyUi.heatmap.title")}
                             </SectionHeading>
-                            <div className="rounded-lg border border-border bg-surface p-4 sm:p-5">
+                            <div className="sticker p-4 sm:p-5">
                                 <StreakHeatmap data={trend} />
                             </div>
                         </section>

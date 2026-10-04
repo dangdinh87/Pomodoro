@@ -1,6 +1,7 @@
 'use client'
 
 import { Badge } from '@/components/ui/badge'
+import { Tomo } from '@/components/brand/tomo'
 import { useI18n } from '@/contexts/i18n-context'
 import { cn } from '@/lib/utils'
 import { INTL_LOCALE } from './history-format'
@@ -11,7 +12,8 @@ interface SessionListProps {
     sessions: { id: string; taskName: string | null; mode: Mode; date: string; duration: number }[]
 }
 
-const MODE_VARIANT = { work: 'brand', shortBreak: 'secondary', longBreak: 'outline' } as const
+// Same colours as the timer modes: focus = tomato, short break = mint, long break = sky.
+const MODE_VARIANT = { work: 'brand', shortBreak: 'success', longBreak: 'info' } as const
 const MAX_ROWS = 50
 
 export function SessionList({ sessions }: SessionListProps) {
@@ -19,14 +21,15 @@ export function SessionList({ sessions }: SessionListProps) {
 
     if (sessions.length === 0) {
         return (
-            <p className="rounded-lg border border-border bg-surface px-5 py-8 text-center text-sm text-ink-muted">
-                {t('historyUi.sessions.none')}
-            </p>
+            <div className="sticker flex items-center justify-center gap-4 px-5 py-7">
+                <Tomo face="sleepy" size={56} className="shrink-0" />
+                <p className="text-sm font-semibold text-ink-muted">{t('historyUi.sessions.none')}</p>
+            </div>
         )
     }
 
     return (
-        <ul className="m-0 list-none divide-y divide-border overflow-hidden rounded-lg border border-border bg-surface p-0">
+        <ul className="sticker m-0 list-none divide-y-2 divide-border overflow-hidden p-0">
             {sessions.slice(0, MAX_ROWS).map((session) => (
                 <li
                     key={session.id}
@@ -46,7 +49,7 @@ export function SessionList({ sessions }: SessionListProps) {
                     <span
                         className={cn(
                             'order-1 min-w-0 truncate text-sm sm:order-0',
-                            session.taskName ? 'font-medium text-ink' : 'text-ink-muted',
+                            session.taskName ? 'font-semibold text-ink' : 'font-medium text-ink-muted',
                         )}
                     >
                         {session.taskName ?? t('historyUi.sessions.noTask')}
@@ -54,7 +57,7 @@ export function SessionList({ sessions }: SessionListProps) {
                     <Badge variant={MODE_VARIANT[session.mode]} className="order-3 justify-self-start sm:order-0 sm:justify-self-auto">
                         {t(`historyUi.sessions.modes.${session.mode}`)}
                     </Badge>
-                    <span className="order-2 text-right text-sm tabular-nums text-ink-secondary sm:order-0">
+                    <span className="order-2 text-right font-heading text-sm font-bold tabular-nums text-ink sm:order-0">
                         {t('historyUi.minutesShort', { minutes: Math.round(session.duration / 60) })}
                     </span>
                 </li>
