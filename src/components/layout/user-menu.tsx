@@ -48,9 +48,9 @@ export function UserMenu() {
         aria-label={user ? user.name || user.email || t('nav.settings') : t('nav.login')}
       >
         {user ? (
-          <Avatar className="size-8 border border-border">
+          <Avatar className="size-8">
             <AvatarImage src={user.avatarUrl || ''} alt="" />
-            <AvatarFallback className="bg-surface-raised text-[0.8125rem] font-semibold text-ink-secondary">
+            <AvatarFallback name={user.name || user.email || undefined} className="text-[0.8125rem]">
               {initial}
             </AvatarFallback>
           </Avatar>

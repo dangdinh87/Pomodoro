@@ -127,7 +127,7 @@ export function AccountSettings() {
         <div className="flex items-center gap-3.5 px-4 py-4 sm:px-5">
           <Avatar className="size-11">
             {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt="" />}
-            <AvatarFallback className="bg-surface-raised font-heading text-base font-bold text-ink-secondary">
+            <AvatarFallback name={user.name || user.email || undefined} className="text-base">
               {initial}
             </AvatarFallback>
           </Avatar>
