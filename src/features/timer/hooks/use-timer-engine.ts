@@ -8,7 +8,7 @@ import { shouldFlushOnAuthChange } from '@/lib/timer/session-recorder';
 import { useOutboxDropNotice } from '@/lib/timer/use-outbox-drop-notice';
 import { playAlarm, preloadAlarm } from '@/lib/timer/alarm';
 import { mayAutoChain } from '@/lib/timer/auto-chain';
-import { claimCompletion, completionKey } from '@/lib/timer/completion-claim';
+import { claimCompletion, completionKey, phaseSessionId } from '@/lib/timer/completion-claim';
 import { notifyPhaseComplete } from '@/lib/timer/notifications';
 import { useI18n } from '@/contexts/i18n-context';
 import { announceFocusComplete } from '@/features/mascot/celebration-store';
@@ -222,6 +222,8 @@ export function useTimerEngine() {
       // The phase really ended at its deadline, even if this tab noticed late
       // (throttled in the background, or reopened within the grace window)
       const endedAt = state.deadlineAt ?? undefined;
+      // Every window finishing this phase records it under the same id (the server dedupes)
+      const clientSessionId = phaseSessionId(currentMode, state.deadlineAt);
 
       if (stale) {
         // Too old to be a real session: no record, no counters, no streak
@@ -239,9 +241,10 @@ export function useTimerEngine() {
           // Ran to its deadline: the only way to earn the task a pomodoro
           completedFullSession: true,
           endedAt,
+          clientSessionId,
         });
       } else {
-        void record({ taskId: null, durationSec: duration, mode: currentMode, endedAt });
+        void record({ taskId: null, durationSec: duration, mode: currentMode, endedAt, clientSessionId });
       }
 
       // Auto-Transition (new phase starts a fresh baseline). A break only rolls

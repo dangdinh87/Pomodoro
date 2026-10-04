@@ -83,6 +83,7 @@ describe('useTimerEngine', () => {
       mode: 'work',
       completedFullSession: true, // ran to its deadline: earns the pomodoro
       endedAt: NOW + 2000,
+      clientSessionId: `work_${NOW + 2000}`, // same phase, same id in every window
     });
     expect(mockPlayAlarm).toHaveBeenCalledTimes(1);
     expect(mockNotify).toHaveBeenCalledWith('work', expect.any(Function));
@@ -113,6 +114,7 @@ describe('useTimerEngine', () => {
       mode: 'work',
       completedFullSession: true,
       endedAt: NOW - 5000, // the real end, not the moment the app reopened
+      clientSessionId: `work_${NOW - 5000}`,
     });
     expect(mockPlayAlarm).not.toHaveBeenCalled();
     const s = useTimerStore.getState();
@@ -231,6 +233,7 @@ describe('useTimerEngine', () => {
       durationSec: 300,
       mode: 'shortBreak',
       endedAt: NOW + 1000,
+      clientSessionId: `shortBreak_${NOW + 1000}`,
     });
     expect(useTimerStore.getState().mode).toBe('work');
   });

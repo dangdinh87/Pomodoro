@@ -13,6 +13,11 @@ export interface SessionPayload {
   completedFullSession?: boolean;
   /** When the segment ended (epoch ms). Defaults to the moment it is recorded. */
   endedAt?: number;
+  /**
+   * Idempotency key chosen by the caller when the same segment can be recorded
+   * from several windows at once (see `phaseSessionId`). Default: a random id.
+   */
+  clientSessionId?: string;
 }
 
 // Outbox: every session is written to the queue BEFORE it is sent and removed
@@ -202,9 +207,10 @@ export async function recordSession(
 
   const { user, isLoading } = useAuthStore.getState();
   const now = Date.now();
+  const { clientSessionId, ...rest } = payload;
   const item: QueuedSession = {
-    id: newId(),
-    payload: { ...payload, durationSec, endedAt: payload.endedAt ?? now },
+    id: clientSessionId ?? newId(),
+    payload: { ...rest, durationSec, endedAt: payload.endedAt ?? now },
     userId: user?.id ?? null,
     guest: user?.isAnonymous,
     queuedAt: now,
@@ -212,7 +218,9 @@ export async function recordSession(
     // Mark in flight right away so a concurrent flush cannot send it twice
     sendingAt: user || !isLoading ? now : undefined,
   };
-  updateQueue((q) => [...q, item]);
+  // Another window may have queued this very phase a moment ago (same caller id):
+  // keep a single item; both windows still post, and the server drops the repeat.
+  updateQueue((q) => (q.some((i) => i.id === item.id) ? q : [...q, item]));
   if (!user && isLoading) return 'queued'; // flushed once auth resolves
 
   if (!user) {

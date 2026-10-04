@@ -66,6 +66,48 @@ describe('session-recorder', () => {
     expect(onRecorded).toHaveBeenCalledTimes(1);
   });
 
+  describe('caller-chosen clientSessionId (the same phase finished in two windows)', () => {
+    it('sends the given id instead of a random one', async () => {
+      fetchMock.mockResolvedValue(res(200));
+      await recordSession({ ...payload, clientSessionId: 'work_1800000000000' });
+      expect(JSON.parse(fetchMock.mock.calls[0][1].body).clientSessionId).toBe('work_1800000000000');
+    });
+
+    it('keeps one outbox item when both windows record the same phase, and both post the same id', async () => {
+      let release: () => void = () => {};
+      const gate = new Promise<void>((resolve) => (release = resolve));
+      fetchMock.mockImplementation(async () => {
+        await gate;
+        return res(200);
+      });
+      const windowA = recordSession({ ...payload, clientSessionId: 'work_1800000000000' });
+      const windowB = recordSession({ ...payload, clientSessionId: 'work_1800000000000' });
+
+      expect(queue()).toHaveLength(1); // the shared outbox never holds the phase twice
+      release();
+      await expect(Promise.all([windowA, windowB])).resolves.toEqual(['recorded', 'recorded']);
+      const ids = fetchMock.mock.calls.map((c) => JSON.parse(c[1].body).clientSessionId);
+      expect(ids).toEqual(['work_1800000000000', 'work_1800000000000']); // the server dedupes on this
+      expect(queue()).toHaveLength(0);
+    });
+
+    it('without a given id every record still gets its own id', async () => {
+      fetchMock.mockResolvedValue(res(200));
+      await recordSession(payload);
+      await recordSession(payload);
+      const [a, b] = fetchMock.mock.calls.map((c) => JSON.parse(c[1].body).clientSessionId);
+      expect(a).not.toBe(b);
+    });
+
+    it('does not persist the id twice in the stored payload', async () => {
+      fetchMock.mockResolvedValue(res(500));
+      await recordSession({ ...payload, clientSessionId: 'work_1800000000000' });
+      const [item] = queue();
+      expect(item.id).toBe('work_1800000000000');
+      expect(item.payload).not.toHaveProperty('clientSessionId');
+    });
+  });
+
   describe('guest without a session', () => {
     beforeEach(() => {
       useAuthStore.setState({ user: null, isLoading: false });
