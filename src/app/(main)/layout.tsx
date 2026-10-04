@@ -1,7 +1,5 @@
 'use client';
 
-import { Suspense } from 'react';
-import GATracker from '@/components/trackings/ga';
 import { AppProviders } from '@/components/providers/app-providers';
 import { useI18n } from '@/contexts/i18n-context';
 
@@ -21,11 +19,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   return (
     <AppProviders>
       <SkipLink />
-      {process.env.NEXT_PUBLIC_GA_ID ? (
-        <Suspense fallback={null}>
-          <GATracker />
-        </Suspense>
-      ) : null}
       <main id="main-content" tabIndex={-1} className="focus:outline-none">
         {children}
       </main>

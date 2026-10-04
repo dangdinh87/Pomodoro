@@ -9,7 +9,7 @@ import { InitialLangProvider } from '@/contexts/i18n-context';
 import { SITE_URL } from '@/config/site';
 import { LOCALE_COOKIE, normalizeLang } from '@/lib/i18n/negotiate-locale';
 import { Baloo_2, Nunito, JetBrains_Mono } from 'next/font/google';
-import Script from 'next/script';
+import { GoogleAnalytics } from '@/components/trackings/ga';
 import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 
@@ -136,21 +136,7 @@ export default async function RootLayout(
             }),
           }}
         />
-        {process.env.NEXT_PUBLIC_GA_ID ? (
-          <>
-            <Script
-              id="ga-loader"
-              strategy="afterInteractive"
-              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
-            />
-            <Script id="ga-init" strategy="afterInteractive">{`
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');
-            `}</Script>
-          </>
-        ) : null}
+        <GoogleAnalytics />
         <InitialLangProvider lang={lang}>{children}</InitialLangProvider>
         <Analytics />
       </body>
