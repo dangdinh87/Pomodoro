@@ -82,11 +82,26 @@ export function readHeadingFont(root: HTMLElement | null): string {
   return family || 'sans-serif';
 }
 
+let webglAvailable: boolean | null = null;
+
+/**
+ * Whether the browser can create a WebGL context. Asked once per page and remembered:
+ * every probe context counts against the browser's small cap (about 16) that the
+ * clock, scene and palette previews also draw from, so it is handed back right away.
+ */
 export function isWebGLAvailable(): boolean {
+  if (webglAvailable !== null) return webglAvailable;
   try {
     const canvas = document.createElement('canvas');
-    return !!(canvas.getContext('webgl2') ?? canvas.getContext('webgl'));
+    const gl = canvas.getContext('webgl2') ?? canvas.getContext('webgl');
+    webglAvailable = !!gl;
+    try {
+      gl?.getExtension('WEBGL_lose_context')?.loseContext();
+    } catch {
+      // Releasing is best effort; the probe itself succeeded
+    }
   } catch {
-    return false;
+    webglAvailable = false;
   }
+  return webglAvailable;
 }
