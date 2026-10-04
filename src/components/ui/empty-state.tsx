@@ -1,18 +1,18 @@
 'use client';
 
 import { type ReactNode } from 'react';
+import { Tomo, type TomoFace } from '@/components/brand/tomo';
 import { cn } from '@/lib/utils';
-
-// WebP preferred (optimized); PNG fallback when WebP not yet generated
-const MASCOT_WEBP = '/mascot/wolf_cute.webp';
-const MASCOT_PNG = '/mascot/wolf_cute.png';
 
 interface EmptyStateProps {
   title: string;
   description?: string;
   action?: ReactNode;
   className?: string;
+  /** Extra classes for the mascot. */
   imageClassName?: string;
+  /** Tomo's expression. */
+  face?: TomoFace;
 }
 
 export function EmptyState({
@@ -21,6 +21,7 @@ export function EmptyState({
   action,
   className,
   imageClassName,
+  face = 'happy',
 }: EmptyStateProps) {
   return (
     <div
@@ -29,18 +30,7 @@ export function EmptyState({
         className
       )}
     >
-      <div className="relative w-32 h-32 shrink-0">
-        <picture>
-          <source srcSet={MASCOT_WEBP} type="image/webp" />
-          <img
-            src={MASCOT_PNG}
-            alt=""
-            width={128}
-            height={128}
-            className={cn('object-contain w-full h-full', imageClassName)}
-          />
-        </picture>
-      </div>
+      <Tomo face={face} size={128} className={cn('shrink-0', imageClassName)} />
       <div className="space-y-2">
         <h3 className="font-heading text-xl font-semibold text-ink">{title}</h3>
         {description && (

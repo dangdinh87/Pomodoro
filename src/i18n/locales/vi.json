@@ -815,7 +815,8 @@
     "description": "Trang bạn đang tìm không tồn tại hoặc đã được di chuyển.",
     "backToTimer": "Về đồng hồ",
     "home": "Trang chủ",
-    "goBack": "Quay lại"
+    "goBack": "Quay lại",
+    "tomoAlt": "Tomo, linh vật cà chua, đang ngủ say"
   },
   "timerComponents": {
     "taskSelector": {

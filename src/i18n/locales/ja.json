@@ -815,7 +815,8 @@
     "description": "お探しのページは存在しないか、移動された可能性があります。",
     "backToTimer": "タイマーに戻る",
     "home": "ホーム",
-    "goBack": "戻る"
+    "goBack": "戻る",
+    "tomoAlt": "ぐっすり眠るトマトのマスコット、トモ"
   },
   "timerComponents": {
     "taskSelector": {
