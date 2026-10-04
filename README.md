@@ -65,7 +65,7 @@ SQL migrations live in [`migrations/`](./migrations) and are currently applied b
 | `pnpm test` | Jest; coverage thresholds are set in `jest.config.js` |
 | `pnpm i18n:check` | Fails if en, vi and ja have different translation keys |
 | `pnpm bg:optimize` | Regenerate optimized background images (also runs before `build`) |
-| `node scripts/generate-pwa-icons.mjs` | Regenerate the PWA icons from `public/images/logo.svg` |
+| `pnpm icons:brand` | Regenerate `favicon.svg`/`.ico`, the PWA icons and `apple-touch-icon.png` from the Tomo artwork (`src/components/brand/tomo-art.ts`) |
 
 ## Project structure
 
