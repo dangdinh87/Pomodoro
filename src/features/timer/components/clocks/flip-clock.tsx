@@ -1,10 +1,11 @@
 'use client';
 
-import { memo, useState, useEffect } from 'react';
+import { memo, useState, useEffect, type CSSProperties } from 'react';
 import { useReducedMotion } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useAnalogClockState } from './use-analog-clock-state';
+import { clockDigitScale } from './clock-digits';
 
 export type FlipClockProps = {
   formattedTime: string;
@@ -14,11 +15,19 @@ export type FlipClockProps = {
   warn?: boolean;
 };
 
+// Viewport-based on purpose (the settings gallery scales this component by measuring it). The maxima keep
+// four tiles (0.82em each) and the colon inside the 560px timer card.
 const sizeClasses = {
-  small: { digit: 'text-[clamp(2.5rem,7vmin,4.5rem)]', gap: 'space-x-1', separator: 'text-[clamp(2.5rem,7vmin,4.5rem)]' },
-  medium: { digit: 'text-[clamp(3.5rem,10vmin,6rem)]', gap: 'space-x-2', separator: 'text-[clamp(3.5rem,10vmin,6rem)]' },
-  large: { digit: 'text-[clamp(4.5rem,13vmin,8rem)]', gap: 'space-x-3', separator: 'text-[clamp(4.5rem,13vmin,8rem)]' },
+  small: { digit: 'text-[length:calc(clamp(2.5rem,14vw,5rem)*var(--clock-scale,1))]', gap: 'space-x-1.5' },
+  medium: { digit: 'text-[length:calc(clamp(3rem,18vw,6.75rem)*var(--clock-scale,1))]', gap: 'space-x-2' },
+  large: { digit: 'text-[length:calc(clamp(3.5rem,19vw,7.5rem)*var(--clock-scale,1))]', gap: 'space-x-3' },
 };
+
+// Tile edge: the sticker outline. The top half carries the top and sides, the bottom half the bottom and sides,
+// and the hinge line between them closes the seam.
+const EDGE_TOP = 'border-t-[length:var(--outline-w)] border-x-[length:var(--outline-w)] border-outline';
+const SEPARATOR_DOT = 'block size-[0.13em] rounded-full border-[length:max(1.5px,0.025em)] border-outline';
+const EDGE_BOTTOM = 'border-b-[length:var(--outline-w)] border-x-[length:var(--outline-w)] border-outline';
 
 const FlipDigit = memo(({ value, color }: { value: string; color: string }) => {
   const reduceMotion = useReducedMotion();
@@ -45,12 +54,12 @@ const FlipDigit = memo(({ value, color }: { value: string; color: string }) => {
 
   return (
     <div 
-      className="relative inline-flex flex-col w-[0.82em] h-[1.3em] font-heading font-bold tabular-nums select-none text-center rounded-lg shadow-[0_0.06em_0.12em_rgb(0_0_0/0.35)]" 
+      className="relative inline-flex flex-col w-[0.82em] h-[1.3em] font-heading font-extrabold tabular-nums select-none text-center rounded-[0.14em] shadow-[0.05em_0.05em_0_var(--outline)]" 
       style={{ perspective: '400px', transformStyle: 'preserve-3d' }}
     >
       {/* STATIC TOP HALF (displays current new value) */}
       <div 
-        className="absolute top-0 left-0 right-0 h-1/2 overflow-hidden bg-surface rounded-t-lg border-t border-x border-border"
+        className={`absolute top-0 left-0 right-0 h-1/2 overflow-hidden bg-surface-raised rounded-t-[0.14em] ${EDGE_TOP}`}
         style={{ backfaceVisibility: 'hidden' }}
       >
         <span 
@@ -68,7 +77,7 @@ const FlipDigit = memo(({ value, color }: { value: string; color: string }) => {
 
       {/* STATIC BOTTOM HALF (displays new value normally, old value only during active flip) */}
       <div 
-        className="absolute bottom-0 left-0 right-0 h-1/2 overflow-hidden bg-surface rounded-b-lg border-b border-x border-border"
+        className={`absolute bottom-0 left-0 right-0 h-1/2 overflow-hidden bg-surface-raised rounded-b-[0.14em] ${EDGE_BOTTOM}`}
         style={{ backfaceVisibility: 'hidden' }}
       >
         <span 
@@ -88,7 +97,7 @@ const FlipDigit = memo(({ value, color }: { value: string; color: string }) => {
       {isFlipping && (
         <div 
           key={`top-${flipId}`}
-          className="absolute top-0 left-0 right-0 h-1/2 overflow-hidden bg-surface rounded-t-lg border-t border-x border-border flip-panel-top-anim"
+          className={`absolute top-0 left-0 right-0 h-1/2 overflow-hidden bg-surface-raised rounded-t-[0.14em] ${EDGE_TOP} flip-panel-top-anim`}
           style={{ 
             transformOrigin: 'bottom',
             backfaceVisibility: 'hidden',
@@ -106,7 +115,7 @@ const FlipDigit = memo(({ value, color }: { value: string; color: string }) => {
             {prevVal}
           </span>
           {/* Shadow Overlay */}
-          <div className="absolute inset-0 bg-black/25 flip-shadow-top-anim pointer-events-none" />
+          <div className="absolute inset-0 bg-outline/25 flip-shadow-top-anim pointer-events-none" />
         </div>
       )}
 
@@ -114,7 +123,7 @@ const FlipDigit = memo(({ value, color }: { value: string; color: string }) => {
       {isFlipping && (
         <div 
           key={`bottom-${flipId}`}
-          className="absolute bottom-0 left-0 right-0 h-1/2 overflow-hidden bg-surface rounded-b-lg border-b border-x border-border flip-panel-bottom-anim"
+          className={`absolute bottom-0 left-0 right-0 h-1/2 overflow-hidden bg-surface-raised rounded-b-[0.14em] ${EDGE_BOTTOM} flip-panel-bottom-anim`}
           style={{ 
             transformOrigin: 'top',
             backfaceVisibility: 'hidden',
@@ -133,13 +142,13 @@ const FlipDigit = memo(({ value, color }: { value: string; color: string }) => {
             {currentVal}
           </span>
           {/* Shadow Overlay */}
-          <div className="absolute inset-0 bg-black/25 flip-shadow-bottom-anim pointer-events-none" />
+          <div className="absolute inset-0 bg-outline/25 flip-shadow-bottom-anim pointer-events-none" />
         </div>
       )}
 
       {/* Center divide line */}
       <div 
-        className="absolute top-1/2 left-0 right-0 h-[1.5px] z-10 bg-border-strong"
+        className="absolute top-1/2 left-0 right-0 z-10 h-[var(--outline-w)] -translate-y-1/2 bg-outline"
       />
     </div>
   );
@@ -153,6 +162,8 @@ export const FlipClock = memo(
     const mins = Math.floor(timeLeft / 60);
     const secs = timeLeft % 60;
     const size = sizeClasses[clockSize];
+    const warning = animConfig.state === 'urgent' || animConfig.state === 'critical';
+    const dotColor = warning ? animConfig.accent : 'var(--accent-solid)';
 
     const minsDigits = String(mins).padStart(2, '0').split('');
     const secsDigits = String(secs).padStart(2, '0').split('');
@@ -204,22 +215,23 @@ export const FlipClock = memo(
             size.digit,
             animConfig.pulse && 'animate-clock-pulse',
           )}
+          style={{ '--clock-scale': clockDigitScale(mins) } as CSSProperties}
         >
           {/* Minutes Digits */}
-          <div className="flex space-x-1 md:space-x-1.5">
+          <div className="flex space-x-2">
             {minsDigits.map((digit, idx) => (
               <FlipDigit key={`min-${idx}`} value={digit} color={animConfig.color} />
             ))}
           </div>
 
           {/* Separator: two dots, stacked on the hinge line */}
-          <div className={cn(size.separator, 'flex h-[1.3em] flex-col items-center justify-center gap-[0.16em] px-[0.04em]')} aria-hidden="true">
-            <span className="block size-[0.1em] rounded-full opacity-70" style={{ backgroundColor: animConfig.color }} />
-            <span className="block size-[0.1em] rounded-full opacity-70" style={{ backgroundColor: animConfig.color }} />
+          <div className="flex h-[1.3em] flex-col items-center justify-center gap-[0.2em] px-[0.03em]" aria-hidden="true">
+            <span className={SEPARATOR_DOT} style={{ backgroundColor: dotColor }} />
+            <span className={SEPARATOR_DOT} style={{ backgroundColor: dotColor }} />
           </div>
 
           {/* Seconds Digits */}
-          <div className="flex space-x-1 md:space-x-1.5">
+          <div className="flex space-x-2">
             {secsDigits.map((digit, idx) => (
               <FlipDigit key={`sec-${idx}`} value={digit} color={animConfig.color} />
             ))}

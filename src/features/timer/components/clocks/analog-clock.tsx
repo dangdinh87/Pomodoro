@@ -1,10 +1,10 @@
 'use client';
 
-import { memo } from 'react';
-import NumberFlow from '@number-flow/react';
+import { memo, type CSSProperties } from 'react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useAnalogClockState } from './use-analog-clock-state';
+import { ClockDigits, clockDigitScale } from './clock-digits';
 
 export type AnalogClockProps = {
   formattedTime: string;
@@ -15,19 +15,19 @@ export type AnalogClockProps = {
   warn?: boolean;
 };
 
-const RADIUS = 90;
+// Geometry in viewBox units (200 x 200): a cream face, a groove with the time left drawn as an outlined arc,
+// a dark-brown hand that points at how much time has gone, and the digits in the middle.
+const RADIUS = 80;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+const ARC_WIDTH = 11;
+const ARC_OUTLINE = 1.7;
 
+// Side of the face. Viewport-based like the other 2D clocks; the 76vw cap keeps it inside the timer card
+// on a phone. The digits are a fixed share of the face, so they never touch the hand.
 const sizeClasses = {
-  small: { container: 'w-[clamp(14rem,35vmin,22rem)] h-[clamp(14rem,35vmin,22rem)]', text: 'text-[clamp(2rem,5vmin,3.5rem)]' },
-  medium: { container: 'w-[clamp(16rem,42vmin,26rem)] h-[clamp(16rem,42vmin,26rem)]', text: 'text-[clamp(2.5rem,7vmin,4.5rem)]' },
-  large: { container: 'w-[clamp(20rem,52vmin,30rem)] h-[clamp(20rem,52vmin,30rem)]', text: 'text-[clamp(3.5rem,10vmin,6rem)]' },
-};
-
-const numberFlowTiming = {
-  transform: { duration: 600, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' as const },
-  spin: { duration: 600, easing: 'cubic-bezier(0.65, 0, 0.35, 1)' as const },
-  opacity: { duration: 350, easing: 'ease-out' as const },
+  small: '[--clock-w:min(64vw,clamp(12rem,27vmin,18rem))]',
+  medium: '[--clock-w:min(76vw,clamp(15rem,34vmin,22rem))]',
+  large: '[--clock-w:min(80vw,clamp(16rem,40vmin,26rem))]',
 };
 
 export const AnalogClock = memo(
@@ -42,145 +42,120 @@ export const AnalogClock = memo(
     const animConfig = useAnalogClockState({ timeLeft, isRunning, warn });
 
     const total = totalTimeForMode || 1;
-    const elapsed = (total - timeLeft) / total; // 0→1 as time passes
+    const elapsed = Math.min(1, Math.max(0, (total - timeLeft) / total)); // 0→1 as time passes
     const remaining = 1 - elapsed;
 
-    // Countdown arc: gap at start (elapsed), solid at end (remaining)
-    // Gap sweeps clockwise from 12 o'clock, remaining arc shrinks behind it
+    // Countdown arc: gap at start (elapsed), solid at end (remaining). The gap sweeps clockwise from 12 o'clock.
     const gapLength = CIRCUMFERENCE * elapsed;
     const solidLength = CIRCUMFERENCE * remaining;
+    const dash = `0 ${gapLength} ${solidLength}`;
+    const angleDeg = elapsed * 360;
 
-    // Head dot at the boundary between gap and remaining (sweeps clockwise)
-    const angle = elapsed * 2 * Math.PI;
-    const headX = 100 + RADIUS * Math.cos(angle);
-    const headY = 100 + RADIUS * Math.sin(angle);
-
-    // Derive minutes/seconds for NumberFlow
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
+    const warning = animConfig.state === 'urgent' || animConfig.state === 'critical';
+    const arcColor = warning ? animConfig.accent : 'var(--accent-solid)';
 
-    const size = sizeClasses[clockSize];
-
-    const svgClassName = cn(
-      'w-full h-full',
-      animConfig.pulse && 'animate-clock-pulse',
-      'clock-color-transition',
-    );
+    const svgClassName = cn('h-full w-full', animConfig.pulse && 'animate-clock-pulse', 'clock-color-transition');
 
     return (
       <div className="text-center">
         <div
-          className={cn('relative mx-auto', size.container)}
-          style={{ color: animConfig.accent }}
+          className={cn('relative mx-auto h-(--clock-w) w-(--clock-w)', sizeClasses[clockSize])}
           role="timer"
           aria-live="off"
           aria-label={t('timer.aria.timeRemaining').replace('{time}', `${minutes}:${String(seconds).padStart(2, '0')}`)}
         >
           {/* Rotation wrapper separated from SVG so animate-clock-pulse scale doesn't override -rotate-90 */}
-          <div className="w-full h-full transform -rotate-90">
-          <svg
-            className={svgClassName}
-            viewBox="0 0 200 200"
-            aria-hidden="true"
-          >
-            {/* Background ring */}
-            <circle
-              cx="100"
-              cy="100"
-              r={RADIUS}
-              strokeWidth="6"
-              stroke="currentColor"
-              fill="none"
-              opacity="0.15"
-            />
-
-            {/* Progress arc: gap (elapsed) then solid (remaining) */}
-            <circle
-              cx="100"
-              cy="100"
-              r={RADIUS}
-              strokeWidth="6"
-              stroke="currentColor"
-              fill="none"
-              strokeLinecap="round"
-              strokeDasharray={`0 ${gapLength} ${solidLength}`}
-              className="transition-[stroke-dasharray] duration-1000"
-            />
-
-            {/* 12 quiet ticks, one per twelfth of the phase */}
-            {Array.from({ length: 12 }, (_, i) => (
-              <line
-                key={i}
-                x1="100"
-                y1="22"
-                x2="100"
-                y2={i % 3 === 0 ? '30' : '27'}
-                stroke="currentColor"
-                strokeWidth={i % 3 === 0 ? 2 : 1.25}
-                strokeLinecap="round"
-                opacity={i % 3 === 0 ? 0.35 : 0.2}
-                transform={`rotate(${i * 30} 100 100)`}
+          <div className="h-full w-full -rotate-90 transform">
+            <svg className={svgClassName} viewBox="0 0 200 200" aria-hidden="true">
+              {/* Face: cream disc with the sticker outline (always 2.5px on screen, whatever the clock size) */}
+              <circle
+                cx="100"
+                cy="100"
+                r="97"
+                fill="var(--surface-raised)"
+                stroke="var(--outline)"
+                vectorEffect="non-scaling-stroke"
+                style={{ strokeWidth: 'var(--outline-w)' }}
               />
-            ))}
 
-            {/* Head dot with pulse aura (visible only when progress > 1%) */}
-            {elapsed > 0.01 && (
-              <>
-                {isRunning && (
+              {/* Groove the arc runs in */}
+              <circle cx="100" cy="100" r={RADIUS} fill="none" stroke="var(--surface)" strokeWidth={ARC_WIDTH + ARC_OUTLINE * 2} />
+
+              {/* Time left: ink underlay, then the colour on top, so the arc has the same outline as every sticker */}
+              {remaining > 0 && (
+                <>
                   <circle
-                    cx={headX}
-                    cy={headY}
-                    r="8"
-                    fill="currentColor"
-                    className="animate-clock-dot-pulse"
-                    opacity="0"
+                    cx="100"
+                    cy="100"
+                    r={RADIUS}
+                    fill="none"
+                    stroke="var(--outline)"
+                    strokeWidth={ARC_WIDTH + ARC_OUTLINE * 2}
+                    strokeLinecap="round"
+                    strokeDasharray={dash}
+                    className="transition-[stroke-dasharray] duration-1000"
                   />
-                )}
-                <circle
-                  cx={headX}
-                  cy={headY}
-                  r="4"
-                  fill="currentColor"
-                  className="transition-all duration-300"
-                  opacity={0.9}
+                  <circle
+                    cx="100"
+                    cy="100"
+                    r={RADIUS}
+                    fill="none"
+                    stroke={arcColor}
+                    strokeWidth={ARC_WIDTH}
+                    strokeLinecap="round"
+                    strokeDasharray={dash}
+                    className="transition-[stroke-dasharray] duration-1000"
+                  />
+                </>
+              )}
+
+              {/* 12 ticks, one per twelfth of the phase, inside the groove */}
+              {Array.from({ length: 12 }, (_, i) => (
+                <line
+                  key={i}
+                  x1="100"
+                  y1={i % 3 === 0 ? '30' : '34'}
+                  x2="100"
+                  y2="40"
+                  stroke="var(--outline)"
+                  strokeWidth={i % 3 === 0 ? 3 : 2}
+                  strokeLinecap="round"
+                  opacity={i % 3 === 0 ? 0.7 : 0.4}
+                  transform={`rotate(${i * 30} 100 100)`}
                 />
-              </>
-            )}
-          </svg>
+              ))}
+
+              {/* Hand: dark brown, from just outside the digits to the groove, ending in a knob that rides the arc */}
+              <g
+                className="transition-transform duration-1000 ease-linear"
+                style={{ transform: `rotate(${angleDeg}deg)`, transformOrigin: '100px 100px' }}
+              >
+                <line x1="157" y1="100" x2="173" y2="100" stroke="var(--outline)" strokeWidth="4" strokeLinecap="round" />
+                {isRunning && (
+                  <circle cx="180" cy="100" r="11" fill={arcColor} className="animate-clock-dot-pulse" opacity="0" />
+                )}
+                <circle cx="180" cy="100" r="7.5" fill="var(--surface)" stroke="var(--outline)" strokeWidth="2.6" />
+                <circle cx="180" cy="100" r="2.4" fill="var(--outline)" />
+              </g>
+            </svg>
           </div>
 
-          {/* Center: NumberFlow time display */}
+          {/* Center: fixed-width digits */}
           <div className="absolute inset-0 flex items-center justify-center">
             <div
-              className={cn(
-                size.text,
-                'font-heading font-bold tabular-nums',
-                'clock-color-transition',
-              )}
-              style={{ color: animConfig.color }}
+              className={cn('font-heading font-extrabold leading-none', 'clock-color-transition')}
+              style={
+                {
+                  color: animConfig.color,
+                  fontSize: 'calc(var(--clock-w) * 0.17 * var(--clock-scale, 1))',
+                  '--clock-scale': clockDigitScale(minutes),
+                } as CSSProperties
+              }
               aria-hidden="true"
             >
-              <div className="flex items-center">
-                <NumberFlow
-                  value={minutes}
-                  format={{ minimumIntegerDigits: 2 }}
-                  animated
-                  willChange
-                  transformTiming={numberFlowTiming.transform}
-                  spinTiming={numberFlowTiming.spin}
-                  opacityTiming={numberFlowTiming.opacity}
-                />
-                <span className="mx-[0.03em] inline-block -translate-y-[0.06em] opacity-60">:</span>
-                <NumberFlow
-                  value={seconds}
-                  format={{ minimumIntegerDigits: 2 }}
-                  animated
-                  willChange
-                  transformTiming={numberFlowTiming.transform}
-                  spinTiming={numberFlowTiming.spin}
-                  opacityTiming={numberFlowTiming.opacity}
-                />
-              </div>
+              <ClockDigits minutes={minutes} seconds={seconds} dotColor={warning ? animConfig.accent : undefined} />
             </div>
           </div>
         </div>
