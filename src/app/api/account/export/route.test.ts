@@ -8,7 +8,8 @@ let mockDb: TestDb;
 vi.mock('@/db', () => ({ get db() { return mockDb; } }));
 vi.mock('@/lib/auth/session-user', () => ({ getSessionUser: vi.fn() }));
 
-const exportData = () => GET(new Request('http://localhost/api/account/export'));
+const exportData = (query = '') => GET(new Request(`http://localhost/api/account/export${query}`));
+const filename = (res: Response) => /filename="([^"]+)"/.exec(res.headers.get('Content-Disposition') ?? '')?.[1];
 
 beforeAll(async () => {
   mockDb = await createTestDb();
@@ -34,6 +35,28 @@ describe('GET /api/account/export', () => {
     expect(body.tasks.map((t: { title: string }) => t.title)).toEqual(['mine']);
     expect(body.sessions).toHaveLength(1);
     expect(body.tags).toEqual(['math']);
+  });
+
+  describe('file name date', () => {
+    let n = 0;
+    beforeEach(async () => {
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(new Date('2026-10-05T17:31:00Z')); // 00:31 on the 6th in Vietnam, 17:31 on the 5th in UTC
+      // The export is rate limited per user, so each test gets its own.
+      vi.mocked(getSessionUser).mockResolvedValue(await createTestUser(mockDb, `export-name-${++n}`));
+    });
+
+    afterEach(() => vi.useRealTimers());
+
+    it('uses the study day in the requested zone (00:31 still belongs to the 5th)', async () => {
+      expect(filename(await exportData('?tz=Asia/Ho_Chi_Minh'))).toBe('studybro-data-2026-10-05.json');
+      expect(filename(await exportData('?tz=Pacific/Auckland'))).toBe('studybro-data-2026-10-06.json'); // 06:31 on the 6th
+    });
+
+    it('keeps the UTC date without a zone or with an invalid one', async () => {
+      expect(filename(await exportData())).toBe('studybro-data-2026-10-05.json');
+      expect(filename(await exportData('?tz=Mars/Olympus'))).toBe('studybro-data-2026-10-05.json');
+    });
   });
 
   it('is rate limited per user', async () => {

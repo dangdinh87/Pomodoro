@@ -7,6 +7,7 @@ import { sameOriginJsonGuard } from '@/lib/api/same-origin-json-guard';
 import { consumeRateLimit } from '@/lib/api/in-memory-rate-limiter';
 import { serverError, unauthorized } from '@/lib/api/responses';
 import { toTaskJson } from '@/lib/tasks/task-json';
+import { isValidTimeZone, studyDayOf } from '@/lib/stats/study-day';
 
 const EXPORT_LIMIT = 3;
 const EXPORT_WINDOW_MS = 60 * 60 * 1000;
@@ -44,7 +45,10 @@ export async function GET(request: Request) {
       sessions: sessionRows,
       tags: tagRow?.tags ?? [],
     };
-    const date = new Date().toISOString().slice(0, 10);
+    // File name date: the study day (04:00 local) in the viewer's zone when `tz` is sent, else the UTC date.
+    const now = new Date();
+    const tz = new URL(request.url).searchParams.get('tz');
+    const date = isValidTimeZone(tz) ? studyDayOf(now, tz) : now.toISOString().slice(0, 10);
     return new NextResponse(JSON.stringify(payload, null, 2), {
       status: 200,
       headers: {

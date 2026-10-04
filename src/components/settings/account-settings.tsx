@@ -19,6 +19,7 @@ import { SettingsRow, SettingsSection } from '@/components/settings/settings-sec
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DownloadSimple, SignOut, UserCircle } from '@phosphor-icons/react/dist/ssr';
 import { openPanel } from '@/features/app-shell/panel-store';
+import { getBrowserTimeZone, studyDayOf } from '@/lib/stats/study-day';
 
 export function AccountSettings() {
   const { t } = useI18n();
@@ -59,7 +60,8 @@ export function AccountSettings() {
   async function handleExport() {
     setExporting(true);
     try {
-      const res = await fetch('/api/account/export');
+      const tz = getBrowserTimeZone();
+      const res = await fetch(`/api/account/export?tz=${encodeURIComponent(tz)}`);
       if (res.status === 429) {
         toast.error(t('settings.account.export.rateLimited'));
         return;
@@ -69,7 +71,7 @@ export function AccountSettings() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `studybro-data-${new Date().toISOString().slice(0, 10)}.json`;
+      a.download = `studybro-data-${studyDayOf(new Date(), tz)}.json`;
       document.body.appendChild(a);
       a.click();
       a.remove();
