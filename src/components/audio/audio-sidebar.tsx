@@ -96,7 +96,12 @@ export function AudioSidebar({ open, onOpenChange }: AudioSidebarProps) {
 
           {/* Content area - NO scroll; only inner list scrolls. Use conditional render to avoid animate-ui height cycle (0) */}
           <div className="flex-1 min-h-0 overflow-hidden flex flex-col relative">
+            {/* The pane that is not shown stays mounted (it keeps its state and fades) but is `inert`:
+                no Tab stops, no screen-reader reading, no clicks. */}
             <div
+              inert={currentTab !== 'ambient'}
+              aria-hidden={currentTab !== 'ambient'}
+              data-pane="ambient"
               className={cn(
                 "h-full min-h-0 flex flex-col transition-opacity duration-200 px-4 pb-2 pt-3",
                 currentTab === 'ambient'
@@ -107,6 +112,9 @@ export function AudioSidebar({ open, onOpenChange }: AudioSidebarProps) {
               <AmbientMixer />
             </div>
             <div
+              inert={currentTab !== 'youtube'}
+              aria-hidden={currentTab !== 'youtube'}
+              data-pane="youtube"
               className={cn(
                 "h-full min-h-0 flex flex-col transition-opacity duration-200 px-4 pb-2 pt-3",
                 currentTab === 'youtube'
@@ -114,7 +122,7 @@ export function AudioSidebar({ open, onOpenChange }: AudioSidebarProps) {
                   : "absolute inset-0 z-0 opacity-0 pointer-events-none h-full w-full"
               )}
             >
-              <div className="h-full w-full flex flex-col pointer-events-auto">
+              <div className="h-full w-full flex flex-col">
                 <YouTubePane />
               </div>
             </div>

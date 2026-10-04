@@ -9,8 +9,8 @@ import { AudioSidebar } from './audio-sidebar';
 import { SoundListCategory } from './sound-list-category';
 
 // The panes themselves are covered elsewhere; here only the sidebar chrome and the mixer rows matter.
-vi.mock('./ambient-mixer', () => ({ AmbientMixer: () => <div data-testid="mixer" /> }));
-vi.mock('./youtube/youtube-pane', () => ({ default: () => <div data-testid="youtube" /> }));
+vi.mock('./ambient-mixer', () => ({ AmbientMixer: () => <button>mixer-control</button> }));
+vi.mock('./youtube/youtube-pane', () => ({ default: () => <button>youtube-control</button> }));
 
 const rain = soundCategories.find((c) => c.key === 'rain')!;
 
@@ -103,5 +103,41 @@ describe('master volume', () => {
       'aria-valuetext',
       'Master volume, muted',
     );
+  });
+});
+
+describe('sound panel tabs', () => {
+  const renderSidebar = () =>
+    render(
+      <I18nProvider initialLang="en">
+        <AudioSidebar open onOpenChange={() => {}} />
+      </I18nProvider>,
+    );
+  const paneOf = (control: string) => screen.getByText(control, { selector: 'button' }).closest('[data-pane]')!;
+
+  it('the tab that is not shown is inert and hidden from assistive tech (no invisible Tab stops)', () => {
+    useAudioStore.setState((s) => ({ audioSettings: { ...s.audioSettings, activeSource: 'ambient' } }));
+    renderSidebar();
+
+    expect(paneOf('mixer-control')).not.toHaveAttribute('inert');
+    expect(paneOf('mixer-control')).toHaveAttribute('aria-hidden', 'false');
+    expect(paneOf('youtube-control')).toHaveAttribute('inert');
+    expect(paneOf('youtube-control')).toHaveAttribute('aria-hidden', 'true');
+    // the screen reader tree only has the controls of the shown tab
+    expect(screen.getByRole('button', { name: 'mixer-control' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'youtube-control' })).not.toBeInTheDocument();
+  });
+
+  it('switching tabs swaps which pane is inert', async () => {
+    useAudioStore.setState((s) => ({ audioSettings: { ...s.audioSettings, activeSource: 'ambient' } }));
+    const user = userEvent.setup();
+    renderSidebar();
+
+    await user.click(screen.getByRole('tab', { name: 'YouTube' }));
+
+    expect(paneOf('youtube-control')).not.toHaveAttribute('inert');
+    expect(paneOf('mixer-control')).toHaveAttribute('inert');
+    expect(screen.queryByRole('button', { name: 'mixer-control' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'youtube-control' })).toBeInTheDocument();
   });
 });
