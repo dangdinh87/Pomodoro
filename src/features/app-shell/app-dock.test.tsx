@@ -1,20 +1,64 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
+import enDict from '@/i18n/locales/en.json';
+import viDict from '@/i18n/locales/vi.json';
+import jaDict from '@/i18n/locales/ja.json';
 import { useSystemStore } from '@/stores/system-store';
 import { AppDock } from './app-dock';
 import { usePanelStore } from './panel-store';
 
 vi.mock('@/contexts/i18n-context', () => ({ useTranslation: () => ({ t: (key: string) => key }) }));
-vi.mock('@/components/animate-ui/components/animate/tooltip', () => ({
-  Tooltip: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  TooltipTrigger: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  TooltipContent: () => null,
-  TooltipProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-}));
 
 describe('AppDock', () => {
   beforeEach(() => {
     window.history.replaceState(null, '', '/');
     usePanelStore.setState({ active: null });
+    useSystemStore.setState({ isFocusMode: false });
+    // jsdom has no Fullscreen API; browsers that do get the toggle
+    document.documentElement.requestFullscreen = vi.fn(async () => {});
+  });
+  afterEach(() => {
+    Reflect.deleteProperty(document.documentElement, 'requestFullscreen');
+  });
+
+  it('is fixed to the viewport, so a short window can never push it below the fold', () => {
+    render(<AppDock />);
+    const nav = screen.getByRole('navigation', { name: 'shell.dock' });
+    expect(nav.className).toContain('fixed');
+    expect(nav.className).toContain('safe-area-inset-bottom');
+    expect(nav).toHaveAttribute('data-chrome');
+  });
+
+  it('gives each panel its candy colour', () => {
+    const { container } = render(<AppDock />);
+    const toneOf = (id: string) => container.querySelector(`[data-panel="${id}"] [data-tone]`)?.getAttribute('data-tone');
+    expect(['tasks', 'sound', 'scene', 'timer', 'stats', 'arcade'].map(toneOf)).toEqual([
+      'butter',
+      'sky',
+      'lilac',
+      'mint',
+      'tomato',
+      'peach',
+    ]);
+    expect(toneOf('fullscreen')).toBe('surface');
+  });
+
+  it('shows the label under each icon for the mobile tab bar', () => {
+    render(<AppDock />);
+    expect(screen.getByText('shell.panels.sound')).toBeInTheDocument();
+  });
+
+  it('leaves out the fullscreen toggle where the browser cannot do fullscreen', () => {
+    Reflect.deleteProperty(document.documentElement, 'requestFullscreen');
+    render(<AppDock />);
+    expect(screen.queryByRole('button', { name: 'timerComponents.enhancedTimer.enterFocus' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'shell.panels.tasks' })).toBeInTheDocument();
+  });
+
+  it('only the open panel reads as pressed', () => {
+    render(<AppDock />);
+    fireEvent.click(screen.getByRole('button', { name: 'shell.panels.sound' }));
+    expect(screen.getByRole('button', { name: 'shell.panels.sound' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'shell.panels.tasks' })).toHaveAttribute('aria-pressed', 'false');
   });
 
   it('labels every panel button and the focus-mode toggle', () => {
@@ -96,6 +140,24 @@ describe('AppDock', () => {
       unmount();
       setFullscreen(true);
       expect(useSystemStore.getState().isFocusMode).toBe(false);
+    });
+  });
+
+  // The mobile tab bar gives each label a ~48px column at 360px and never breaks inside a word, so a
+  // word that is too long would spill out of its column. Keep every label's longest word short.
+  describe('tab-bar labels fit their column in every language', () => {
+    type Dict = { shell: { panels: Record<string, string>; fullscreenShort: string } };
+    const dock = ['tasks', 'sound', 'scene', 'timer', 'stats', 'arcade'];
+    it.each([
+      ['en', enDict as unknown as Dict],
+      ['vi', viDict as unknown as Dict],
+      ['ja', jaDict as unknown as Dict],
+    ])('%s', (_lang, dict) => {
+      const labels = [...dock.map((id) => dict.shell.panels[id]), dict.shell.fullscreenShort];
+      for (const label of labels) {
+        const longestWord = Math.max(...label.split(' ').map((word) => [...word].length));
+        expect(longestWord, label).toBeLessThanOrEqual(6);
+      }
     });
   });
 });

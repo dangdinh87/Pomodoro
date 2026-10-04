@@ -1172,13 +1172,33 @@
         "timer": "Timer",
         "panels": "Open",
         "language": "Language",
-        "account": "Account"
+        "account": "Account",
+        "actions": "Actions"
       },
       "pause": "Pause",
       "start": "Start",
       "reset": "Reset timer",
       "switchTo": "Switch to {mode}",
-      "guide": "Pomodoro guide"
+      "guide": "Pomodoro guide",
+      "addTask": "Add a task",
+      "changeScene": "Change scene",
+      "mute": "Mute sounds",
+      "unmute": "Unmute sounds",
+      "skip": "Skip session",
+      "fullscreen": "Toggle fullscreen",
+      "shortcuts": "Keyboard shortcuts"
+    },
+    "homeHeading": "Free Pomodoro timer online",
+    "fullscreenShort": "Full screen",
+    "sessionsToday": "{count} sessions today",
+    "sessionsTodayOne": "{count} session today",
+    "shortcuts": {
+      "title": "Keyboard shortcuts",
+      "description": "Press these keys anywhere, except while typing.",
+      "toggleTimer": "Start or pause",
+      "reset": "Reset timer",
+      "openPanel": "Open {panel}",
+      "help": "Show this list"
     }
   },
   "clockStyles": {

@@ -1172,13 +1172,33 @@
         "timer": "Hẹn giờ",
         "panels": "Mở",
         "language": "Ngôn ngữ",
-        "account": "Tài khoản"
+        "account": "Tài khoản",
+        "actions": "Thao tác nhanh"
       },
       "pause": "Tạm dừng",
       "start": "Bắt đầu",
       "reset": "Đặt lại hẹn giờ",
       "switchTo": "Chuyển sang {mode}",
-      "guide": "Hướng dẫn Pomodoro"
+      "guide": "Hướng dẫn Pomodoro",
+      "addTask": "Thêm việc",
+      "changeScene": "Đổi không gian",
+      "mute": "Tắt tiếng",
+      "unmute": "Bật tiếng",
+      "skip": "Bỏ qua phiên",
+      "fullscreen": "Bật/tắt toàn màn hình",
+      "shortcuts": "Phím tắt"
+    },
+    "homeHeading": "Đồng hồ Pomodoro online miễn phí",
+    "fullscreenShort": "Phóng to",
+    "sessionsToday": "{count} phiên hôm nay",
+    "sessionsTodayOne": "{count} phiên hôm nay",
+    "shortcuts": {
+      "title": "Phím tắt",
+      "description": "Nhấn phím ở bất cứ đâu, trừ lúc đang gõ.",
+      "toggleTimer": "Bắt đầu hoặc tạm dừng",
+      "reset": "Đặt lại hẹn giờ",
+      "openPanel": "Mở {panel}",
+      "help": "Hiện danh sách này"
     }
   },
   "clockStyles": {

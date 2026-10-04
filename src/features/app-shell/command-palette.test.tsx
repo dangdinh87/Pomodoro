@@ -1,8 +1,11 @@
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useAudioStore } from '@/stores/audio-store';
 import { useTimerStore } from '@/stores/timer-store';
 import { useResetDialogStore } from '@/features/timer/lib/request-reset';
 import { CommandPalette, usePaletteStore } from './command-palette';
+import { usePanelStore } from './panel-store';
+import { useShortcutHelpStore } from './shortcut-help';
 
 vi.mock('@/contexts/i18n-context', () => ({
   LANGS: [{ code: 'en', label: 'English' }],
@@ -49,5 +52,94 @@ describe('CommandPalette Reset', () => {
 
     expect(resetTimer).toHaveBeenCalledTimes(1);
     expect(useResetDialogStore.getState().open).toBe(false);
+  });
+});
+
+describe('CommandPalette commands', () => {
+  beforeEach(() => {
+    Element.prototype.scrollIntoView = vi.fn();
+    window.history.replaceState(null, '', '/');
+    usePanelStore.setState({ active: null });
+    usePaletteStore.setState({ open: true });
+    useShortcutHelpStore.setState({ open: false });
+    useTimerStore.setState({ mode: 'work', timeLeft: 1500, lastSessionTimeLeft: 1500, isRunning: false, deadlineAt: null });
+  });
+  afterEach(() => {
+    Reflect.deleteProperty(document.documentElement, 'requestFullscreen');
+    document.body.querySelectorAll('[data-test-skip]').forEach((el) => el.remove());
+  });
+
+  const pick = async (label: string) => {
+    const user = userEvent.setup();
+    await act(async () => {
+      await user.click(await screen.findByText(label));
+    });
+  };
+
+  it('Add a task opens the Tasks panel', async () => {
+    render(<CommandPalette />);
+    await pick('shell.palette.addTask');
+    expect(usePanelStore.getState().active).toBe('tasks');
+    expect(usePaletteStore.getState().open).toBe(false);
+  });
+
+  it('Change scene opens the Scene panel', async () => {
+    render(<CommandPalette />);
+    await pick('shell.palette.changeScene');
+    expect(usePanelStore.getState().active).toBe('scene');
+  });
+
+  it('Mute and Unmute flip the same switch the sound panel uses', async () => {
+    const toggleMute = vi.fn();
+    useAudioStore.setState({ toggleMute, audioSettings: { ...useAudioStore.getState().audioSettings, isMuted: false } });
+    const { unmount } = render(<CommandPalette />);
+    await pick('shell.palette.mute');
+    expect(toggleMute).toHaveBeenCalledTimes(1);
+    unmount();
+
+    useAudioStore.setState({ audioSettings: { ...useAudioStore.getState().audioSettings, isMuted: true } });
+    usePaletteStore.setState({ open: true });
+    render(<CommandPalette />);
+    await pick('shell.palette.unmute');
+    expect(toggleMute).toHaveBeenCalledTimes(2);
+  });
+
+  it('Skip presses the timer\'s own skip button, so its confirmation and recording rules still apply', async () => {
+    const skip = document.createElement('button');
+    skip.setAttribute('aria-label', 'timer.controls.skip_hint');
+    skip.setAttribute('data-test-skip', '');
+    const onClick = vi.fn();
+    skip.addEventListener('click', onClick);
+    document.body.appendChild(skip);
+
+    render(<CommandPalette />);
+    await pick('shell.palette.skip');
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(usePaletteStore.getState().open).toBe(false);
+  });
+
+  it('Toggle fullscreen is offered only where the browser can do it', async () => {
+    const { unmount } = render(<CommandPalette />);
+    expect(screen.queryByText('shell.palette.fullscreen')).not.toBeInTheDocument();
+    unmount();
+
+    const requestFullscreen = vi.fn(async () => {});
+    document.documentElement.requestFullscreen = requestFullscreen;
+    usePaletteStore.setState({ open: true });
+    render(<CommandPalette />);
+    await pick('shell.palette.fullscreen');
+    expect(requestFullscreen).toHaveBeenCalledTimes(1);
+  });
+
+  it('Keyboard shortcuts opens the help dialog', async () => {
+    render(<CommandPalette />);
+    await pick('shell.palette.shortcuts');
+    expect(useShortcutHelpStore.getState().open).toBe(true);
+    expect(await screen.findByText('shell.shortcuts.title')).toBeInTheDocument();
+  });
+
+  it('uses the dialog scrim, not a custom black overlay', () => {
+    render(<CommandPalette />);
+    expect(document.body.querySelector('[class*="bg-black"]')).toBeNull();
   });
 });

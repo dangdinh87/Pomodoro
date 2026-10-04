@@ -1172,13 +1172,33 @@
         "timer": "タイマー",
         "panels": "開く",
         "language": "言語",
-        "account": "アカウント"
+        "account": "アカウント",
+        "actions": "クイック操作"
       },
       "pause": "一時停止",
       "start": "開始",
       "reset": "タイマーをリセット",
       "switchTo": "{mode}に切り替え",
-      "guide": "ポモドーロガイド"
+      "guide": "ポモドーロガイド",
+      "addTask": "タスクを追加",
+      "changeScene": "シーンを変更",
+      "mute": "ミュート",
+      "unmute": "ミュート解除",
+      "skip": "セッションをスキップ",
+      "fullscreen": "全画面の切り替え",
+      "shortcuts": "キーボードショートカット"
+    },
+    "homeHeading": "無料ポモドーロタイマー",
+    "fullscreenShort": "全画面",
+    "sessionsToday": "今日 {count} セッション",
+    "sessionsTodayOne": "今日 {count} セッション",
+    "shortcuts": {
+      "title": "キーボードショートカット",
+      "description": "入力中を除き、どこでもキーで操作できます。",
+      "toggleTimer": "開始 / 一時停止",
+      "reset": "タイマーをリセット",
+      "openPanel": "{panel}を開く",
+      "help": "この一覧を表示"
     }
   },
   "clockStyles": {
