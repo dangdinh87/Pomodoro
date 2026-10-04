@@ -18,8 +18,9 @@ export interface SessionPayload {
 // Outbox: every session is written to the queue BEFORE it is sent and removed
 // only once the server acknowledges it. A tab closing mid-request therefore
 // leaves the item behind to be flushed next time (plus `keepalive` lets the
-// request itself usually survive unload). Server-side idempotency is still
-// needed to fully rule out a duplicate when the ack is lost.
+// request itself usually survive unload). The item id travels as
+// `clientSessionId`: if the ack is lost the retry is recognised server-side
+// and acknowledged without recording the session twice.
 interface QueuedSession {
   id: string;
   payload: SessionPayload;
@@ -92,7 +93,14 @@ export function normalizeDuration(durationSec: number): number {
 // have an expired token), retried a limited number of times.
 type SendOutcome = 'ok' | 'drop' | 'network' | 'server';
 
-async function send(payload: SessionPayload): Promise<SendOutcome> {
+/** When the segment ended: its own end time, else when it was queued (items stored by older versions). */
+function endTime({ payload, queuedAt }: QueuedSession): string {
+  const ms = payload.endedAt ?? queuedAt;
+  return new Date(Number.isFinite(ms) ? ms : queuedAt).toISOString();
+}
+
+async function send(item: QueuedSession): Promise<SendOutcome> {
+  const { payload } = item;
   try {
     const res = await fetch(ENDPOINT, {
       method: 'POST',
@@ -102,6 +110,9 @@ async function send(payload: SessionPayload): Promise<SendOutcome> {
         durationSec: payload.durationSec,
         mode: payload.mode,
         completedFullSession: payload.completedFullSession === true,
+        // The outbox id makes a retry (lost response, two tabs) idempotent
+        clientSessionId: item.id,
+        endedAt: endTime(item),
       }),
       keepalive: true, // let the request survive tab close / reload
     });
@@ -153,15 +164,16 @@ export async function recordSession(
   if (durationSec < 1) return 'skipped';
 
   const { user, isLoading } = useAuthStore.getState();
+  const now = Date.now();
   const item: QueuedSession = {
     id: newId(),
-    payload: { ...payload, durationSec },
+    payload: { ...payload, durationSec, endedAt: payload.endedAt ?? now },
     userId: user?.id ?? null,
     guest: user?.isAnonymous,
-    queuedAt: Date.now(),
+    queuedAt: now,
     attempts: 0,
     // Mark in flight right away so a concurrent flush cannot send it twice
-    sendingAt: user || !isLoading ? Date.now() : undefined,
+    sendingAt: user || !isLoading ? now : undefined,
   };
   updateQueue((q) => [...q, item]);
   if (!user && isLoading) return 'queued'; // flushed once auth resolves
@@ -175,7 +187,7 @@ export async function recordSession(
     patchItem(item.id, { userId: guest.id, guest: true, sendingAt: Date.now() });
   }
 
-  const outcome = await send(item.payload);
+  const outcome = await send(item);
   if (outcome === 'ok') {
     removeItem(item.id);
     onRecorded?.();
@@ -235,7 +247,7 @@ async function flushLocked(onRecorded?: () => void) {
   let sent = false;
   for (const item of candidates) {
     patchItem(item.id, { sendingAt: Date.now() });
-    const outcome = await send(item.payload);
+    const outcome = await send(item);
     if (outcome === 'ok') {
       removeItem(item.id);
       sent = true;

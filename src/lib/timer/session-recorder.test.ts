@@ -177,6 +177,68 @@ describe('session-recorder', () => {
     expect(sent()).toEqual([true, false, false]);
   });
 
+  describe('idempotency and real end time', () => {
+    const bodies = () => fetchMock.mock.calls.map(([, init]) => JSON.parse(init.body));
+
+    it('sends the outbox item id as clientSessionId', async () => {
+      let queuedId = '';
+      fetchMock.mockImplementation(async () => {
+        queuedId = queue()[0].id;
+        return res(200);
+      });
+      await recordSession(payload);
+      expect(bodies()[0].clientSessionId).toBe(queuedId);
+      expect(queuedId).not.toBe('');
+    });
+
+    it('re-sends the same clientSessionId when a failed attempt is retried', async () => {
+      fetchMock.mockResolvedValueOnce(res(503));
+      await recordSession(payload);
+      fetchMock.mockResolvedValueOnce(res(200));
+      await flushSessionQueue();
+      const [first, second] = bodies();
+      expect(second.clientSessionId).toBe(first.clientSessionId);
+      expect(second.endedAt).toBe(first.endedAt);
+    });
+
+    it('reports when the segment ended, not when it was uploaded', async () => {
+      vi.useFakeTimers();
+      try {
+        vi.setSystemTime(new Date('2026-10-05T10:00:00Z'));
+        fetchMock.mockRejectedValueOnce(new Error('offline'));
+        await recordSession(payload);
+
+        vi.setSystemTime(new Date('2026-10-05T12:30:00Z')); // back online 2.5 h later
+        fetchMock.mockResolvedValueOnce(res(200));
+        await flushSessionQueue();
+        expect(bodies()[1].endedAt).toBe('2026-10-05T10:00:00.000Z');
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('uses the explicit end time of the segment when given', async () => {
+      fetchMock.mockResolvedValue(res(200));
+      const endedAt = Date.parse('2026-10-05T09:15:00Z');
+      await recordSession({ ...payload, endedAt });
+      expect(bodies()[0].endedAt).toBe('2026-10-05T09:15:00.000Z');
+    });
+
+    it('falls back to the queue time for items stored before endedAt existed', async () => {
+      const queuedAt = Date.parse('2026-10-05T08:00:00Z');
+      vi.useFakeTimers();
+      try {
+        vi.setSystemTime(queuedAt + 1000);
+        seedItem({ id: 'old-format', queuedAt });
+        fetchMock.mockResolvedValue(res(200));
+        await flushSessionQueue();
+        expect(bodies()[0]).toMatchObject({ clientSessionId: 'old-format', endedAt: '2026-10-05T08:00:00.000Z' });
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+  });
+
   it('never sends durations below 1 second', async () => {
     await expect(
       recordSession({ ...payload, durationSec: 0.4 }),

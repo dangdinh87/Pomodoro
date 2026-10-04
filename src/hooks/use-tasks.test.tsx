@@ -178,7 +178,7 @@ describe('useTasks optimistic updates', () => {
     };
 
     it('shows the specific toast when the tasks API answers 429', async () => {
-      const list = fetchMock.getMockImplementation()!;
+      const list = fetchMock.getMockImplementation() as (url: string, init?: { method?: string }) => unknown;
       fetchMock.mockImplementation((url: string, init?: { method?: string }) =>
         init?.method === 'POST'
           ? Promise.resolve({ ok: false, status: 429, json: () => ({}) })
@@ -196,7 +196,7 @@ describe('useTasks optimistic updates', () => {
     });
 
     it('keeps the generic toast for other failures', async () => {
-      const list = fetchMock.getMockImplementation()!;
+      const list = fetchMock.getMockImplementation() as (url: string, init?: { method?: string }) => unknown;
       fetchMock.mockImplementation((url: string, init?: { method?: string }) =>
         init?.method === 'POST'
           ? Promise.resolve({ ok: false, status: 500, statusText: '', json: () => ({}) })
