@@ -4,9 +4,11 @@ const isDev = process.env.NODE_ENV === 'development';
 
 /**
  * Content-Security-Policy, shipped as Report-Only first: violations show up in
- * the browser console without breaking anything. Once a deploy shows no
- * unexpected reports, rename the header to `Content-Security-Policy` to enforce.
- * External origins: YouTube iframe API/embeds, Google Analytics.
+ * the browser console without breaking anything, and are posted to /api/csp-report
+ * (report-uri for Firefox/Safari, report-to + Reporting-Endpoints for Chrome), which
+ * logs them. Once a deploy shows no unexpected reports, rename the header to
+ * `Content-Security-Policy` to enforce.
+ * External origins: YouTube iframe API/embeds, Google Analytics, Open-Meteo.
  */
 const contentSecurityPolicy = [
   "default-src 'self'",
@@ -14,8 +16,9 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
-  // youtube.com: oEmbed lookups (src/lib/youtube-utils.ts); the rest: GA4 beacons
-  "connect-src 'self' https://www.youtube.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://stats.g.doubleclick.net https://www.google.com",
+  // youtube.com: oEmbed lookups (src/lib/youtube-utils.ts); open-meteo: forecast and place search
+  // for the ambient-mood feature; the rest: GA4 beacons
+  "connect-src 'self' https://www.youtube.com https://api.open-meteo.com https://geocoding-api.open-meteo.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://stats.g.doubleclick.net https://www.google.com",
   "media-src 'self' data: blob: https:",
   'frame-src https://www.youtube.com https://www.youtube-nocookie.com',
   "worker-src 'self' blob:",
@@ -23,10 +26,14 @@ const contentSecurityPolicy = [
   "base-uri 'self'",
   "form-action 'self'",
   "frame-ancestors 'none'",
+  'report-uri /api/csp-report',
+  'report-to csp-endpoint',
 ].join('; ');
 
 const securityHeaders = [
   { key: 'Content-Security-Policy-Report-Only', value: contentSecurityPolicy },
+  // Names the `csp-endpoint` group used by `report-to` above
+  { key: 'Reporting-Endpoints', value: 'csp-endpoint="/api/csp-report"' },
   // Clickjacking protection. This is the ONLY framing protection for now:
   // browsers ignore frame-ancestors in a Report-Only policy. DENY also blocks
   // embedding the timer in other sites (e.g. Notion); relax deliberately if wanted.
