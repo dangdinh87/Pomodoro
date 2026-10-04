@@ -5,6 +5,16 @@ import { Button } from '@/components/ui/button'
 import { FilterChip, FilterChipGroup } from '@/components/ui/filter-chip'
 import { IconTile } from '@/components/ui/icon-tile'
 import { Switch } from '@/components/ui/switch'
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { ArrowsClockwise, Clock, Minus, Plus, Timer, X } from '@phosphor-icons/react/dist/ssr';
 import { defaultSettings, useTimerStore, type TimerSettings as TimerSettingsData } from '@/stores/timer-store'
 import { useAudioStore } from '@/stores/audio-store'
@@ -96,6 +106,8 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
     const settings = useTimerStore((s) => s.settings)
     const updateSettings = useTimerStore((s) => s.updateSettings)
     const [saved, flash] = useSavedFlash()
+    // "Reset to defaults" wipes durations, alerts and the alarm in one go, so it asks first.
+    const [confirmingReset, setConfirmingReset] = useState(false)
     // Free typing happens in string drafts (only while a field is being edited);
     // they are clamped and applied on blur / Enter. Otherwise the field shows the store.
     const [typing, setTyping] = useState<Partial<Record<DurationKey, string>>>({})
@@ -139,6 +151,25 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
         flash()
         toast.success(t('timerSettings.toasts.reset'))
     }
+
+    const askReset = () => setConfirmingReset(true)
+    const resetDialog = (
+        <AlertDialog open={confirmingReset} onOpenChange={setConfirmingReset}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>{t('timerSettings.resetConfirm.title')}</AlertDialogTitle>
+                    <AlertDialogDescription>{t('timerSettings.resetConfirm.description')}</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    {/* Radix focuses Cancel first, so a stray Space/Enter cannot confirm */}
+                    <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+                    <AlertDialogAction variant="destructive" onClick={resetToDefaults}>
+                        {t('timerSettings.resetConfirm.confirm')}
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+    )
 
     const live = { ...settings, ...durationsFromDraft() }
     const activePreset = matchPreset(live.workDuration, live.shortBreakDuration)
@@ -266,9 +297,10 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
             <div className="space-y-6">
                 {body}
                 <div className="flex items-center justify-between border-t-2 border-border pt-4">
-                    <Button variant="secondary" onClick={resetToDefaults}>{t('timerSettings.actions.resetDefaults')}</Button>
+                    <Button variant="secondary" onClick={askReset}>{t('timerSettings.actions.resetDefaults')}</Button>
                     <SavedIndicator show={saved} />
                 </div>
+                {resetDialog}
             </div>
         )
     }
@@ -282,7 +314,7 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                     <SavedIndicator show={saved} />
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
-                    <Button variant="secondary" onClick={resetToDefaults} size="sm" className="hidden sm:inline-flex">{t('timerSettings.actions.resetDefaults')}</Button>
+                    <Button variant="secondary" onClick={askReset} size="sm" className="hidden sm:inline-flex">{t('timerSettings.actions.resetDefaults')}</Button>
                     <Button variant="secondary" size="icon" onClick={onClose} className="size-9 rounded-full">
                         <X size={16} weight="bold" aria-hidden="true" />
                         <span className="sr-only">{t('common.close')}</span>
@@ -291,8 +323,9 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
             </div>
             <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6">
                 {body}
-                <Button variant="secondary" onClick={resetToDefaults} className="mt-8 w-full sm:hidden">{t('timerSettings.actions.resetDefaults')}</Button>
+                <Button variant="secondary" onClick={askReset} className="mt-8 w-full sm:hidden">{t('timerSettings.actions.resetDefaults')}</Button>
             </div>
+            {resetDialog}
         </div>
     )
 }

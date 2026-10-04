@@ -234,6 +234,11 @@
     "toasts": {
       "reset": "Đã đặt lại cài đặt hẹn giờ về mặc định"
     },
+    "resetConfirm": {
+      "title": "Đặt lại cài đặt hẹn giờ?",
+      "description": "Độ dài phiên, kiểu đồng hồ, tự động bắt đầu và chuông sẽ về mặc định. Việc và thống kê của bạn vẫn giữ nguyên.",
+      "confirm": "Đặt lại"
+    },
     "presets": {
       "title": "Mẫu có sẵn",
       "label": "{focus} phút tập trung, {rest} phút nghỉ",

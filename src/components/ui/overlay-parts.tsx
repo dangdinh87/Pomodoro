@@ -63,6 +63,17 @@ export const MENU_SEPARATOR = "-mx-1.5 my-1.5 h-0.5 bg-border"
 export const MENU_TICK_SLOT = "absolute right-2.5 flex size-4 items-center justify-center"
 
 /**
+ * `onOpenAutoFocus` for a panel whose first tabbable control does something on Space/Enter (a header "Reset to
+ * defaults", "Save changes"): Radix would focus it on open, and Space is also the timer's Start key. Focus lands on
+ * the content itself instead (it is the named dialog, so screen readers announce it) and Tab walks the panel from
+ * the top. Pair it with `focus:outline-hidden` on the content.
+ */
+export function focusContentOnOpen(event: Event) {
+  event.preventDefault()
+  ;(event.currentTarget as HTMLElement | null)?.focus()
+}
+
+/**
  * Round, outlined close button for Dialog and Sheet. Its accessible name is translated
  * (`common.close`). It stays a direct child of the content so `[&>button]:hidden` keeps working.
  */

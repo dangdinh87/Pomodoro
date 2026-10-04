@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createJSONStorage } from 'zustand/middleware';
 import { installMemoryStorage } from '@/test-utils/memory-storage';
@@ -144,12 +144,32 @@ describe('TimerSettings (saves as you change)', () => {
 
     render(<TimerSettings onClose={vi.fn()} />);
     await user.click(screen.getAllByRole('button', { name: 'timerSettings.actions.resetDefaults' })[0]);
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'timerSettings.resetConfirm.confirm' }));
 
     expect(settings()).toEqual(defaultSettings);
     expect(persisted()).toEqual(defaultSettings);
     expect(useAudioStore.getState().audioSettings).toMatchObject({ alarmType: 'bell', alarmVolume: 70 });
     expect(toastSuccess).toHaveBeenCalledWith('timerSettings.toasts.reset');
     expect(workField()).toHaveValue('25');
+  });
+
+  it('Reset to defaults asks first: nothing changes until confirmed, and Cancel keeps the settings', async () => {
+    const user = userEvent.setup();
+    useTimerStore.getState().updateSettings({ workDuration: 50 });
+    render(<TimerSettings onClose={vi.fn()} />);
+
+    await user.click(screen.getAllByRole('button', { name: 'timerSettings.actions.resetDefaults' })[0]);
+    const dialog = screen.getByRole('alertdialog', { name: 'timerSettings.resetConfirm.title' });
+    expect(dialog).toHaveTextContent('timerSettings.resetConfirm.description');
+    expect(settings().workDuration).toBe(50); // asking is not resetting
+    expect(toastSuccess).not.toHaveBeenCalled();
+    // Space/Enter right after it opens must hit the safe button, not the destructive one
+    expect(within(dialog).getByRole('button', { name: 'common.cancel' })).toHaveFocus();
+
+    await user.keyboard(' ');
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    expect(settings().workDuration).toBe(50);
+    expect(toastSuccess).not.toHaveBeenCalled();
   });
 
   it('closing needs no confirmation and keeps what was set', async () => {

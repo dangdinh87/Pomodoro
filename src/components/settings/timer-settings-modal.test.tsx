@@ -5,7 +5,12 @@ vi.mock('@/contexts/i18n-context', () => ({
   useI18n: () => ({ t: (key: string) => key }),
 }));
 vi.mock('@/components/settings/timer-settings', () => ({
-  TimerSettings: () => <div>timer settings body</div>,
+  TimerSettings: () => (
+    <div>
+      <button>reset-first-in-header</button>
+      <button>close</button>
+    </div>
+  ),
 }));
 
 describe('TimerSettingsModal', () => {
@@ -16,5 +21,12 @@ describe('TimerSettingsModal', () => {
     expect(screen.getByRole('dialog', { name: 'timerSettings.title' })).toBeInTheDocument();
     expect(consoleError).not.toHaveBeenCalled();
     consoleError.mockRestore();
+  });
+
+  it('opens with focus on the dialog, not on the first control (that is "Reset to defaults": Space would wipe the settings)', () => {
+    render(<TimerSettingsModal isOpen onClose={vi.fn()} />);
+    const dialog = screen.getByRole('dialog', { name: 'timerSettings.title' });
+    expect(dialog).toHaveFocus();
+    expect(screen.getByRole('button', { name: 'reset-first-in-header' })).not.toHaveFocus();
   });
 });

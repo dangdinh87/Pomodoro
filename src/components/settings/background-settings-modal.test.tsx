@@ -50,6 +50,12 @@ describe('BackgroundSettingsModal', () => {
     expect(consoleError).not.toHaveBeenCalled();
   });
 
+  it('opens with focus on the dialog, not on "Save changes" (Space would save and close the panel)', () => {
+    render(<BackgroundSettingsModal isOpen onClose={vi.fn()} />);
+    expect(screen.getByRole('dialog', { name: 'scenes.title' })).toHaveFocus();
+    expect(screen.getByRole('button', { name: 'settings.background.saveChanges' })).not.toHaveFocus();
+  });
+
   it('Esc puts the saved background back and closes', async () => {
     const onClose = vi.fn();
     const user = userEvent.setup();

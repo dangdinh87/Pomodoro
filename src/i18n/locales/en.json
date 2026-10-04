@@ -234,6 +234,11 @@
     "toasts": {
       "reset": "Timer settings restored to defaults"
     },
+    "resetConfirm": {
+      "title": "Reset timer settings?",
+      "description": "Session lengths, clock style, auto-start and the alarm go back to their defaults. Tasks and stats are not affected.",
+      "confirm": "Reset"
+    },
     "presets": {
       "title": "Presets",
       "label": "{focus} min focus, {rest} min break",
