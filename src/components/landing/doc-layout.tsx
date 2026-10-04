@@ -76,7 +76,7 @@ export function DocLayout({ title, lead, meta, tocLabel, sections, after }: DocL
         {meta ? <p className="mt-3 text-sm text-ink-muted">{meta}</p> : null}
       </header>
 
-      <div className="mt-10 grid gap-10 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-16">
+      <div className="mt-10 grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-16">
         <nav aria-label={tocLabel} className="lg:sticky lg:top-20 lg:self-start">
           <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-ink-muted">{tocLabel}</p>
           <ol className="grid gap-1 rounded-lg border border-border bg-surface p-2 sm:grid-cols-2 lg:block lg:space-y-0.5 lg:border-0 lg:bg-transparent lg:p-0">

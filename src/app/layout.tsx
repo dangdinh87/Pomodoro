@@ -8,29 +8,32 @@ import { cookies } from 'next/headers';
 import { InitialLangProvider } from '@/contexts/i18n-context';
 import { SITE_URL } from '@/config/site';
 import { LOCALE_COOKIE, normalizeLang } from '@/lib/i18n/negotiate-locale';
-import { Be_Vietnam_Pro, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
+import { Baloo_2, Nunito, JetBrains_Mono } from 'next/font/google';
 import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 
-const spaceGrotesk = Space_Grotesk({
+// Both are variable fonts (Baloo 2 uses 600-800, Nunito 500-800): leaving `weight` out ships one
+// file per subset for every weight instead of one per weight. Japanese has no web font on
+// purpose; globals.css falls back to the system rounded Gothic.
+const baloo2 = Baloo_2({
   subsets: ['latin', 'vietnamese'],
-  weight: ['500', '700'],
   display: 'swap',
-  variable: '--font-space-grotesk',
+  variable: '--font-baloo-2',
 });
 
-const beVietnamPro = Be_Vietnam_Pro({
+const nunito = Nunito({
   subsets: ['latin', 'vietnamese'],
-  weight: ['400', '500', '600', '700'],
   display: 'swap',
-  variable: '--font-be-vietnam-pro',
+  variable: '--font-nunito',
 });
 
+// Only shortcut hints and code use it: do not preload.
 const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin', 'vietnamese'],
+  subsets: ['latin'],
   weight: ['400'],
   display: 'swap',
+  preload: false,
   variable: '--font-jetbrains-mono',
 });
 
@@ -85,11 +88,11 @@ export const metadata: Metadata = {
   },
 };
 
-// Colors from globals.css: light --background (white), dark --background (24 10% 6%)
+// Colors from globals.css: --surface-page in light (cream) and dark (chocolate)
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#F9FAFB' },
-    { media: '(prefers-color-scheme: dark)', color: '#0a0a0b' },
+    { media: '(prefers-color-scheme: light)', color: '#FFF3E0' },
+    { media: '(prefers-color-scheme: dark)', color: '#1A120F' },
   ],
 };
 
@@ -107,7 +110,7 @@ export default async function RootLayout(
     <html
       lang={lang}
       suppressHydrationWarning
-      className={`${spaceGrotesk.variable} ${beVietnamPro.variable} ${jetbrainsMono.variable}`}
+      className={`${baloo2.variable} ${nunito.variable} ${jetbrainsMono.variable}`}
     >
       <body>
         {/* JSON-LD structured data for SEO */}

@@ -4,6 +4,7 @@ const COLOR_KEY_STORAGE = 'ui-theme-key';
 const FONT_STORAGE = 'ui-font';
 const FONT_SIZE_STORAGE = 'ui-font-size';
 const STYLE_TAG_ID = 'app-theme-vars';
+const DARK_SELECTOR = ":root[data-theme='dark']";
 
 const toCss = (tokens: AccentTokens) =>
   Object.entries(tokens)
@@ -11,8 +12,8 @@ const toCss = (tokens: AccentTokens) =>
     .join('\n');
 
 /**
- * A <style> tag (not inline vars on <html>) so the preset also wins inside
- * subtrees that are scoped with their own `data-theme`, e.g. the timer page.
+ * A <style> tag (not inline vars on <html>) so it is applied after globals.css and wins over the
+ * default PRIMARY block. Selectors mirror globals.css (`:root` / `:root[data-theme='dark']`).
  */
 export function applyColorPreset(preset: ColorPreset) {
   const existing = document.getElementById(STYLE_TAG_ID);
@@ -21,7 +22,7 @@ export function applyColorPreset(preset: ColorPreset) {
     return;
   }
   const styleEl = existing ?? Object.assign(document.createElement('style'), { id: STYLE_TAG_ID });
-  styleEl.textContent = `:root {\n${toCss(preset.light)}\n}\n[data-theme='dark'] {\n${toCss(preset.dark)}\n}`;
+  styleEl.textContent = `:root {\n${toCss(preset.light)}\n}\n${DARK_SELECTOR} {\n${toCss(preset.dark)}\n}`;
   if (!existing) document.head.appendChild(styleEl);
 }
 
@@ -35,9 +36,9 @@ export function saveColorPreset(preset: ColorPreset) {
   applyColorPreset(preset);
 }
 
+/** Body font choices. Nunito (the default) is the `--font-body` stack from globals.css, so its css is empty. */
 export const UI_FONTS = [
-  { name: 'Be Vietnam Pro', css: '' },
-  { name: 'Space Grotesk', css: 'var(--font-heading)' },
+  { name: 'Nunito', css: '' },
   {
     name: 'System UI',
     css: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
@@ -46,7 +47,7 @@ export const UI_FONTS = [
 
 export type UiFontName = (typeof UI_FONTS)[number]['name'];
 
-/** Fonts removed from the picker (Nunito, Inter) fall back to the body font. */
+/** Saved fonts that are no longer offered (Be Vietnam Pro, Space Grotesk, Inter...) fall back to Nunito. */
 export function getSavedUiFont(): UiFontName {
   const saved = localStorage.getItem(FONT_STORAGE);
   return UI_FONTS.find((f) => f.name === saved)?.name ?? UI_FONTS[0].name;
