@@ -41,7 +41,7 @@ function Digit({ digit }: { digit: string }) {
 }
 
 function Colon({ color }: { color: string }) {
-  const dot = 'block size-[0.15em] rounded-full border-[length:max(1.5px,0.028em)] border-outline transition-colors duration-1000';
+  const dot = 'block size-[0.15em] rounded-full border-[length:max(1.5px,0.028em)] border-outline motion-safe:transition-colors motion-safe:duration-1000';
   return (
     <span data-clock-colon className="mx-[0.03em] flex w-[0.3em] flex-col items-center justify-center gap-[0.2em]">
       <i className={dot} style={{ backgroundColor: color }} />

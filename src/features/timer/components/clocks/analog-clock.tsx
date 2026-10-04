@@ -95,7 +95,7 @@ export const AnalogClock = memo(
                     strokeWidth={ARC_WIDTH + ARC_OUTLINE * 2}
                     strokeLinecap="round"
                     strokeDasharray={dash}
-                    className="transition-[stroke-dasharray] duration-1000"
+                    className="motion-safe:transition-[stroke-dasharray] motion-safe:duration-1000"
                   />
                   <circle
                     cx="100"
@@ -106,7 +106,7 @@ export const AnalogClock = memo(
                     strokeWidth={ARC_WIDTH}
                     strokeLinecap="round"
                     strokeDasharray={dash}
-                    className="transition-[stroke-dasharray] duration-1000"
+                    className="motion-safe:transition-[stroke-dasharray] motion-safe:duration-1000"
                   />
                 </>
               )}
@@ -129,7 +129,7 @@ export const AnalogClock = memo(
 
               {/* Hand: dark brown, from just outside the digits to the groove, ending in a knob that rides the arc */}
               <g
-                className="transition-transform duration-1000 ease-linear"
+                className="motion-safe:transition-transform motion-safe:duration-1000 motion-safe:ease-linear"
                 style={{ transform: `rotate(${angleDeg}deg)`, transformOrigin: '100px 100px' }}
               >
                 <line x1="157" y1="100" x2="173" y2="100" stroke="var(--outline)" strokeWidth="4" strokeLinecap="round" />
