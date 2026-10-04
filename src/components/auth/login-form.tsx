@@ -1,6 +1,6 @@
 'use client';
 
-import { Logo } from '@/components/brand/logo';
+import { Tomo } from '@/components/brand/tomo';
 import { useEffect, useState } from 'react';
 import { CircleNotch, EnvelopeSimple, SignIn } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '@/components/ui/button';
@@ -81,13 +81,16 @@ export function LoginForm({ googleEnabled, onSignedIn }: { googleEnabled: boolea
   }
 
   return (
-    <Card className="w-full max-w-md">
+    // m-1.5: the dialog around this card scrolls (overflow-y-auto), which clips the card's outline on the
+    // top/left and its hard shadow on the bottom/right when the card touches the dialog edge.
+    <Card className="m-1.5 max-w-md">
       <CardHeader className="space-y-2 text-center">
-        <CardTitle className="flex flex-col items-center gap-3 font-heading text-2xl font-bold">
-          <Logo variant="mark" size={56} />
+        <CardTitle className="flex flex-col items-center gap-3 font-heading text-2xl font-extrabold">
+          {/* Tomo reacts to the form: worried while an error is showing, happy otherwise */}
+          <Tomo face={error ? 'worried' : 'happy'} size={96} />
           {t('login.title')}
         </CardTitle>
-        <CardDescription className="text-sm text-ink-muted">
+        <CardDescription className="text-sm text-ink-secondary">
           {step === 'email' ? t('login.description') : t('login.form.codeSent', { email: email.trim() })}
         </CardDescription>
       </CardHeader>
@@ -108,8 +111,8 @@ export function LoginForm({ googleEnabled, onSignedIn }: { googleEnabled: boolea
                 disabled={busy}
               />
             </div>
-            <Button className="w-full" type="submit" disabled={busy || !email.trim()}>
-              {busy ? <CircleNotch size={16} className="animate-spin" /> : <EnvelopeSimple size={16} />}
+            <Button className="w-full" size="lg" type="submit" disabled={busy || !email.trim()}>
+              {busy ? <CircleNotch size={16} className="animate-spin motion-reduce:animate-none" /> : <EnvelopeSimple size={16} weight="bold" />}
               {busy ? t('login.form.sending') : t('login.form.sendCode')}
             </Button>
           </form>
@@ -130,15 +133,15 @@ export function LoginForm({ googleEnabled, onSignedIn }: { googleEnabled: boolea
                 disabled={busy}
               />
             </div>
-            <Button className="w-full" type="submit" disabled={busy || code.length !== CODE_LENGTH}>
-              {busy ? <CircleNotch size={16} className="animate-spin" /> : <SignIn size={16} />}
+            <Button className="w-full" size="lg" type="submit" disabled={busy || code.length !== CODE_LENGTH}>
+              {busy ? <CircleNotch size={16} className="animate-spin motion-reduce:animate-none" /> : <SignIn size={16} weight="bold" />}
               {busy ? t('login.form.signingIn') : t('login.form.signIn')}
             </Button>
-            <div className="flex justify-between text-xs">
-              <button type="button" className="text-ink-muted hover:text-ink" onClick={() => setStep('email')} disabled={busy}>
+            <div className="flex justify-between gap-3 text-sm">
+              <button type="button" className="focus-ring rounded-sm font-bold text-ink-secondary underline-offset-4 hover:text-ink hover:underline" onClick={() => setStep('email')} disabled={busy}>
                 {t('login.form.changeEmail')}
               </button>
-              <button type="button" className="text-brand hover:underline" onClick={() => sendCode()} disabled={busy}>
+              <button type="button" className="focus-ring rounded-sm font-bold text-brand underline-offset-4 hover:text-brand-hover hover:underline" onClick={() => sendCode()} disabled={busy}>
                 {t('login.form.resend')}
               </button>
             </div>
@@ -146,26 +149,26 @@ export function LoginForm({ googleEnabled, onSignedIn }: { googleEnabled: boolea
         )}
 
         {error && (
-          <p role="alert" className="text-sm text-danger-ink">
+          <p role="alert" className="rounded-xl border-2 border-danger-ink bg-danger-bg px-3 py-2 text-sm font-semibold text-danger-ink">
             {error}
           </p>
         )}
 
         {googleEnabled && step === 'email' && (
           <>
-            <div className="flex items-center gap-4 text-xs text-ink-muted">
+            <div className="flex items-center gap-4 text-sm font-semibold text-ink-muted">
               <Separator className="flex-1" />
               {t('login.form.or')}
               <Separator className="flex-1" />
             </div>
-            <Button type="button" variant="outline" className="w-full" onClick={signInWithGoogle} disabled={busy}>
+            <Button type="button" variant="secondary" size="lg" className="w-full" onClick={signInWithGoogle} disabled={busy}>
               <GoogleGlyph />
               {t('login.form.continueWithGoogle')}
             </Button>
           </>
         )}
 
-        {user?.isAnonymous && <p className="text-center text-xs text-ink-muted">{t('login.guestNote')}</p>}
+        {user?.isAnonymous && <p className="text-center text-sm text-ink-muted">{t('login.guestNote')}</p>}
       </CardContent>
 
     </Card>
