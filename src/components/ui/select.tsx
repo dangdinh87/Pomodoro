@@ -5,6 +5,14 @@ import * as SelectPrimitive from "@radix-ui/react-select"
 import { Check, CaretDown, CaretUp, X } from '@phosphor-icons/react/dist/ssr';
 
 import { cn } from "@/lib/utils"
+import {
+  ANCHORED_CARD,
+  MENU_HEADING,
+  MENU_ROW,
+  MENU_SEPARATOR,
+  MENU_TICK_SLOT,
+  POP_IN_ANCHORED,
+} from "@/components/ui/overlay-parts"
 
 const Select = SelectPrimitive.Root
 
@@ -22,7 +30,9 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex h-10 w-full items-center justify-between rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink transition-[border-color,box-shadow] duration-150 data-placeholder:text-ink-faint focus:outline-hidden focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-brand/15 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+      // Outlined 42px control with a small hard shadow. Open or keyboard focus: the shadow turns accent
+      // (2px 2px 0 --accent-solid, spec §5) and focus-visible adds the app-wide 3px ring.
+      "flex h-[42px] w-full items-center justify-between gap-2 rounded-md border-[length:var(--outline-w)] border-outline bg-surface px-3 text-sm font-semibold text-ink shadow-sticker-sm transition-[box-shadow,background-color] duration-100 data-placeholder:text-ink-muted data-[state=open]:shadow-[2px_2px_0_var(--accent-solid)] focus-visible:shadow-[2px_2px_0_var(--accent-solid)] focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none [&>span]:line-clamp-1",
       className
     )}
     {...props}
@@ -44,13 +54,13 @@ const SelectTrigger = React.forwardRef<
           e.stopPropagation()
           onClear()
         }}
-        className="h-4 w-4 opacity-50 hover:opacity-100"
+        className="h-4 w-4 shrink-0 text-ink-secondary hover:text-ink"
       >
-        <X size={16} />
+        <X size={16} weight="bold" />
       </button>
     ) : (
       <SelectPrimitive.Icon asChild>
-        <CaretDown size={16} className="opacity-50" />
+        <CaretDown size={16} weight="bold" className="shrink-0 text-ink-secondary" />
       </SelectPrimitive.Icon>
     )}
   </SelectPrimitive.Trigger>
@@ -64,12 +74,12 @@ const SelectScrollUpButton = React.forwardRef<
   <SelectPrimitive.ScrollUpButton
     ref={ref}
     className={cn(
-      "flex cursor-default items-center justify-center py-1",
+      "flex cursor-default items-center justify-center py-1 text-ink-secondary",
       className
     )}
     {...props}
   >
-    <CaretUp size={16} />
+    <CaretUp size={16} weight="bold" />
   </SelectPrimitive.ScrollUpButton>
 ))
 SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName
@@ -81,12 +91,12 @@ const SelectScrollDownButton = React.forwardRef<
   <SelectPrimitive.ScrollDownButton
     ref={ref}
     className={cn(
-      "flex cursor-default items-center justify-center py-1",
+      "flex cursor-default items-center justify-center py-1 text-ink-secondary",
       className
     )}
     {...props}
   >
-    <CaretDown size={16} />
+    <CaretDown size={16} weight="bold" />
   </SelectPrimitive.ScrollDownButton>
 ))
 SelectScrollDownButton.displayName =
@@ -100,9 +110,12 @@ const SelectContent = React.forwardRef<
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        "relative z-50 max-h-96 min-w-32 overflow-hidden rounded-md border border-border bg-surface text-ink shadow-[0_4px_20px_-8px_rgba(0,0,0,0.4)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        // sticker card (outline, --shadow-sticker, --radius-lg) with the springy pop-in
+        ANCHORED_CARD,
+        "relative max-h-96 min-w-32 overflow-hidden origin-(--radix-select-content-transform-origin)",
+        POP_IN_ANCHORED,
         position === "popper" &&
-        "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
+        "data-[side=bottom]:translate-y-2 data-[side=left]:-translate-x-2 data-[side=right]:translate-x-2 data-[side=top]:-translate-y-2",
         className
       )}
       position={position}
@@ -111,7 +124,7 @@ const SelectContent = React.forwardRef<
       <SelectScrollUpButton />
       <SelectPrimitive.Viewport
         className={cn(
-          "p-1",
+          "p-1.5",
           position === "popper" &&
           "h-(--radix-select-trigger-height) w-full min-w-(--radix-select-trigger-width)"
         )}
@@ -130,7 +143,7 @@ const SelectLabel = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SelectPrimitive.Label
     ref={ref}
-    className={cn("py-1.5 pl-8 pr-2 text-sm font-semibold", className)}
+    className={cn(MENU_HEADING, className)}
     {...props}
   />
 ))
@@ -142,19 +155,16 @@ const SelectItem = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <SelectPrimitive.Item
     ref={ref}
-    className={cn(
-      "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-hidden focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50",
-      className
-    )}
+    className={cn(MENU_ROW, "pr-8", className)}
     {...props}
   >
-    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+
+    <span className={MENU_TICK_SLOT}>
       <SelectPrimitive.ItemIndicator>
-        <Check size={16} />
+        <Check size={16} weight="bold" />
       </SelectPrimitive.ItemIndicator>
     </span>
-
-    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
   </SelectPrimitive.Item>
 ))
 SelectItem.displayName = SelectPrimitive.Item.displayName
@@ -165,7 +175,7 @@ const SelectSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SelectPrimitive.Separator
     ref={ref}
-    className={cn("-mx-1 my-1 h-px bg-border", className)}
+    className={cn(MENU_SEPARATOR, className)}
     {...props}
   />
 ))
