@@ -29,7 +29,7 @@ export const parseYouTubeUrl = (url: string): ParsedYouTubeUrl => {
       return id ? { videoId: id } : {};
     }
 
-    if (u.hostname.includes('youtube.com')) {
+    if (u.hostname === 'youtube.com' || u.hostname.endsWith('.youtube.com')) {
       if (u.pathname.startsWith('/watch')) {
         return {
           videoId: u.searchParams.get('v') || undefined,
