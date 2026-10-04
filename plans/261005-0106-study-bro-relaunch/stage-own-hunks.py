@@ -18,12 +18,17 @@ keep = [h for h in hunks if mark.search(h) and 'weather' not in h.lower()]
 if not keep:
     sys.exit(f'{path}: no matching hunk')
 
-result = subprocess.run(
-    ['git', 'apply', '--cached', '--unidiff-zero', '-'],
-    input=head + ''.join(keep), text=True, capture_output=True,
-)
-if result.returncode:
-    sys.exit(f'{path}: git apply failed: {result.stderr}')
+# One hunk at a time, bottom to top. Zero-context hunks only apply at their exact old line,
+# and a subset in one patch breaks when new-side numbers were shifted by hunks left out;
+# going bottom-up keeps the old line numbers of the remaining hunks valid in the index.
+for hunk in reversed(keep):
+    result = subprocess.run(
+        ['git', 'apply', '--cached', '--unidiff-zero', '-'],
+        input=head + hunk, text=True, capture_output=True,
+    )
+    if result.returncode:
+        subprocess.run(['git', 'restore', '--staged', '--', path])
+        sys.exit(f'{path}: git apply failed: {result.stderr}')
 
 if path.endswith('.json'):
     staged = subprocess.run(['git', 'show', f':{path}'], capture_output=True, text=True).stdout
