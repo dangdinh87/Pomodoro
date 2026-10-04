@@ -590,6 +590,7 @@
       "playing": "đang phát",
       "stopAll": "Dừng tất cả",
       "active": "đang bật",
+      "mixedLabel": "Âm thanh hỗn hợp ({count} âm)",
       "pausedAlert": {
         "title": "YouTube đang phát",
         "description": "Âm thanh nền tạm dừng khi bạn phát YouTube để tránh chồng âm."
