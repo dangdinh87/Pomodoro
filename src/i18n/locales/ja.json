@@ -713,7 +713,17 @@
       "errors": {
         "cannotPlay": "この動画を再生できません。リンクを確認してください。",
         "playerFailed": "YouTubeプレーヤーを起動できませんでした。もう一度お試しください。",
-        "controlFailed": "再生を操作できませんでした。もう一度お試しください。"
+        "controlFailed": "再生を操作できませんでした。もう一度お試しください。",
+        "notFound": "この動画は削除されたか、非公開です。別の動画をお試しください。",
+        "embedBlocked": "この動画は、投稿者がYouTube以外での再生を許可していません。別の動画をお試しください。"
+      },
+      "mini": {
+        "label": "YouTubeプレーヤー",
+        "collapse": "プレーヤーを小さくする",
+        "expand": "プレーヤーを大きくする",
+        "close": "プレーヤーを閉じて動画を止める",
+        "previousVideo": "前の動画",
+        "nextVideo": "次の動画"
       },
       "nowPlaying": "再生中",
       "soundSettings": "サウンド設定",

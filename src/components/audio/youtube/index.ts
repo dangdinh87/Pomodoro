@@ -1,2 +1,2 @@
 export { YouTubeInputSection } from './youtube-input-section';
-export { YouTubeSuggestions } from './youtube-suggestions';
+export { YouTubeMiniPlayer } from './youtube-mini-player';

@@ -58,7 +58,7 @@ const YouTubePane = memo(() => {
   const [canScrollRight, setCanScrollRight] = useState(false);
 
   // YouTube player hook
-  const { playerState, togglePlayback, stopPlayback, createOrUpdatePlayer } = useYouTubePlayer();
+  const { playerState, togglePlayback, stopPlayback, play } = useYouTubePlayer();
 
   // Parse YouTube URL
   const parsedUrl = useMemo(() => parseYouTubeUrl(youtubeUrl), [youtubeUrl]);
@@ -142,11 +142,11 @@ const YouTubePane = memo(() => {
 
     // Play the new video/playlist
     if (parsed.listId && !parsed.videoId) {
-      await createOrUpdatePlayer(parsed.listId, true, { isPlaylist: true });
+      await play({ listId: parsed.listId });
     } else if (parsed.videoId) {
-      await createOrUpdatePlayer(parsed.videoId, true);
+      await play({ videoId: parsed.videoId });
     }
-  }, [createOrUpdatePlayer, updateAudioSettings, togglePlayback, playerState.currentSource]);
+  }, [play, updateAudioSettings, togglePlayback, playerState.currentSource]);
 
   // Handle random suggestion
   const handlePickRandomSuggestion = useCallback(async () => {
@@ -160,11 +160,11 @@ const YouTubePane = memo(() => {
 
     // Always play the new video/playlist directly
     if (parsed.listId && !parsed.videoId) {
-      await createOrUpdatePlayer(parsed.listId, true, { isPlaylist: true });
+      await play({ listId: parsed.listId });
     } else if (parsed.videoId) {
-      await createOrUpdatePlayer(parsed.videoId, true);
+      await play({ videoId: parsed.videoId });
     }
-  }, [createOrUpdatePlayer, updateAudioSettings]);
+  }, [play, updateAudioSettings]);
 
   // Check if a suggestion is currently playing
   const isSuggestionPlaying = useCallback((suggestionUrl: string): boolean => {

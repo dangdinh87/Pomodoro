@@ -617,6 +617,13 @@ html[data-chrome-idle='true'] [data-chrome] {
 html[data-chrome-idle='true'] body {
   cursor: none;
 }
+/* The YouTube mini player must stay on screen (YouTube's terms), so it dims with the chrome instead of vanishing. */
+[data-mini-player] {
+  transition: opacity 0.6s ease;
+}
+html[data-chrome-idle='true'] [data-mini-player] {
+  opacity: 0.5;
+}
 
 /*
  * Pomodoro mode colours: focus = tomato (the brand, or the chosen colour preset), short

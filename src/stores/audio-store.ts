@@ -822,7 +822,6 @@ export const useAudioStore = create<AudioState>()(
 export {
   audioManager,
   playAmbientSound,
-  playYouTube,
   stopAllAudio,
   setAudioVolume,
   setAudioMute,

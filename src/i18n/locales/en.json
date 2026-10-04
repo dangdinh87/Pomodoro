@@ -713,7 +713,17 @@
       "errors": {
         "cannotPlay": "Couldn't play this video. Check the link and try again.",
         "playerFailed": "Couldn't start the YouTube player. Please try again.",
-        "controlFailed": "Couldn't control playback. Please try again."
+        "controlFailed": "Couldn't control playback. Please try again.",
+        "notFound": "This video was removed or is private. Try another one.",
+        "embedBlocked": "The owner doesn't allow this video to play outside YouTube. Try another one."
+      },
+      "mini": {
+        "label": "YouTube player",
+        "collapse": "Make the player smaller",
+        "expand": "Make the player bigger",
+        "close": "Close the player and stop the video",
+        "previousVideo": "Previous video",
+        "nextVideo": "Next video"
       },
       "nowPlaying": "Now playing",
       "soundSettings": "Sound settings",

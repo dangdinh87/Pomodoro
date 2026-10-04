@@ -713,7 +713,17 @@
       "errors": {
         "cannotPlay": "Không phát được video này. Bạn kiểm tra lại liên kết nhé.",
         "playerFailed": "Không khởi động được trình phát YouTube. Bạn thử lại nhé.",
-        "controlFailed": "Không điều khiển được trình phát. Bạn thử lại nhé."
+        "controlFailed": "Không điều khiển được trình phát. Bạn thử lại nhé.",
+        "notFound": "Video này đã bị gỡ hoặc để riêng tư. Bạn thử video khác nhé.",
+        "embedBlocked": "Chủ video không cho phát ngoài YouTube. Bạn thử video khác nhé."
+      },
+      "mini": {
+        "label": "Trình phát YouTube",
+        "collapse": "Thu nhỏ trình phát",
+        "expand": "Phóng to trình phát",
+        "close": "Đóng trình phát và dừng video",
+        "previousVideo": "Video trước",
+        "nextVideo": "Video sau"
       },
       "nowPlaying": "Đang phát",
       "soundSettings": "Cài đặt âm thanh",
