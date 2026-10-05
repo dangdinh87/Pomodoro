@@ -43,17 +43,23 @@ export function LoginForm({ googleEnabled, onSignedIn }: { googleEnabled: boolea
   // The message is about the address itself: mark the field, not only the alert
   const [emailInvalid, setEmailInvalid] = useState(false);
   const emailField = useRef<HTMLInputElement>(null);
+  const codeField = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isAuthenticated) onSignedIn();
   }, [isAuthenticated, onSignedIn]);
+
+  // The fields are disabled while a request is out, and a disabled field drops focus (it fell to the dialog frame,
+  // which showed the browser's default focus outline). When the request ends in an error, go back to the field to fix.
+  useEffect(() => {
+    if (!busy && error) (step === 'email' ? emailField : codeField).current?.focus();
+  }, [busy, error, step]);
 
   // The email form is `noValidate`: the browser would show its own bubble, in the browser's language, and accepts
   // "abc@x". The message is ours (login.errors.invalidEmail), shown in the page language next to the field.
   function rejectEmail() {
     setEmailInvalid(true);
     setError(t('login.errors.invalidEmail'));
-    emailField.current?.focus();
   }
 
   async function sendCode(event?: React.FormEvent) {
@@ -148,6 +154,7 @@ export function LoginForm({ googleEnabled, onSignedIn }: { googleEnabled: boolea
               <Label htmlFor="code">{t('login.form.code')}</Label>
               <Input
                 id="code"
+                ref={codeField}
                 inputMode="numeric"
                 autoComplete="one-time-code"
                 pattern="[0-9]*"

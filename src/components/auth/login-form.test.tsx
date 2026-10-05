@@ -99,4 +99,24 @@ describe('LoginForm: requesting a code', () => {
       expect(await screen.findByRole('alert')).toHaveTextContent(text);
     });
   });
+
+  describe('focus after an error', () => {
+    it('returns to the email field when sending fails (a disabled field drops focus to the dialog frame)', async () => {
+      send.mockResolvedValue({ data: null, error: { status: 500, message: 'x' } } as never);
+      renderForm();
+      await screen.findByRole('alert');
+      await waitFor(() => expect(screen.getByRole('textbox')).toHaveFocus());
+    });
+
+    it('returns to the code field when the code is wrong', async () => {
+      send.mockResolvedValue({ data: { success: true }, error: null } as never);
+      vi.mocked(authClient.signIn.emailOtp).mockResolvedValue({ data: null, error: { status: 400, message: 'x' } } as never);
+      renderForm();
+      const code = await screen.findByLabelText(/code/i);
+      fireEvent.change(code, { target: { value: '123456' } });
+      fireEvent.submit(code.closest('form')!);
+      await screen.findByRole('alert');
+      await waitFor(() => expect(screen.getByLabelText(/code/i)).toHaveFocus());
+    });
+  });
 });
