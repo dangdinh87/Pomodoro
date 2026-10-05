@@ -52,7 +52,7 @@ export const TaskQuickAdd = forwardRef<HTMLInputElement, TaskQuickAddProps>(func
         placeholder={t('tasksUi.quickAddPlaceholder')}
         aria-label={t('tasksUi.quickAddLabel')}
         maxLength={200}
-        className="h-8 min-w-0 flex-1 basis-[calc(100%-2.5rem)] bg-transparent px-2 font-body text-[0.9375rem] font-semibold text-ink outline-hidden placeholder:font-medium placeholder:text-ink-muted sm:basis-0"
+        className="h-8 min-w-0 flex-1 basis-[calc(100%-2.5rem)] bg-transparent px-2 font-body text-[0.9375rem] pointer-coarse:text-base font-semibold text-ink outline-hidden placeholder:font-medium placeholder:text-ink-muted sm:basis-0"
       />
 
       <div className="flex w-full items-center gap-1 sm:w-auto">

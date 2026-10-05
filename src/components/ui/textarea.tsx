@@ -11,7 +11,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         return (
             <textarea
                 className={cn(
-                    "field flex min-h-[96px] px-3.5 py-2.5 text-[0.9375rem]",
+                    "field flex min-h-[96px] px-3.5 py-2.5 text-[0.9375rem] pointer-coarse:text-base",
                     className
                 )}
                 ref={ref}

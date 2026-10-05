@@ -26,6 +26,18 @@ describe('Input and Textarea', () => {
     expect(input).toHaveValue('Tomo');
   });
 
+  it('are 16px on touch screens (iOS Safari zooms the page on focus of a smaller field)', () => {
+    render(
+      <>
+        <Input aria-label="One line" />
+        <Textarea aria-label="Many lines" />
+      </>,
+    );
+    // jsdom has no media queries: the contract is the touch variant that overrides the 15px desktop size
+    expect(screen.getByLabelText('One line')).toHaveClass('text-[0.9375rem]', 'pointer-coarse:text-base');
+    expect(screen.getByLabelText('Many lines')).toHaveClass('text-[0.9375rem]', 'pointer-coarse:text-base');
+  });
+
   it('exposes the invalid state to the .field danger styling', () => {
     render(<Input aria-label="Email" aria-invalid="true" />);
     expect(screen.getByLabelText('Email')).toHaveAttribute('aria-invalid', 'true');
