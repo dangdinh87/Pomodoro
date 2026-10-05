@@ -48,7 +48,15 @@ describe('database module', () => {
     const source = readFileSync(join(process.cwd(), 'src/db/index.ts'), 'utf8');
     expect(source).not.toMatch(/^import\s+(?!type\b)[^;]*from\s+['"]@electric-sql\/pglite['"]/m);
     expect(source).not.toMatch(/^import\s+(?!type\b)[^;]*from\s+['"]drizzle-orm\/pglite['"]/m);
-    expect(source).toContain("import('@electric-sql/pglite')");
+    expect(source).toMatch(/import\([^)]*'@electric-sql\/pglite'\)/);
+  });
+
+  it('keeps PGlite out of the bundle, so the file tracer never sees it (instrumentation included)', () => {
+    const source = readFileSync(join(process.cwd(), 'src/db/index.ts'), 'utf8');
+    // Every runtime import of either package must be one Turbopack leaves to Node
+    const imports = source.match(/import\([^)]*'(?:@electric-sql\/pglite|drizzle-orm\/pglite)'\)/g) ?? [];
+    expect(imports).toHaveLength(2);
+    for (const statement of imports) expect(statement).toContain('turbopackIgnore: true');
   });
 
   it('tells the file tracer to leave PGlite out of the serverless functions (it follows literal dynamic imports too)', () => {

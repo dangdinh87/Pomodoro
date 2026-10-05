@@ -1,5 +1,12 @@
 /** @vitest-environment node */
-import { onRequestError } from './instrumentation';
+import { onRequestError, register } from './instrumentation';
+
+const { dbModuleLoaded, migrate } = vi.hoisted(() => ({ dbModuleLoaded: vi.fn(), migrate: vi.fn() }));
+vi.mock('@/db', () => {
+  dbModuleLoaded();
+  return { db: { kind: 'local' }, MIGRATIONS_FOLDER: 'drizzle' };
+});
+vi.mock('drizzle-orm/pglite/migrator', () => ({ migrate }));
 
 const fetchMock = vi.fn();
 
@@ -21,6 +28,46 @@ const request = {
 };
 const context = { routerKind: 'App Router', routePath: '/app/api/tasks/[id]/route', routeType: 'route', renderSource: undefined, revalidateReason: undefined, renderType: undefined } as never;
 const error = Object.assign(new Error('db exploded for user@example.com'), { digest: '99' });
+
+describe('register', () => {
+  beforeEach(() => {
+    dbModuleLoaded.mockClear();
+    migrate.mockReset().mockResolvedValue(undefined);
+    vi.stubEnv('NEXT_RUNTIME', 'nodejs');
+  });
+
+  it('never loads the database layer in production (DATABASE_URL set)', async () => {
+    vi.stubEnv('DATABASE_URL', 'postgres://user:pass@db.example.com/app');
+    vi.stubEnv('VERCEL', '');
+    await register();
+    expect(dbModuleLoaded).not.toHaveBeenCalled();
+    expect(migrate).not.toHaveBeenCalled();
+  });
+
+  it('never loads the database layer on Vercel, even without DATABASE_URL', async () => {
+    vi.stubEnv('DATABASE_URL', '');
+    vi.stubEnv('VERCEL', '1');
+    await register();
+    expect(dbModuleLoaded).not.toHaveBeenCalled();
+    expect(migrate).not.toHaveBeenCalled();
+  });
+
+  it('does nothing on the edge runtime', async () => {
+    vi.stubEnv('NEXT_RUNTIME', 'edge');
+    vi.stubEnv('DATABASE_URL', '');
+    vi.stubEnv('VERCEL', '');
+    await register();
+    expect(migrate).not.toHaveBeenCalled();
+  });
+
+  it('migrates the local PGlite database on a local run', async () => {
+    vi.stubEnv('DATABASE_URL', '');
+    vi.stubEnv('VERCEL', '');
+    await register();
+    expect(migrate).toHaveBeenCalledTimes(1);
+    expect(migrate).toHaveBeenCalledWith({ kind: 'local' }, { migrationsFolder: 'drizzle' });
+  });
+});
 
 describe('onRequestError', () => {
   it('writes one structured log line with route, method, digest and message, and nothing personal', async () => {

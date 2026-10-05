@@ -15,12 +15,20 @@ export const isLocalDatabase = () => !process.env.DATABASE_URL;
 /**
  * PGlite is ~10 MB of WASM and only ever runs locally, so it is loaded with a dynamic import in
  * the local branch alone. A static import would evaluate it on every serverless cold start even
- * with DATABASE_URL set. (The dynamic import does not keep it out of the traced files, because
- * the file tracer follows string-literal imports too: that is `outputFileTracingExcludes` in
- * next.config.ts.) Both packages are loaded together: the drizzle adapter imports PGlite itself.
+ * with DATABASE_URL set. Both packages are loaded together: the drizzle adapter imports PGlite itself.
+ *
+ * `turbopackIgnore` leaves the two imports to Node at run time (resolved from the project's
+ * node_modules) instead of compiling them in. A plain string-literal import, even a dynamic one,
+ * puts PGlite in the module graph, and the file tracer then copies its ~20 MB into the function
+ * (the instrumentation trace too, which `outputFileTracingExcludes` cannot reach). The adapter
+ * then comes from the unbundled drizzle-orm while the schema comes from the bundled one: drizzle
+ * matches its classes by a global symbol (`is()` in drizzle-orm/entity), not by identity.
  */
 async function loadLocalDriver() {
-  const [{ PGlite }, { drizzle }] = await Promise.all([import('@electric-sql/pglite'), import('drizzle-orm/pglite')]);
+  const [{ PGlite }, { drizzle }] = await Promise.all([
+    import(/* webpackIgnore: true */ /* turbopackIgnore: true */ '@electric-sql/pglite'),
+    import(/* webpackIgnore: true */ /* turbopackIgnore: true */ 'drizzle-orm/pglite'),
+  ]);
   return { PGlite, drizzle };
 }
 

@@ -1,11 +1,16 @@
 import type { Instrumentation } from 'next';
 import { buildServerErrorReport, reportError } from '@/lib/observability/error-reporter';
 
+/**
+ * Only a local run (no DATABASE_URL, not on Vercel) migrates its own PGlite here; Neon is migrated by
+ * .github/workflows/db-migrate.yml (`pnpm db:migrate`). Production returns before importing the
+ * database layer at all, and the PGlite imports inside it are left out of the bundle
+ * (`turbopackIgnore` in src/db/index.ts), so none of PGlite is traced into this file's function.
+ */
 export async function register() {
   if (process.env.NEXT_RUNTIME !== 'nodejs') return;
-  const { db, isLocalDatabase, MIGRATIONS_FOLDER } = await import('@/db');
-  // Neon is migrated by .github/workflows/db-migrate.yml (`pnpm db:migrate`); local PGlite migrates itself.
-  if (!isLocalDatabase()) return;
+  if (process.env.DATABASE_URL || process.env.VERCEL) return;
+  const { db, MIGRATIONS_FOLDER } = await import('@/db');
   const { migrate } = await import('drizzle-orm/pglite/migrator');
   await migrate(db as Parameters<typeof migrate>[0], { migrationsFolder: MIGRATIONS_FOLDER });
 }
