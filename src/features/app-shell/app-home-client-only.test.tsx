@@ -3,7 +3,7 @@ import { AppHomeClientOnly } from './app-home-client-only';
 
 // The heavy app never finishes loading in this test, so what is on screen is the placeholder
 // a visitor (and the server HTML) gets first.
-vi.mock('./app-home', () => new Promise(() => {}));
+vi.mock('./app-runtime', () => new Promise(() => {}));
 
 describe('AppHomeClientOnly', () => {
   it('shows the 25:00 skeleton while the app downloads', async () => {

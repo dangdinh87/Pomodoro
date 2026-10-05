@@ -12,7 +12,8 @@ import {
 
 /**
  * Restores the user's saved colour preset, font and font size on app startup.
- * Must be rendered inside AppProviders so it runs on every page load.
+ * Rendered by the (main) layout, so it runs on hydration of every app page load
+ * (before the app's own code arrives: it also styles the server HTML).
  */
 export function ThemeRestorer() {
   useLayoutEffect(() => {
