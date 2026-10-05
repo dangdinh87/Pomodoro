@@ -12,6 +12,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useStats } from '@/hooks/use-stats';
 import { studyTodayDate } from '@/lib/stats/study-day';
 import { openCommandPalette } from './command-palette';
+import { LiveClock } from './live-clock';
 import { modShortcut } from './platform';
 import { openPanel } from './panel-store';
 
@@ -85,6 +86,7 @@ export function AppStatusBar() {
 
       <div className="ml-auto flex items-center gap-2">
         <ProgressPills progress={progress} />
+        <LiveClock />
         <button
           type="button"
           onClick={openCommandPalette}

@@ -1244,7 +1244,8 @@
       "reset": "Đặt lại hẹn giờ",
       "openPanel": "Mở {panel}",
       "help": "Hiện danh sách này"
-    }
+    },
+    "liveClock": "Giờ hiện tại"
   },
   "clockStyles": {
     "flip3d": "Lật 3D",

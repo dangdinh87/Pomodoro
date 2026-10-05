@@ -1244,7 +1244,8 @@
       "reset": "Reset timer",
       "openPanel": "Open {panel}",
       "help": "Show this list"
-    }
+    },
+    "liveClock": "Current time"
   },
   "clockStyles": {
     "flip3d": "Flip 3D",

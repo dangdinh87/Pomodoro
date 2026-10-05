@@ -1244,7 +1244,8 @@
       "reset": "タイマーをリセット",
       "openPanel": "{panel}を開く",
       "help": "この一覧を表示"
-    }
+    },
+    "liveClock": "現在時刻"
   },
   "clockStyles": {
     "flip3d": "フリップ 3D",
