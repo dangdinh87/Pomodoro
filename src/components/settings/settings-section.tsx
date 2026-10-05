@@ -1,6 +1,9 @@
-import type { ReactNode } from "react"
+"use client"
+
+import { useId, type ReactNode } from "react"
 import type { Icon } from "@phosphor-icons/react"
 import { SlidersHorizontal } from "@phosphor-icons/react/dist/ssr"
+import { FieldLabelContext } from "@/components/ui/field-label"
 import { IconTile, type IconTileTone } from "@/components/ui/icon-tile"
 import { cn } from "@/lib/utils"
 
@@ -36,6 +39,8 @@ interface SettingsRowProps {
 }
 
 export function SettingsRow({ label, description, children, stacked = false }: SettingsRowProps) {
+    // The label names the control beside it (a Select trigger only shows its current value)
+    const labelId = useId()
     return (
         <div
             className={cn(
@@ -44,10 +49,12 @@ export function SettingsRow({ label, description, children, stacked = false }: S
             )}
         >
             <div className="min-w-0 flex-1 space-y-0.5">
-                <p className="text-[0.9375rem] font-bold text-ink">{label}</p>
+                <p id={labelId} className="text-[0.9375rem] font-bold text-ink">{label}</p>
                 {description && <p className="text-[0.8125rem] leading-snug text-ink-muted">{description}</p>}
             </div>
-            <div className={cn(!stacked && "shrink-0 sm:w-[180px]")}>{children}</div>
+            <FieldLabelContext.Provider value={labelId}>
+                <div className={cn(!stacked && "shrink-0 sm:w-[180px]")}>{children}</div>
+            </FieldLabelContext.Provider>
         </div>
     )
 }

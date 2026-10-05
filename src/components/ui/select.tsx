@@ -5,6 +5,7 @@ import * as SelectPrimitive from "@radix-ui/react-select"
 import { Check, CaretDown, CaretUp, X } from '@phosphor-icons/react/dist/ssr';
 
 import { cn } from "@/lib/utils"
+import { useFieldLabelId } from "@/components/ui/field-label"
 import {
   ANCHORED_CARD,
   MENU_HEADING,
@@ -26,9 +27,14 @@ const SelectTrigger = React.forwardRef<
     onClear?: () => void
     showClear?: boolean
   }
->(({ className, children, onClear, showClear, ...props }, ref) => (
+>(({ className, children, onClear, showClear, ...props }, ref) => {
+  // Named by the visible label of the row it sits in, unless the caller names it (aria-label / aria-labelledby)
+  const rowLabelId = useFieldLabelId()
+  const named = props["aria-label"] !== undefined || props["aria-labelledby"] !== undefined
+  return (
   <SelectPrimitive.Trigger
     ref={ref}
+    aria-labelledby={named ? undefined : rowLabelId}
     className={cn(
       // Outlined 42px control with a small hard shadow. Open or keyboard focus: the shadow turns accent
       // (2px 2px 0 --accent-solid, spec §5) and focus-visible adds the app-wide 3px ring.
@@ -64,7 +70,8 @@ const SelectTrigger = React.forwardRef<
       </SelectPrimitive.Icon>
     )}
   </SelectPrimitive.Trigger>
-))
+  )
+})
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName
 
 const SelectScrollUpButton = React.forwardRef<

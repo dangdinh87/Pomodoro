@@ -13,12 +13,13 @@ import { Globe } from '@phosphor-icons/react/dist/ssr';
 import { cn } from '@/lib/utils';
 
 export function LanguageSwitcher({ className }: { className?: string }) {
-  const { lang, setLang } = useI18n();
+  const { lang, setLang, t } = useI18n();
 
   return (
     <Select value={lang} onValueChange={(value) => setLang(value as Lang)}>
-      <SelectTrigger className={cn("w-[140px]", className)}>
-        <Globe size={16} className="mr-2" />
+      {/* min-w, not w: "Tiếng Việt" and "日本語" must never be cut to "Tiếng…" */}
+      <SelectTrigger aria-label={t('common.language')} className={cn("w-auto min-w-44", className)}>
+        <Globe size={16} className="mr-2 shrink-0" aria-hidden="true" />
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
