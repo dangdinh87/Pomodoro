@@ -9,7 +9,7 @@ import { EmptyState } from './empty-state';
 import { FilterChip, FilterChipGroup } from './filter-chip';
 import { Kbd } from './kbd';
 import Loader from './loader';
-import { PageHeader } from './page-header';
+import { PageHeader, PanelBody } from './page-header';
 import { Separator } from './separator';
 import { Skeleton } from './skeleton';
 import { StatStrip } from './stat-strip';
@@ -185,6 +185,17 @@ describe('PageHeader, Table, Loader', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'History' })).toHaveClass('font-extrabold');
     expect(screen.getByText('Your sessions')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Export' })).toBeInTheDocument();
+  });
+
+  it('a panel body keeps its header clear of the panel close button (top right, 32px wide + 16px inset)', () => {
+    const { container } = render(
+      <PanelBody>
+        <PageHeader title="Tasks" actions={<button>Manage</button>} />
+      </PanelBody>,
+    );
+    // jsdom has no layout: the contract is the right padding the header gets from the body (40px = 10 x 4px)
+    expect(container.firstElementChild!.className).toContain('[&>header]:pr-10');
+    expect(container.querySelector('header')).toBeInTheDocument();
   });
 
   it('table header carries the outline rule and heading font', () => {

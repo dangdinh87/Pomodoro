@@ -19,9 +19,13 @@ export function PageContainer({
   );
 }
 
-/** Padding for page content rendered inside a sheet or dialog panel. */
+/**
+ * Padding for page content rendered inside a sheet or dialog panel. The panel's round close button sits
+ * 16px from the top right corner (OverlayClose, 32px wide), so a header placed straight under it gets
+ * `pr-10`: its actions (a "..." menu, view chips) stop short of the button instead of overlapping it.
+ */
 export function PanelBody({ className, children }: { className?: string; children: ReactNode }) {
-  return <div className={cn('px-5 pb-10 pt-6 sm:px-8 sm:pt-8', className)}>{children}</div>;
+  return <div className={cn('px-5 pb-10 pt-6 sm:px-8 sm:pt-8 [&>header]:pr-10', className)}>{children}</div>;
 }
 
 export function PageHeader({
