@@ -8,6 +8,7 @@ import * as schema from '@/db/schema';
 import { sendOtpEmail } from '@/lib/email/send-otp-email';
 import { moveGuestData } from '@/lib/auth/move-guest-data';
 import { otpEmailLimitHook, otpSendIpRateRules } from '@/lib/auth/otp-limits';
+import { authBaseURL } from '@/lib/auth/base-url';
 import { getGoogleCredentials } from '@/lib/auth/providers';
 import { buildServerErrorReport } from '@/lib/observability/error-reporter';
 import { scheduleReport } from '@/lib/observability/schedule-report';
@@ -15,6 +16,8 @@ import { scheduleReport } from '@/lib/observability/schedule-report';
 const google = getGoogleCredentials();
 
 export const auth = betterAuth({
+  // BETTER_AUTH_URL, else the site origin (or this deployment's own host); from the request in `next dev`
+  baseURL: authBaseURL(),
   database: drizzleAdapter(db, { provider: 'pg', schema }),
   socialProviders: google ? { google } : {},
   session: {
