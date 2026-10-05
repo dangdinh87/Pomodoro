@@ -26,7 +26,7 @@ function SheetPanel({ id, side, children }: { id: PanelId; side: 'left' | 'right
   const open = usePanelStore((s) => s.active === id);
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side={side} className="w-full overflow-y-auto p-0 sm:max-w-[720px]">
+      <SheetContent side={side} aria-describedby={undefined} className="w-full overflow-y-auto p-0 sm:max-w-[720px]">
         <PanelTitle id={id} as={SheetTitle} />
         {open && children}
       </SheetContent>
@@ -55,6 +55,7 @@ function DialogPanel({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
+        aria-describedby={undefined}
         className={cn(
           'block max-h-[90dvh] max-w-2xl overflow-y-auto p-0',
           bare && 'border-0 bg-transparent p-2 shadow-none',

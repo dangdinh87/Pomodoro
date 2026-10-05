@@ -43,4 +43,16 @@ describe('PanelHost dialog shells', () => {
     expect(shell).toHaveClass('p-0');
     expect(shell).not.toHaveClass('bg-transparent');
   });
+
+  // Radix warns (dev console) when a dialog has a title but neither a Description nor aria-describedby={undefined}.
+  // Panels are named by their sr-only title and describe themselves with their own content.
+  it.each(['settings', 'tasks', 'login'] as const)('opens %s without Radix\'s "Missing Description" warning', (id) => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(<PanelHost googleEnabled={false} />);
+    act(() => openPanel(id));
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(warn.mock.calls.flat().join('\n')).not.toContain('Missing `Description`');
+    warn.mockRestore();
+  });
 });
