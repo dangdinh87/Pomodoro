@@ -39,7 +39,7 @@ Bốn file `phase-0N-*.md` dự kiến ban đầu không được viết: viết
 | 2.7 | Dọn dẹp sau rebrand: mini player YouTube hiển thị (P1-8), timer/bell settings, follow-up #1 #8 #16 #18 #19 + co giãn stage theo dvh | 3a | **xong** 9d1e1c5…e56289f |
 | 2.6 | Trang ngoài app: landing, guide/legal, 404/lỗi/đăng nhập; viết lại `docs/design-system.md` | 2.4a, 2.5b | **xong** 7695916…ab61843 |
 | 3.x | 3a **xong** caaaaf3, 9cc6d7d, 37914e1; 3b **xong** 587fbb0…9505cee (routing `[lang]`, proxy, getT(locale), switcher, banner, locale tải động); 3b sau: metadata/hreflang/sitemap/JSON-LD/OG theo locale + PGlite động. Nội dung gốc: `[lang]` routing + hreflang + metadata theo locale + static/ISR + JSON-LD + locale tải động + PGlite động | — | chưa làm |
-| 4.x | 4a (dọn code chết, deps, ⌘K Skip — **xong** e9d8968…473ef1b; xoá `migrations/`, SQL Supabase, `public/images` bị chặn quyền → chờ chủ dự án) và 4b (migrate action, error tracking, OTP theo email, CSP report, DB hardening, ratchet, .env.example — **xong** 5254aee…aaff643) ; sửa mồ côi `shell.panelError` ef74c72; rà soát code (**xong**, sửa xong 1eac46a…) + build sạch HEAD (**xanh**, da320f6) + audit giao diện (**xong**); đang làm: sửa lỗi giao diện, batch perf + chuông xuyên trang; sau đó push + PR nháp; 4c sau: rà soát toàn nhánh + push + PR nháp. Nội dung gốc: migrate action, error tracking, rate limit OTP, CSP report, DB hardening, ratchet, dọn code chết, push + PR nháp + CI xanh | — | chưa làm |
+| 4.x | 4a (dọn code chết, deps, ⌘K Skip — **xong** e9d8968…473ef1b; xoá `migrations/`, SQL Supabase, `public/images` bị chặn quyền → chờ chủ dự án) và 4b (migrate action, error tracking, OTP theo email, CSP report, DB hardening, ratchet, .env.example — **xong** 5254aee…aaff643) ; sửa mồ côi `shell.panelError` ef74c72; rà soát code (**xong**, sửa xong 1eac46a…) + build sạch HEAD (**xanh**, da320f6) + audit giao diện (**xong**); sửa lỗi giao diện (**xong** 641a8a3…cdc2a7c), perf + chuông xuyên trang (**xong** 75430cc…2a2f312); build sạch HEAD xanh; **push + PR nháp #188, CI pass**; 4c sau: rà soát toàn nhánh + push + PR nháp. Nội dung gốc: migrate action, error tracking, rate limit OTP, CSP report, DB hardening, ratchet, dọn code chết, push + PR nháp + CI xanh | — | chưa làm |
 
 Thứ tự: 1A ∥ 1B → 1C → 1D → 2.x → 3.x → 4.x. Batch nào sửa locale JSON thì không chạy song song với batch khác cũng sửa locale, trừ khi cả hai chỉ thêm key ở namespace riêng.
 
@@ -106,3 +106,5 @@ Năm loại tình huống mà spec ngầm yêu cầu nhưng dễ lọt test nh�
 ## Progress log
 
 Mỗi phase xong thì thêm một dòng: ngày, commit đầu và cuối, kết quả 4 gate, đường dẫn ảnh, ghi chú việc bị giữ lại.
+
+- 2026-10-05 ~08:10: hoàn tất relaunch. HEAD 2a2f312 build sạch xanh (1730 test, 32 trang SSG). PR nháp #188, mọi check pass. Tổng kết: `plans/reports/implementation-261005-study-bro-relaunch.md`.
