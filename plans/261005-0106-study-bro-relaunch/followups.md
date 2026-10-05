@@ -24,16 +24,16 @@
 | 20 | 2048: ô trống gần trùng màu bàn cờ ở chế độ sáng (màu in-game) | 2.5b | Bỏ qua (luật: không đổi màu trong game) |
 | 21 | Lệnh ⌘K "Skip" bấm nút theo aria-label (dễ gãy) | 2.4a | **Xong (4a)**: nút và ⌘K cùng gọi `requestTimerSkip()` (`features/timer/lib/request-skip.ts`) |
 | 22 | `app-home.tsx` (WIP thời tiết) còn ghi cứng `data-theme="dark"` — vô hại vì selector là `:root[data-theme]` | 2.4a | Dọn khi WIP thời tiết commit |
-| 23 | Mobile: thẻ YouTube (sàn 200×200 theo ToS) che nửa dưới thẻ timer | 2.7 | Mobile: đặt player trong luồng trang dưới thẻ timer (không overlay), hoặc trong khay trên tab bar có chừa chỗ |
-| 24 | Thẻ YouTube `z-40` bị panel/dialog `z-50` che khi mở | 2.7 | Cân nhắc: khi panel mở, đưa player vào góc panel hoặc chấp nhận (ghi lý do) |
+| 23 | Mobile: thẻ YouTube (sàn 200×200 theo ToS) che nửa dưới thẻ timer | 2.7 | Mobile: đặt player trong luồng trang dưới thẻ timer (không overlay), hoặc trong khay trên tab bar có chừa chỗ — **Xong (visual-fixes, 17bd71e)**: dưới 768px thẻ nằm trong luồng dưới thẻ timer |
+| 24 | Thẻ YouTube `z-40` bị panel/dialog `z-50` che khi mở | 2.7 | Cân nhắc: khi panel mở, đưa player vào góc panel hoặc chấp nhận (ghi lý do) — **Xong, quyết giữ z-40 (17bd71e)**: lý do ghi ở design-system 7a |
 | 25 | 404 lồng (`/vi/nope`) HTML là vỏ lỗi Next, UI VI dựng sau hydrate | 3a | Kiểm ở preview; noindex nên SEO không ảnh hưởng |
 | 26 | File sót chưa xoá được (lệnh `rm` bị chặn quyền): `migrations/`, `supabase_schema.sql`, `fix_sessions_rls.sql`, `public/images/` (png 3,9 MB + `file.svg`); đã grep 0 tham chiếu | 4a | Chủ dự án cho phép rồi chạy `git rm -r migrations supabase_schema.sql fix_sessions_rls.sql public/images` |
 | 27 | `.Jules/palette.md` vs `.jules/palette.md` trùng tên trên đĩa không phân biệt hoa thường; chỉ khác 3 dòng trống, sửa bằng `git rm --cached .Jules/palette.md` | 4a | Một commit riêng khi phiên khác đã commit xong `.Jules/palette.md` |
 | 28 | `NEXT_PUBLIC_FEATURE_HISTORY` chỉ ẩn UI, không chặn `/api/history` và `/api/stats` (`feature-gate.ts` chưa từng được nối, đã xoá) | 4a | Nối cờ vào 2 route hoặc bỏ cờ |
-| 29 | Video gợi ý `04RM0CQPLHQ` trong `src/data/youtube-suggestions.ts` trả 404 thumbnail | 4a | Thay bằng video còn sống |
+| 29 | Video gợi ý `04RM0CQPLHQ` trong `src/data/youtube-suggestions.ts` trả 404 thumbnail | 4a | Thay bằng video còn sống — **Xong (1787696)**: thay bằng `rUxyKA_-grg` |
 | 30 | Xoá `migrations/`, `supabase_schema.sql`, `fix_sessions_rls.sql`, `public/images/` (0 tham chiếu) — **bị bộ kiểm quyền chặn**, không lách | 4a | Chủ dự án tự chạy `git rm -r …` hoặc cấp quyền |
 | 31 | `.Jules/palette.md` vs `.jules/palette.md` va chạm hoa/thường | 4a | `git rm --cached .Jules/palette.md` (chủ dự án quyết) |
-| 32 | Video gợi ý YouTube `04RM0CQPLHQ` trả 404 thumbnail | 4a | Kiểm và thay id trong danh sách gợi ý/preset |
+| 32 | Video gợi ý YouTube `04RM0CQPLHQ` trả 404 thumbnail | 4a | Kiểm và thay id trong danh sách gợi ý/preset — **Xong (1787696)** |
 | 33 | First-load JS `/[lang]` 318 KB gzip, guide/privacy/terms 209 KB gzip (ngân sách mục tiêu ≤ 200 KB cho app, trang nội dung nên < 120 KB) | build-check | Batch perf: phân tích chunk, lazy-load provider/motion/confetti/cmdk, trang nội dung không kéo provider của app |
 | 34 | `instrumentation.js.nft.json` vẫn kéo 177 file PGlite (20 MB) | build-check | Instrumentation không import db ở production; import động chỉ khi local |
 | 35 | Build in "Better Auth Base URL not set" ×7 | build-check | `baseURL` fallback từ `SITE_URL` khi không có `BETTER_AUTH_URL` |
