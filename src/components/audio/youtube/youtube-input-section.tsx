@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Play, Pause, CircleNotch, X } from '@phosphor-icons/react/dist/ssr';
 import { MusicVisualizer } from './music-visualizer';
+import { YouTubeThumbnail } from './youtube-thumbnail';
 import { ParsedYouTubeUrl, YouTubeSource } from '@/hooks/use-youtube-player';
 import { YouTubeOEmbedResponse } from '@/lib/youtube-utils';
 import { motion, AnimatePresence } from 'motion/react';
@@ -29,12 +30,15 @@ const PLAYER_HEIGHT = 'min-h-[56px]';
 // Extract the compact NowPlaying UI to a sub-component for clarity
 const NowPlayingCompact = ({
   thumbnailUrl,
+  title,
   isPlaying,
   onToggle,
   onStop,
   onInputClick,
 }: {
   thumbnailUrl?: string;
+  /** Title of the video on the card: the status line says whether it plays, this says what. */
+  title: string;
   isPlaying: boolean;
   onToggle: () => void;
   onStop: () => void;
@@ -49,14 +53,15 @@ const NowPlayingCompact = ({
         aria-label={t('audio.youtube.close')}
         className="focus-ring group relative h-10 w-14 shrink-0 overflow-hidden rounded-[8px] border-2 border-outline bg-surface-raised"
       >
-        {thumbnailUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={thumbnailUrl} alt="" className="h-full w-full object-cover" />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-ink-muted">
-            <Play size={16} weight="fill" aria-hidden="true" />
-          </div>
-        )}
+        <YouTubeThumbnail
+          src={thumbnailUrl}
+          className="h-full w-full object-cover"
+          fallback={
+            <div className="flex h-full w-full items-center justify-center text-ink-muted">
+              <Play size={16} weight="fill" aria-hidden="true" />
+            </div>
+          }
+        />
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/60 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
           <span className="text-[0.6875rem] font-bold text-white">{t('common.edit')}</span>
         </div>
@@ -77,8 +82,8 @@ const NowPlayingCompact = ({
           )}
           {isPlaying ? t('audio.youtube.status.playing') : t('audio.youtube.status.paused')}
         </span>
-        <p className="truncate text-xs font-semibold leading-tight text-ink">
-          {isPlaying ? t('audio.youtube.nowPlaying') : t('audio.youtube.soundSettings')}
+        <p className="truncate text-xs font-semibold leading-tight text-ink" title={title}>
+          {title}
         </p>
       </div>
 
@@ -167,6 +172,7 @@ export const YouTubeInputSection = memo(({
             >
               <NowPlayingCompact
                 thumbnailUrl={thumbnailUrl}
+                title={playingVideoDetails.title}
                 isPlaying={isPlaying}
                 onToggle={onTogglePlayback}
                 onStop={onStop}

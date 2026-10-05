@@ -13,6 +13,7 @@ import {
   getSuggestionsByCategory
 } from '@/data/youtube-suggestions';
 import { YouTubeInputSection } from './youtube-input-section';
+import { YouTubeThumbnail } from './youtube-thumbnail';
 import { Button } from '@/components/ui/button';
 import { FilterChip } from '@/components/ui/filter-chip';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
@@ -324,16 +325,11 @@ const YouTubePane = memo(() => {
                           >
                             {/* Thumbnail */}
                             <div className="relative flex h-9 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[8px] border-2 border-outline bg-surface-raised">
-                              {thumbnailUrl ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
-                                  src={thumbnailUrl}
-                                  alt=""
-                                  className="h-full w-full object-cover"
-                                />
-                              ) : (
-                                <span className="font-mono text-[8px] text-ink-muted">YT</span>
-                              )}
+                              <YouTubeThumbnail
+                                src={thumbnailUrl}
+                                className="h-full w-full object-cover"
+                                fallback={<span className="font-mono text-[8px] text-ink-muted">YT</span>}
+                              />
 
                               {/* Animated overlay when playing */}
                               {isPlaying && (
