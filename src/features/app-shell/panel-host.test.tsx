@@ -4,10 +4,6 @@ import { PanelHost } from './panel-host';
 
 vi.mock('@/contexts/i18n-context', () => ({ useI18n: () => ({ t: (key: string) => key }) }));
 // Keep the heavy panels out: only the dialog shells are under test
-vi.mock('@/components/audio/audio-sidebar', () => ({ AudioSidebar: () => null }));
-vi.mock('@/components/settings/background-settings-modal', () => ({ default: () => null }));
-vi.mock('@/components/settings/timer-settings-modal', () => ({ TimerSettingsModal: () => null }));
-vi.mock('@/components/auth/login-form', () => ({ LoginForm: () => <div data-testid="login-card" className="sticker-lg" /> }));
 vi.mock('./panel-loaders', () => ({
   LAZY_PANELS: {
     tasks: () => null,
@@ -15,6 +11,12 @@ vi.mock('./panel-loaders', () => ({
     arcade: () => null,
     settings: () => <div data-testid="settings-body" />,
     feedback: () => null,
+  },
+  LAZY_OVERLAYS: {
+    sound: () => null,
+    scene: () => null,
+    timer: () => null,
+    login: () => <div data-testid="login-card" className="sticker-lg" />,
   },
 }));
 

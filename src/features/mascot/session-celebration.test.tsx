@@ -99,7 +99,7 @@ describe('SessionCelebration', () => {
   });
   afterEach(() => vi.useRealTimers());
 
-  it('shows after a focus session ends on its own: Tomo party, title, minutes, streak, both buttons', () => {
+  it('shows after a focus session ends on its own: Tomo party, title, minutes, streak, both buttons', async () => {
     focusAboutToEnd();
     renderStage();
     expect(dialog()).toBeNull();
@@ -114,7 +114,8 @@ describe('SessionCelebration', () => {
     expect(screen.getByRole('img', { name: '4-day streak' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Take a break' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Later' })).toBeInTheDocument();
-    expect(confetti).toHaveBeenCalled();
+    // canvas-confetti is imported on demand
+    await vi.waitFor(() => expect(confetti).toHaveBeenCalled());
   });
 
   it('counts today in the streak while the stats do not include this session yet', () => {
@@ -263,12 +264,14 @@ describe('SessionCelebration', () => {
     });
   });
 
-  it('reduced motion: no confetti', () => {
+  it('reduced motion: no confetti', async () => {
     reducedMotion = true;
     focusAboutToEnd();
     renderStage();
     advance(2500);
     expect(screen.getByRole('dialog')).toBeInTheDocument();
+    // Would have been imported by now if it had been fired
+    await vi.dynamicImportSettled();
     expect(confetti).not.toHaveBeenCalled();
   });
 

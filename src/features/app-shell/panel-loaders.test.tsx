@@ -1,7 +1,7 @@
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentType } from 'react';
-import { LAZY_PANELS, lazyPanel, preloadPanelsWhenIdle } from './panel-loaders';
+import { LAZY_OVERLAYS, LAZY_PANELS, lazyPanel, preloadPanel, preloadPanelsWhenIdle } from './panel-loaders';
 
 vi.mock('@/contexts/i18n-context', () => ({ useI18n: () => ({ t: (key: string) => key }) }));
 // Keep the five real panel chunks out of these tests
@@ -10,6 +10,10 @@ vi.mock('@/features/panels/stats-panel', () => ({ default: () => null }));
 vi.mock('@/features/panels/arcade-panel', () => ({ default: () => null }));
 vi.mock('@/features/panels/settings-panel', () => ({ default: () => null }));
 vi.mock('@/features/panels/feedback-panel', () => ({ default: () => null }));
+vi.mock('@/components/audio/audio-sidebar', () => ({ AudioSidebar: () => null }));
+vi.mock('@/components/settings/background-settings-modal', () => ({ default: () => null }));
+vi.mock('@/components/settings/timer-settings-modal', () => ({ TimerSettingsModal: () => null }));
+vi.mock('@/components/auth/login-form', () => ({ LoginForm: () => null }));
 
 const Hello = () => <p>panel body</p>;
 
@@ -87,7 +91,9 @@ describe('preloadPanelsWhenIdle', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     // jsdom has no requestIdleCallback: the setTimeout fallback is exercised
-    spies = Object.values(LAZY_PANELS).map((p) => vi.spyOn(p, 'preload').mockResolvedValue());
+    spies = [...Object.values(LAZY_PANELS), ...Object.values(LAZY_OVERLAYS)].map((p) =>
+      vi.spyOn(p, 'preload').mockResolvedValue(),
+    );
   });
   afterEach(() => {
     vi.useRealTimers();
@@ -95,7 +101,15 @@ describe('preloadPanelsWhenIdle', () => {
     Reflect.deleteProperty(navigator, 'connection');
   });
 
-  it('warms every panel chunk once idle', () => {
+  it('warms the sheets and dialogs that load on demand on hover/focus of their dock button too', () => {
+    preloadPanel('sound');
+    preloadPanel('login');
+    expect(vi.mocked(LAZY_OVERLAYS.sound.preload)).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(LAZY_OVERLAYS.login.preload)).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(LAZY_OVERLAYS.scene.preload)).not.toHaveBeenCalled();
+  });
+
+  it('warms every panel chunk once idle (sound, scene, timer settings and sign-in included)', () => {
     const cancel = preloadPanelsWhenIdle();
     vi.advanceTimersByTime(5000);
     spies.forEach((s) => expect(s).toHaveBeenCalledTimes(1));

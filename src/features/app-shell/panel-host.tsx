@@ -3,18 +3,15 @@
 import type { ReactNode } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
-import { AudioSidebar } from '@/components/audio/audio-sidebar';
-import BackgroundSettingsModal from '@/components/settings/background-settings-modal';
-import { TimerSettingsModal } from '@/components/settings/timer-settings-modal';
-import { LoginForm } from '@/components/auth/login-form';
 import { useI18n } from '@/contexts/i18n-context';
 import { cn } from '@/lib/utils';
-import { LAZY_PANELS } from './panel-loaders';
+import { LAZY_OVERLAYS, LAZY_PANELS } from './panel-loaders';
 import { PANELS } from './panel-registry';
 import { closePanel, usePanelStore, type PanelId } from './panel-store';
 
 const { tasks: TasksPanel, stats: StatsPanel, arcade: ArcadePanel, settings: SettingsPanel, feedback: FeedbackPanel } =
   LAZY_PANELS;
+const { sound: AudioSidebar, scene: BackgroundSettingsModal, timer: TimerSettingsModal, login: LoginForm } = LAZY_OVERLAYS;
 
 const onOpenChange = (open: boolean) => {
   if (!open) closePanel();
@@ -76,9 +73,9 @@ export function PanelHost({ googleEnabled }: { googleEnabled: boolean }) {
 
   return (
     <>
-      <AudioSidebar open={active === 'sound'} onOpenChange={onOpenChange} />
-      <BackgroundSettingsModal isOpen={active === 'scene'} onClose={closePanel} />
-      <TimerSettingsModal isOpen={active === 'timer'} onClose={closePanel} />
+      <AudioSidebar needed={active === 'sound'} open={active === 'sound'} onOpenChange={onOpenChange} />
+      <BackgroundSettingsModal needed={active === 'scene'} isOpen={active === 'scene'} onClose={closePanel} />
+      <TimerSettingsModal needed={active === 'timer'} isOpen={active === 'timer'} onClose={closePanel} />
 
       <SheetPanel id="tasks" side="left">
         <TasksPanel />
@@ -101,7 +98,7 @@ export function PanelHost({ googleEnabled }: { googleEnabled: boolean }) {
         <ArcadePanel />
       </DialogPanel>
       <DialogPanel id="login" bare className="max-w-md">
-        <LoginForm googleEnabled={googleEnabled} onSignedIn={closePanel} />
+        <LoginForm needed googleEnabled={googleEnabled} onSignedIn={closePanel} />
       </DialogPanel>
     </>
   );

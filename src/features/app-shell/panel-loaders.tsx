@@ -3,6 +3,7 @@
 import { Component, useEffect, useReducer, useState, type ComponentType, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/contexts/i18n-context';
+import { lazyOnDemand, preloadAllOnDemand } from '@/lib/lazy-on-demand';
 import type { PanelId } from './panel-store';
 
 /** Holds the panel's shape while its chunk loads, so the sheet/dialog animates in right away. */
@@ -101,16 +102,35 @@ export const LAZY_PANELS = {
   feedback: lazyPanel(() => import('@/features/panels/feedback-panel')),
 } satisfies Partial<Record<PanelId, LazyPanel>>;
 
+/**
+ * Panels that bring their own sheet or dialog (sound, scene, timer settings, sign-in). Their code, and
+ * their icons (the sound list alone has 36), loads when one first opens, on hover, or once the app is idle.
+ */
+export const LAZY_OVERLAYS = {
+  sound: lazyOnDemand(() => import('@/components/audio/audio-sidebar').then((m) => m.AudioSidebar)),
+  scene: lazyOnDemand(() => import('@/components/settings/background-settings-modal').then((m) => m.default)),
+  timer: lazyOnDemand(() => import('@/components/settings/timer-settings-modal').then((m) => m.TimerSettingsModal)),
+  login: lazyOnDemand(() => import('@/components/auth/login-form').then((m) => m.LoginForm)),
+} satisfies Partial<Record<PanelId, { preload: () => Promise<void> }>>;
+
 export function preloadPanel(id: PanelId) {
-  void LAZY_PANELS[id as keyof typeof LAZY_PANELS]?.preload().catch(() => {});
+  const lazy =
+    LAZY_PANELS[id as keyof typeof LAZY_PANELS] ?? LAZY_OVERLAYS[id as keyof typeof LAZY_OVERLAYS];
+  void lazy?.preload().catch(() => {});
 }
 
-/** Warms every panel chunk once the browser is idle after the timer has rendered. */
+/**
+ * Warms every panel chunk once the browser is idle after the timer has rendered, and the other
+ * on-demand pieces with them (sound, scene and timer settings, sign-in, command palette, celebration).
+ */
 export function preloadPanelsWhenIdle() {
   // Data Saver: a panel loads when it is opened (or hovered), not speculatively
   const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
   if (connection?.saveData) return () => {};
-  const run = () => (Object.keys(LAZY_PANELS) as PanelId[]).forEach(preloadPanel);
+  const run = () => {
+    (Object.keys(LAZY_PANELS) as PanelId[]).forEach(preloadPanel);
+    preloadAllOnDemand();
+  };
   // Safari has no requestIdleCallback.
   if (typeof window.requestIdleCallback === 'function') {
     const handle = window.requestIdleCallback(run, { timeout: 4000 });

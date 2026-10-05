@@ -16,6 +16,22 @@ vi.mock('@/hooks/use-auth', () => ({
   useAuth: () => ({ isAuthenticated: false, signOut: vi.fn() }),
 }));
 
+describe('CommandPalette loading', () => {
+  it('loads its dialog only once opened (cmdk and the command icons stay out of the app chunk)', async () => {
+    // cmdk scrolls the active item into view
+    Element.prototype.scrollIntoView = vi.fn();
+    usePaletteStore.setState({ open: false });
+    render(<CommandPalette />);
+    expect(screen.queryByRole('dialog')).toBeNull();
+
+    await act(async () => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }));
+    });
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    expect(usePaletteStore.getState().open).toBe(true);
+  });
+});
+
 describe('CommandPalette Reset', () => {
   beforeEach(() => {
     // cmdk scrolls the active item into view
@@ -123,6 +139,8 @@ describe('CommandPalette commands', () => {
 
   it('Toggle fullscreen is offered only where the browser can do it', async () => {
     const { unmount } = render(<CommandPalette />);
+    // The palette's code loads on demand: wait for it before checking what it leaves out
+    expect(await screen.findByText('shell.palette.reset')).toBeInTheDocument();
     expect(screen.queryByText('shell.palette.fullscreen')).not.toBeInTheDocument();
     unmount();
 
