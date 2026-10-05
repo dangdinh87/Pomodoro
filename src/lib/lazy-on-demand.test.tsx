@@ -67,3 +67,19 @@ describe('lazyOnDemand', () => {
     expect(b).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('lazyOnDemand placeholder', () => {
+  it('holds the place with the given box until the code arrives, then swaps in the component', async () => {
+    let resolve!: (component: typeof Sheet) => void;
+    const LazySheet = lazyOnDemand(
+      () => new Promise<typeof Sheet>((r) => (resolve = r)),
+      ({ label }) => <div data-testid="placeholder">{label}-box</div>,
+    );
+    render(<LazySheet needed open label="3d" />);
+    expect(screen.getByTestId('placeholder')).toHaveTextContent('3d-box');
+
+    await act(async () => resolve(Sheet));
+    expect(screen.queryByTestId('placeholder')).toBeNull();
+    expect(screen.getByText('3d')).toBeInTheDocument();
+  });
+});

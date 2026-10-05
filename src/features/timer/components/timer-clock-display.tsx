@@ -3,15 +3,31 @@
 import { memo, useMemo } from 'react';
 import { useTimerStore } from '@/stores/timer-store';
 import { useReducedMotion } from 'motion/react';
+import { lazyOnDemand } from '@/lib/lazy-on-demand';
 import { SessionCycle } from './session-cycle';
 import { TimerProgress } from './timer-progress';
-import {
-    AnalogClock,
-    DigitalClock,
-    FlipClock,
-    ThreeClock,
-    resolveClockType,
-} from './clocks';
+import { AnalogClock } from './clocks/analog-clock';
+import { DigitalClock } from './clocks/digital-clock';
+import { FlipClock } from './clocks/flip-clock';
+import { stageWidth } from './clocks/clock-math';
+import { resolveClockType, threeDStageAspect } from './clocks/clock-registry';
+import type { ThreeClockProps } from './clocks/three-clock';
+
+// The 3D styles are opt-in: their component (with NumberFlow) loads when one is shown, three.js
+// later still (ThreeClockHost). Until then an empty stage of the exact same box holds the place.
+const ThreeClock = lazyOnDemand<ThreeClockProps>(
+    () => import('./clocks/three-clock').then((m) => m.ThreeClock),
+    ({ scene, clockSize = 'medium' }) => {
+        const aspect = threeDStageAspect(scene);
+        return (
+            <div
+                aria-hidden="true"
+                className="relative mx-auto"
+                style={{ width: stageWidth(clockSize, aspect), aspectRatio: String(aspect) }}
+            />
+        );
+    },
+);
 
 export const TimerClockDisplay = memo(function TimerClockDisplay() {
     const reduceMotion = useReducedMotion();
@@ -82,6 +98,7 @@ export const TimerClockDisplay = memo(function TimerClockDisplay() {
         case 'solid':
             clockContent = (
                 <ThreeClock
+                    needed
                     scene={clockType}
                     timeLeft={timeLeft}
                     totalTimeForMode={totalTimeForMode}

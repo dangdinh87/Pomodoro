@@ -37,3 +37,8 @@ export function resolveClockType(type: string | undefined): SelectableClockType 
 export function isThreeDClock(type: string | undefined): boolean {
   return getClockStyle(type ?? '')?.is3d ?? false;
 }
+
+/** Width / height of a 3D clock's stage. The tomato scene keeps room for its time label below the fruit. */
+export function threeDStageAspect(scene: string): number {
+  return scene === 'tomato' ? 0.92 : (getClockStyle(scene)?.aspect ?? 1);
+}

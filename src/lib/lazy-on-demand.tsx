@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useReducer, type ComponentType } from 'react';
+import { useEffect, useReducer, type ComponentType, type ReactNode } from 'react';
 
 type Preload = () => Promise<void>;
 
@@ -11,11 +11,15 @@ export type OnDemand<P extends object> = ComponentType<P & { needed: boolean }> 
 
 /**
  * A component whose code is fetched the first time it is `needed` (a dialog or sheet opening, a
- * celebration starting), not with the page. Until then it renders nothing; once loaded it stays
- * mounted like a static import would, so close animations and state behave the same.
- * No Suspense (same reason as `lazyPanel`): a preloaded chunk renders on the first frame.
+ * celebration starting), not with the page. Until then it renders `placeholder` (nothing by
+ * default: give one with the component's exact box when it is in the page flow, so nothing moves);
+ * once loaded it stays mounted like a static import would, so close animations and state behave
+ * the same. No Suspense (same reason as `lazyPanel`): a preloaded chunk renders on the first frame.
  */
-export function lazyOnDemand<P extends object>(load: () => Promise<ComponentType<P>>): OnDemand<P> {
+export function lazyOnDemand<P extends object>(
+  load: () => Promise<ComponentType<P>>,
+  placeholder?: (props: P) => ReactNode,
+): OnDemand<P> {
   let Loaded: ComponentType<P> | null = null;
   let pending: Promise<void> | null = null;
   const preload: Preload = () =>
@@ -35,7 +39,8 @@ export function lazyOnDemand<P extends object>(load: () => Promise<ComponentType
     useEffect(() => {
       if (needed && !Loaded) preload().then(rerender, (error) => console.error(error));
     }, [needed]);
-    return Loaded ? <Loaded {...(props as unknown as P)} /> : null;
+    if (Loaded) return <Loaded {...(props as unknown as P)} />;
+    return placeholder ? placeholder(props as unknown as P) : null;
   }
   LazyOnDemand.preload = preload;
   registry.add(LazyOnDemand);

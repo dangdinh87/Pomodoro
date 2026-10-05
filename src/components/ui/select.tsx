@@ -13,7 +13,7 @@ import {
   MENU_SEPARATOR,
   MENU_TICK_SLOT,
   POP_IN_ANCHORED,
-} from "@/components/ui/overlay-parts"
+} from "@/components/ui/overlay-styles"
 
 const Select = SelectPrimitive.Root
 

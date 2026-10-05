@@ -7,7 +7,7 @@ import { useReducedMotion } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/contexts/i18n-context';
 import { DigitalClock } from './digital-clock';
-import { getClockStyle } from './clock-registry';
+import { threeDStageAspect } from './clock-registry';
 import { getClockVisualState, splitTime, stageWidth, type ClockSizeKey } from './clock-math';
 import { useAnalogClockState } from './use-analog-clock-state';
 import { isWebGLAvailable, readHeadingFont, useClockPalette } from './three/use-clock-palette';
@@ -98,7 +98,7 @@ export const ThreeClock = memo(function ThreeClock({
     );
   }
 
-  const aspect = scene === 'tomato' ? 0.92 : (getClockStyle(scene)?.aspect ?? 1);
+  const aspect = threeDStageAspect(scene);
   const { minutes, seconds } = splitTime(timeLeft);
   const clock = `${minutes}:${String(seconds).padStart(2, '0')}`;
 
