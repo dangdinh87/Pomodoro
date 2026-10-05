@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useLayoutEffect, useRef, useState } from "react"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { IconTile } from "@/components/ui/icon-tile"
 import { GeneralSettings } from "@/components/settings/general-settings"
@@ -14,6 +14,13 @@ export default function SettingsPanel() {
     const { t } = useI18n()
     const [active, setActive] = useState<SettingsSectionId>('general')
     const current = SETTINGS_SECTIONS.find((s) => s.id === active)!
+    const content = useRef<HTMLElement>(null)
+
+    // The content scrolls, the sections do not: opening a section from the middle of another one would land
+    // halfway down it, with its first rows (and the theme switch) out of sight.
+    useLayoutEffect(() => {
+        if (content.current) content.current.scrollTop = 0
+    }, [active])
 
     return (
         <div className="flex h-[min(640px,90dvh)] flex-col md:flex-row">
@@ -52,7 +59,7 @@ export default function SettingsPanel() {
                 </nav>
             </aside>
 
-            <main className="min-h-0 flex-1 overflow-y-auto px-5 pb-8 pt-6 md:px-8 md:pt-8">
+            <main ref={content} className="min-h-0 flex-1 overflow-y-auto px-5 pb-8 pt-6 md:px-8 md:pt-8">
                 <h2 className="mb-5 font-heading text-xl font-extrabold tracking-[-0.02em] text-ink max-md:sr-only">
                     {t(current.labelKey)}
                 </h2>

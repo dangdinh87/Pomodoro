@@ -66,6 +66,33 @@ describe('AppStatusBar', () => {
     expect(screen.queryByTestId('sessions-today')).not.toBeInTheDocument();
   });
 
+  describe('logo on a narrow bar', () => {
+    const wordmark = () => screen.getByText('Study Bro');
+
+    it('never wraps the name to two lines', () => {
+      render(<AppStatusBar />);
+      expect(wordmark()).toHaveClass('whitespace-nowrap');
+    });
+
+    it('with the streak and sessions pills (about 340px of controls) keeps only Tomo below 380px, and still names the brand to screen readers', () => {
+      withStats(3, 2);
+      render(<AppStatusBar />);
+      expect(wordmark()).toHaveClass('max-[379px]:sr-only');
+    });
+
+    it('with fewer pills (no session, or no streak yet) the name has room and stays', () => {
+      stats.hasSession = false;
+      const { unmount } = render(<AppStatusBar />);
+      expect(wordmark().className).not.toContain('sr-only');
+      unmount();
+
+      stats.hasSession = true;
+      withStats(0, 2);
+      render(<AppStatusBar />);
+      expect(wordmark().className).not.toContain('sr-only');
+    });
+  });
+
   describe('command menu hint', () => {
     const platform = vi.spyOn(window.navigator, 'platform', 'get');
     afterAll(() => platform.mockRestore());

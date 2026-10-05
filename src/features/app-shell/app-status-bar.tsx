@@ -20,17 +20,21 @@ const CHIP =
   'sticker-sm sticker-press focus-ring inline-flex items-center rounded-full font-heading font-extrabold text-ink';
 const ICON_BUTTON = `${CHIP} size-9 justify-center`;
 
-/** Streak and today's sessions come from the same stats the Stats panel shows; guests with no session see neither. */
-function ProgressPills() {
-  const { t } = useI18n();
+/** Streak and today's sessions come from the same stats the Stats panel shows; guests with no session get none. */
+function useProgress(): { streak: number; sessions: number } | null {
   const { hasSession } = useAuth();
   // The study day starts at 04:00; recomputed per render so it rolls over without a reload (same as DailyProgress).
   const today = studyTodayDate();
   const { data } = useStats({ from: today, to: today });
   if (!hasSession || !isFeatureEnabled('history')) return null;
+  return { streak: data?.summary.streak.current ?? 0, sessions: data?.summary.completedSessions ?? 0 };
+}
 
-  const streak = data?.summary.streak.current ?? 0;
-  const sessions = data?.summary.completedSessions ?? 0;
+function ProgressPills({ progress }: { progress: { streak: number; sessions: number } | null }) {
+  const { t } = useI18n();
+  if (!progress) return null;
+
+  const { streak, sessions } = progress;
   const sessionsLabel = t(sessions === 1 ? 'shell.sessionsTodayOne' : 'shell.sessionsToday', { count: sessions });
 
   return (
@@ -66,6 +70,7 @@ function ProgressPills() {
 
 export function AppStatusBar() {
   const { t } = useI18n();
+  const progress = useProgress();
 
   return (
     <header
@@ -73,11 +78,13 @@ export function AppStatusBar() {
       className="absolute inset-x-0 top-0 z-20 flex h-16 items-center gap-3 px-[clamp(16px,4vw,32px)] pt-[env(safe-area-inset-top)]"
     >
       <div className="flex min-w-0 items-center gap-2">
-        <Logo size={28} />
+        {/* Logo + streak pill + sessions pill + search + account need ~340px: on a 360px phone the wordmark gives
+            way to Tomo (still read out) instead of wrapping to two lines. With fewer pills the name fits. */}
+        <Logo size={28} wordmarkClassName={progress && progress.streak > 0 ? 'max-[379px]:sr-only' : undefined} />
       </div>
 
       <div className="ml-auto flex items-center gap-2">
-        <ProgressPills />
+        <ProgressPills progress={progress} />
         <button
           type="button"
           onClick={openCommandPalette}
