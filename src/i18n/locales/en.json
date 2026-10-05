@@ -956,8 +956,8 @@
       "soundSettings": "Sound settings",
       "backgroundSettings": "Scene",
       "timerSettings": "Timer settings",
-      "exitFocus": "Exit focus mode",
-      "enterFocus": "Enter focus mode"
+      "exitFocus": "Exit full screen",
+      "enterFocus": "Enter full screen"
     },
     "animatedCountdown": {
       "modes": {

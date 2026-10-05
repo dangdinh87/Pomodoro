@@ -115,4 +115,37 @@ describe('LanguageSuggestion', () => {
     expect(screen.queryByRole('region')).not.toBeInTheDocument();
     vi.restoreAllMocks();
   });
+
+  describe('layout: an in-flow bar that never covers the page', () => {
+    const root = document.documentElement;
+    const barHeight = (px: number) => vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(px);
+
+    it('is not fixed or absolute (a floating card always covered something: mascot, H1, article text)', () => {
+      setBrowserLanguages(['vi-VN']);
+      renderOn('en');
+      const bar = screen.getByRole('region');
+      expect(bar.className).not.toMatch(/\b(fixed|absolute|sticky)\b/);
+      // a narrow screen wraps the buttons under the text instead of squeezing the text
+      expect(bar.querySelector('.flex-wrap')).not.toBeNull();
+    });
+
+    it('publishes its height as --lang-banner-h while shown, and withdraws it when dismissed', async () => {
+      barHeight(72);
+      setBrowserLanguages(['vi-VN']);
+      renderOn('en');
+      expect(root.style.getPropertyValue('--lang-banner-h')).toBe('72px');
+
+      await userEvent.click(screen.getByRole('button', { name: 'Đóng' }));
+      expect(root.style.getPropertyValue('--lang-banner-h')).toBe('');
+    });
+
+    it('withdraws the height when the component goes away', () => {
+      barHeight(56);
+      setBrowserLanguages(['vi-VN']);
+      const { unmount } = renderOn('en');
+      expect(root.style.getPropertyValue('--lang-banner-h')).toBe('56px');
+      unmount();
+      expect(root.style.getPropertyValue('--lang-banner-h')).toBe('');
+    });
+  });
 });

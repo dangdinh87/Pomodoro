@@ -51,4 +51,11 @@ describe('timer stage sizing', () => {
     expect(read('src/features/timer/components/enhanced-timer.tsx')).toMatch(/data-chrome className="[^"]*\brelative\b[^"]*\bz-10\b/);
     expect(read('src/features/timer/components/clocks/clock-digits.tsx')).toContain('pointer-events-none');
   });
+
+  it('hands the language bar height back, for the live stage and the skeleton alike', () => {
+    expect(css).toMatch(/section\[data-timer\],\s*\[data-stage-skeleton\]\s*\{\s*min-height: calc\(100dvh - var\(--lang-banner-h, 0px\)\)/);
+    expect(read(SKELETON)).toContain('data-stage-skeleton');
+    expect(read('src/features/app-shell/app-home.tsx')).toMatch(/<section[^>]*data-timer/s);
+    expect(block).toContain('--lang-banner-h');
+  });
 });

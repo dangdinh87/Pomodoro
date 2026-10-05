@@ -588,7 +588,7 @@
    calc() yet, but tan(atan2(a, b)) is a / b as a plain number. The live card (enhanced-timer.tsx) and the
    server skeleton (app-home-skeleton.tsx) both read these, so they always have the same size. */
 .stage-card {
-  --stage-t: clamp(0, tan(atan2(100dvh - 640px, 180px)), 1);
+  --stage-t: clamp(0, tan(atan2(100dvh - var(--lang-banner-h, 0px) - 640px, 180px)), 1);
   --stage-pad: 20px;
   --stage-tomo: calc(52px + 20px * var(--stage-t));
   --stage-mascot-mb: calc(8px + 8px * var(--stage-t));
@@ -604,6 +604,15 @@
   .stage-card {
     --stage-pad: calc(20px + 12px * var(--stage-t));
   }
+}
+
+/* The language suggestion bar sits above the page in the normal flow and publishes its height as
+   --lang-banner-h (components/layout/language-suggestion.tsx). The one-screen stage hands that height back, so
+   bar + stage are one viewport tall and the card keeps its room above the dock. `section[data-timer]` is the
+   live stage (other data-timer elements are popovers and previews); [data-stage-skeleton] is its server frame. */
+section[data-timer],
+[data-stage-skeleton] {
+  min-height: calc(100dvh - var(--lang-banner-h, 0px));
 }
 
 /* ═══ Timer: chrome fades while a session runs and the pointer is idle (hooks/use-chrome-idle.ts) ═══ */

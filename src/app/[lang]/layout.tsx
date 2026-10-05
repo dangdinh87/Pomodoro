@@ -43,8 +43,9 @@ export default async function RootLayout({
         <JsonLd data={organizationJsonLd()} />
         <GoogleAnalytics />
         <I18nProvider locale={lang} messages={messages}>
-          {children}
+          {/* Above the page, in the flow: it pushes the content down instead of covering it */}
           <LanguageSuggestion />
+          {children}
         </I18nProvider>
         <Analytics />
       </body>

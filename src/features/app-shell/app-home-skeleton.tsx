@@ -18,6 +18,7 @@ export function AppHomeSkeleton() {
     <section
       aria-hidden="true"
       data-testid="app-home-skeleton"
+      data-stage-skeleton
       className="relative flex min-h-dvh w-full flex-col items-center justify-center px-[clamp(16px,4vw,32px)] pb-24 pt-16"
     >
       <div className="absolute inset-x-0 top-0 flex h-16 items-center px-[clamp(16px,4vw,32px)] pt-[env(safe-area-inset-top)]">

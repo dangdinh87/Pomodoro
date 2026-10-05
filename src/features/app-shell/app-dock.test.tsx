@@ -31,6 +31,8 @@ describe('AppDock', () => {
     const box = nav.parentElement!;
     expect(box.className).toContain('sticky');
     expect(box.className).toContain('h-dvh');
+    // The language bar pushes the section down by --lang-banner-h; the box is lifted by it so the dock stays on the edge
+    expect(box.className).toContain('mt-[calc(-1*var(--lang-banner-h,0px))]');
     expect(box.parentElement).toBe(screen.getByTestId('dock-frame'));
     expect(screen.getByTestId('dock-frame').className).toContain('absolute inset-0');
     expect(nav.className).not.toContain('fixed');
@@ -166,6 +168,23 @@ describe('AppDock', () => {
         const longestWord = Math.max(...label.split(' ').map((word) => [...word].length));
         expect(longestWord, label).toBeLessThanOrEqual(6);
       }
+    });
+  });
+
+  // WCAG 2.5.3 (label in name): a voice-control user says what they see. The tile shows `shell.fullscreenShort`.
+  describe('the full screen tile is named with the words it shows', () => {
+    type Dict = {
+      shell: { fullscreenShort: string };
+      timerComponents: { enhancedTimer: { enterFocus: string; exitFocus: string } };
+    };
+    it.each([
+      ['en', enDict as unknown as Dict],
+      ['vi', viDict as unknown as Dict],
+      ['ja', jaDict as unknown as Dict],
+    ])('%s', (_lang, dict) => {
+      const shown = dict.shell.fullscreenShort.toLowerCase();
+      expect(dict.timerComponents.enhancedTimer.enterFocus.toLowerCase()).toContain(shown);
+      expect(dict.timerComponents.enhancedTimer.exitFocus.toLowerCase()).toContain(shown);
     });
   });
 });

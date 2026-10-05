@@ -956,8 +956,8 @@
       "soundSettings": "サウンド設定",
       "backgroundSettings": "シーン",
       "timerSettings": "タイマー設定",
-      "exitFocus": "フォーカスモードを終了",
-      "enterFocus": "フォーカスモードに入る"
+      "exitFocus": "全画面を終了",
+      "enterFocus": "全画面にする"
     },
     "animatedCountdown": {
       "modes": {

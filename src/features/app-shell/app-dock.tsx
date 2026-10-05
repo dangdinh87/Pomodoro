@@ -159,7 +159,9 @@ export function AppDock() {
     // The frame covers the stage section; its sticky child is one viewport tall and stays at the top of the
     // screen until the section's end, then rides up with it. The nav sits at the bottom of that child.
     <div className="pointer-events-none absolute inset-0 z-30" data-testid="dock-frame">
-      <div className="pointer-events-none sticky top-0 h-dvh">
+      {/* -mt: the language bar (when shown) pushes the section down; this frame starts at the section, so lift
+          the viewport-tall box by the bar's height to keep the dock on the bottom edge at scroll 0. */}
+      <div className="pointer-events-none sticky top-0 mt-[calc(-1*var(--lang-banner-h,0px))] h-dvh">
         <nav data-chrome aria-label={t('shell.dock')} className={isFocusMode ? NAV_FOCUS : NAV_TRAY}>
           <TooltipProvider delayDuration={250}>
             {!isFocusMode && panels.map((id) => <DockButton key={id} id={id} />)}
