@@ -8,7 +8,8 @@ import { shouldFlushOnAuthChange } from '@/lib/timer/session-recorder';
 import { useOutboxDropNotice } from '@/lib/timer/use-outbox-drop-notice';
 import { playAlarm, preloadAlarm } from '@/lib/timer/alarm';
 import { mayAutoChain } from '@/lib/timer/auto-chain';
-import { claimCompletion, completionKey, phaseSessionId } from '@/lib/timer/completion-claim';
+import { claimAlarm, claimCompletion, completionKey, phaseSessionId } from '@/lib/timer/completion-claim';
+import { markEngineMounted } from '@/lib/timer/engine-presence';
 import { notifyPhaseComplete } from '@/lib/timer/notifications';
 import { useI18n } from '@/contexts/i18n-context';
 import { announceFocusComplete } from '@/features/mascot/celebration-store';
@@ -56,6 +57,9 @@ export function useTimerEngine() {
   const totalFocusTimeRef = useRef(useTimerStore.getState().totalFocusTime);
   // BUG-05 FIX: Mutex to prevent concurrent handleLoopComplete calls
   const isCompletingRef = useRef(false);
+
+  // While this runs, the deadline watcher of the [lang] layout stays idle: the engine rings itself
+  useEffect(() => markEngineMounted(), []);
 
   // Sync refs with store changes (one-way sync for loop usage)
   useEffect(() => {
@@ -200,7 +204,8 @@ export function useTimerEngine() {
       const currentSettings = state.settings;
       const currentSessionCount = useTimerStore.getState().sessionCount;
 
-      if (!quiet) {
+      // The deadline watcher of a tab showing /guide (no engine there) may have rung for this end already
+      if (!quiet && claimAlarm(completionKey(state.mode, state.deadlineAt))) {
         playAlarm();
         notifyPhaseComplete(currentMode, tRef.current);
       }

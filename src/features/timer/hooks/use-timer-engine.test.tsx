@@ -4,6 +4,7 @@ import { installMemoryStorage } from '@/test-utils/memory-storage';
 import { useTimerStore } from '@/stores/timer-store';
 import { useTasksStore } from '@/stores/task-store';
 import { getBrowserTimeZone, studyDayOf } from '@/lib/stats/study-day';
+import { isEngineMounted } from '@/lib/timer/engine-presence';
 import { useTimerEngine } from './use-timer-engine';
 
 const mockRecord = vi.fn();
@@ -214,6 +215,31 @@ describe('useTimerEngine', () => {
     expect(mockRecord).not.toHaveBeenCalled();
     expect(mockPlayAlarm).not.toHaveBeenCalled();
     expect(useTimerStore.getState().mode).toBe('work');
+  });
+
+  it('still records and advances, but does not ring again, when a /guide tab already rang this end', () => {
+    // (claims are remembered for the whole file: a deadline no other test in this block uses)
+    const deadline = NOW + 1700;
+    // The deadline watcher of another tab (on a page without the engine) claimed the bell
+    window.localStorage.setItem('timer-alarm-claim', `work:${deadline}|guide-tab`);
+    useTimerStore.setState({ timeLeft: 2, isRunning: true, deadlineAt: deadline });
+    renderHook(() => useTimerEngine());
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
+
+    expect(mockPlayAlarm).not.toHaveBeenCalled();
+    expect(mockNotify).not.toHaveBeenCalled();
+    expect(mockRecord).toHaveBeenCalledTimes(1);
+    expect(useTimerStore.getState().mode).toBe('shortBreak');
+  });
+
+  it('tells the deadline watcher it is running while mounted (StrictMode included)', () => {
+    expect(isEngineMounted()).toBe(false);
+    const { unmount } = renderHook(() => useTimerEngine(), { wrapper: StrictMode });
+    expect(isEngineMounted()).toBe(true);
+    unmount();
+    expect(isEngineMounted()).toBe(false);
   });
 
   it('records breaks without a task', () => {

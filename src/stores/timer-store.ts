@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { getBrowserTimeZone, studyDayOf } from '@/lib/stats/study-day';
+import { CATCH_UP_GRACE_MS, TIMER_STORAGE_KEY } from '@/lib/timer/persisted-phase';
+
+export { CATCH_UP_GRACE_MS };
 
 export type TimerMode = 'work' | 'shortBreak' | 'longBreak';
 export type ClockType =
@@ -106,15 +109,6 @@ export function migrateTimerState(persisted: unknown, version: number): TimerSta
   if (settings) state.settings = settings;
   return state as unknown as TimerState;
 }
-
-/**
- * How late a phase may have finished (tab closed/crashed/reloaded) and still
- * count as a real session. Within this window the engine records it as if it
- * had just completed; beyond it the timer silently moves to the next phase
- * without crediting a session, so reopening the app days later cannot mint
- * sessions or streak days.
- */
-export const CATCH_UP_GRACE_MS = 15 * 60 * 1000;
 
 /** Full length (seconds) of the phase described by the given state. */
 function phaseSeconds(state: Pick<TimerState, 'mode' | 'settings'>): number {
@@ -348,7 +342,7 @@ export const useTimerStore = create<TimerState>()(
       },
     }),
     {
-      name: 'timer-storage',
+      name: TIMER_STORAGE_KEY,
       version: TIMER_STORE_VERSION,
       // v0 -> v1: lastSessionTimeLeft is now persisted; missing fields are
       // defaulted in mergePersistedTimerState. v1 -> v3: see migrateTimerState.

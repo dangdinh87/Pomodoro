@@ -4,12 +4,14 @@
 // with stale state, e.g. StrictMode double effects) gets `false`.
 
 const CLAIM_KEY = 'timer-completion-claim';
+const ALARM_CLAIM_KEY = 'timer-alarm-claim';
 
 /** Unique per tab so a claim can be attributed to its owner when debugging. */
 const TAB_ID = Math.random().toString(36).slice(2);
 
 /** Fallback when storage is unavailable: still one-shot within this tab. */
 const claimedLocally = new Set<string>();
+const alarmClaimedLocally = new Set<string>();
 
 export function completionKey(mode: string, deadlineAt: number | null) {
   // A missing deadline must never collide with a later completion
@@ -37,15 +39,30 @@ export function phaseSessionId(mode: string, deadlineAt: number | null): string 
  * session rests on `phaseSessionId`, not on this claim.
  */
 export function claimCompletion(key: string): boolean {
-  if (claimedLocally.has(key)) return false;
-  claimedLocally.add(key);
-  if (claimedLocally.size > 50) {
-    claimedLocally.delete(claimedLocally.values().next().value as string);
+  return claimOnce(CLAIM_KEY, claimedLocally, key);
+}
+
+/**
+ * One-shot claim of the bell (alarm + system notification) for a phase end, shared by the engine
+ * (app page) and the deadline watcher (content pages, where no engine runs), so that one tab rings
+ * once even when one window is on /guide and another on the app. Separate from the completion
+ * claim on purpose: ringing on /guide must leave the completion to the engine, which records the
+ * session when the user comes back.
+ */
+export function claimAlarm(key: string): boolean {
+  return claimOnce(ALARM_CLAIM_KEY, alarmClaimedLocally, key);
+}
+
+function claimOnce(storageKey: string, local: Set<string>, key: string): boolean {
+  if (local.has(key)) return false;
+  local.add(key);
+  if (local.size > 50) {
+    local.delete(local.values().next().value as string);
   }
   try {
-    const existing = window.localStorage.getItem(CLAIM_KEY);
+    const existing = window.localStorage.getItem(storageKey);
     if (existing && existing.split('|')[0] === key) return false;
-    window.localStorage.setItem(CLAIM_KEY, `${key}|${TAB_ID}`);
+    window.localStorage.setItem(storageKey, `${key}|${TAB_ID}`);
     return true;
   } catch {
     return true;

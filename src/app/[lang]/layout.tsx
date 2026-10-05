@@ -11,6 +11,7 @@
 import { I18nProvider } from '@/contexts/i18n-context';
 import { JsonLd } from '@/components/seo/json-ld';
 import { LanguageSuggestion } from '@/components/layout/language-suggestion';
+import { DeadlineWatcher } from '@/features/timer/components/deadline-watcher';
 import { GoogleAnalytics } from '@/components/trackings/ga';
 import { loadMessages } from '@/lib/i18n/messages';
 import { SUPPORTED_LANGS } from '@/lib/i18n/negotiate-locale';
@@ -46,6 +47,8 @@ export default async function RootLayout({
           {/* Above the page, in the flow: it pushes the content down instead of covering it */}
           <LanguageSuggestion />
           {children}
+          {/* Rings a running timer's end on pages without the timer (guide, privacy, terms) */}
+          <DeadlineWatcher />
         </I18nProvider>
         <Analytics />
       </body>

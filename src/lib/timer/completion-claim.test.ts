@@ -1,5 +1,5 @@
 import { installMemoryStorage } from '@/test-utils/memory-storage';
-import { claimCompletion, completionKey, phaseSessionId } from './completion-claim';
+import { claimAlarm, claimCompletion, completionKey, phaseSessionId } from './completion-claim';
 
 describe('completion-claim', () => {
   beforeEach(() => {
@@ -40,6 +40,22 @@ describe('completion-claim', () => {
     });
     expect(claimCompletion('work:30')).toBe(true);
     expect(claimCompletion('work:30')).toBe(false);
+  });
+
+  describe('claimAlarm', () => {
+    it('lets one tab ring a phase end once, whoever claims first (engine or deadline watcher)', () => {
+      expect(claimAlarm('work:40')).toBe(true);
+      expect(claimAlarm('work:40')).toBe(false);
+      window.localStorage.setItem('timer-alarm-claim', 'work:41|other-tab');
+      expect(claimAlarm('work:41')).toBe(false);
+    });
+
+    it('is separate from the completion claim: ringing on /guide leaves the recording to the engine', () => {
+      expect(claimAlarm('work:50')).toBe(true);
+      expect(claimCompletion('work:50')).toBe(true);
+      expect(window.localStorage.getItem('timer-completion-claim')).toMatch(/^work:50\|/);
+      expect(window.localStorage.getItem('timer-alarm-claim')).toMatch(/^work:50\|/);
+    });
   });
 
   describe('phaseSessionId', () => {

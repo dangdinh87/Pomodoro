@@ -64,6 +64,13 @@ describe('notifyPhaseComplete', () => {
     expect(created).toHaveLength(0);
   });
 
+  it('shows while the tab is visible when asked to (pages without the timer on screen)', () => {
+    setHidden(false);
+    notifyPhaseComplete('shortBreak', t, { evenIfVisible: true });
+    expect(created).toHaveLength(1);
+    expect(created[0].title).toBe('T(timer.notifications.breakDone.title)');
+  });
+
   it.each(['default', 'denied'] as const)('stays quiet when permission is %s', (p) => {
     permission = p;
     notifyPhaseComplete('work', t);

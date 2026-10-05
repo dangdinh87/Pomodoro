@@ -39,11 +39,18 @@ const TEXT_KEY: Record<TimerMode, string> = {
 };
 
 /**
- * Shows a system notification in the UI language (`t`), but only when the tab
- * is not visible: with the tab in view the bell and confetti already say it.
+ * Shows a system notification in the UI language (`t`), by default only when
+ * the tab is not visible: with the app in view the bell and confetti already
+ * say it. `evenIfVisible`: pages without the timer (guide, privacy, terms)
+ * have nothing else on screen that says the phase ended.
  */
-export function notifyPhaseComplete(mode: TimerMode, t: Translate): void {
-  if (!supported() || !document.hidden) return;
+export function notifyPhaseComplete(
+  mode: TimerMode,
+  t: Translate,
+  { evenIfVisible = false }: { evenIfVisible?: boolean } = {},
+): void {
+  if (!supported()) return;
+  if (!document.hidden && !evenIfVisible) return;
   if (Notification.permission !== 'granted') return;
   const key = TEXT_KEY[mode];
   try {

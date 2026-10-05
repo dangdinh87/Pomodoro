@@ -7,6 +7,9 @@ vi.mock('../fonts', () => ({ fontVariables: 'fonts' }));
 vi.mock('@vercel/analytics/next', () => ({ Analytics: () => null }));
 vi.mock('@/components/trackings/ga', () => ({ GoogleAnalytics: () => null }));
 vi.mock('@/components/layout/language-suggestion', () => ({ LanguageSuggestion: () => null }));
+vi.mock('@/features/timer/components/deadline-watcher', () => ({
+  DeadlineWatcher: () => <i data-testid="deadline-watcher" />,
+}));
 
 import RootLayout, * as layoutModule from './layout';
 
@@ -33,6 +36,11 @@ describe('[lang] layout', () => {
     expect(site.inLanguage).toEqual(['en', 'vi', 'ja']);
     expect(site.url).toBe(SITE_URL);
     expect(org.logo.url).toBe(`${SITE_URL}/icons/icon-512x512.png`);
+  });
+
+  it('mounts the deadline watcher on every page (it rings where the timer engine is not mounted)', async () => {
+    const html = await render('vi');
+    expect(html).toContain('data-testid="deadline-watcher"');
   });
 
   it('sets no title or metadata of its own, so the root "%s | Study Bro" template reaches every page', () => {
