@@ -985,7 +985,7 @@
     }
   },
   "historyUi": {
-    "title": "History",
+    "title": "Stats",
     "description": "Your focus time, streaks and recent sessions.",
     "rangeLabel": "Date range",
     "ranges": {

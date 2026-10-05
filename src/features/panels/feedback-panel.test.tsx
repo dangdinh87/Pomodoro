@@ -35,6 +35,30 @@ describe('FeedbackPanel', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it('moves focus to the message when it is the empty one', () => {
+    vi.stubGlobal('fetch', vi.fn());
+    renderPanel();
+    fireEvent.click(screen.getByRole('button', { name: 'Send feedback' }));
+    expect(screen.getByLabelText('Your message')).toHaveFocus();
+  });
+
+  it('moves focus to the email when that is the only field to fix, and does not send', () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+    const { container } = renderPanel();
+    fireEvent.change(container.querySelector('#feedback-message')!, { target: { value: 'Please add a dark timer sound.' } });
+    const email = container.querySelector('#feedback-email') as HTMLInputElement;
+    fireEvent.change(email, { target: { value: 'abc@x' } });
+    fireEvent.submit(email.closest('form') as HTMLFormElement);
+
+    expect(email).toHaveFocus();
+    expect(email).toHaveAttribute('aria-invalid', 'true');
+    const hint = container.querySelector('#feedback-email-hint')!;
+    expect(email.getAttribute('aria-describedby')).toBe(hint.id);
+    expect(hint).toHaveAttribute('role', 'alert');
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it.each(['en', 'vi', 'ja'] as Lang[])('thanks the sender with a partying Tomo after a successful send (%s)', async (lang) => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, status: 200, headers: new Headers() }));
     const { container } = renderPanel(lang);

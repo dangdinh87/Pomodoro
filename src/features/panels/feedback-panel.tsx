@@ -18,7 +18,7 @@ import {
     type FeedbackFormErrors,
 } from '@/features/feedback/feedback-form';
 import { Bug, CircleNotch, Lightbulb, NotePencil, PaperPlaneTilt, Question } from '@phosphor-icons/react/dist/ssr';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 const FEEDBACK_TYPES = [
     { key: 'feature', Icon: Lightbulb },
@@ -83,13 +83,19 @@ export default function FeedbackPanel() {
     // Empty means "not edited": the session email is used as the default.
     const [emailEdit, setEmailEdit] = useState<string | null>(null);
     const email = emailEdit ?? (isAuthenticated ? user?.email ?? '' : '');
+    const messageField = useRef<HTMLTextAreaElement>(null);
+    const emailField = useRef<HTMLInputElement>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (loading) return;
         const found = validateFeedbackForm({ message, email });
         setErrors(found);
-        if (hasErrors(found)) return;
+        if (hasErrors(found)) {
+            // Move to the first field that needs fixing, so keyboard and screen-reader users land on the problem
+            (found.message ? messageField : emailField).current?.focus();
+            return;
+        }
 
         setLoading(true);
         setSubmitError(null);
@@ -185,6 +191,7 @@ export default function FeedbackPanel() {
                     <Label htmlFor="feedback-message">{t('feedback.form.message')}</Label>
                     <Textarea
                         id="feedback-message"
+                        ref={messageField}
                         placeholder={t('feedback.form.messagePlaceholder')}
                         className="min-h-[120px] resize-none"
                         aria-invalid={!!messageError}
@@ -216,10 +223,12 @@ export default function FeedbackPanel() {
                         <Label htmlFor="feedback-email">{t('feedback.form.email')}</Label>
                         <Input
                             id="feedback-email"
+                            ref={emailField}
                             type="email"
                             autoComplete="email"
                             placeholder={t('feedback.form.emailPlaceholder')}
                             aria-invalid={!!errors.email}
+                            aria-describedby="feedback-email-hint"
                             value={email}
                             onChange={(e) => {
                                 setEmailEdit(e.target.value);
@@ -227,9 +236,9 @@ export default function FeedbackPanel() {
                             }}
                         />
                         {errors.email ? (
-                            <p role="alert" className="text-xs text-danger-ink">{t('feedback.errors.emailInvalid')}</p>
+                            <p id="feedback-email-hint" role="alert" className="text-xs text-danger-ink">{t('feedback.errors.emailInvalid')}</p>
                         ) : (
-                            <p className="text-xs text-ink-muted">{t('pagesUi.feedback.contactHint')}</p>
+                            <p id="feedback-email-hint" className="text-xs text-ink-muted">{t('pagesUi.feedback.contactHint')}</p>
                         )}
                     </div>
                 </div>

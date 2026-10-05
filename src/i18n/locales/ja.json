@@ -985,7 +985,7 @@
     }
   },
   "historyUi": {
-    "title": "履歴",
+    "title": "統計",
     "description": "集中時間、連続日数、最近のセッションを確認できます。",
     "rangeLabel": "期間",
     "ranges": {

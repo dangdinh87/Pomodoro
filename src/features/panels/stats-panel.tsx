@@ -77,12 +77,20 @@ export default function StatsPanel() {
         return (
             <PanelBody>
                 <PageHeader title={t("historyUi.title")} description={t("historyUi.description")} />
+                {/* A visitor who has not finished a session yet has no session (guest or account) to read stats from.
+                    That is "nothing yet", which the landing page promised needs no account; signing in stays one tap away
+                    for someone whose stats live in an account. */}
                 <EmptyState
-                    title={t("auth.signInToViewStats")}
+                    face="sleepy"
+                    title={t("historyUi.empty.title")}
+                    description={t("historyUi.empty.description")}
                     action={
-                        <Button onClick={() => openPanel("login")}>
-                            {t("auth.signInButton")}
-                        </Button>
+                        <div className="flex flex-col items-center gap-2">
+                            <Button onClick={closePanel}>{t("historyUi.empty.action")}</Button>
+                            <Button variant="ghost" onClick={() => openPanel("login")}>
+                                {t("auth.signInToViewStats")}
+                            </Button>
+                        </div>
                     }
                 />
             </PanelBody>

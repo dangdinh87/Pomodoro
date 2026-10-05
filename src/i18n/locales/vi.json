@@ -985,7 +985,7 @@
     }
   },
   "historyUi": {
-    "title": "Lịch sử",
+    "title": "Thống kê",
     "description": "Thời gian tập trung, chuỗi ngày và các phiên gần đây.",
     "rangeLabel": "Khoảng ngày",
     "ranges": {
