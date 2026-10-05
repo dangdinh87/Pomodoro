@@ -10,14 +10,15 @@ vi.mock('@/lib/auth-client', () => ({
 
 const send = vi.mocked(authClient.emailOtp.sendVerificationOtp);
 
-function renderForm(lang: Lang = 'en') {
+function renderForm(lang: Lang = 'en', address = 'me@example.com') {
   render(
     <I18nProvider initialLang={lang}>
       <LoginForm googleEnabled={false} onSignedIn={vi.fn()} />
     </I18nProvider>,
   );
-  fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'me@example.com' } });
-  fireEvent.submit(screen.getByLabelText(/email/i).closest('form')!);
+  const field = screen.getByRole('textbox'); // the label is in the page language
+  fireEvent.change(field, { target: { value: address } });
+  fireEvent.submit(field.closest('form')!);
 }
 
 beforeEach(() => send.mockReset());
@@ -60,5 +61,42 @@ describe('LoginForm: requesting a code', () => {
     send.mockResolvedValue({ data: null, error: { status: 500, message: 'x' } } as never);
     renderForm();
     expect(await screen.findByRole('alert')).toHaveTextContent(/couldn't send the code/i);
+  });
+
+  describe('an address that is not an email', () => {
+    it.each(['abc@x', 'abc', 'a b@c.d', '@x.com'])('"%s" is refused on the spot, without asking the server', async (address) => {
+      renderForm('en', address);
+      const alert = await screen.findByRole('alert');
+      expect(alert).toHaveTextContent(/doesn't look right/i);
+      expect(alert).not.toHaveTextContent(/try again in a minute/i);
+      expect(send).not.toHaveBeenCalled();
+      const field = screen.getByLabelText(/email/i);
+      expect(field).toHaveAttribute('aria-invalid', 'true');
+      expect(field).toHaveAttribute('aria-describedby', alert.id);
+      expect(field).toHaveFocus();
+    });
+
+    it('also maps the server answer (400 INVALID_EMAIL) to that message, not to "try again in a minute"', async () => {
+      send.mockResolvedValue({ data: null, error: { status: 400, code: 'INVALID_EMAIL', message: 'Invalid email' } } as never);
+      renderForm('en', 'me@example.com');
+      const alert = await screen.findByRole('alert');
+      expect(alert).toHaveTextContent(/doesn't look right/i);
+      expect(screen.getByLabelText(/email/i)).toHaveAttribute('aria-invalid', 'true');
+    });
+
+    it('clears the mark as soon as the address is edited', async () => {
+      renderForm('en', 'abc@x');
+      await screen.findByRole('alert');
+      fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'abc@x.com' } });
+      expect(screen.getByLabelText(/email/i)).not.toHaveAttribute('aria-invalid');
+    });
+
+    it.each([
+      ['vi', 'Địa chỉ email chưa hợp lệ'],
+      ['ja', 'メールアドレスの形式が正しくありません'],
+    ] as const)('says it in %s', async (lang, text) => {
+      renderForm(lang, 'abc@x');
+      expect(await screen.findByRole('alert')).toHaveTextContent(text);
+    });
   });
 });

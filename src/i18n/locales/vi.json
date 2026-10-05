@@ -908,6 +908,7 @@
     },
     "errors": {
       "googleConnectionFailed": "Không thể kết nối Google. Thử lại sau.",
+      "invalidEmail": "Địa chỉ email chưa hợp lệ. Bạn kiểm tra lại nhé.",
       "sendFailed": "Chưa gửi được mã. Thử lại sau ít phút.",
       "invalidCode": "Mã không đúng hoặc đã hết hạn.",
       "tooManyCodes": "Bạn đã xin mã quá nhiều lần. Đợi khoảng 10 phút rồi thử lại nhé.",

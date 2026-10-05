@@ -1,7 +1,7 @@
 'use client';
 
 import { Tomo } from '@/components/brand/tomo';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CircleNotch, EnvelopeSimple, SignIn } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,9 +11,13 @@ import { Separator } from '@/components/ui/separator';
 import { useI18n } from '@/contexts/i18n-context';
 import { useAuth } from '@/hooks/use-auth';
 import { authClient } from '@/lib/auth-client';
-import { OTP_EMAIL_RATE_LIMITED } from '@/lib/auth/otp-error-codes';
+import { OTP_EMAIL_RATE_LIMITED, OTP_INVALID_EMAIL } from '@/lib/auth/otp-error-codes';
 
 const CODE_LENGTH = 6;
+const ERROR_ID = 'login-error';
+
+// Not RFC 5322: "something@domain.tld". The browser's own type=email check accepts "abc@x" (no dot), which the server rejects.
+const LOOKS_LIKE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function GoogleGlyph() {
   return (
@@ -36,21 +40,35 @@ export function LoginForm({ googleEnabled, onSignedIn }: { googleEnabled: boolea
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // The message is about the address itself: mark the field, not only the alert
+  const [emailInvalid, setEmailInvalid] = useState(false);
+  const emailField = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isAuthenticated) onSignedIn();
   }, [isAuthenticated, onSignedIn]);
 
+  // The email form is `noValidate`: the browser would show its own bubble, in the browser's language, and accepts
+  // "abc@x". The message is ours (login.errors.invalidEmail), shown in the page language next to the field.
+  function rejectEmail() {
+    setEmailInvalid(true);
+    setError(t('login.errors.invalidEmail'));
+    emailField.current?.focus();
+  }
+
   async function sendCode(event?: React.FormEvent) {
     event?.preventDefault();
-    setBusy(true);
     setError(null);
+    setEmailInvalid(false);
+    if (!LOOKS_LIKE_EMAIL.test(email.trim())) return rejectEmail();
+    setBusy(true);
     const { error: sendError } = await authClient.emailOtp.sendVerificationOtp({
       email: email.trim(),
       type: 'sign-in',
     });
     setBusy(false);
     if (sendError) {
+      if (sendError.status === 400 && sendError.code === OTP_INVALID_EMAIL) return rejectEmail();
       // 429: Better Auth's per-IP limit (this network asked too often) or our per-address limit, which
       // carries a code: then the cause may well be somebody else, so say it is the address (src/lib/auth/otp-limits.ts)
       setError(t(sendError.status === 429 ? (sendError.code === OTP_EMAIL_RATE_LIMITED ? 'login.errors.tooManyCodesForEmail' : 'login.errors.tooManyCodes') : 'login.errors.sendFailed'));
@@ -99,18 +117,24 @@ export function LoginForm({ googleEnabled, onSignedIn }: { googleEnabled: boolea
 
       <CardContent className="space-y-4">
         {step === 'email' ? (
-          <form className="space-y-4" onSubmit={sendCode}>
+          <form className="space-y-4" onSubmit={sendCode} noValidate>
             <div className="space-y-2">
               <Label htmlFor="email">{t('login.form.email')}</Label>
               <Input
                 id="email"
+                ref={emailField}
                 type="email"
                 required
                 autoComplete="email"
                 placeholder={t('login.form.emailPlaceholder')}
                 value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                  setEmailInvalid(false);
+                }}
                 disabled={busy}
+                aria-invalid={emailInvalid || undefined}
+                aria-describedby={emailInvalid ? ERROR_ID : undefined}
               />
             </div>
             <Button className="w-full" size="lg" type="submit" disabled={busy || !email.trim()}>
@@ -151,7 +175,7 @@ export function LoginForm({ googleEnabled, onSignedIn }: { googleEnabled: boolea
         )}
 
         {error && (
-          <p role="alert" className="rounded-xl border-2 border-danger-ink bg-danger-bg px-3 py-2 text-sm font-semibold text-danger-ink">
+          <p id={ERROR_ID} role="alert" className="rounded-xl border-2 border-danger-ink bg-danger-bg px-3 py-2 text-sm font-semibold text-danger-ink">
             {error}
           </p>
         )}

@@ -908,6 +908,7 @@
     },
     "errors": {
       "googleConnectionFailed": "Unable to connect to Google. Try again later.",
+      "invalidEmail": "That email address doesn't look right. Check it and try again.",
       "sendFailed": "Couldn't send the code. Try again in a minute.",
       "invalidCode": "That code is wrong or has expired.",
       "tooManyCodes": "You've requested a lot of codes. Please wait about 10 minutes and try again.",
