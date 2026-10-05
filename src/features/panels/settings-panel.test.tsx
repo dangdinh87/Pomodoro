@@ -7,7 +7,7 @@ vi.mock('@/components/settings/general-settings', () => ({ GeneralSettings: () =
 vi.mock('@/components/settings/appearance-settings', () => ({ AppearanceSettings: () => <p>appearance body</p> }));
 vi.mock('@/components/settings/account-settings', () => ({ AccountSettings: () => <p>account body</p> }));
 
-const content = () => screen.getByRole('main');
+const content = () => screen.getByTestId('settings-content');
 
 describe('SettingsPanel', () => {
   it('starts each section at its top, however far the previous one was scrolled', async () => {
@@ -29,5 +29,13 @@ describe('SettingsPanel', () => {
     content().scrollTop = 200;
     await user.click(screen.getAllByRole('button', { name: 'settings.nav.general' })[0]);
     expect(content().scrollTop).toBe(200);
+  });
+
+  it('adds no landmark or heading of its own inside the dialog (it used to nest a second main, an aside and an h1)', () => {
+    render(<SettingsPanel />);
+    expect(screen.queryByRole('main')).not.toBeInTheDocument();
+    expect(screen.queryByRole('complementary')).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: 'settings.title' })).toBeInTheDocument();
   });
 });

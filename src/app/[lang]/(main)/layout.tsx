@@ -1,5 +1,6 @@
 'use client';
 
+import { SKIP_LINK_CLASS } from '@/components/layout/skip-link';
 import { AppProviders } from '@/components/providers/app-providers';
 import { useI18n } from '@/contexts/i18n-context';
 
@@ -8,7 +9,7 @@ function SkipLink() {
   return (
     <a
       href="#main-content"
-      className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-3 focus:z-50 focus:rounded-md focus:bg-surface focus:px-3 focus:py-2 focus:text-sm focus:font-semibold focus:text-ink focus:ring-2 focus:ring-brand"
+      className={SKIP_LINK_CLASS}
     >
       {t('skipLink.label')}
     </a>
