@@ -10,7 +10,8 @@ import {
   youtubeSuggestions,
   getYouTubeThumbnailUrl,
   getCategories,
-  getSuggestionsByCategory
+  getSuggestionsByCategory,
+  defaultSuggestionCategory,
 } from '@/data/youtube-suggestions';
 import { YouTubeInputSection } from './youtube-input-section';
 import { YouTubeThumbnail } from './youtube-thumbnail';
@@ -42,13 +43,13 @@ const stripTrailingEmoji = (text: string) => {
 };
 
 const YouTubePane = memo(() => {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   // Audio store hooks
   const audioSettings = useAudioStore((state) => state.audioSettings);
   const updateAudioSettings = useAudioStore((state) => state.updateAudioSettings);
 
   const [youtubeUrl, setYoutubeUrl] = useState<string>(audioSettings.youtubeUrl || '');
-  const [selectedCategory, setSelectedCategory] = useState<string>('Chill VN');
+  const [selectedCategory, setSelectedCategory] = useState<string>(() => defaultSuggestionCategory(lang));
 
   // State for currently playing video details
   const [playingVideoDetails, setPlayingVideoDetails] = useState<YouTubeOEmbedResponse | null>(null);

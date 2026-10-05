@@ -49,9 +49,9 @@ export const youtubeSuggestions: YouTubeSuggestion[] = [
   },
   {
     label:
-      '𝐏𝐥𝐚𝐲𝐥𝐢𝐬𝐭 thanh âm của Đại Dương Đen update',
+      'Playlist thanh âm của Đại Dương Đen update',
     url: 'https://www.youtube.com/watch?v=1IKDDJE7Qb0',
-    description: '𝐏𝐥𝐚𝐲𝐥𝐢𝐬𝐭 thanh âm của Đại Dương Đen',
+    description: 'Playlist thanh âm của Đại Dương Đen',
     category: 'Chill VN',
   },
 
@@ -395,6 +395,12 @@ export const getSuggestionsByCategory = (
 ): YouTubeSuggestion[] => {
   return youtubeSuggestions.filter((s) => s.category === category);
 };
+
+/**
+ * Category the library opens on. The "Chill VN" picks are Vietnamese music, so only a Vietnamese UI starts there;
+ * everyone else starts on lofi (instrumental, no language to understand).
+ */
+export const defaultSuggestionCategory = (lang: string): string => (lang === 'vi' ? 'Chill VN' : 'Lofi');
 
 // Get all unique categories
 export const getCategories = (): string[] => {

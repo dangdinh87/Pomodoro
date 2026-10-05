@@ -1,4 +1,4 @@
-import { getSuggestionsByCategory, youtubeSuggestions } from './youtube-suggestions';
+import { defaultSuggestionCategory, getCategories, getSuggestionsByCategory, youtubeSuggestions } from './youtube-suggestions';
 
 describe('youtube suggestions', () => {
   it('no longer offers the removed video 04RM0CQPLHQ (its thumbnail answered 404 and the embed 403)', () => {
@@ -18,5 +18,20 @@ describe('youtube suggestions', () => {
       expect(item.category.trim(), item.url).not.toBe('');
       expect(item.url, item.label).toMatch(/^https:\/\/www\.youtube\.com\/(watch\?v=|playlist\?list=)/);
     }
+  });
+
+  it('uses no "mathematical bold" letters (U+1D400 and up): no UI font has them, so they showed in a serif fallback', () => {
+    for (const item of youtubeSuggestions) {
+      for (const text of [item.label, item.description]) {
+        expect([...text].filter((ch) => ch.codePointAt(0)! >= 0x1d400 && ch.codePointAt(0)! <= 0x1d7ff), text).toEqual([]);
+      }
+    }
+  });
+
+  it('opens the library on Vietnamese picks for a Vietnamese UI and on lofi for the others', () => {
+    expect(defaultSuggestionCategory('vi')).toBe('Chill VN');
+    expect(defaultSuggestionCategory('en')).toBe('Lofi');
+    expect(defaultSuggestionCategory('ja')).toBe('Lofi');
+    for (const lang of ['vi', 'en', 'ja']) expect(getCategories()).toContain(defaultSuggestionCategory(lang));
   });
 });
