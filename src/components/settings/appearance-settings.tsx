@@ -96,7 +96,8 @@ export function AppearanceSettings() {
                     <FilterChipGroup label={t("settings.general.theme.mode")} className="flex-wrap">
                         {THEME_MODES.map(({ value, Icon }) => (
                             <FilterChip key={value} active={mode === value} onClick={() => handleModeChange(value)}>
-                                <Icon size={16} weight="bold" aria-hidden />
+                                {/* The icons go on a phone: with "Theo hệ thống" the three chips need 319px and the row has 284 */}
+                                <Icon size={16} weight="bold" aria-hidden className="max-[420px]:hidden" />
                                 {t(`settings.general.theme.${value}`)}
                             </FilterChip>
                         ))}

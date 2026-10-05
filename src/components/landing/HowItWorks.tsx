@@ -41,8 +41,9 @@ export function HowItWorks({ lang }: { lang: Lang }) {
               <div
                 key={i}
                 style={{ flexGrow: s.min, flexBasis: 0 }}
-                // min-w keeps the 5-minute pieces wide enough for their label on a phone
-                className={`flex min-w-6 items-center justify-center rounded-[10px] border-2 border-outline font-heading text-xs font-extrabold tabular-nums text-on-accent sm:min-w-9 ${s.fill}`}
+                // min-w keeps each piece wide enough for its label on a phone: 5 minutes is one or two digits, the long
+                // break reads "15–30" and must not wrap at the dash
+                className={`flex items-center justify-center whitespace-nowrap rounded-[10px] border-2 border-outline font-heading text-xs font-extrabold tabular-nums text-on-accent ${s.label.length > 2 ? 'min-w-12' : 'min-w-6 sm:min-w-9'} ${s.fill}`}
               >
                 {s.label}
               </div>

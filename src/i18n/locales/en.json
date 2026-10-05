@@ -476,7 +476,7 @@
         "light": "Light",
         "dark": "Dark",
         "system": "System",
-        "colorSection": "Colour",
+        "colorSection": "Color",
         "textSection": "Text",
         "sizes": {
           "small": "Small",
