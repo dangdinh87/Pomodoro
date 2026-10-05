@@ -29,7 +29,9 @@ const EDGE_TOP = 'border-t-[length:var(--outline-w)] border-x-[length:var(--outl
 const SEPARATOR_DOT = 'block size-[0.13em] rounded-full border-[length:max(1.5px,0.025em)] border-outline';
 const EDGE_BOTTOM = 'border-b-[length:var(--outline-w)] border-x-[length:var(--outline-w)] border-outline';
 
-const FlipDigit = memo(({ value, color }: { value: string; color: string }) => {
+// Exported: the real-time clock view (`real-time-clock.tsx`) reuses this exact tile — same look, same
+// flip mechanics — for an HH:MM:SS display that isn't a countdown, without touching this file's timer logic.
+export const FlipDigit = memo(({ value, color }: { value: string; color: string }) => {
   const reduceMotion = useReducedMotion();
   const [currentVal, setCurrentVal] = useState(value);
   const [prevVal, setPrevVal] = useState(value);
@@ -175,38 +177,9 @@ export const FlipClock = memo(
         aria-live="off"
         aria-label={t('timer.aria.timeRemaining').replace('{time}', `${mins}:${String(secs).padStart(2, '0')}`)}
       >
-        {/* Style block for animations */}
-        <style dangerouslySetInnerHTML={{ __html: `
-          @keyframes flip-top {
-            0% { transform: rotateX(0deg); }
-            100% { transform: rotateX(-90deg); }
-          }
-          @keyframes flip-bottom {
-            0% { transform: rotateX(90deg); }
-            100% { transform: rotateX(0deg); }
-          }
-          @keyframes flip-shadow-top {
-            0% { opacity: 0; }
-            100% { opacity: 0.55; }
-          }
-          @keyframes flip-shadow-bottom {
-            0% { opacity: 0.55; }
-            100% { opacity: 0; }
-          }
-          .flip-panel-top-anim {
-            animation: flip-top 250ms ease-in forwards;
-          }
-          .flip-panel-bottom-anim {
-            animation: flip-bottom 250ms ease-out 250ms both;
-          }
-          .flip-shadow-top-anim {
-            animation: flip-shadow-top 250ms ease-in forwards;
-          }
-          .flip-shadow-bottom-anim {
-            animation: flip-shadow-bottom 250ms ease-out 250ms both;
-          }
-        ` }} />
-
+        {/* Flip keyframes live in globals.css (shared by every FlipDigit mount: the Pomodoro clock, the
+            clock-style gallery previews, and the real-time clock), so they're declared once, not re-injected
+            per instance. */}
         <div
           aria-hidden="true"
           className={cn(

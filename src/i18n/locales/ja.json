@@ -1187,6 +1187,11 @@
       "moreAmbient": "+ 環境音 {count}件",
       "ambientPlaying": "環境音を再生中",
       "ambientMix": "環境音ミックス（{count}件）"
+    },
+    "realClock": {
+      "aria": "現在時刻: {time}",
+      "view": "現在時刻",
+      "back": "ポモドーロに戻る"
     }
   },
   "shell": {

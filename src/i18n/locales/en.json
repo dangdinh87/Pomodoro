@@ -1187,6 +1187,11 @@
       "moreAmbient": "+ {count} ambient",
       "ambientPlaying": "Ambient sound playing",
       "ambientMix": "Ambient mix ({count} sounds)"
+    },
+    "realClock": {
+      "aria": "Current time: {time}",
+      "view": "Current time",
+      "back": "Back to Pomodoro"
     }
   },
   "shell": {

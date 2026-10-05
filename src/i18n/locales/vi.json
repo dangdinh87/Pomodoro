@@ -1187,6 +1187,11 @@
       "moreAmbient": "+ {count} âm thanh nền",
       "ambientPlaying": "Đang phát âm thanh nền",
       "ambientMix": "Âm thanh nền kết hợp ({count} âm)"
+    },
+    "realClock": {
+      "aria": "Giờ hiện tại: {time}",
+      "view": "Giờ hiện tại",
+      "back": "Quay lại Pomodoro"
     }
   },
   "shell": {

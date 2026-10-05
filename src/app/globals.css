@@ -142,6 +142,24 @@
     0%, 100% { opacity: 0; r: 6; }
     50% { opacity: 0.4; r: 10; }
   }
+  /* Flip-clock tile: the top panel rotates away, the bottom panel rotates into place, each tile's own shadow
+     fades to sell the depth. Shared by every FlipDigit mount (Pomodoro clock, gallery previews, real-time clock). */
+  @keyframes flip-top {
+    0% { transform: rotateX(0deg); }
+    100% { transform: rotateX(-90deg); }
+  }
+  @keyframes flip-bottom {
+    0% { transform: rotateX(90deg); }
+    100% { transform: rotateX(0deg); }
+  }
+  @keyframes flip-shadow-top {
+    0% { opacity: 0; }
+    100% { opacity: 0.55; }
+  }
+  @keyframes flip-shadow-bottom {
+    0% { opacity: 0.55; }
+    100% { opacity: 0; }
+  }
   /* Checkbox tick: small overshoot bounce. Use with motion-safe: so reduced motion keeps it still. */
   @keyframes tick-pop {
     0% { transform: scale(0.4); opacity: 0; }
@@ -510,6 +528,13 @@
   .clock-color-transition {
     transition: color 1.5s ease-in-out;
   }
+
+  /* Flip-clock tile classes (keyframes are declared in @theme above, next to clock-pulse). Plain classes,
+     not custom properties, so they live here rather than in @theme. Shared by every FlipDigit mount. */
+  .flip-panel-top-anim { animation: flip-top 250ms ease-in forwards; }
+  .flip-panel-bottom-anim { animation: flip-bottom 250ms ease-out 250ms both; }
+  .flip-shadow-top-anim { animation: flip-shadow-top 250ms ease-in forwards; }
+  .flip-shadow-bottom-anim { animation: flip-shadow-bottom 250ms ease-out 250ms both; }
 
   @media (prefers-reduced-motion: reduce) {
     .animate-clock-pulse,
