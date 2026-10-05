@@ -1,5 +1,6 @@
 'use client';
 
+import { YouTubeMiniPlayer } from '@/components/audio/youtube/youtube-mini-player';
 import { useTimerStore } from '@/stores/timer-store';
 import { useChromeIdle } from '@/hooks/use-chrome-idle';
 import { useCelebrationStore } from '@/features/mascot/celebration-store';
@@ -53,6 +54,8 @@ export function EnhancedTimer() {
           <DailyProgress />
         </div>
       </section>
+      {/* The YouTube card: in the flow right under the timer card on a phone, docked bottom-left from md up */}
+      <YouTubeMiniPlayer />
       <TimerLiveAnnouncer />
       <ResetTimerDialog />
       <Celebration />

@@ -27,28 +27,33 @@ import { useAudioStore } from '@/stores/audio-store';
 import { useYouTubeStore } from '@/stores/youtube-player-store';
 import { useYouTubePlayer } from '@/hooks/use-youtube-player';
 
-// Docked bottom-left, above the dock (desktop) or the bottom tab bar (mobile). z-40: over the page and the
-// dock (z-30), under panels and dialogs (z-50), which are opened on purpose and close again.
-// Offsets = the dock's own bottom margin (max(0.5rem|1rem, safe area)) + its height + a gap of about 10px.
-const DOCK_OFFSET =
-  'left-2 bottom-[calc(max(0.5rem,env(safe-area-inset-bottom))+6rem)] md:left-4 md:bottom-[calc(max(1rem,env(safe-area-inset-bottom))+4.5rem)]';
-// The card is as wide as the video needs: expanded 16:9 up to 416px, collapsed exactly YouTube's minimum
-// (200px of video plus the 2.5px border on each side).
-const WIDTH_EXPANDED = 'w-[min(23rem,calc(100vw-1rem))] md:w-[26rem]';
+// Placement. From md (768px) up it floats bottom-left, above the dock: the offsets are the dock's own bottom
+// margin (max(1rem, safe area)) + its height + a gap of about 10px. z-40: over the page and the dock (z-30), under
+// panels and dialogs (z-50), which the user opens on purpose and which close again; their 40% scrim leaves the card
+// visible around them.
+// Below md (a phone) it is NOT floating: the card is part of the page, right under the timer card, so it can never
+// sit on the timer controls (a 200x200 video floating over a 390px-wide screen covered Start and Reset). The stage
+// grows to hold it and the page scrolls; the section's bottom padding keeps the tab bar off it at the end.
+const PLACEMENT =
+  'max-md:relative max-md:mx-auto max-md:mt-4 md:fixed md:left-4 md:bottom-[calc(max(1rem,env(safe-area-inset-bottom))+4.5rem)]';
+// The card is as wide as the video needs: expanded 16:9 up to 416px (a phone: the width of the timer card, 368px
+// at most), collapsed exactly YouTube's minimum (200px of video plus the 2.5px border on each side).
+const WIDTH_EXPANDED = 'max-md:w-[min(100%,23rem)] md:w-[26rem]';
 const WIDTH_COLLAPSED = 'w-[calc(200px+2*var(--outline-w))]';
 
 /**
  * The YouTube player, on screen. YouTube requires an embedded player to be visible, at least 200x200 px and
- * not covered, so the video never plays hidden: it plays in this card, docked bottom-left while anything is
- * loaded in the player, and the card goes away (with the iframe) when playback is closed.
+ * not covered, so the video never plays hidden: it plays in this card, shown while anything is loaded in the
+ * player (docked bottom-left on a wide screen, under the timer card on a phone), and the card goes away (with the
+ * iframe) when playback is closed.
  *
  * Collapsed = a compact card: the chrome shrinks (no title, no volume) but the video stays at the 200x200
  * minimum and keeps playing. Collapsing never pauses; closing stops and removes it. While the timer runs and the
  * pointer rests, the card dims with the rest of the chrome (globals.css) but stays visible.
  *
- * Mounted once in AppProviders: it also owns the error toast, because a playback error can arrive after the
- * Sounds panel that started the video is closed. Unmounting it (language switch, leaving the app pages) stops
- * playback: the iframe cannot outlive its card.
+ * Mounted once, in the timer stage (EnhancedTimer: that is where it sits in the flow on a phone): it also owns the
+ * error toast, because a playback error can arrive after the Sounds panel that started the video is closed.
+ * Unmounting it (language switch, leaving the app pages) stops playback: the iframe cannot outlive its card.
  */
 export function YouTubeMiniPlayer() {
   const { t } = useI18n();
@@ -97,8 +102,8 @@ export function YouTubeMiniPlayer() {
       animate={{ y: 0 }}
       transition={{ type: 'spring', stiffness: 420, damping: 28 }}
       className={cn(
-        'sticker fixed z-40 overflow-hidden',
-        DOCK_OFFSET,
+        'sticker z-40 overflow-hidden',
+        PLACEMENT,
         collapsed ? WIDTH_COLLAPSED : WIDTH_EXPANDED,
       )}
     >

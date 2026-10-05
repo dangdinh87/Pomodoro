@@ -11,7 +11,6 @@ import { AuthSessionSync } from '@/components/providers/auth-session-sync';
 import { BackgroundRenderer } from '@/components/background/background-renderer';
 import { ThemeRestorer } from '@/components/providers/theme-restorer';
 import { AudioCleanupProvider } from '@/components/providers/audio-cleanup-provider';
-import { YouTubeMiniPlayer } from '@/components/audio/youtube/youtube-mini-player';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NextTopLoader from 'nextjs-toploader';
@@ -44,7 +43,6 @@ export function AppProviders({ children }: AppProvidersProps) {
           <BackgroundRenderer />
           <MotionConfig reducedMotion="user">
             {children}
-            <YouTubeMiniPlayer />
           </MotionConfig>
           <Toaster />
         </QueryProvider>

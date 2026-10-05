@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { act, fireEvent, render, renderHook, screen } from '@testing-library/react';
 import { toast } from 'sonner';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -148,6 +150,40 @@ describe('YouTube mini player: the video is always on screen', () => {
     expect(FakePlayer.instances).toHaveLength(0);
     expect(useYouTubeStore.getState().status).toBe('stopped');
     expect(useYouTubeStore.getState().errorKey).toBe('audio.youtube.errors.playerFailed');
+  });
+});
+
+describe('YouTube mini player: placement', () => {
+  // jsdom has no layout or media queries, so the placement contract is the class list; the real check
+  // (elementFromPoint on the Start button at 360, 390 and 768px with a video playing) is a browser probe.
+  const classes = async () => {
+    await startPlaying();
+    return screen.getByTestId('youtube-mini-player').className.split(/\s+/);
+  };
+
+  it('floats only from md up; below md it is in the flow, so it cannot sit on the timer controls', async () => {
+    const list = await classes();
+    expect(list).toContain('md:fixed');
+    expect(list).toContain('max-md:relative');
+    // no unconditional fixed/absolute and no mobile offsets (they would shift the in-flow card)
+    expect(list).not.toContain('fixed');
+    expect(list).not.toContain('absolute');
+    expect(list.filter((c) => /^(left|right|top|bottom)-/.test(c))).toEqual([]);
+  });
+
+  it('keeps the card inside the timer card width on a phone, with the 200px minimum on its own', async () => {
+    const list = await classes();
+    expect(list).toContain('max-md:w-[min(100%,23rem)]');
+    const slot = screen.getByTestId('youtube-player-slot');
+    expect(slot.style.minWidth).toBe(`${YOUTUBE_MIN_PX}px`);
+    expect(slot.style.minHeight).toBe(`${YOUTUBE_MIN_PX}px`);
+  });
+
+  it('is mounted by the timer stage (where the flow is), not by the app providers', () => {
+    const root = path.resolve(import.meta.dirname, '../../../..');
+    const read = (file: string) => readFileSync(path.join(root, file), 'utf8');
+    expect(read('src/features/timer/components/enhanced-timer.tsx')).toContain('<YouTubeMiniPlayer />');
+    expect(read('src/components/providers/app-providers.tsx')).not.toContain('YouTubeMiniPlayer');
   });
 });
 
