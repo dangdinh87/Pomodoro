@@ -4,6 +4,7 @@ import { createJSONStorage } from 'zustand/middleware';
 import { installMemoryStorage } from '@/test-utils/memory-storage';
 import { useAudioStore } from '@/stores/audio-store';
 import { defaultSettings, useTimerStore } from '@/stores/timer-store';
+import { useGoalStore } from '@/stores/goal-store';
 import { TimerSettings } from './timer-settings';
 
 const toastSuccess = vi.fn();
@@ -29,6 +30,7 @@ const settings = () => useTimerStore.getState().settings;
 const workField = () => screen.getByRole('textbox', { name: /timerSettings.labels.workDuration/ });
 const saved = () => screen.queryByText('settings.saved');
 const persisted = () => JSON.parse(window.localStorage.getItem('timer-storage')!).state.settings;
+const persistedGoal = () => JSON.parse(window.localStorage.getItem('goal-settings')!).state.dailyGoalMinutes;
 
 describe('TimerSettings (saves as you change)', () => {
   beforeEach(() => {
@@ -43,6 +45,8 @@ describe('TimerSettings (saves as you change)', () => {
       deadlineAt: null,
       settings: { ...defaultSettings },
     });
+    useGoalStore.persist.setOptions({ storage: createJSONStorage(() => window.localStorage) });
+    useGoalStore.setState({ dailyGoalMinutes: 0 });
   });
 
   it('has no Save button: there is nothing pending', () => {
@@ -187,5 +191,23 @@ describe('TimerSettings (saves as you change)', () => {
     render(<TimerSettings onClose={vi.fn()} />);
     act(() => useTimerStore.setState({ settings: { ...defaultSettings, workDuration: 33 } }));
     expect(workField()).toHaveValue('33');
+  });
+
+  it('a daily goal preset applies and persists the moment it is picked', async () => {
+    const user = userEvent.setup();
+    render(<TimerSettings onClose={vi.fn()} />);
+    await user.click(screen.getByRole('button', { name: '120 settingsUi.unitMin' }));
+    expect(useGoalStore.getState().dailyGoalMinutes).toBe(120);
+    expect(persistedGoal()).toBe(120);
+    expect(saved()).toBeInTheDocument();
+  });
+
+  it('"Off" clears the daily goal', async () => {
+    const user = userEvent.setup();
+    useGoalStore.setState({ dailyGoalMinutes: 90 });
+    render(<TimerSettings onClose={vi.fn()} />);
+    await user.click(screen.getByRole('button', { name: 'timerSettings.labels.dailyGoalOff' }));
+    expect(useGoalStore.getState().dailyGoalMinutes).toBe(0);
+    expect(persistedGoal()).toBe(0);
   });
 });

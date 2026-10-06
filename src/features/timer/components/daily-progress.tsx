@@ -7,9 +7,11 @@ import { useStats } from '@/hooks/use-stats';
 import { useAuth } from '@/hooks/use-auth';
 import { useSystemStore } from '@/stores/system-store';
 import { useTimerStore } from '@/stores/timer-store';
+import { useGoalStore } from '@/stores/goal-store';
 import { studyTodayDate } from '@/lib/stats/study-day';
 import { useActiveTask } from '../hooks/use-active-task';
 import { TaskSelector } from './task-selector';
+import { DailyGoalRing } from './daily-goal-ring';
 
 export const DailyProgress = memo(function DailyProgress() {
     const { t } = useTranslation();
@@ -26,6 +28,10 @@ export const DailyProgress = memo(function DailyProgress() {
     const { data: statsData } = useStats(todayRange);
     const sessions = statsData?.summary.completedSessions || 0;
     const focusMinutes = Math.floor((statsData?.summary.totalFocusTime || 0) / 60);
+
+    const goalMinutes = useGoalStore((state) => state.dailyGoalMinutes);
+    const hasGoal = goalMinutes > 0;
+    const goalPercent = hasGoal ? focusMinutes / goalMinutes : 0;
 
     const isBreakMode = mode === 'shortBreak' || mode === 'longBreak';
 
@@ -44,6 +50,12 @@ export const DailyProgress = memo(function DailyProgress() {
                   .replace('{time}', formatMinutes(focusMinutes))
             : null;
 
+    const goalSummary = hasGoal
+        ? t(focusMinutes >= goalMinutes ? 'timerUi.dailyGoalReached' : 'timerUi.dailyGoalProgress')
+              .replace('{focus}', String(focusMinutes))
+              .replace('{goal}', String(goalMinutes))
+        : null;
+
     if (isFocusMode) return null;
 
     return (
@@ -58,7 +70,13 @@ export const DailyProgress = memo(function DailyProgress() {
                 </div>
             )}
 
-            {hasSession && summary && <p data-chrome className="text-[0.8125rem] font-semibold text-ink-secondary tabular-nums">{summary}</p>}
+            {hasSession && hasGoal && goalSummary && (
+                <div data-chrome className="flex items-center gap-2">
+                    <DailyGoalRing percent={goalPercent} />
+                    <p className="text-[0.8125rem] font-semibold text-ink-secondary tabular-nums">{goalSummary}</p>
+                </div>
+            )}
+            {hasSession && !hasGoal && summary && <p data-chrome className="text-[0.8125rem] font-semibold text-ink-secondary tabular-nums">{summary}</p>}
         </div>
     );
 });

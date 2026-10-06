@@ -15,9 +15,10 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { ArrowsClockwise, Clock, Minus, Plus, Timer, X } from '@phosphor-icons/react/dist/ssr';
+import { ArrowsClockwise, Clock, Minus, Plus, Target, Timer, X } from '@phosphor-icons/react/dist/ssr';
 import { defaultSettings, useTimerStore, type TimerSettings as TimerSettingsData } from '@/stores/timer-store'
 import { useAudioStore } from '@/stores/audio-store'
+import { DAILY_GOAL_PRESETS_MIN, useGoalStore } from '@/stores/goal-store'
 import { toast } from 'sonner'
 import { SettingsSection, SettingsRow } from '@/components/settings/settings-section'
 import { BellNotificationsSection } from '@/components/settings/bell-notifications-section'
@@ -105,6 +106,8 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
     const { t } = useI18n()
     const settings = useTimerStore((s) => s.settings)
     const updateSettings = useTimerStore((s) => s.updateSettings)
+    const dailyGoalMinutes = useGoalStore((s) => s.dailyGoalMinutes)
+    const setDailyGoalMinutes = useGoalStore((s) => s.setDailyGoalMinutes)
     const [saved, flash] = useSavedFlash()
     // "Reset to defaults" wipes durations, alerts and the alarm in one go, so it asks first.
     const [confirmingReset, setConfirmingReset] = useState(false)
@@ -249,6 +252,26 @@ export function TimerSettings({ onClose }: { onClose?: () => void }) {
                 {toggleRow('auto-start-break', t('timerSettings.labels.autoStartBreaks'), t('settingsUi.autoStartBreakHint'), 'autoStartBreak')}
                 {toggleRow('auto-start-work', t('timerSettings.labels.autoStartWork'), t('settingsUi.autoStartWorkHint'), 'autoStartWork')}
                 {toggleRow('low-time-warning', t('timerSettings.labels.lowTimeWarning'), t('settingsUi.lowTimeWarningHint'), 'lowTimeWarningEnabled')}
+            </SettingsSection>
+
+            <SettingsSection title={t('timerSettings.labels.dailyGoal')} icon={Target} tone="peach">
+                <SettingsRow label={t('timerSettings.labels.dailyGoal')} description={t('settingsUi.dailyGoalHint')} stacked>
+                    <FilterChipGroup label={t('timerSettings.labels.dailyGoal')} className="flex-wrap overflow-visible">
+                        {DAILY_GOAL_PRESETS_MIN.map((minutes) => (
+                            <FilterChip
+                                key={minutes}
+                                active={dailyGoalMinutes === minutes}
+                                onClick={() => {
+                                    setDailyGoalMinutes(minutes)
+                                    flash()
+                                }}
+                                className="tabular-nums"
+                            >
+                                {minutes === 0 ? t('timerSettings.labels.dailyGoalOff') : `${minutes} ${unitMin}`}
+                            </FilterChip>
+                        ))}
+                    </FilterChipGroup>
+                </SettingsRow>
             </SettingsSection>
 
             <BellNotificationsSection onChange={flash} />
