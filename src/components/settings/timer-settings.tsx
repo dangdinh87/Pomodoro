@@ -70,7 +70,7 @@ function DurationStepper({
                 {label}
                 <span className="ml-1 whitespace-nowrap font-normal text-ink-muted">· {unit}</span>
             </label>
-            <div className="flex h-[42px] items-stretch divide-x-2 divide-control-edge overflow-hidden rounded-md border-[length:var(--outline-w)] border-control-edge bg-surface shadow-sticker-sm transition-shadow duration-100 focus-within:shadow-[2px_2px_0_var(--accent-solid)] focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-ring">
+            <div className="flex h-[42px] items-stretch divide-x-2 divide-control-edge overflow-hidden rounded-md border-[length:var(--outline-w)] border-control-edge bg-surface shadow-sticker-sm transition-shadow duration-100 focus-within:shadow-[2px_2px_0_var(--accent-solid)] focus-within:outline-3 focus-within:outline-offset-3 focus-within:outline-ring">
                 <button type="button" className={stepBtn} onClick={() => onStep(-1)} aria-label={decLabel}>
                     <Minus size={14} weight="bold" aria-hidden />
                 </button>

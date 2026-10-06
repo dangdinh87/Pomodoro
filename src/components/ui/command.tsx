@@ -24,7 +24,7 @@ export const CommandInput = React.forwardRef<
 >(({ className, ...props }, ref) => (
   // pr-14 keeps the field clear of the dialog's round close button when the palette sits in a dialog.
   <div className="p-3 pr-14">
-    <div className="flex h-[42px] items-center gap-2 rounded-md border-[length:var(--outline-w)] border-outline bg-surface px-3 shadow-sticker-sm transition-shadow duration-100 focus-within:shadow-[2px_2px_0_var(--accent-solid)] focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-ring">
+    <div className="flex h-[42px] items-center gap-2 rounded-md border-[length:var(--outline-w)] border-outline bg-surface px-3 shadow-sticker-sm transition-shadow duration-100 focus-within:shadow-[2px_2px_0_var(--accent-solid)] focus-within:outline-3 focus-within:outline-offset-3 focus-within:outline-ring">
       <MagnifyingGlass size={16} weight="bold" className="shrink-0 text-ink-secondary" aria-hidden="true" />
       <CommandPrimitive.Input
         ref={ref}

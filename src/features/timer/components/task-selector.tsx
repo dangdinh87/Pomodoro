@@ -53,6 +53,28 @@ export function TaskSelector({ className }: TaskSelectorProps) {
   const [pendingTaskId, setPendingTaskId] = useState<string | null>(null);
   const [taskCompleteOpen, setTaskCompleteOpen] = useState(false);
   const completedTaskRef = useRef<Task | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  // The popover opens upward (the trigger sits near the bottom of the stage card): capped so it never
+  // grows tall enough to reach the clock digits above, however tall its content gets. The real gap
+  // depends on viewport (the digits' font-size is vw-based) and on how many tasks are listed, so it's
+  // measured live rather than assumed; MIN_POPOVER_HEIGHT is the floor below which we'd rather accept a
+  // little overlap than render something too small to read or use.
+  const [popoverMaxHeight, setPopoverMaxHeight] = useState<number>();
+  useEffect(() => {
+    if (!isOpen) return;
+    const MIN_POPOVER_HEIGHT = 140;
+    const SIDE_OFFSET_AND_MARGIN = 16;
+    const measure = () => {
+      const clockBottom = document.querySelector('[data-clock-display]')?.getBoundingClientRect().bottom;
+      const triggerTop = triggerRef.current?.getBoundingClientRect().top;
+      if (clockBottom == null || triggerTop == null) return;
+      const available = triggerTop - clockBottom - SIDE_OFFSET_AND_MARGIN;
+      setPopoverMaxHeight(Math.max(MIN_POPOVER_HEIGHT, available));
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [isOpen]);
 
   // Filter to eligible (incomplete) tasks
   const pendingTasks = tasks.filter((task) => {
@@ -118,7 +140,7 @@ export function TaskSelector({ className }: TaskSelectorProps) {
     <>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <button type="button" className={cn(PILL, activeTask ? PILL_CHOSEN : PILL_EMPTY, className)}>
+          <button ref={triggerRef} type="button" className={cn(PILL, activeTask ? PILL_CHOSEN : PILL_EMPTY, className)}>
             <Target size={18} weight="bold" className={cn('shrink-0', activeTask ? 'text-brand' : 'text-ink-secondary')} aria-hidden="true" />
             <span className={cn('min-w-0 flex-1 truncate font-heading text-base font-bold', activeTask ? 'text-ink' : 'text-ink-secondary')}>
               {activeTask ? activeTask.title : t('timerComponents.taskSelector.selectToFocus')}
@@ -136,19 +158,27 @@ export function TaskSelector({ className }: TaskSelectorProps) {
           data-timer
           data-mode={timerMode}
           align="center"
-          className="w-[min(92vw,380px)] overflow-hidden p-0"
+          side="bottom"
+          sideOffset={4}
+          // The trigger sits near the bottom of the stage card, close to the viewport edge: there's
+          // rarely enough room below it, so Radix almost always flips this to open upward. `style` caps
+          // it at the live-measured gap above (see the popoverMaxHeight effect) so it never reaches the
+          // clock digits; content that doesn't fit scrolls instead.
+          collisionPadding={8}
+          style={popoverMaxHeight != null ? { maxHeight: popoverMaxHeight } : undefined}
+          className="w-[min(92vw,380px)] overflow-y-auto overscroll-contain p-0"
         >
-          <div className="flex items-center justify-between px-4 pb-2 pt-3">
+          <div className="flex items-center justify-between px-4 pb-1 pt-2">
             <h3 className="text-[0.8125rem] font-semibold text-ink">{t('timerUi.activeTasks')}</h3>
             <span className="text-xs tabular-nums text-ink-muted">{pendingTasks.length}</span>
           </div>
 
           {pendingTasks.length === 0 ? (
-            <p className="border-t border-border px-4 py-6 text-center text-[0.8125rem] text-ink-muted">
+            <p className="border-t border-border px-4 py-1.5 text-center text-[0.8125rem] text-ink-muted">
               {t('timerUi.noActiveTasks')}
             </p>
           ) : (
-            <ul className="max-h-[260px] divide-y divide-border overflow-y-auto border-t border-border custom-scrollbar">
+            <ul className="max-h-22.5 divide-y divide-border overflow-y-auto border-t border-border custom-scrollbar">
               {pendingTasks.map((task) => {
                 const isActive = task.id === activeTaskId;
                 const progress = Math.min(100, Math.round((task.actualPomodoros / task.estimatePomodoros) * 100));
@@ -182,7 +212,7 @@ export function TaskSelector({ className }: TaskSelectorProps) {
             </ul>
           )}
 
-          <form onSubmit={handleAddTask} className="flex items-center gap-2 border-t border-border p-3">
+          <form onSubmit={handleAddTask} className="flex items-center gap-2 border-t border-border p-2">
             <Input
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
@@ -195,7 +225,7 @@ export function TaskSelector({ className }: TaskSelectorProps) {
             </Button>
           </form>
 
-          <div className="border-t border-border px-4 py-2.5">
+          <div className="border-t border-border px-4 py-1.5">
             <button
               type="button"
               onClick={() => {

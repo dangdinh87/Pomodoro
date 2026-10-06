@@ -127,7 +127,11 @@ export const TimerClockDisplay = memo(function TimerClockDisplay() {
     const showProgressLine = clockType !== 'analog' && clockType !== 'tomato' && clockType !== 'orbit';
 
     return (
-        <div className="flex w-full flex-col items-center gap-(--stage-gap)">
+        // data-clock-display: a measuring hook, not a style hook. The task picker (task-selector.tsx)
+        // reads this node's bottom edge so its popover never grows tall enough to cover the digits
+        // when it opens upward — the real gap varies by viewport (the digits' font-size is vw-based)
+        // and by content, so a fixed pixel budget can't stay correct everywhere; this can.
+        <div data-clock-display className="flex w-full flex-col items-center gap-(--stage-gap)">
             <div className="flex w-full flex-col items-center gap-(--stage-gap)">
                 {/* 3D stages are sized by the viewport; never let one spill out of the card */}
                 <div className="flex w-full justify-center [&>*]:max-w-full">{clockContent}</div>

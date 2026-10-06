@@ -66,7 +66,7 @@ function Calendar({
           defaultClassNames.dropdowns
         ),
         dropdown_root: cn(
-          "has-focus:shadow-[2px_2px_0_var(--accent-solid)] has-focus:outline-3 has-focus:outline-offset-2 has-focus:outline-ring border-[length:var(--outline-w)] border-outline shadow-sticker-sm relative rounded-md",
+          "has-focus:shadow-[2px_2px_0_var(--accent-solid)] has-focus:outline-3 has-focus:outline-offset-3 has-focus:outline-ring border-[length:var(--outline-w)] border-outline shadow-sticker-sm relative rounded-md",
           defaultClassNames.dropdown_root
         ),
         dropdown: cn(

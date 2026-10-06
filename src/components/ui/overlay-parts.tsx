@@ -40,7 +40,7 @@ export const OverlayClose = React.forwardRef<
       ref={ref}
       aria-label={t("common.close")}
       className={cn(
-        "absolute right-4 top-4 flex size-8 items-center justify-center rounded-full border-2 border-outline bg-surface text-ink shadow-sticker-sm transition-[transform,box-shadow,background-color] duration-100 hover:bg-surface-hover active:translate-x-0.5 active:translate-y-0.5 active:shadow-none focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none",
+        "absolute right-4 top-4 flex size-8 items-center justify-center rounded-full border-2 border-outline bg-surface text-ink shadow-sticker-sm transition-[transform,box-shadow,background-color] duration-100 hover:bg-surface-hover active:translate-x-0.5 active:translate-y-0.5 active:shadow-none focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-ring disabled:pointer-events-none",
         className,
       )}
       {...props}

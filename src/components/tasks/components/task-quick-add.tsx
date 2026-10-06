@@ -42,7 +42,7 @@ export const TaskQuickAdd = forwardRef<HTMLInputElement, TaskQuickAddProps>(func
         submit()
       }}
       // The whole bar is one sticker field: typing in it turns the shadow accent-coloured and draws the focus ring.
-      className="field flex h-auto flex-wrap items-center gap-x-1 gap-y-1 px-2.5 py-2 has-[input:focus-visible]:shadow-[2px_2px_0_var(--accent-solid)] has-[input:focus-visible]:outline-3 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-ring sm:flex-nowrap"
+      className="field flex h-auto flex-wrap items-center gap-x-1 gap-y-1 px-2.5 py-2 has-[input:focus-visible]:shadow-[2px_2px_0_var(--accent-solid)] has-[input:focus-visible]:outline-3 has-[input:focus-visible]:outline-offset-3 has-[input:focus-visible]:outline-ring sm:flex-nowrap"
     >
       <IconTile icon={Plus} tone="tomato" size="sm" weight="bold" className="shrink-0" />
       <input
