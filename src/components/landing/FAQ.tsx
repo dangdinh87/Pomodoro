@@ -1,60 +1,44 @@
-/**
- * SSR FAQ component - text content rendered server-side for SEO
- * Accordion interactivity handled by FAQAccordion client component
- */
-import { t } from '@/lib/server-translations';
-import { FAQAccordion } from './faq-accordion';
+import { CaretDown } from '@phosphor-icons/react/dist/ssr';
+import { Tomo } from '@/components/brand/tomo';
+import type { Lang } from '@/lib/i18n/negotiate-locale';
+import { getT } from '@/lib/server-translations';
+import { getFaqItems } from './faq-items';
+import { PanelLink } from './panel-link';
 
-export function FAQ() {
-  const faqs = [
-    { question: t('landing.faq.items.q1.question'), answer: t('landing.faq.items.q1.answer') },
-    { question: t('landing.faq.items.q2.question'), answer: t('landing.faq.items.q2.answer') },
-    { question: t('landing.faq.items.q3.question'), answer: t('landing.faq.items.q3.answer') },
-    { question: t('landing.faq.items.q4.question'), answer: t('landing.faq.items.q4.answer') },
-    { question: t('landing.faq.items.q5.question'), answer: t('landing.faq.items.q5.answer') },
-    { question: t('landing.faq.items.q6.question'), answer: t('landing.faq.items.q6.answer') },
-  ];
+/** Native <details> keeps every answer in the HTML for search engines, with no client JS. */
+export function FAQ({ lang }: { lang: Lang }) {
+  const t = getT(lang);
+  const items = getFaqItems(t);
 
   return (
-    <section id="faq" className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] rounded-full bg-gradient-to-b from-blue-500/5 to-transparent blur-3xl" />
-      </div>
-
-      <div className="mx-auto max-w-3xl">
-        {/* Section Header - server-rendered for SEO */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-medium mb-6">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-            {t('landing.faq.badge')}
-          </div>
-
-          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-slate-900 dark:text-white">
-            {t('landing.faq.title')}
-            <span className="block mt-2 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 bg-clip-text text-transparent">
-              {t('landing.faq.titleHighlight')}
-            </span>
-          </h2>
-          <p className="mt-6 text-lg text-muted-foreground">
-            {t('landing.faq.subtitle')}
+    <section id="faq" className="scroll-mt-24 px-[clamp(16px,4vw,32px)] pb-16 lg:pb-24">
+      <div className="mx-auto grid max-w-[1180px] gap-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-16">
+        <div>
+          <Tomo face="happy" size={112} className="mb-4 size-20 sm:size-28" />
+          <h2 className="font-heading text-3xl font-extrabold leading-[1.1] tracking-[-0.02em] text-ink sm:text-4xl">{t('site.faq.title')}</h2>
+          <p className="mt-4 text-base leading-relaxed text-ink-secondary">
+            {t('site.faq.still')}{' '}
+            <PanelLink panel="feedback" className="focus-ring rounded-sm font-bold text-brand underline-offset-4 hover:text-brand-hover hover:underline">
+              {t('site.faq.contact')}
+            </PanelLink>
           </p>
         </div>
 
-        {/* FAQ List - text passed as props to client accordion */}
-        <FAQAccordion items={faqs} />
-
-        {/* Still have questions */}
-        <div className="mt-12 text-center">
-          <p className="text-muted-foreground">
-            {t('landing.faq.stillHaveQuestions')}{' '}
-            <a
-              href="/feedback"
-              className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
-            >
-              {t('landing.faq.sendMessage')}
-            </a>
-          </p>
+        <div className="space-y-4 pr-1">
+          {items.map((item) => (
+            <details key={item.question} className="group sticker-sm">
+              <summary className="focus-ring flex cursor-pointer list-none items-center justify-between gap-4 rounded-[inherit] px-5 py-4 text-left font-heading text-[1.0625rem] font-bold leading-snug text-ink marker:hidden focus-visible:outline-offset-2 [&::-webkit-details-marker]:hidden">
+                {item.question}
+                <span
+                  aria-hidden="true"
+                  className="inline-flex size-7 shrink-0 items-center justify-center rounded-full border-2 border-outline bg-candy-butter text-on-accent transition-transform duration-150 group-open:rotate-180 group-open:bg-candy-mint motion-reduce:transition-none"
+                >
+                  <CaretDown size={14} weight="bold" />
+                </span>
+              </summary>
+              <p className="max-w-[68ch] px-5 pb-5 text-[0.9375rem] leading-[1.7] text-ink-secondary">{item.answer}</p>
+            </details>
+          ))}
         </div>
       </div>
     </section>

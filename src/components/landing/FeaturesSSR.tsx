@@ -1,125 +1,62 @@
-/**
- * SSR-compatible Features component for SEO
- * Static content rendered on server
- */
 import {
+  ArrowRight,
+  ChartBar,
+  GameController,
+  ImageSquare,
+  ListChecks,
+  MusicNotes,
   Timer,
-  BarChart3,
-  ListTodo,
-  Music,
-  Palette,
-  Flame,
-  MessageSquare,
-  Gamepad2,
-} from 'lucide-react';
-import { t } from '@/lib/server-translations';
-import { cn } from '@/lib/utils';
+  UserCircle,
+} from '@phosphor-icons/react/dist/ssr';
+import type { Icon } from '@phosphor-icons/react';
+import { Tomo } from '@/components/brand/tomo';
+import { IconTile, type IconTileTone } from '@/components/ui/icon-tile';
+import { StickerCard } from '@/components/ui/sticker-card';
+import type { Lang } from '@/lib/i18n/negotiate-locale';
+import { getT } from '@/lib/server-translations';
+import type { PanelId } from '@/features/app-shell/panel-store';
+import { PanelLink } from './panel-link';
 
-const FEATURES = [
-  {
-    key: 'timer',
-    icon: Timer,
-    color: 'bg-blue-600',
-    bgGlow: 'from-blue-600/20 to-transparent',
-  },
-  {
-    key: 'tasks',
-    icon: ListTodo,
-    color: 'bg-orange-600',
-    bgGlow: 'from-orange-600/20 to-transparent',
-  },
-  {
-    key: 'analytics',
-    icon: BarChart3,
-    color: 'bg-purple-600',
-    bgGlow: 'from-purple-600/20 to-transparent',
-  },
-  {
-    key: 'chatAI',
-    icon: MessageSquare,
-    color: 'bg-cyan-600',
-    bgGlow: 'from-cyan-600/20 to-transparent',
-  },
-  {
-    key: 'entertainment',
-    icon: Gamepad2,
-    color: 'bg-emerald-600',
-    bgGlow: 'from-emerald-600/20 to-transparent',
-  },
-  {
-    key: 'sounds',
-    icon: Music,
-    color: 'bg-green-600',
-    bgGlow: 'from-green-600/20 to-transparent',
-  },
-  {
-    key: 'streaks',
-    icon: Flame,
-    color: 'bg-red-600',
-    bgGlow: 'from-red-600/20 to-transparent',
-  },
-  {
-    key: 'themes',
-    icon: Palette,
-    color: 'bg-pink-600',
-    bgGlow: 'from-pink-600/20 to-transparent',
-  },
+// Tile colours follow the dock (spec §7.1) so a feature has the same colour here and in the app.
+const FEATURES: { key: string; icon: Icon; panel: PanelId; tone: IconTileTone }[] = [
+  { key: 'timer', icon: Timer, panel: 'timer', tone: 'mint' },
+  { key: 'tasks', icon: ListChecks, panel: 'tasks', tone: 'butter' },
+  { key: 'stats', icon: ChartBar, panel: 'stats', tone: 'tomato' },
+  { key: 'sound', icon: MusicNotes, panel: 'sound', tone: 'sky' },
+  { key: 'scene', icon: ImageSquare, panel: 'scene', tone: 'lilac' },
+  { key: 'arcade', icon: GameController, panel: 'arcade', tone: 'peach' },
+  { key: 'account', icon: UserCircle, panel: 'login', tone: 'surface' },
 ];
 
-export function FeaturesSSR() {
+/** What's inside: sticker cards tilted in turn (decorative, so the tilt is allowed), Tomo beside the heading. */
+export function FeaturesSSR({ lang }: { lang: Lang }) {
+  const t = getT(lang);
   return (
-    <section id="features" className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-background">
-      <div className="mx-auto max-w-6xl">
-        {/* Section Header - SEO important */}
-        <div className="mb-16">
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-4">
-            {t('landing.features.title')} {t('landing.features.titleHighlight')}
-          </h2>
-          <p className="text-slate-600 dark:text-neutral-400 max-w-2xl text-lg">
-            {t('landing.features.subtitle')}
-          </p>
+    <section id="features" className="scroll-mt-24 px-[clamp(16px,4vw,32px)] py-16 lg:py-24">
+      <div className="mx-auto max-w-[1180px]">
+        <div className="mb-10 flex items-end justify-between gap-6">
+          <div className="max-w-2xl">
+            <h2 className="font-heading text-3xl font-extrabold leading-[1.1] tracking-[-0.02em] text-ink sm:text-4xl">{t('site.features.title')}</h2>
+            <p className="mt-4 text-base leading-relaxed text-ink-secondary">{t('site.features.lead')}</p>
+          </div>
+          <Tomo face="happy" size={128} className="hidden size-24 shrink-0 sm:block lg:size-32" />
         </div>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {FEATURES.map((feature) => {
-            const Icon = feature.icon;
-            return (
-              <article
-                key={feature.key}
-                className="group relative flex flex-col p-8 rounded-[2.5rem] bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-white/[0.05] transition-all duration-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:border-neutral-300 dark:hover:border-white/[0.1]"
-              >
-                {/* Icon */}
-                <div
-                  className={cn(
-                    'h-12 w-12 rounded-xl flex items-center justify-center mb-8 shadow-lg ring-1 ring-white/10 transition-transform group-hover:scale-110 duration-300',
-                    feature.color
-                  )}
-                >
-                  <Icon className="h-6 w-6 text-white" />
-                </div>
-
-                {/* Content */}
-                <div className="space-y-4">
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
-                    {t(`landing.features.items.${feature.key}.title`)}
-                  </h3>
-                  <p className="text-slate-600 dark:text-neutral-500 leading-relaxed font-medium">
-                    {t(`landing.features.items.${feature.key}.description`)}
-                  </p>
-                </div>
-
-                {/* Hover glow effect */}
-                <div
-                  className={cn(
-                    'absolute inset-0 rounded-[2.5rem] bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none',
-                    feature.bgGlow
-                  )}
-                />
-              </article>
-            );
-          })}
-        </div>
+        <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {FEATURES.map(({ key, icon, panel, tone }, i) => (
+            <li key={key} className={`flex ${i === 0 ? 'lg:col-span-2' : ''} ${i === FEATURES.length - 1 ? 'sm:max-lg:col-span-2' : ''}`}>
+              <StickerCard tilt={i % 2 === 0 ? 'left' : 'right'} className="flex w-full flex-col gap-3 p-6">
+                <IconTile icon={icon} tone={tone} size="lg" />
+                <h3 className="font-heading text-xl font-bold leading-tight tracking-[-0.01em] text-ink">{t(`site.features.${key}.title`)}</h3>
+                <p className="flex-1 text-sm leading-relaxed text-ink-secondary">{t(`site.features.${key}.desc`)}</p>
+                <PanelLink panel={panel} className="focus-ring mt-1 inline-flex items-center gap-1.5 self-start rounded-md font-heading text-[0.9375rem] font-bold text-brand hover:text-brand-hover hover:underline">
+                  {t(`shell.panels.${panel}`)}
+                  <ArrowRight size={14} weight="bold" />
+                </PanelLink>
+              </StickerCard>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

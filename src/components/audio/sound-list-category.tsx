@@ -1,27 +1,38 @@
 'use client'
 
-import { memo, useState } from 'react'
-import { ChevronDown } from 'lucide-react'
+import { memo } from 'react'
 import { cn } from '@/lib/utils'
 import { Slider } from '@/components/ui/slider'
+import { IconTile, type IconTileTone } from '@/components/ui/icon-tile'
 import { useAudioStore } from '@/stores/audio-store'
 import type { SoundItem } from '@/lib/audio/sound-catalog'
 import { useTranslation } from '@/contexts/i18n-context'
+import { getSoundIcon } from './sound-icons'
 import type { SoundCategory } from '@/lib/audio/sound-catalog'
+
+// Candy colour per category: pure identity, never state (an active row is also shown by the
+// filled icon, the 40% readout and the slider range, so colour is not the only cue).
+const CATEGORY_TONE: Record<SoundCategory, IconTileTone> = {
+    nature: 'mint',
+    rain: 'sky',
+    noise: 'lilac',
+    study: 'butter',
+    cozy: 'peach',
+    transport: 'tomato',
+    city: 'sky',
+    machine: 'lilac',
+}
 
 interface SoundListCategoryProps {
     categoryKey: SoundCategory
     sounds: readonly SoundItem[]
-    defaultOpen?: boolean
 }
 
 export const SoundListCategory = memo(function SoundListCategory({
     categoryKey,
     sounds,
-    defaultOpen = true,
 }: SoundListCategoryProps) {
     const { t } = useTranslation()
-    const [isOpen, setIsOpen] = useState(defaultOpen)
     const activeAmbientSounds = useAudioStore((s) => s.activeAmbientSounds)
     const toggleAmbient = useAudioStore((s) => s.toggleAmbient)
     const setSoundVolume = useAudioStore((s) => s.setSoundVolume)
@@ -33,107 +44,93 @@ export const SoundListCategory = memo(function SoundListCategory({
         const state = getActiveState(s.id)
         return state && state.volume > 0
     }).length
+    const tone = CATEGORY_TONE[categoryKey]
 
     return (
-        <div>
-            {/* Category header */}
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-1.5 w-full py-1.5 text-left group"
-            >
-                <ChevronDown
-                    className={cn(
-                        'h-3.5 w-3.5 text-muted-foreground transition-transform',
-                        !isOpen && '-rotate-90'
-                    )}
-                />
-                <span className="text-xs font-semibold text-foreground uppercase tracking-wider">
+        <section aria-label={t(`audio.categories.${categoryKey}`)}>
+            <div className="flex items-center justify-between gap-2 pb-2">
+                <h4 className="font-heading text-[0.9375rem] font-bold text-ink">
                     {t(`audio.categories.${categoryKey}`)}
-                </span>
-                <span className="text-xs text-foreground/60">({sounds.length})</span>
+                </h4>
                 {activeCount > 0 && (
-                    <span className="ml-auto text-xs font-medium text-primary">
+                    <span className="rounded-full bg-brand-soft px-2 py-0.5 text-xs font-bold text-brand-ink">
                         {activeCount} {t('audio.ambient.active')}
                     </span>
                 )}
-            </button>
+            </div>
 
-            {/* Sound rows */}
-            {isOpen && (
-                <div className="space-y-0.5 pb-2">
-                    {sounds.map((sound) => {
-                        const activeState = getActiveState(sound.id)
-                        const isActive = !!activeState
-                        const volume = activeState?.volume ?? 0
+            <ul className="sticker-sm divide-y-2 divide-border overflow-hidden">
+                {sounds.map((sound) => {
+                    const activeState = getActiveState(sound.id)
+                    const isActive = !!activeState
+                    const volume = activeState?.volume ?? 0
+                    const label = t(`audio.sounds.${sound.id}`)
+                    const SoundIcon = getSoundIcon(sound.id)
 
-                        return (
-                            <div
-                                key={sound.id}
-                                className={cn(
-                                    'flex items-center gap-2 rounded-lg px-2 py-1 transition-colors',
-                                    isActive
-                                        ? 'bg-primary/8'
-                                        : 'hover:bg-muted/50'
-                                )}
+                    return (
+                        <li
+                            key={sound.id}
+                            className={cn(
+                                'flex items-center gap-3 px-3 py-2.5 transition-colors',
+                                isActive && 'bg-surface-raised'
+                            )}
+                        >
+                            <button
+                                type="button"
+                                onClick={() => toggleAmbient(sound.id)}
+                                aria-pressed={isActive}
+                                aria-label={label}
+                                className="focus-ring shrink-0 rounded-[12px] transition-transform duration-100 hover:-translate-y-px active:translate-y-px"
                             >
-                                {/* Toggle button (icon) */}
-                                <button
-                                    onClick={() => toggleAmbient(sound.id)}
-                                    className={cn(
-                                        'text-base shrink-0 w-7 h-7 rounded-md flex items-center justify-center transition-all',
-                                        isActive
-                                            ? 'bg-primary/15 scale-105'
-                                            : 'opacity-60 hover:opacity-100'
-                                    )}
-                                >
-                                    {sound.icon}
-                                </button>
-
-                                {/* Label */}
-                                <span
-                                    className={cn(
-                                        'text-[13px] truncate w-[100px] shrink-0',
-                                        isActive ? 'font-medium text-foreground' : 'text-foreground/70'
-                                    )}
-                                    title={t(`audio.sounds.${sound.id}`)}
-                                >
-                                    {t(`audio.sounds.${sound.id}`)}
-                                </span>
-
-                                {/* Volume slider */}
-                                <Slider
-                                    value={[volume]}
-                                    min={0}
-                                    max={100}
-                                    step={1}
-                                    onValueChange={(v) => {
-                                        if (!isActive && v[0] > 0) {
-                                            // Activate with the dragged volume
-                                            playAmbient(sound.id, v[0])
-                                        } else if (isActive) {
-                                            setSoundVolume(sound.id, v[0])
-                                        }
-                                    }}
-                                    className={cn(
-                                        'flex-1 min-w-[60px]',
-                                        !isActive && 'opacity-30'
-                                    )}
+                                <IconTile
+                                    icon={SoundIcon}
+                                    tone={isActive ? tone : 'surface'}
+                                    weight={isActive ? 'fill' : 'bold'}
+                                    className={cn(isActive && 'shadow-sticker-sm')}
                                 />
+                            </button>
 
-                                {/* Volume % */}
-                                <span
-                                    className={cn(
-                                        'text-xs w-8 text-right tabular-nums shrink-0',
-                                        isActive ? 'text-foreground/90' : 'text-foreground/40'
-                                    )}
-                                >
-                                    {volume}%
-                                </span>
-                            </div>
-                        )
-                    })}
-                </div>
-            )}
-        </div>
+                            <span
+                                className={cn(
+                                    'line-clamp-2 w-24 shrink-0 break-words text-[0.875rem] leading-tight sm:w-28',
+                                    isActive ? 'font-bold text-ink' : 'font-semibold text-ink-secondary'
+                                )}
+                                title={label}
+                            >
+                                {label}
+                            </span>
+
+                            <Slider
+                                value={[volume]}
+                                min={0}
+                                max={100}
+                                step={1}
+                                aria-label={label}
+                                aria-valuetext={
+                                    isActive
+                                        ? t('audio.ambient.valueText', { name: label, value: volume })
+                                        : t('audio.ambient.valueTextOff', { name: label })
+                                }
+                                onValueChange={(v) => {
+                                    if (!isActive && v[0] > 0) {
+                                        playAmbient(sound.id, v[0])
+                                    } else if (isActive) {
+                                        setSoundVolume(sound.id, v[0])
+                                    }
+                                }}
+                                className={cn('min-w-[60px] flex-1', !isActive && 'opacity-60')}
+                            />
+
+                            <span
+                                aria-hidden="true"
+                                className={cn('w-9 shrink-0 text-right text-xs tabular-nums', isActive ? 'font-bold text-ink' : 'font-semibold text-ink-muted')}
+                            >
+                                {isActive ? `${volume}%` : t('timerUi.soundOff')}
+                            </span>
+                        </li>
+                    )
+                })}
+            </ul>
+        </section>
     )
 })

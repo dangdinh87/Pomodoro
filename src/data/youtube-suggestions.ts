@@ -15,12 +15,6 @@ export const youtubeSuggestions: YouTubeSuggestion[] = [
   // 1. CHILL VN (Vietnamese Lofi/Indie)
   // ==========================================
   {
-    label: 'Playlist Nhạc Speed Up Chill Nhẹ Nhàng Để Học Bài Cực Cuốn | Deven',
-    url: 'https://www.youtube.com/watch?v=04RM0CQPLHQ',
-    description: 'Nhạc Indie Việt nhẹ nhàng 🌿',
-    category: 'Chill VN',
-  },
-  {
     label: 'Những Bản Piano Cover Cảm Xúc Nhất Của An Coong || An Coong 2023',
     url: 'https://www.youtube.com/watch?v=rHKCWKZA6RI',
     description: 'V-Pop Lofi Chill 🌧️',
@@ -55,9 +49,9 @@ export const youtubeSuggestions: YouTubeSuggestion[] = [
   },
   {
     label:
-      '𝐏𝐥𝐚𝐲𝐥𝐢𝐬𝐭 thanh âm của Đại Dương Đen update',
+      'Playlist thanh âm của Đại Dương Đen update',
     url: 'https://www.youtube.com/watch?v=1IKDDJE7Qb0',
-    description: '𝐏𝐥𝐚𝐲𝐥𝐢𝐬𝐭 thanh âm của Đại Dương Đen',
+    description: 'Playlist thanh âm của Đại Dương Đen',
     category: 'Chill VN',
   },
 
@@ -69,6 +63,12 @@ export const youtubeSuggestions: YouTubeSuggestion[] = [
     label: 'Lofi Girl - beats to relax/study to',
     url: 'https://www.youtube.com/watch?v=jfKfPfyJRdk',
     description: 'Radio Lofi huyền thoại (Live)',
+    category: 'Lofi',
+  },
+  {
+    label: 'Lofi Girl - beats to sleep/chill to',
+    url: 'https://www.youtube.com/watch?v=rUxyKA_-grg',
+    description: 'Radio Lofi dịu nhẹ (Live)',
     category: 'Lofi',
   },
   {
@@ -395,6 +395,12 @@ export const getSuggestionsByCategory = (
 ): YouTubeSuggestion[] => {
   return youtubeSuggestions.filter((s) => s.category === category);
 };
+
+/**
+ * Category the library opens on. The "Chill VN" picks are Vietnamese music, so only a Vietnamese UI starts there;
+ * everyone else starts on lofi (instrumental, no language to understand).
+ */
+export const defaultSuggestionCategory = (lang: string): string => (lang === 'vi' ? 'Chill VN' : 'Lofi');
 
 // Get all unique categories
 export const getCategories = (): string[] => {

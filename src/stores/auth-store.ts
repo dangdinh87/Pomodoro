@@ -6,7 +6,8 @@ export interface AuthUser {
   email?: string;
   name?: string;
   avatarUrl?: string;
-  provider?: string;
+  /** Guest session created on the first write; not a real account yet. */
+  isAnonymous: boolean;
 }
 
 interface AuthState {
@@ -16,6 +17,10 @@ interface AuthState {
   setLoading: (isLoading: boolean) => void;
 }
 
+/**
+ * Mirror of the Better Auth session (kept in sync by AuthSessionSync) so code
+ * outside React, like the session recorder, can read who is signed in.
+ */
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
@@ -26,12 +31,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-      partialize: (state) => ({
-        user: state.user,
-      }),
+      partialize: (state) => ({ user: state.user }),
     },
   ),
 );
-
-
-

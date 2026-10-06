@@ -1,61 +1,37 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase-server';
+import { db } from '@/db';
+import { feedbacks } from '@/db/schema';
+import { getSessionUser } from '@/lib/auth/session-user';
+import { consumeRateLimit, getClientIp } from '@/lib/api/in-memory-rate-limiter';
+import { badRequest, readJson, serverError } from '@/lib/api/responses';
+import { validateFeedback } from './feedback-schema';
 
-export async function POST(req: Request) {
-    try {
-        const supabase = await createClient();
-        const body = await req.json();
-        const { name, email, type, message, rating } = body;
+const FEEDBACK_LIMIT_PER_WINDOW = 5;
+const FEEDBACK_WINDOW_MS = 10 * 60 * 1000;
 
-        if (!message) {
-            return NextResponse.json(
-                { error: 'Message is required' },
-                { status: 400 }
-            );
-        }
+export async function POST(request: Request) {
+  const rateLimit = consumeRateLimit(
+    `feedback:${getClientIp(request)}`,
+    FEEDBACK_LIMIT_PER_WINDOW,
+    FEEDBACK_WINDOW_MS,
+  );
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: 'Too many feedback submissions. Please try again later.' },
+      { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfterSec) } },
+    );
+  }
 
-        if (!type || !['feature', 'bug', 'question', 'other'].includes(type)) {
-            return NextResponse.json(
-                { error: 'Invalid feedback type' },
-                { status: 400 }
-            );
-        }
+  const body = await readJson(request);
+  if (body === undefined) return badRequest('Request body must be valid JSON');
+  const parsed = validateFeedback(body);
+  if (!parsed.success) return badRequest(parsed.error);
 
-        if (rating !== undefined && (rating < 1 || rating > 5)) {
-            return NextResponse.json(
-                { error: 'Rating must be between 1 and 5' },
-                { status: 400 }
-            );
-        }
-
-        // Get authenticated user (optional - anonymous feedback allowed)
-        const { data: { user } } = await supabase.auth.getUser();
-
-        const { error } = await supabase
-            .from('feedbacks')
-            .insert({
-                user_id: user?.id || null,
-                type,
-                message,
-                rating: rating || null,
-                name: name || null,
-                email: email || null,
-            });
-
-        if (error) {
-            console.error('Feedback insert error:', error);
-            return NextResponse.json(
-                { error: 'Failed to save feedback' },
-                { status: 500 }
-            );
-        }
-
-        return NextResponse.json({ success: true });
-    } catch (error) {
-        console.error('Feedback error:', error);
-        return NextResponse.json(
-            { error: 'Internal Server Error' },
-            { status: 500 }
-        );
-    }
+  try {
+    const user = await getSessionUser();
+    await db.insert(feedbacks).values({ userId: user?.id ?? null, ...parsed.data });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return serverError('Failed to save feedback', error);
+  }
 }

@@ -1,5 +1,10 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  type QueryClient,
+} from '@tanstack/react-query';
 import {
   Task,
   CreateTaskInput,
@@ -8,6 +13,10 @@ import {
   TaskStatus,
 } from '@/stores/task-store';
 import { useAuthStore } from '@/stores/auth-store';
+import { ensureSession } from '@/lib/auth-client';
+import { TooManyRequestsError } from '@/lib/api/too-many-requests-error';
+import { TaskLimitError, taskLimitErrorFrom } from '@/lib/tasks/task-limit-error';
+import { useI18n } from '@/contexts/i18n-context';
 import { toast } from 'sonner';
 import { startOfDay, endOfDay } from 'date-fns';
 
@@ -53,7 +62,6 @@ function mapTaskFromApi(raw: any): Task {
     updatedAt: raw.updatedAt ?? raw.updated_at ?? now,
     // New fields
     dueDate: raw.dueDate ?? raw.due_date ?? null,
-    parentTaskId: raw.parentTaskId ?? raw.parent_task_id ?? null,
     displayOrder: raw.displayOrder ?? raw.display_order ?? 0,
     isTemplate: raw.isTemplate ?? raw.is_template ?? false,
   };
@@ -106,6 +114,7 @@ async function fetchTasks({
 }
 
 async function createTask(input: CreateTaskInput): Promise<Task> {
+  await ensureSession();
   const body = {
     title: input.title,
     description: input.description,
@@ -113,7 +122,6 @@ async function createTask(input: CreateTaskInput): Promise<Task> {
     estimate_pomodoros: input.estimatePomodoros ?? 1,
     tags: input.tags ?? [],
     due_date: input.dueDate ?? null,
-    parent_task_id: input.parentTaskId ?? null,
     is_template: input.isTemplate ?? false,
   };
 
@@ -123,8 +131,13 @@ async function createTask(input: CreateTaskInput): Promise<Task> {
     body: JSON.stringify(body),
   });
 
+  if (res.status === 429) throw new TooManyRequestsError();
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
+    if (res.status === 409) {
+      const limitError = taskLimitErrorFrom(errorData);
+      if (limitError) throw limitError;
+    }
     const errorMessage =
       errorData.details || errorData.error || 'Failed to create task';
     console.error('Failed to create task:', {
@@ -153,7 +166,6 @@ async function updateTask({
     tags: input.tags,
     status: input.status?.toUpperCase(),
     due_date: input.dueDate,
-    parent_task_id: input.parentTaskId,
     display_order: input.displayOrder,
     is_template: input.isTemplate,
   };
@@ -200,13 +212,61 @@ async function cloneTask(taskId: string): Promise<Task> {
   const res = await fetch(`/api/tasks/${taskId}/clone`, {
     method: 'POST',
   });
-  if (!res.ok) throw new Error('Failed to clone task');
+  if (!res.ok) {
+    const limitError = res.status === 409 ? taskLimitErrorFrom(await res.json().catch(() => null)) : null;
+    throw limitError ?? new Error('Failed to clone task');
+  }
   const data = await res.json();
   return mapTaskFromApi(data.task);
 }
 
+type TasksPage = { tasks: Task[]; total: number };
+type TasksSnapshot = [readonly unknown[], TasksPage | undefined][];
+
+// The list query key is ['tasks', page, limit, filters] and its data is a
+// page object, so optimistic updates must patch every cached page by prefix.
+async function patchCachedTasks(
+  queryClient: QueryClient,
+  updater: (tasks: Task[]) => Task[],
+): Promise<{ snapshots: TasksSnapshot }> {
+  await queryClient.cancelQueries({ queryKey: ['tasks'] });
+  const snapshots = queryClient.getQueriesData<TasksPage>({
+    queryKey: ['tasks'],
+  }) as TasksSnapshot;
+  queryClient.setQueriesData<TasksPage>({ queryKey: ['tasks'] }, (old) => {
+    if (!old) return old;
+    const tasks = updater(old.tasks);
+    // Keep the pagination total in step when rows are removed
+    const removed = Math.max(0, old.tasks.length - tasks.length);
+    return { ...old, tasks, total: Math.max(0, old.total - removed) };
+  });
+  return { snapshots };
+}
+
+// Optimistic mutations share this key so each can tell whether it is the last
+// one still pending. Refetching earlier would replace the optimistic state of
+// the others with stale server data.
+const TASK_MUTATION_KEY = ['task-optimistic-mutation'];
+
+function invalidateIfLastPending(queryClient: QueryClient) {
+  // onSettled runs while this mutation still counts as pending
+  if (queryClient.isMutating({ mutationKey: TASK_MUTATION_KEY }) <= 1) {
+    queryClient.invalidateQueries({ queryKey: ['tasks'] });
+  }
+}
+
+function restoreCachedTasks(
+  queryClient: QueryClient,
+  context?: { snapshots: TasksSnapshot },
+) {
+  context?.snapshots.forEach(([key, data]) =>
+    queryClient.setQueryData(key, data),
+  );
+}
+
 export function useTasks(filters: any = {}) {
   const queryClient = useQueryClient();
+  const { t } = useI18n();
   const user = useAuthStore((state) => state.user);
 
   const [page, setPage] = useState(1);
@@ -237,120 +297,98 @@ export function useTasks(filters: any = {}) {
 
   const createTaskMutation = useMutation({
     mutationFn: createTask,
+    // No success toast: the new row appearing in the list is the feedback
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast.success('Task created successfully');
     },
     onError: (error) => {
-      toast.error('Failed to create task');
+      toast.error(
+        error instanceof TooManyRequestsError
+          ? t('errors.tooManyRequests')
+          : error instanceof TaskLimitError
+            ? t('tasksUi.errors.limitReached', { max: error.max })
+            : t('tasksUi.errors.createFailed'),
+      );
       console.error(error);
     },
   });
 
   const updateTaskMutation = useMutation({
+    mutationKey: TASK_MUTATION_KEY,
     mutationFn: updateTask,
-    onMutate: async ({ id, input }) => {
-      await queryClient.cancelQueries({ queryKey: ['tasks'] });
-      const previousTasks = queryClient.getQueryData<Task[]>(['tasks']);
-
-      queryClient.setQueryData<Task[]>(['tasks'], (old) => {
-        if (!old) return [];
-        return old.map((task) => {
-          if (task.id === id) {
-            return {
-              ...task,
-              ...input,
-              // Handle partial updates for nested/complex types if needed
-              priority: input.priority ?? task.priority,
-              status: input.status ?? task.status,
-              updatedAt: new Date().toISOString(), // Optimistic update timestamp
-            } as Task;
-          }
-          return task;
-        });
-      });
-
-      return { previousTasks };
-    },
-    onError: (err, newTodo, context) => {
-      if (context?.previousTasks) {
-        queryClient.setQueryData(['tasks'], context.previousTasks);
-      }
-      toast.error('Failed to update task');
+    onMutate: ({ id, input }) =>
+      patchCachedTasks(queryClient, (tasks) =>
+        tasks.map((task) =>
+          task.id === id
+            ? ({
+                ...task,
+                ...input,
+                priority: input.priority ?? task.priority,
+                status: input.status ?? task.status,
+                updatedAt: new Date().toISOString(), // Optimistic timestamp
+              } as Task)
+            : task,
+        ),
+      ),
+    onError: (err, vars, context) => {
+      restoreCachedTasks(queryClient, context);
+      toast.error(t('tasksUi.errors.updateFailed'));
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      invalidateIfLastPending(queryClient);
     },
   });
 
   const softDeleteTaskMutation = useMutation({
+    mutationKey: TASK_MUTATION_KEY,
     mutationFn: softDeleteTask,
-    onMutate: async (id) => {
-      await queryClient.cancelQueries({ queryKey: ['tasks'] });
-      const previousTasks = queryClient.getQueryData<Task[]>(['tasks']);
-
-      queryClient.setQueryData<Task[]>(['tasks'], (old) =>
-        old ? old.filter((task) => task.id !== id) : [],
-      );
-
-      return { previousTasks };
-    },
+    onMutate: (id: string) =>
+      patchCachedTasks(queryClient, (tasks) =>
+        tasks.filter((task) => task.id !== id),
+      ),
     onError: (err, id, context) => {
-      queryClient.setQueryData(['tasks'], context?.previousTasks);
-      toast.error('Failed to delete task');
+      restoreCachedTasks(queryClient, context);
+      toast.error(t('tasksUi.errors.deleteFailed'));
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast.success('Task moved to trash');
+      invalidateIfLastPending(queryClient);
     },
   });
 
   const hardDeleteTaskMutation = useMutation({
+    mutationKey: TASK_MUTATION_KEY,
     mutationFn: hardDeleteTask,
-    onMutate: async (id) => {
-      await queryClient.cancelQueries({ queryKey: ['tasks'] });
-      const previousTasks = queryClient.getQueryData<Task[]>(['tasks']);
-
-      queryClient.setQueryData<Task[]>(['tasks'], (old) =>
-        old ? old.filter((task) => task.id !== id) : [],
-      );
-
-      return { previousTasks };
-    },
+    onMutate: (id: string) =>
+      patchCachedTasks(queryClient, (tasks) =>
+        tasks.filter((task) => task.id !== id),
+      ),
     onError: (err, id, context) => {
-      queryClient.setQueryData(['tasks'], context?.previousTasks);
-      toast.error('Failed to permanently delete task');
+      restoreCachedTasks(queryClient, context);
+      toast.error(t('tasksUi.errors.deleteFailed'));
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast.success('Task permanently deleted');
+      invalidateIfLastPending(queryClient);
     },
   });
 
   const reorderTasksMutation = useMutation({
+    mutationKey: TASK_MUTATION_KEY,
     mutationFn: reorderTasks,
-    onMutate: async (taskOrders) => {
-      await queryClient.cancelQueries({ queryKey: ['tasks'] });
-      const previousTasks = queryClient.getQueryData<Task[]>(['tasks']);
-
-      // Optimistic update for reordering
-      queryClient.setQueryData<Task[]>(['tasks'], (old) => {
-        if (!old) return [];
-        const orderMap = new Map(taskOrders.map((t) => [t.id, t.displayOrder]));
-        return old.map((task) => ({
+    onMutate: (taskOrders) => {
+      const orderMap = new Map(taskOrders.map((t) => [t.id, t.displayOrder]));
+      return patchCachedTasks(queryClient, (tasks) =>
+        tasks.map((task) => ({
           ...task,
           displayOrder: orderMap.get(task.id) ?? task.displayOrder,
-        }));
-      });
-
-      return { previousTasks };
+        })),
+      );
     },
     onError: (err, taskOrders, context) => {
-      queryClient.setQueryData(['tasks'], context?.previousTasks);
-      toast.error('Failed to reorder tasks');
+      restoreCachedTasks(queryClient, context);
+      toast.error(t('tasksUi.errors.reorderFailed'));
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      invalidateIfLastPending(queryClient);
     },
   });
 
@@ -358,10 +396,13 @@ export function useTasks(filters: any = {}) {
     mutationFn: cloneTask,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast.success('Task cloned successfully');
     },
-    onError: () => {
-      toast.error('Failed to clone task');
+    onError: (error) => {
+      toast.error(
+        error instanceof TaskLimitError
+          ? t('tasksUi.errors.limitReached', { max: error.max })
+          : t('tasksUi.errors.cloneFailed'),
+      );
     },
   });
 

@@ -1,9 +1,47 @@
 /**
- * Migration map: old path-based background values → new pack IDs.
- * Used once per user on first load after the refactor.
+ * Saved-background migration. Pure, so it is unit-tested (background-migration.test.ts).
+ * Old path-based values map to pack ids; removed art maps to a kept sibling or the default scene.
  */
 
-/** IDs no longer in any pack (Classic + Travel removed). Stored value is migrated to system. */
+import { findImageById } from '@/data/background-packs';
+import { findSceneById } from '@/features/scenes/lib/scene-registry';
+
+export type BGType = 'none' | 'solid' | 'image' | 'gradient' | 'random' | 'scene';
+
+export interface BackgroundSettings {
+  type: BGType;
+  value: string;
+  opacity: number;
+  blur: number;
+  brightness: number;
+  /** Scenes only. Undefined = on. */
+  motion?: boolean;
+  /** Scenes only: recolour with the timer mode. Undefined = on. */
+  followMode?: boolean;
+}
+
+/** The "Pomodoro" scene: a solid tint of the current timer mode (see --stage-tint). */
+export const DEFAULT_BACKGROUND: BackgroundSettings = {
+  type: 'solid',
+  value: 'var(--surface-page)',
+  opacity: 1,
+  blur: 0,
+  brightness: 100,
+};
+
+/** Near-duplicate photos retired in the scene overhaul: the old id keeps working via its kept sibling. */
+export const ALIASED_BACKGROUND_IDS: Record<string, string> = {
+  'fantasy-adventurers-2': 'fantasy-adventurers-1',
+  'fantasy-adventurers-3': 'fantasy-adventurers-1',
+  'fantasy-adventurers-4': 'fantasy-adventurers-1',
+  'fantasy-adventurers-5': 'fantasy-adventurers-1',
+  'fantasy-house-moon-illustration-1': 'fantasy-house-moon-illustration',
+  'fantasy-house-moon-illustration-2': 'fantasy-house-moon-illustration',
+  'fantasy-house-moon-illustration-3': 'fantasy-house-moon-illustration',
+  'cityscape-anime-inspired-urban-area-1': 'cityscape-anime-inspired-urban-area',
+};
+
+/** IDs no longer in any pack (Classic + Travel removed). Stored value is migrated to the default scene. */
 export const REMOVED_BACKGROUND_IDS = new Set([
   'landscape-cartoon',
   'chill-shiba',
@@ -20,8 +58,6 @@ export const REMOVED_BACKGROUND_IDS = new Set([
 ]);
 
 export const PATH_TO_ID_MAP: Record<string, string> = {
-  // System
-  'system:auto-color': 'system-auto-color',
   // Legacy auto lofi → pick day video
   'lofi:auto': 'day-chill',
   'lofi-auto': 'day-chill',
@@ -76,3 +112,31 @@ export const PATH_TO_ID_MAP: Record<string, string> = {
   '/backgrounds/new/fantasy-group-adventurers (4).jpg':
     'fantasy-adventurers-5',
 };
+
+const clamp = (n: unknown, min: number, max: number, fallback: number) =>
+  typeof n === 'number' && Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : fallback;
+
+/** Migrate old or broken configs to safe values. Returns the same object when nothing changed. */
+export function migrateBackground(bg: BackgroundSettings): BackgroundSettings {
+  if (!bg?.value || bg.type === 'none' || bg.type === 'random') {
+    return { ...DEFAULT_BACKGROUND };
+  }
+
+  if (bg.type === 'scene') {
+    if (!findSceneById(bg.value)) return { ...DEFAULT_BACKGROUND };
+    const brightness = clamp(bg.brightness, 0, 200, 100);
+    return brightness === bg.brightness ? bg : { ...bg, brightness };
+  }
+
+  if (bg.type === 'image') {
+    if (REMOVED_BACKGROUND_IDS.has(bg.value) || bg.value.startsWith('system:') || bg.value === 'system-auto-color') {
+      return { ...DEFAULT_BACKGROUND };
+    }
+    if (!findImageById(bg.value)) {
+      const newId = PATH_TO_ID_MAP[bg.value] ?? ALIASED_BACKGROUND_IDS[bg.value];
+      if (newId) return migrateBackground({ ...bg, value: newId });
+    }
+  }
+
+  return bg;
+}

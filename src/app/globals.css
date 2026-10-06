@@ -1,148 +1,458 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
+/* Dark mode is set by next-themes on <html data-theme="dark">. Subtrees that still carry a
+   hard-coded data-theme="dark" (legacy "always dark stage") follow the user's theme instead. */
+@custom-variant dark (&:where(:root[data-theme="dark"], :root[data-theme="dark"] *));
+
+/* Design tokens live as plain CSS variables further down (:root + :root[data-theme='dark']).
+   `inline` makes utilities reference those variables directly, so a runtime colour
+   preset (src/config/themes.ts) re-skins every utility, and opacity modifiers
+   (bg-brand/10) still work through Tailwind's own color-mix. */
+@theme inline {
+  --font-heading: var(--font-heading);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+
+  /* shadcn/ui names */
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--border);
+  --color-ring: var(--accent);
+  --color-background: var(--surface-page);
+  --color-foreground: var(--ink);
+  --color-primary: var(--accent-solid);
+  --color-primary-foreground: var(--on-accent);
+  --color-secondary: var(--surface-raised);
+  --color-secondary-foreground: var(--ink);
+  --color-destructive: var(--danger);
+  --color-destructive-foreground: var(--on-accent);
+  --color-muted: var(--surface-raised);
+  --color-muted-foreground: var(--ink-muted);
+  --color-accent: var(--surface-hover);
+  --color-accent-foreground: var(--ink);
+  --color-popover: var(--surface);
+  --color-popover-foreground: var(--ink);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--ink);
+
+  /* Design-system tokens */
+  --color-ink: var(--ink);
+  --color-ink-secondary: var(--ink-secondary);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-surface: var(--surface);
+  --color-surface-page: var(--surface-page);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-hover: var(--surface-hover);
+  --color-brand: var(--accent);
+  --color-brand-hover: var(--accent-hover);
+  --color-brand-soft: var(--accent-soft);
+  --color-brand-ink: var(--accent-ink);
+  --color-brand-solid: var(--accent-solid);
+  --color-brand-edge: var(--accent-edge);
+
+  /* Sticker pop (docs/superpowers/specs/2026-10-05-sticker-pop-rebrand-design.md §3):
+     outline = sticker border/shadow colour, on-accent = text/icon on every solid colour. */
+  --color-outline: var(--outline);
+  --color-on-accent: var(--on-accent);
+  /* Edge of form controls: = outline in light; a lighter brown in dark so unchecked boxes, inputs and tracks keep a 3:1 boundary */
+  --color-control-edge: var(--control-edge);
+
+  /* Candy colours: identity + decoration only, never for status. Always paired with on-accent. */
+  --color-candy-tomato: var(--candy-tomato);
+  --color-candy-mint: var(--candy-mint);
+  --color-candy-butter: var(--candy-butter);
+  --color-candy-lilac: var(--candy-lilac);
+  --color-candy-sky: var(--candy-sky);
+  --color-candy-peach: var(--candy-peach);
+
+  /* Semantic tones — pick by meaning, never for decoration.
+     DEFAULT is a solid fill (text on it is on-accent); -ink is the text colour on -bg or the page. */
+  --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
+  --color-success-ink: var(--success-ink);
+  --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-ink: var(--warning-ink);
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+  --color-danger-ink: var(--danger-ink);
+  --color-info: var(--info);
+  --color-info-bg: var(--info-bg);
+  --color-info-ink: var(--info-ink);
+  --color-ai: var(--ai);
+  --color-ai-bg: var(--ai-bg);
+  --color-ai-ink: var(--ai-ink);
+  --color-gold: var(--gold);
+  --color-timer: var(--timer-foreground);
+
+  /* `rounded` / `rounded-md` = inputs, buttons, rows (12px); `rounded-lg` = cards, popovers (20px);
+     `rounded-xl` = modals, the timer card (28px) */
+  --radius: var(--radius);
+  --radius-sm: 8px;
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  /* Hard offset shadows: shadow-sticker-sm | shadow-sticker | shadow-sticker-lg */
+  --shadow-sticker-sm: var(--shadow-sticker-sm);
+  --shadow-sticker: var(--shadow-sticker);
+  --shadow-sticker-lg: var(--shadow-sticker-lg);
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-fade-in: fade-in 0.5s ease-out;
+  --animate-slide-in-from-top: slide-in-from-top 0.3s ease-out;
+  --animate-slide-in-from-bottom: slide-in-from-bottom 0.3s ease-out;
+  --animate-pulse-ring: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-clock-pulse: clock-pulse 1s ease-in-out infinite;
+  --animate-clock-dot-pulse: clock-dot-pulse 2s ease-in-out infinite;
+  --animate-tick-pop: tick-pop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  @keyframes accordion-down {
+    from { height: 0; }
+    to { height: var(--radix-accordion-content-height); }
+  }
+  @keyframes accordion-up {
+    from { height: var(--radix-accordion-content-height); }
+    to { height: 0; }
+  }
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slide-in-from-top {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+  }
+  @keyframes slide-in-from-bottom {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  @keyframes pulse-ring {
+    0%, 100% { transform: scale(0.95); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.5; }
+  }
+  @keyframes clock-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+  }
+  @keyframes clock-dot-pulse {
+    0%, 100% { opacity: 0; r: 6; }
+    50% { opacity: 0.4; r: 10; }
+  }
+  /* Flip-clock tile: the top panel rotates away, the bottom panel rotates into place, each tile's own shadow
+     fades to sell the depth. Shared by every FlipDigit mount (Pomodoro clock, gallery previews, real-time clock). */
+  @keyframes flip-top {
+    0% { transform: rotateX(0deg); }
+    100% { transform: rotateX(-90deg); }
+  }
+  @keyframes flip-bottom {
+    0% { transform: rotateX(90deg); }
+    100% { transform: rotateX(0deg); }
+  }
+  @keyframes flip-shadow-top {
+    0% { opacity: 0; }
+    100% { opacity: 0.55; }
+  }
+  @keyframes flip-shadow-bottom {
+    0% { opacity: 0.55; }
+    100% { opacity: 0; }
+  }
+  /* Checkbox tick: small overshoot bounce. Use with motion-safe: so reduced motion keeps it still. */
+  @keyframes tick-pop {
+    0% { transform: scale(0.4); opacity: 0; }
+    60% { transform: scale(1.22); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+}
+
+/* Sticker utilities that need variant support (group-*:, data-*:, hover:). */
+/* Playful tilt for decorative stickers, toasts and landing cards only (never forms, lists, tables).
+   Uses the individual `rotate` property so it composes with the press translate. */
+@utility tilt-l {
+  rotate: -1deg;
+}
+@utility tilt-r {
+  rotate: 1deg;
+}
+/* Sticker outline: --outline-w (2.5px) in --outline. Use border-2 border-outline for elements <= 32px tall. */
+@utility border-sticker {
+  border: var(--outline-w) solid var(--outline);
+}
+
+/* Only the legal pages use it; keeps v3's centred, capped container. */
+@utility container {
+  margin-inline: auto;
+  padding-inline: 2rem;
+  @media (width >= 1400px) {
+    max-width: 1400px;
+  }
+}
+
+/* v4 preflight dropped the pointer cursor on buttons; the app relies on it. */
 @layer base {
-  :root {
-    /* Brand colors - Clean white with Orange primary */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 4%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 4%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 4%;
-    --primary: 12 85% 55%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
-    --accent: 24 80% 92%;
-    --accent-foreground: 20 80% 25%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 12 85% 55%;
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+}
 
-    /* Border radius */
-    --radius: 0.75rem;
-    --radius-sm: 0.5rem;
-    --radius-lg: 1rem;
-    --radius-xl: 1.5rem;
+/* ═══ Sticker pop — buttons and surfaces (spec §3.3, §5) ═══
+   Everything raised is a sticker: outline + hard offset shadow. Pressing sinks the element by the
+   shadow depth (--sticker-offset) so it looks pushed flat; hover lifts it 1px. All values read tokens,
+   so dark mode and colour presets re-skin them. */
+@layer components {
+  .btn {
+    --sticker-offset: 4px;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: var(--outline-w) solid var(--outline);
+    border-radius: var(--radius);
+    box-shadow: var(--sticker-offset) var(--sticker-offset) 0 var(--outline);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.08s ease, box-shadow 0.08s ease, background-color 0.15s ease, color 0.15s ease;
+  }
+  .btn:hover:not(:disabled) {
+    transform: translate(-1px, -1px);
+    box-shadow: calc(var(--sticker-offset) + 1px) calc(var(--sticker-offset) + 1px) 0 var(--outline);
+  }
+  .btn:active:not(:disabled) {
+    transform: translate(var(--sticker-offset), var(--sticker-offset));
+    box-shadow: 0 0 0 var(--outline);
+  }
+  .btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  .btn:disabled { cursor: not-allowed; pointer-events: none; opacity: 0.5; box-shadow: none; transform: none; }
+  .btn svg { flex-shrink: 0; pointer-events: none; }
 
-    /* Shadows */
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.07);
-    --shadow-glow: 0 0 20px hsl(var(--primary) / 0.3);
+  /* Heights: sm 34 · md 42 · lg 50 · icon 40 (spec §5) */
+  .btn--sm { --sticker-offset: 3px; height: 34px; padding: 0 14px; font-size: 0.875rem; }
+  .btn--md { height: 42px; padding: 0 18px; font-size: 1rem; }
+  .btn--lg { height: 50px; padding: 0 24px; font-size: 1.125rem; }
+  .btn--icon { --sticker-offset: 3px; height: 40px; width: 40px; padding: 0; }
 
-    /* Chart — 5 showcase colors (Default theme) */
-    --chart-1: 12 85% 55%;
-    --chart-2: 24 80% 50%;
-    --chart-3: 35 90% 52%;
-    --chart-4: 45 93% 47%;
-    --chart-5: 8 75% 45%;
+  .btn--primary { background: var(--accent-solid); color: var(--on-accent); }
+  .btn--primary:hover:not(:disabled) { background: var(--accent-solid-hover); }
 
-    --timer-foreground: 12 85% 55%;
+  .btn--secondary { background: var(--surface); color: var(--ink); }
+  .btn--secondary:hover:not(:disabled) { background: var(--surface-hover); }
 
-    /* Surface */
-    --surface: 0 0% 100%;
-    --surface-foreground: 0 0% 4%;
-    --surface-variant: 0 0% 96%;
-    --surface-variant-foreground: 0 0% 4%;
-    --outline: 0 0% 88%;
-    --outline-variant: 0 0% 82%;
-    --scrim: 0 0% 0%;
-    --shadow: 0 0% 0%;
+  /* "fun": butter yellow, for playful secondary actions */
+  .btn--fun { background: var(--candy-butter); color: var(--on-accent); }
+  .btn--fun:hover:not(:disabled) { background: color-mix(in srgb, var(--candy-butter) 82%, white); }
 
-    /* Focus */
-    --focus-active: 12 85% 55%;
-    --focus-inactive: 12 40% 30%;
+  .btn--danger { background: var(--danger); color: var(--on-accent); }
+  .btn--danger:hover:not(:disabled) { background: color-mix(in srgb, var(--danger) 82%, white); }
 
-    /* Sidebar */
-    --sidebar-background: 0 0% 99%;
-    --sidebar-foreground: 0 0% 9%;
-    --sidebar-primary: 12 85% 55%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 99%;
-    --sidebar-accent-foreground: 0 0% 9%;
-    --sidebar-border: 0 0% 90%;
-    --sidebar-ring: 12 85% 55%;
+  /* Ghost and link are flat: no outline, no shadow, no sinking */
+  .btn--ghost,
+  .btn--link { border-color: transparent; box-shadow: none; background: transparent; }
+  .btn--ghost { color: var(--ink-secondary); }
+  .btn--ghost:hover:not(:disabled) { background: var(--surface-hover); color: var(--ink); transform: none; box-shadow: none; }
+  .btn--ghost:active:not(:disabled) { transform: scale(0.97); box-shadow: none; }
 
-    /* Gamification */
-    --streak-flame: 24 95% 55%;
-    --streak-ember: 38 92% 50%;
-    --streak-at-risk: 45 93% 47%;
-    --xp-fill: 24 85% 55%;
-    --level-glow: 24 90% 60%;
-    --badge-bronze: 30 80% 55%;
-    --badge-silver: 240 5% 65%;
-    --badge-gold: 45 93% 47%;
-    --coin-primary: 45 93% 47%;
-    --coin-shine: 45 100% 75%;
+  .btn--link { height: auto; padding: 0; gap: 6px; color: var(--ink-secondary); font-family: var(--font-body); font-weight: 600; border-radius: 0; }
+  .btn--link:hover:not(:disabled) { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; transform: none; box-shadow: none; }
+  .btn--link:active:not(:disabled) { transform: none; }
+
+  /* ── Sticker surfaces: .sticker (cards, popovers) · -sm (chips, inputs) · -lg (modals, timer card) ── */
+  .sticker,
+  .sticker-sm,
+  .sticker-lg {
+    background: var(--surface);
+    color: var(--ink);
+    border: var(--outline-w) solid var(--outline);
+  }
+  .sticker { --sticker-offset: 4px; border-radius: var(--radius-lg); box-shadow: var(--shadow-sticker); }
+  .sticker-sm { --sticker-offset: 2px; border-radius: var(--radius); box-shadow: var(--shadow-sticker-sm); }
+  .sticker-lg { --sticker-offset: 6px; border-radius: var(--radius-xl); box-shadow: var(--shadow-sticker-lg); }
+
+  /* Add to any .sticker*: hover lifts 1px, press sinks by the shadow depth */
+  .sticker-press {
+    cursor: pointer;
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+  }
+  .sticker-press:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: calc(var(--sticker-offset, 4px) + 1px) calc(var(--sticker-offset, 4px) + 1px) 0 var(--outline);
+  }
+  .sticker-press:active {
+    transform: translate(var(--sticker-offset, 4px), var(--sticker-offset, 4px));
+    box-shadow: 0 0 0 var(--outline);
   }
 
-  .dark {
-    --background: 24 10% 6%;
-    --foreground: 30 10% 96%;
-    --card: 24 12% 8%;
-    --card-foreground: 30 10% 96%;
-    --popover: 24 10% 7%;
-    --popover-foreground: 30 10% 96%;
-    --primary: 12 90% 58%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 20 10% 16%;
-    --secondary-foreground: 30 10% 94%;
-    --muted: 20 8% 14%;
-    --muted-foreground: 30 8% 65%;
-    --accent: 24 50% 18%;
-    --accent-foreground: 24 80% 85%;
-    --destructive: 0 85% 60%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 24 8% 16%;
-    --input: 24 8% 14%;
-    --ring: 12 85% 58%;
+  /* Doodle layer for the default scene (background-renderer) and any element that should look like the page paper */
+  .paper-bg {
+    background-image: var(--doodle);
+    background-size: var(--doodle-size) var(--doodle-size);
+  }
 
-    --chart-1: 12 85% 58%;
-    --chart-2: 24 80% 55%;
-    --chart-3: 35 90% 55%;
-    --chart-4: 45 93% 55%;
-    --chart-5: 8 75% 52%;
+  /* Visible keyboard focus shared by every small control (checkbox, radio, switch, slider thumb, tabs, chips).
+     Override the offset with a focus-visible:outline-offset-* utility where a scroll container would clip it. */
+  .focus-ring:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 
-    --timer-foreground: 12 85% 58%;
+  /* Form field (input, textarea; the select trigger can reuse it): outlined, hard shadow that turns
+     accent-coloured on focus, danger tone when aria-invalid. Height/padding come from the component. */
+  .field {
+    width: 100%;
+    border: var(--outline-w) solid var(--control-edge);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: var(--shadow-sticker-sm);
+    font-family: var(--font-body);
+    font-weight: 600;
+    line-height: 1.4;
+    transition: box-shadow 0.12s ease, background-color 0.12s ease, border-color 0.12s ease;
+  }
+  .field::placeholder { color: var(--ink-muted); font-weight: 500; }
+  .field:focus-visible {
+    /* 3px offset, same as .btn/.focus-ring everywhere else: enough gap that the ring reads as a halo
+       around the field, not a second border fused to the sticker shadow below. */
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+    box-shadow: 2px 2px 0 var(--accent-solid);
+  }
+  .field[aria-invalid='true'] { border-color: var(--danger-ink); box-shadow: 2px 2px 0 var(--danger); }
+  .field[aria-invalid='true']:focus-visible { outline-color: var(--danger-ink); }
+  .field:disabled { cursor: not-allowed; opacity: 0.5; box-shadow: none; background: var(--surface-raised); }
 
-    --surface: 24 10% 6%;
-    --surface-foreground: 30 10% 96%;
-    --surface-variant: 24 8% 14%;
-    --surface-variant-foreground: 30 10% 96%;
-    --outline: 24 8% 16%;
-    --outline-variant: 24 6% 25%;
-    --scrim: 0 0% 0%;
-    --shadow: 0 0% 0%;
+  /* Loading placeholder: raised surface with a soft light sweep. The sweep is dropped under reduced motion. */
+  .skeleton { position: relative; overflow: hidden; background: var(--surface-raised); box-shadow: inset 0 0 0 2px var(--border); }
+  .skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--surface) 75%, transparent), transparent);
+    animation: skeleton-shimmer 1.6s ease-in-out infinite;
+  }
+  @keyframes skeleton-shimmer {
+    to { transform: translateX(100%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton::after { animation: none; display: none; }
+  }
+}
 
-    --focus-active: 12 85% 58%;
-    --focus-inactive: 12 30% 30%;
+/*
+ * Design tokens — Sticker pop (docs/superpowers/specs/2026-10-05-sticker-pop-rebrand-design.md §3).
+ * Light is the default; dark is opt-in via next-themes (<html data-theme="dark">).
+ * Only the PRIMARY block changes per colour preset; everything else is shared.
+ * Colour presets (src/config/themes.ts) re-declare just the PRIMARY block at runtime.
+ */
+@layer base {
+  :root {
+    /* ═══ PRIMARY — Tomato (default preset) ═══ */
+    --accent: #C2330F;              /* text, links, focus ring (>= 4.5:1 on --surface-page) */
+    --accent-hover: #9E290B;
+    --accent-soft: #FFD9CC;
+    --accent-ink: #8F2711;          /* text on --accent-soft */
+    --accent-solid: #FF5A36;        /* solid fill; text on it is --on-accent */
+    --accent-solid-hover: #FF7050;
+    --accent-edge: var(--outline);  /* kept so old call sites do not break */
 
-    --sidebar-background: 24 12% 7%;
-    --sidebar-foreground: 30 10% 94%;
-    --sidebar-primary: 12 85% 58%;
-    --sidebar-primary-foreground: 20 100% 8%;
-    --sidebar-accent: 20 10% 14%;
-    --sidebar-accent-foreground: 30 10% 94%;
-    --sidebar-border: 20 8% 16%;
-    --sidebar-ring: 12 85% 58%;
+    /* Fonts: set in src/app/layout.tsx (next/font) and consumed here. Japanese falls back to system rounded Gothic. */
+    --font-heading: var(--font-baloo-2, 'Baloo 2'), 'Hiragino Maru Gothic ProN', 'Yu Gothic', Meiryo, system-ui, sans-serif;
+    --font-body: var(--font-nunito, 'Nunito'), 'Hiragino Maru Gothic ProN', 'Yu Gothic', Meiryo, system-ui, sans-serif;
+    --font-mono: var(--font-jetbrains-mono, 'JetBrains Mono'), 'Fira Code', monospace;
 
-    --streak-flame: 24 95% 60%;
-    --streak-ember: 38 92% 55%;
-    --streak-at-risk: 45 93% 52%;
-    --xp-fill: 24 85% 60%;
-    --level-glow: 24 90% 70%;
-    --badge-bronze: 30 80% 60%;
-    --badge-silver: 240 5% 70%;
-    --badge-gold: 45 93% 52%;
-    --coin-primary: 45 93% 52%;
-    --coin-shine: 45 100% 80%;
+    --ink: #2A1A14;                 /* main text, also the sticker outline */
+    --ink-secondary: #5A4038;
+    --ink-muted: #7A6158;           /* >= 4.5:1 on --surface-page */
+    --ink-faint: #A48E83;           /* disabled / decorative only, never text people must read */
+
+    --surface-page: #FFF3E0;        /* cream paper (doodle pattern: --doodle) */
+    --surface: #FFFCF6;             /* cards, popovers, modals */
+    --surface-raised: #FCEBD2;      /* nested cells, tracks */
+    --surface-hover: #FFE6C2;
+
+    --border: #EAD6BF;              /* thin inner dividers */
+    --border-strong: var(--outline);
+    --outline: #2A1A14;             /* sticker border and hard shadow colour */
+    --on-accent: #2A1A14;           /* text / icon on every solid colour */
+    --control-edge: var(--outline); /* border of inputs, checkboxes, switch and slider tracks (WCAG 1.4.11) */
+
+    /* Candy colours — identity and decoration, always with --on-accent text, never for status */
+    --candy-tomato: #FF5A36;
+    --candy-mint: #7BDCB5;
+    --candy-butter: #FFD45C;
+    --candy-lilac: #C9B6FF;
+    --candy-sky: #7CC8FF;
+    --candy-peach: #FFB38A;
+
+    /* Semantic tones — DEFAULT = solid fill (on-accent text), -bg = soft panel, -ink = text on -bg / the page */
+    --success: #7BDCB5; --success-bg: #DDF6EA; --success-ink: #13603F;
+    --warning: #FFD45C; --warning-bg: #FFF2C7; --warning-ink: #7A5200;
+    --danger: #FF8A75;  --danger-bg: #FFE1DA;  --danger-ink: #9B2410;
+    --info: #7CC8FF;    --info-bg: #DDEFFF;    --info-ink: #0F4C81;
+    --ai: #C9B6FF;      --ai-bg: #EEE7FF;      --ai-ink: #4B2C9E;
+    --gold: #FFB800;    /* streak, trophies (with --outline) */
+
+    /* Game / chart palette (white text on top) — mini games keep their own colours, not part of the rebrand */
+    --blue-solid: #1D4ED8; --green-solid: #047857; --purple-solid: #6D28D9;
+    --amber-solid: #B45309; --rose-solid: #BE123C; --pink-solid: #DB2777; --cyan-solid: #0E7490;
+    --amber-meter: #D9A300;
+
+    /* Sticker geometry */
+    --outline-w: 2.5px;             /* 2px for elements <= 32px tall */
+    --shadow-sticker-sm: 2px 2px 0 var(--outline);
+    --shadow-sticker: 4px 4px 0 var(--outline);
+    --shadow-sticker-lg: 6px 6px 0 var(--outline);
+    --radius: 12px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+
+    --timer-foreground: var(--accent);
+
+    /* Paper doodle (tiny tomatoes, stars, dots, squiggles): ~6% ink on cream. Tiled by body and the default scene (.paper-bg). */
+    --doodle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Cg opacity='0.1'%3E%3Cg transform='translate(34 44)'%3E%3Cellipse cx='0' cy='1.6' rx='8' ry='6.8' fill='%23FF5A36'/%3E%3Cpath d='M-0.7 -6.6 L-0.5 -10.2 L0.7 -10.2 L0.9 -6.6Z' fill='%232E9B5E'/%3E%3Cpath d='M0.0 -7.7 L1.2 -5.3 L5.3 -5.3 L1.9 -3.9 L3.3 -1.6 L0.0 -3.1 L-3.3 -1.6 L-1.9 -3.9 L-5.3 -5.3 L-1.2 -5.3Z' fill='%232E9B5E'/%3E%3C/g%3E%3Cg transform='translate(176 152)'%3E%3Cellipse cx='0' cy='1.6' rx='8' ry='6.8' fill='%23FF5A36'/%3E%3Cpath d='M-0.7 -6.6 L-0.5 -10.2 L0.7 -10.2 L0.9 -6.6Z' fill='%232E9B5E'/%3E%3Cpath d='M0.0 -7.7 L1.2 -5.3 L5.3 -5.3 L1.9 -3.9 L3.3 -1.6 L0.0 -3.1 L-3.3 -1.6 L-1.9 -3.9 L-5.3 -5.3 L-1.2 -5.3Z' fill='%232E9B5E'/%3E%3C/g%3E%3Cg transform='translate(98 208)'%3E%3Cellipse cx='0' cy='1.6' rx='8' ry='6.8' fill='%23FF5A36'/%3E%3Cpath d='M-0.7 -6.6 L-0.5 -10.2 L0.7 -10.2 L0.9 -6.6Z' fill='%232E9B5E'/%3E%3Cpath d='M0.0 -7.7 L1.2 -5.3 L5.3 -5.3 L1.9 -3.9 L3.3 -1.6 L0.0 -3.1 L-3.3 -1.6 L-1.9 -3.9 L-5.3 -5.3 L-1.2 -5.3Z' fill='%232E9B5E'/%3E%3C/g%3E%3C/g%3E%3Cg opacity='0.06'%3E%3Cpath transform='translate(122 36) scale(1)' d='M0 -7 Q1.5 -1.5 7 0 Q1.5 1.5 0 7 Q-1.5 1.5 -7 0 Q-1.5 -1.5 0 -7Z' fill='%232A1A14'/%3E%3Cpath transform='translate(36 152) scale(0.8)' d='M0 -7 Q1.5 -1.5 7 0 Q1.5 1.5 0 7 Q-1.5 1.5 -7 0 Q-1.5 -1.5 0 -7Z' fill='%232A1A14'/%3E%3Cpath transform='translate(206 62) scale(0.9)' d='M0 -7 Q1.5 -1.5 7 0 Q1.5 1.5 0 7 Q-1.5 1.5 -7 0 Q-1.5 -1.5 0 -7Z' fill='%232A1A14'/%3E%3Cpath transform='translate(222 214) scale(0.7)' d='M0 -7 Q1.5 -1.5 7 0 Q1.5 1.5 0 7 Q-1.5 1.5 -7 0 Q-1.5 -1.5 0 -7Z' fill='%232A1A14'/%3E%3Ccircle cx='78' cy='100' r='2.5' fill='%232A1A14'/%3E%3Ccircle cx='150' cy='98' r='2' fill='%232A1A14'/%3E%3Ccircle cx='204' cy='122' r='2.5' fill='%232A1A14'/%3E%3Ccircle cx='14' cy='214' r='2' fill='%232A1A14'/%3E%3Ccircle cx='132' cy='176' r='2.5' fill='%232A1A14'/%3E%3Ccircle cx='62' cy='24' r='2' fill='%232A1A14'/%3E%3Ccircle cx='236' cy='16' r='2' fill='%232A1A14'/%3E%3Cpath transform='translate(84 62) rotate(-12)' d='M0 0 q4 -6 8 0 t8 0 t8 0' fill='none' stroke='%232A1A14' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath transform='translate(160 206) rotate(8)' d='M0 0 q4 -6 8 0 t8 0 t8 0' fill='none' stroke='%232A1A14' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath transform='translate(14 100) rotate(-6)' d='M0 0 q4 -6 8 0 t8 0 t8 0' fill='none' stroke='%232A1A14' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath transform='translate(176 22) rotate(10)' d='M0 0 q4 -6 8 0 t8 0 t8 0' fill='none' stroke='%232A1A14' stroke-width='2.2' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E");
+    --doodle-size: 240px;
+  }
+
+  :root[data-theme='dark'] {
+    --accent: #FF8A6B;
+    --accent-hover: #FFA38A;
+    --accent-soft: #5C2E22;
+    --accent-ink: #FFB09C;
+    /* --accent-solid (+hover) and the candy colours stay as in light mode; text on them is still --on-accent */
+
+    --ink: #FFF3E0;
+    --ink-secondary: #E8D5C0;
+    --ink-muted: #C2AA96;
+    --ink-faint: #8A7465;
+
+    --surface-page: #1A120F;
+    --surface: #2E221C;             /* cards are lighter than the page so the black outline reads */
+    --surface-raised: #3A2C24;
+    --surface-hover: #45352B;
+
+    --border: #4A392E;
+    --outline: #0B0705;
+    --control-edge: #8A7465;        /* 3.5:1 on --surface, 4.1:1 on --surface-page; the black --outline alone is ~1.3:1 */
+
+    --success-bg: #1F3A2D; --success-ink: #8FE6C2;
+    --warning-bg: #40330F; --warning-ink: #FFD45C;
+    --danger-bg: #4A211A;  --danger-ink: #FFA591;
+    --info-bg: #1B3347;    --info-ink: #8AD0FF;
+    --ai-bg: #33284F;      --ai-ink: #D4C6FF;
+
+    --blue-solid: #2563EB; --green-solid: #059669; --purple-solid: #7C3AED;
+    --amber-solid: #D97706; --rose-solid: #E11D48; --pink-solid: #EC4899; --cyan-solid: #0891B2;
+    --amber-meter: #FBBF24;
+
+    /* Chocolate paper: cream doodle at ~5% */
+    --doodle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Cg opacity='0.07'%3E%3Cg transform='translate(34 44)'%3E%3Cellipse cx='0' cy='1.6' rx='8' ry='6.8' fill='%23FF8A6B'/%3E%3Cpath d='M-0.7 -6.6 L-0.5 -10.2 L0.7 -10.2 L0.9 -6.6Z' fill='%237BDCB5'/%3E%3Cpath d='M0.0 -7.7 L1.2 -5.3 L5.3 -5.3 L1.9 -3.9 L3.3 -1.6 L0.0 -3.1 L-3.3 -1.6 L-1.9 -3.9 L-5.3 -5.3 L-1.2 -5.3Z' fill='%237BDCB5'/%3E%3C/g%3E%3Cg transform='translate(176 152)'%3E%3Cellipse cx='0' cy='1.6' rx='8' ry='6.8' fill='%23FF8A6B'/%3E%3Cpath d='M-0.7 -6.6 L-0.5 -10.2 L0.7 -10.2 L0.9 -6.6Z' fill='%237BDCB5'/%3E%3Cpath d='M0.0 -7.7 L1.2 -5.3 L5.3 -5.3 L1.9 -3.9 L3.3 -1.6 L0.0 -3.1 L-3.3 -1.6 L-1.9 -3.9 L-5.3 -5.3 L-1.2 -5.3Z' fill='%237BDCB5'/%3E%3C/g%3E%3Cg transform='translate(98 208)'%3E%3Cellipse cx='0' cy='1.6' rx='8' ry='6.8' fill='%23FF8A6B'/%3E%3Cpath d='M-0.7 -6.6 L-0.5 -10.2 L0.7 -10.2 L0.9 -6.6Z' fill='%237BDCB5'/%3E%3Cpath d='M0.0 -7.7 L1.2 -5.3 L5.3 -5.3 L1.9 -3.9 L3.3 -1.6 L0.0 -3.1 L-3.3 -1.6 L-1.9 -3.9 L-5.3 -5.3 L-1.2 -5.3Z' fill='%237BDCB5'/%3E%3C/g%3E%3C/g%3E%3Cg opacity='0.05'%3E%3Cpath transform='translate(122 36) scale(1)' d='M0 -7 Q1.5 -1.5 7 0 Q1.5 1.5 0 7 Q-1.5 1.5 -7 0 Q-1.5 -1.5 0 -7Z' fill='%23FFF3E0'/%3E%3Cpath transform='translate(36 152) scale(0.8)' d='M0 -7 Q1.5 -1.5 7 0 Q1.5 1.5 0 7 Q-1.5 1.5 -7 0 Q-1.5 -1.5 0 -7Z' fill='%23FFF3E0'/%3E%3Cpath transform='translate(206 62) scale(0.9)' d='M0 -7 Q1.5 -1.5 7 0 Q1.5 1.5 0 7 Q-1.5 1.5 -7 0 Q-1.5 -1.5 0 -7Z' fill='%23FFF3E0'/%3E%3Cpath transform='translate(222 214) scale(0.7)' d='M0 -7 Q1.5 -1.5 7 0 Q1.5 1.5 0 7 Q-1.5 1.5 -7 0 Q-1.5 -1.5 0 -7Z' fill='%23FFF3E0'/%3E%3Ccircle cx='78' cy='100' r='2.5' fill='%23FFF3E0'/%3E%3Ccircle cx='150' cy='98' r='2' fill='%23FFF3E0'/%3E%3Ccircle cx='204' cy='122' r='2.5' fill='%23FFF3E0'/%3E%3Ccircle cx='14' cy='214' r='2' fill='%23FFF3E0'/%3E%3Ccircle cx='132' cy='176' r='2.5' fill='%23FFF3E0'/%3E%3Ccircle cx='62' cy='24' r='2' fill='%23FFF3E0'/%3E%3Ccircle cx='236' cy='16' r='2' fill='%23FFF3E0'/%3E%3Cpath transform='translate(84 62) rotate(-12)' d='M0 0 q4 -6 8 0 t8 0 t8 0' fill='none' stroke='%23FFF3E0' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath transform='translate(160 206) rotate(8)' d='M0 0 q4 -6 8 0 t8 0 t8 0' fill='none' stroke='%23FFF3E0' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath transform='translate(14 100) rotate(-6)' d='M0 0 q4 -6 8 0 t8 0 t8 0' fill='none' stroke='%23FFF3E0' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath transform='translate(176 22) rotate(10)' d='M0 0 q4 -6 8 0 t8 0 t8 0' fill='none' stroke='%23FFF3E0' stroke-width='2.2' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E");
   }
 }
 
@@ -150,356 +460,305 @@
   * {
     @apply border-border;
   }
+  html {
+    font-size: 16px;
+  }
   body {
-    @apply bg-background text-foreground;
-    transition:
-      background-color 0.3s ease,
-      color 0.3s ease,
-      border-color 0.3s ease;
+    font-family: var(--font-body);
+    color: var(--ink);
+    /* "Giấy kem": --surface-page (tinted by timer mode through --stage-tint) + tiled doodle */
+    background-color: var(--stage-tint);
+    background-image: var(--doodle);
+    background-size: var(--doodle-size) var(--doodle-size);
+    transition: background-color 0.7s ease;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
   }
-
-  /* Exclude certain elements from transitions for better performance */
-  img,
-  video,
-  iframe,
-  canvas {
-    transition: none;
+  h1, h2, h3, h4 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.01em;
+    line-height: 1.15;
   }
-  /* Avoid animating thousands of SVG nodes on theme toggle */
-  svg,
-  svg * {
-    transition: none;
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+    color: var(--ink);
+  }
+  @media (hover: none) and (max-width: 1023px) {
+    input, textarea, select {
+      font-size: 16px;
+    }
   }
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
-/* macOS-like scrollbar with dark mode improvements */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
-}
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 9999px;
-  border: 2px solid transparent;
-  background-clip: padding-box;
-  transition: background-color 0.2s ease;
-}
-html.dark ::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.3);
-}
-::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(0, 0, 0, 0.4);
-}
-html.dark ::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.5);
-}
-
-/* Timer animations */
-@keyframes timer-pulse {
-  0%,
-  100% {
-    transform: scale(1);
+@layer utilities {
+  /* macOS-like scrollbar; colours derive from --ink so they follow the theme */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--ink) 28%, transparent) transparent;
   }
-  50% {
-    transform: scale(1.03);
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
   }
-}
-
-.timer-pulse {
-  animation: timer-pulse 0.15s ease-out;
-}
-
-/* Subtle low-time glow: uses CSS var for unified color; enable via conditional class */
-.timer-glow {
-  text-shadow:
-    0 0 0.35rem hsl(var(--timer-foreground)),
-    0 0 0.6rem hsl(var(--timer-foreground));
-}
-
-/* Optional gentle shake for low-time warning; small translate on X to keep 60fps */
-@keyframes timer-shake {
-  0%,
-  100% {
-    transform: translateX(0);
+  ::-webkit-scrollbar-track {
+    background: transparent;
   }
-  20% {
-    transform: translateX(-0.75px);
+  ::-webkit-scrollbar-thumb {
+    background-color: color-mix(in srgb, var(--ink) 28%, transparent);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    transition: background-color 0.2s ease;
   }
-  40% {
-    transform: translateX(0.75px);
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: color-mix(in srgb, var(--ink) 48%, transparent);
   }
-  60% {
-    transform: translateX(-0.5px);
-  }
-  80% {
-    transform: translateX(0.5px);
-  }
-}
 
-.timer-shake {
-  animation: timer-shake 0.18s ease-in-out;
-}
-
-/* Clock state animations */
-@keyframes clock-pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-}
-
-@keyframes clock-dot-pulse {
-  0%, 100% { opacity: 0; r: 6; }
-  50% { opacity: 0.4; r: 10; }
-}
-
-/* Smooth color transition for clock state changes */
-.clock-color-transition {
-  transition: color 1.5s ease-in-out;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-clock-pulse,
-  .animate-clock-dot-pulse {
-    animation: none;
-  }
+  /* Smooth color transition for clock state changes */
   .clock-color-transition {
-    transition: none;
+    transition: color 1.5s ease-in-out;
+  }
+
+  /* Flip-clock tile classes (keyframes are declared in @theme above, next to clock-pulse). Plain classes,
+     not custom properties, so they live here rather than in @theme. Shared by every FlipDigit mount. */
+  .flip-panel-top-anim { animation: flip-top 250ms ease-in forwards; }
+  .flip-panel-bottom-anim { animation: flip-bottom 250ms ease-out 250ms both; }
+  .flip-shadow-top-anim { animation: flip-shadow-top 250ms ease-in forwards; }
+  .flip-shadow-bottom-anim { animation: flip-shadow-bottom 250ms ease-out 250ms both; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-clock-pulse,
+    .animate-clock-dot-pulse {
+      animation: none;
+    }
+    .clock-color-transition {
+      transition: none;
+    }
+  }
+
+  .timer-state-transition {
+    transition:
+      opacity 0.2s ease-in-out,
+      transform 0.2s ease-in-out;
+  }
+
+  /* Hide scrollbar while keeping scroll functionality */
+  .scrollbar-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* FilterChipGroup: fades whichever edge still has hidden chips, so a scrollable row never just cuts a
+     chip off mid-pill with no sign there's more. The data attributes come from useScrollArrows; a row
+     that fits entirely (or wraps instead of scrolling) gets neither, so the mask is a no-op for it. */
+  .chip-scroll-fade[data-scroll-left] {
+    mask-image: linear-gradient(to right, transparent, black 24px);
+  }
+  .chip-scroll-fade[data-scroll-right] {
+    mask-image: linear-gradient(to left, transparent, black 24px);
+  }
+  .chip-scroll-fade[data-scroll-left][data-scroll-right] {
+    mask-image: linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent);
+  }
+
+  /* Custom macOS-style scrollbar for audio modal - visible & scrollable */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: color-mix(in srgb, var(--ink) 32%, transparent);
+    border-radius: 10px;
+    transition: background-color 0.2s ease;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: color-mix(in srgb, var(--ink) 50%, transparent);
+  }
+
+  /* Firefox scrollbar */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--ink) 32%, transparent) transparent;
+  }
+
+  /* Safe area utilities for notched devices (iOS, Android) */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .pl-safe {
+    padding-left: env(safe-area-inset-left, 0px);
+  }
+
+  .pr-safe {
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+
+}
+
+/* ═══ Timer stage: the card and the dock fit one screen (batch 2.7) ═══
+   The section around the card reserves 160px (pt-16 status bar + pb-24 dock), so the card may be at most
+   100dvh - 160px tall. At 820px of height and above everything has its full size (what 1440x900 shows);
+   below that the spacing, Tomo and the digits shrink together until 640px, where a 657px laptop window
+   still shows the whole card and the dock. --stage-t is that 0..1 progress: lengths cannot be divided in
+   calc() yet, but tan(atan2(a, b)) is a / b as a plain number. The live card (enhanced-timer.tsx) and the
+   server skeleton (app-home-skeleton.tsx) both read these, so they always have the same size. */
+.stage-card {
+  --stage-t: clamp(0, tan(atan2(100dvh - var(--lang-banner-h, 0px) - 640px, 180px)), 1);
+  --stage-pad: 20px;
+  --stage-tomo: calc(52px + 20px * var(--stage-t));
+  --stage-mascot-mb: calc(8px + 8px * var(--stage-t));
+  --stage-chips-mb: calc(8px + 12px * var(--stage-t));
+  --stage-digits: calc(108px + 52px * var(--stage-t));
+  --stage-gap: calc(8px + 8px * var(--stage-t));
+  --stage-controls-mt: calc(12px + 16px * var(--stage-t));
+  --stage-btn: calc(48px + 8px * var(--stage-t));
+  --stage-gap-lg: calc(12px + 8px * var(--stage-t));
+  --stage-gap-sm: calc(8px + 4px * var(--stage-t));
+}
+@media (min-width: 640px) {
+  .stage-card {
+    --stage-pad: calc(20px + 12px * var(--stage-t));
   }
 }
 
-.timer-state-transition {
-  transition:
-    opacity 0.2s ease-in-out,
-    transform 0.2s ease-in-out;
+/* The language suggestion bar sits above the page in the normal flow and publishes its height as
+   --lang-banner-h (components/layout/language-suggestion.tsx). The one-screen stage hands that height back, so
+   bar + stage are one viewport tall and the card keeps its room above the dock. `section[data-timer]` is the
+   live stage (other data-timer elements are popovers and previews); [data-stage-skeleton] is its server frame. */
+section[data-timer],
+[data-stage-skeleton] {
+  min-height: calc(100dvh - var(--lang-banner-h, 0px));
 }
 
-.timer-button-transition {
-  transition:
-    opacity 0.15s ease-out,
-    transform 0.15s ease-out;
+/* ═══ Timer: chrome fades while a session runs and the pointer is idle (hooks/use-chrome-idle.ts) ═══ */
+[data-chrome] {
+  transition: opacity 0.6s ease;
+}
+html[data-chrome-idle='true'] [data-chrome] {
+  opacity: 0;
+  pointer-events: none;
+}
+html[data-chrome-idle='true'] body {
+  cursor: none;
+}
+/* The YouTube mini player must stay on screen (YouTube's terms), so it dims with the chrome instead of vanishing. */
+[data-mini-player] {
+  transition: opacity 0.6s ease;
+}
+html[data-chrome-idle='true'] [data-mini-player] {
+  opacity: 0.5;
 }
 
-/* Mini Player Card Animations */
-@keyframes gradient-x {
-  0%,
-  100% {
-    background-position: 0% 50%;
+/*
+ * Pomodoro mode colours: focus = tomato (the brand, or the chosen colour preset), short
+ * break = mint, long break = sky. The stage re-points the accent so the mode chip,
+ * progress bar and primary button all read the current mode. Specificity beats colour presets.
+ */
+/* Re-resolved on the stage: a custom property inherits the value computed at :root,
+   which would pin the clock to the focus colour. */
+[data-timer] {
+  --timer-foreground: var(--accent);
+}
+[data-timer][data-mode='shortBreak'] {
+  --accent: #1E7A57;
+  --accent-hover: #17634A;
+  --accent-soft: #D2F3E4;
+  --accent-ink: #13603F;
+  --accent-solid: #7BDCB5;
+  --accent-solid-hover: #8FE3C1;
+}
+[data-timer][data-mode='longBreak'] {
+  --accent: #1A5F99;
+  --accent-hover: #144D7D;
+  --accent-soft: #D6ECFF;
+  --accent-ink: #0F4C81;
+  --accent-solid: #7CC8FF;
+  --accent-solid-hover: #94D3FF;
+}
+:root[data-theme='dark'] [data-timer][data-mode='shortBreak'] {
+  --accent: #7BDCB5;
+  --accent-hover: #9BE8C8;
+  --accent-soft: #1F3A2D;
+  --accent-ink: #A6EBCF;
+}
+:root[data-theme='dark'] [data-timer][data-mode='longBreak'] {
+  --accent: #7CC8FF;
+  --accent-hover: #9DD7FF;
+  --accent-soft: #1B3347;
+  --accent-ink: #A9DCFF;
+}
+
+/* Default scene ("Giấy kem"): the page colour with a faint tint of the mode colour, cross-faded
+   on mode change. Set on <html> because the scene layer sits outside the stage.
+   The timer store calls the focus mode 'work'. */
+@layer base {
+  html {
+    --stage-tint: var(--surface-page);
   }
-  50% {
-    background-position: 100% 50%;
+  html[data-timer-mode='work'] {
+    --stage-tint: color-mix(in srgb, var(--accent-solid) 4%, var(--surface-page));
   }
-}
-
-@keyframes pulse-slow {
-  0%,
-  100% {
-    opacity: 1;
+  html[data-timer-mode='shortBreak'] {
+    --stage-tint: color-mix(in srgb, var(--candy-mint) 22%, var(--surface-page));
   }
-  50% {
-    opacity: 0.5;
+  html[data-timer-mode='longBreak'] {
+    --stage-tint: color-mix(in srgb, var(--candy-sky) 22%, var(--surface-page));
   }
-}
-
-@keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
+  html[data-theme='dark'][data-timer-mode='work'] {
+    --stage-tint: color-mix(in srgb, var(--accent-solid) 6%, var(--surface-page));
   }
-  to {
-    transform: rotate(360deg);
+  html[data-theme='dark'][data-timer-mode='shortBreak'] {
+    --stage-tint: color-mix(in srgb, var(--candy-mint) 11%, var(--surface-page));
   }
-}
-
-.animate-gradient-x {
-  background-size: 200% 200%;
-  animation: gradient-x 3s ease infinite;
-}
-
-.animate-pulse-slow {
-  animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-.animate-spin-slow {
-  animation: spin-slow 3s linear infinite;
-}
-
-/* Hide scrollbar while keeping scroll functionality */
-.scrollbar-hide {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-/* Custom macOS-style scrollbar for audio modal - visible & scrollable */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.25);
-  border-radius: 10px;
-  transition: background-color 0.2s ease;
-}
-
-html.dark .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.35);
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(0, 0, 0, 0.4);
-}
-
-html.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.4);
-}
-
-/* Firefox scrollbar */
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
-}
-
-html.dark .custom-scrollbar {
-  scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
-}
-
-/* Border Beam Animation - GPU-composited via transform */
-@keyframes border-beam {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
+  html[data-theme='dark'][data-timer-mode='longBreak'] {
+    --stage-tint: color-mix(in srgb, var(--candy-sky) 11%, var(--surface-page));
   }
 }
 
-.animate-border-beam {
-  animation: border-beam var(--duration) linear infinite;
-  animation-delay: var(--delay);
-  animation-direction: var(--direction);
-}
-
-/* Audio Pulse Animations */
-@keyframes pulse-red {
-  0% {
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+/* Reduced motion: neutralize decorative CSS animations (functional state changes stay).
+   .animate-spin is kept on purpose: loading spinners are a busy cue, and a slow
+   rotation is acceptable under reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse,
+  .animate-ping,
+  .animate-bounce,
+  [class*='animate-gradient'],
+  [class*='animate-pulse-'],
+  [class*='animate-spin-'],
+  [class*='animate-border-beam'],
+  [class*='animate-shimmer'],
+  [class*='animate-equalizer'],
+  [class*='animate-eq-'] {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
-  70% {
-    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  .timer-pulse,
+  .timer-shake {
+    animation: none !important;
   }
-  100% {
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-  }
-}
-
-.pulse-red {
-  animation: pulse-red 2s infinite;
-}
-
-@keyframes pulse-primary {
-  0% {
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
-  }
-}
-
-.pulse-primary {
-  animation: pulse-primary 2s infinite;
-}
-
-/* YouTube equalizer animation */
-@keyframes equalizer {
-  0%, 100% { height: 30%; }
-  50% { height: 100%; }
-}
-
-/* Equalizer bar animation for now-playing card */
-@keyframes eq-bar {
-  0%, 100% { height: 20%; }
-  25% { height: 80%; }
-  50% { height: 45%; }
-  75% { height: 100%; }
-}
-
-.animate-eq-bar {
-  animation: eq-bar 1.2s ease-in-out infinite;
-}
-
-/* Shimmer bar animation */
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  50% { transform: translateX(0%); }
-  100% { transform: translateX(100%); }
-}
-
-/* Safe area utilities for notched devices (iOS, Android) */
-.pb-safe {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-.pt-safe {
-  padding-top: env(safe-area-inset-top, 0px);
-}
-
-.pl-safe {
-  padding-left: env(safe-area-inset-left, 0px);
-}
-
-.pr-safe {
-  padding-right: env(safe-area-inset-right, 0px);
-}
-
-/* Sidebar-specific enhancements */
-[data-sidebar='sidebar'] {
-  /* Smooth scrolling for sidebar content */
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Enhanced focus states for accessibility */
-[data-sidebar='menu-button']:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px hsl(var(--sidebar-ring) / 0.5);
-}
-
-/* Sidebar separator with gradient effect */
-[data-sidebar='separator'] {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    hsl(var(--sidebar-border)) 20%,
-    hsl(var(--sidebar-border)) 80%,
-    transparent 100%
-  );
-}
-
-/* Active nav item left indicator glow effect */
-[data-sidebar='menu-button'][data-active='true']::before {
-  box-shadow: 0 0 8px 1px hsl(var(--sidebar-primary) / 0.3);
-}
-
-.dark [data-sidebar='menu-button'][data-active='true']::before {
-  box-shadow: 0 0 12px 2px hsl(var(--sidebar-primary) / 0.4);
 }

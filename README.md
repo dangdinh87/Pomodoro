@@ -1,132 +1,130 @@
-# Pomodoro Focus & Productivity Application
+# Study Bro — Pomodoro Focus Timer
 
-A comprehensive Pomodoro Timer web application that combines time management, focus enhancement, and productivity analytics to help users achieve their 10,000-hour mastery goals.
+A study-focused Pomodoro web app: a customizable timer with several clock styles, tasks linked to focus sessions, ambient sounds and a YouTube player, focus history and streaks, and short break games. Available in English, Vietnamese and Japanese.
+
+Live: https://studywithbro.com
 
 ## Features
 
-### Core Features
-- **Pomodoro Timer System**: Customizable work, short break, and long break durations with visual countdown indicators
-- **Focus Mode**: Distraction-blocking environment with website whitelist/blacklist management
-- **Progress Tracking & Analytics**: Comprehensive hour tracking toward 10,000-hour goals with interactive charts
-- **Task Management**: Project and task creation with Pomodoro session assignment
-- **User Experience**: Responsive dark/light theme toggle with mobile-first design
-- **Audio & Ambient Features**: Ambient sound library with customizable notification sounds
-- **Data Management**: Secure authentication with cloud-based synchronization
+- **Timer**: work, short break and long break phases with five clock styles (digital, flip, analog, progress bar, animated). It keeps time accurately when the tab is in the background or after a reload, coordinates across open tabs, and sends a notification when a phase ends while the tab is hidden.
+- **Tasks**: priorities, tags, due dates, subtasks, templates, drag-and-drop ordering, and pomodoro tracking per task.
+- **History**: focus statistics, charts and streaks. Requires sign-in.
+- **Audio**: an ambient sound mixer, alarm sounds and a YouTube player.
+- **Break games**: 2048, Snake, Wordle and others.
+- **Account**: change password, export your data as JSON, and delete your account.
+- **Optional, behind feature flags**: the AI study chat (`NEXT_PUBLIC_FEATURE_CHAT`) and the leaderboard (`NEXT_PUBLIC_FEATURE_LEADERBOARD`). Both are off by default.
 
-### Technical Features
-- **Progressive Web App (PWA)**: Offline capabilities with service workers
-- **Responsive Design**: Optimized for mobile and desktop using Tailwind CSS
-- **Modern Stack**: Next.js 14, TypeScript, shadcn/ui components
-- **State Management**: Zustand for complex state management
-- **Database**: PostgreSQL with Prisma ORM
-- **Real-time Updates**: WebSockets for live synchronization
+Guests can use the timer without an account. Sessions are only saved for signed-in users.
 
-## Getting Started
+## Tech stack
 
-### Prerequisites
-- Node.js 18+ and npm
-- PostgreSQL database (for production)
+- **Next.js 14** (App Router) with TypeScript, deployed on Vercel
+- **Supabase**: Auth (Google OAuth and email) and Postgres with Row Level Security
+- **State and data**: Zustand (persisted client state) and TanStack Query (server state)
+- **UI**: Tailwind CSS, shadcn/ui and Radix primitives, Motion
+- **i18n**: a custom provider (en, vi, ja). The locale is negotiated from `Accept-Language`, stored in the `app.lang` cookie, and rendered on the server.
+- **AI chat**: MegaLLM through a server route, with per-user quotas
+- **Testing and CI**: Jest and React Testing Library, run by GitHub Actions on every pull request (type-check, lint, i18n key check, tests, build)
 
-### Installation
+## Getting started
 
-1. Clone the repository:
+Prerequisites: Node.js 22+, pnpm 10, and a Supabase project.
+
 ```bash
-git clone <repository-url>
-cd pomodoro-focus-app
+pnpm install
+cp .env.example .env.local   # then fill in the values
+pnpm dev                     # http://localhost:3000
 ```
 
-2. Install dependencies:
-```bash
-npm install
+### Environment variables
+
+Every variable is documented in [`.env.example`](./.env.example) (one line each, with where it is read). With none set, the app runs locally on a built-in PGlite database and prints sign-in codes to the console.
+
+Never put a secret in a `NEXT_PUBLIC_` variable: those values are inlined into the browser bundle.
+
+### Database
+
+Postgres through Drizzle ORM. Locally the app uses PGlite (`.pglite/`, created and migrated on server start) whenever `DATABASE_URL` is unset; production uses Neon.
+
+1. Edit `src/db/schema.ts`.
+2. `pnpm db:generate --name <what-changed>` writes `drizzle/NNNN_<name>.sql` and its `meta/` snapshot. Commit both.
+3. Tests run every migration on an in-memory PGlite, so a broken migration fails `pnpm test`.
+4. Production is migrated by [`.github/workflows/db-migrate.yml`](./.github/workflows/db-migrate.yml) (push to `master` touching `drizzle/**`, or run it by hand). Write migrations additive (new column, new index) so the previous deploy keeps working while the new one rolls out.
+
+## Scripts
+
+| Command | What it does |
+|---|---|
+| `pnpm dev` | Start the dev server |
+| `pnpm build` / `pnpm start` | Production build and start. The build fails on type or lint errors. |
+| `pnpm type-check` | `tsc --noEmit` |
+| `pnpm lint` | ESLint (`next/core-web-vitals` and `next/typescript`) |
+| `pnpm test` | Jest; coverage thresholds are set in `jest.config.js` |
+| `pnpm i18n:check` | Fails if en, vi and ja have different translation keys |
+| `pnpm bg:optimize` | Regenerate optimized background images (also runs before `build`) |
+| `pnpm icons:brand` | Regenerate `favicon.svg`/`.ico`, the PWA icons and `apple-touch-icon.png` from the Tomo artwork (`src/components/brand/tomo-art.ts`) |
+
+## Deploy checklist
+
+Do these once, in order, before the first production deploy.
+
+**1. GitHub** (Settings > Secrets and variables > Actions; a `production` environment secret works too)
+
+| Secret | Used by | Value |
+|---|---|---|
+| `DATABASE_URL` | `db-migrate.yml` | Neon **unpooled** (direct) connection string. The job fails on a pooled `-pooler` URL or an empty value. |
+
+**2. Vercel** (Production environment; Preview should use its own Neon branch, never the production database)
+
+| Variable | Required | Value |
+|---|---|---|
+| `DATABASE_URL` | yes | Neon **pooled** connection string (the app runs on serverless functions) |
+| `BETTER_AUTH_SECRET` | yes | `openssl rand -base64 32` |
+| `BETTER_AUTH_URL`, `NEXT_PUBLIC_SITE_URL` | yes | The https origin that serves this deploy: `https://studywithbro.com` once that domain is live, the current production origin (`https://www.pomodoro-focus.site`) until the cutover. Build-time (inlined), and every canonical URL, hreflang, the sitemap and the share image come from it. |
+| `RESEND_API_KEY`, `EMAIL_FROM` | yes | Without them nobody can sign in by email. `EMAIL_FROM` must belong to a domain verified in Resend. |
+
+The code defaults to `https://studywithbro.com` when `NEXT_PUBLIC_SITE_URL` is unset, which is right for local runs, CI and previews. To make sure a production deploy never ships on that default by accident, `scripts/check-prod-env.mjs` (run by `prebuild`) **fails the build** when `VERCEL_ENV=production` and `NEXT_PUBLIC_SITE_URL` (an https origin) or `EMAIL_FROM` is missing. The log says which one.
+| `SENTRY_DSN` | recommended | Error tracking. Without it errors still go to the Vercel runtime logs as JSON. |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | optional | Redirect URI `<BETTER_AUTH_URL>/api/auth/callback/google` |
+| `NEXT_PUBLIC_GA_ID` | optional | `G-XXXXXXXXXX` or `GTM-XXXXXXX` |
+| `DOMAIN_MOVE` | only at the domain move | `1` makes the old domain 308 to the canonical one. Leave it unset until the new domain serves this project. |
+
+Remove the old Supabase, MegaLLM and Spotify variables from Vercel.
+
+**3. First deploy**
+
+1. Run the **DB migrate** workflow by hand (Actions > DB migrate > Run workflow, branch `master`) so the schema exists before traffic arrives.
+2. Merge to `master`; Vercel deploys. Later migrations run by themselves when `drizzle/**` changes.
+
+   **A deploy that needs a new migration:** the DB migrate workflow and the Vercel build start from the same push and finish independently, and Vercel makes the new build live as soon as it is ready. Code that reads or writes a new column fails until the migration has run. So run the **DB migrate** workflow (or let the one triggered by the push finish, and check it is green) **before the deploy goes live**: with auto-promote on, merge once the migration is additive and already applied; or turn off auto-assign of the production domain, wait for the workflow, then promote the deployment. Write migrations additive so the previous deploy keeps working in the meantime.
+3. Check `/api/auth/ok`, sign in with an email code, and open the browser console for Content-Security-Policy-Report-Only reports. Reports are also posted to `/api/csp-report` and logged. When they are clean, rename the header to `Content-Security-Policy` in `next.config.ts` to enforce.
+4. Point an uptime monitor at `/` and `/api/auth/ok`, and schedule a database backup (Neon point-in-time restore has a short window on the free plan).
+
+## Project structure
+
+```
+src/
+├── app/
+│   ├── (landing)/     # Marketing pages, server-rendered: home, privacy, terms
+│   ├── (auth)/        # login, signup, reset-password
+│   ├── (main)/        # App: timer, tasks, history, settings, guide, entertainment, feedback…
+│   ├── api/           # Route handlers: tasks, sessions, account, chat, …
+│   └── auth/callback/ # Supabase OAuth / email callback
+├── components/        # UI by feature (tasks, audio, settings, layout, ui primitives)
+├── config/            # Constants, feature flags
+├── hooks/  stores/    # React Query hooks, Zustand stores
+├── i18n/locales/      # en.json, vi.json, ja.json
+└── lib/               # Supabase clients, timer engine helpers, API guards, i18n
 ```
 
-3. Set up environment variables:
-```bash
-cp .env.example .env.local
-```
+More docs are in [`docs/`](./docs) (architecture, audio system, backgrounds). Reviews and plans are in [`plans/`](./plans).
 
-4. Run the development server:
-```bash
-npm run dev
-```
+## Security notes
 
-5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-## Project Structure
-
-```
-pomodoro-focus-app/
-├── src/
-│   ├── app/                 # Next.js app directory
-│   │   ├── globals.css      # Global styles
-│   │   ├── layout.tsx       # Root layout
-│   │   └── page.tsx         # Home page
-│   ├── components/          # Reusable components
-│   │   ├── ui/              # shadcn/ui components
-│   │   ├── theme-provider.tsx
-│   │   └── pomodoro-timer.tsx
-│   └── lib/                 # Utility functions
-│       └── utils.ts
-├── public/                  # Static assets
-├── package.json
-├── tailwind.config.js
-├── tsconfig.json
-└── next.config.js
-```
-
-## Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm run type-check` - Run TypeScript type checking
-
-## Key Components
-
-### PomodoroTimer
-The core timer component with:
-- Customizable session durations
-- Visual progress indicators
-- Session tracking
-- Audio notifications
-
-### UI Components
-Built with shadcn/ui for consistent design:
-- Button, Card, Progress, Switch, Label, Separator
-- Fully accessible with keyboard navigation
-- Dark/light theme support
-
-## Development Notes
-
-### Current Status
-- ✅ Basic project structure with Next.js 14 and TypeScript
-- ✅ Tailwind CSS configuration with custom design system
-- ✅ Core Pomodoro timer functionality with multiple clock modes
-- ✅ shadcn/ui components integration
-- ✅ Task management with Supabase backend
-- ✅ Audio system (ambient sounds, YouTube, Spotify)
-- ✅ Supabase authentication
-- ✅ Session history tracking
-- 🔄 Focus mode implementation (in progress)
-- 🔄 Progress analytics dashboard (in progress)
-
-### Known Issues
-- Some TypeScript errors in animate-ui components (React ref compatibility)
-- Spotify integration requires valid OAuth credentials
-- PWA service worker needs verification
-
-### Architecture
-See [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for detailed system documentation.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+- API routes authenticate with `supabase.auth.getUser()` and scope every query by user. Inputs are validated: task, session and feedback schemas, ownership checks, and sanitized filters.
+- `/api/chat` has an hourly per-user quota and caps message size, history and output tokens.
+- Security headers are set in `next.config.js`. The CSP runs in Report-Only mode for now; review the console reports before enforcing it.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+No license file has been added yet.

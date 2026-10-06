@@ -48,3 +48,9 @@ next-env.d.ts
 public/backgrounds/full/
 public/backgrounds/thumb/
 public/backgrounds/manifest.json
+
+# local Postgres (PGlite) for dev/harness
+/.pglite
+
+# Brainstorming mockups (superpowers visual companion)
+.superpowers/

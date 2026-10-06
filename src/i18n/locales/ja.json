@@ -1,10 +1,10 @@
 {
   "brand": {
-    "title": "StudyBro",
+    "title": "Study Bro",
     "subtitle": "一緒に勉強しましょう"
   },
   "common": {
-    "loading": "読み込み中...",
+    "loading": "読み込み中…",
     "error": "エラー",
     "success": "成功",
     "cancel": "キャンセル",
@@ -30,7 +30,67 @@
     "language": "言語",
     "total": "合計",
     "item": "件",
-    "items": "件"
+    "items": "件",
+    "scrollLeft": "左にスクロール",
+    "scrollRight": "右にスクロール"
+  },
+  "skipLink": {
+    "label": "メインコンテンツへスキップ"
+  },
+  "tomoBubble": {
+    "dismiss": "このメッセージを閉じる"
+  },
+  "tomo": {
+    "celebration": {
+      "takeBreak": "休憩する",
+      "later": "あとで",
+      "minutes": "+{count}分",
+      "summary": "{count}分間、集中しました。"
+    },
+    "lines": {
+      "celebration": {
+        "1": "セッション完了！",
+        "2": "やりましたね！",
+        "3": "いい集中でした！",
+        "4": "トマトがまたひとつ増えました！"
+      },
+      "breakTip": {
+        "1": "立ち上がって、軽く伸びをしましょう。背中も喜びます。",
+        "2": "水を一杯飲みましょう。一杯で十分です。",
+        "3": "遠くを眺めて、目を休ませましょう。",
+        "4": "ゆっくり深呼吸。今は何もしなくて大丈夫です。"
+      },
+      "keepStreak": {
+        "1": "連続日数、続けたいですよね。1セッションだけでもつながりますよ！",
+        "2": "今日はまだ空っぽです。1セッションあれば連続日数を守れます。",
+        "3": "連続日数が途切れたら悲しいです…。1セッションだけどうですか？",
+        "4": "まだ間に合います！1セッションで連続日数はつながりますよ。"
+      },
+      "sleep": {
+        "1": "もう遅い時間です。睡眠は、学んだことを定着させる大切な時間ですよ。",
+        "2": "そろそろおやすみの時間です。続きは明日にしましょう。",
+        "3": "ふわぁ…眠くなってきました。今日はここまでにしませんか？",
+        "4": "ぐっすり眠ると、明日の集中力が違いますよ。早めに休みましょう。"
+      },
+      "greetingMorning": {
+        "1": "おはようございます！まず1セッション始めましょうか？",
+        "2": "朝ですね。ひとつ決めて、一緒に始めましょう。",
+        "3": "新しい一日の始まりです。ウォームアップに1セッションどうですか？",
+        "4": "おはようございます。今日もひとつずつ進めましょう。"
+      },
+      "greetingAfternoon": {
+        "1": "こんにちは！もう1セッション、いかがですか？",
+        "2": "お昼のあとは、軽めの1セッションから始めましょう。",
+        "3": "午後はつい眠くなりますよね。短く集中してみましょう。",
+        "4": "今日はどこまで進みましたか？続きを一緒にやりましょう。"
+      },
+      "greetingEvening": {
+        "1": "こんばんは！休む前に、ゆったり1セッションどうですか？",
+        "2": "夜ですね。今日の分をひとつだけ片づけましょう。",
+        "3": "小さな1セッションでも、ちゃんと積み重なりますよ。",
+        "4": "今夜は何を終わらせますか？小さなことからで大丈夫です。"
+      }
+    }
   },
   "nav": {
     "navigation": "ナビゲーション",
@@ -38,31 +98,33 @@
     "timer": "集中",
     "tasks": "タスク",
     "history": "履歴",
-    "leaderboard": "ランキング",
     "chatAI": "AIチャット",
-    "entertainment": "エンタメ",
+    "entertainment": "ゲーム",
     "settings": "設定",
     "guide": "ガイド",
     "feedback": "フィードバック",
     "login": "ログイン",
     "logout": "ログアウト",
-    "loginNow": "今すぐログイン"
+    "loginNow": "今すぐログイン",
+    "signInHint": "タスクと統計をデバイス間で同期"
   },
   "auth": {
     "login": "ログイン",
     "pleaseLogin": "続行するにはログインしてください",
-    "signInToManageTasks": "タスクを管理するにはログインしてください",
-    "signInToViewStats": "統計を見るにはログインしてください",
+    "signInToViewStats": "ログインすると統計を確認できます",
     "signInButton": "ログイン",
     "signOutSuccess": "ログアウトしました",
     "signOutError": "ログアウトできません",
     "signOutConfirm": "ログアウトしますか？",
-    "supabaseNotConfigured": "Supabaseが設定されていません",
     "signOutUnexpectedError": "ログアウト中にエラーが発生しました"
   },
   "timer": {
+    "staleEnded": "席を外している間にタイマーが終了したため、記録していません。",
+    "outbox": {
+      "dropped": "古くなったオフラインのセッションがあり、保存できませんでした。"
+    },
     "modes": {
-      "work": "作業",
+      "work": "集中",
       "shortBreak": "短い休憩",
       "longBreak": "長い休憩"
     },
@@ -82,11 +144,25 @@
       }
     },
     "toasts": {
-      "work_done": "作業セッション完了！休憩しましょう。",
-      "break_done": "休憩終了！集中しましょう。"
+      "work_done": "集中セッションが完了しました。休憩しましょう。",
+      "break_done": "休憩が終わりました。集中しましょう。"
+    },
+    "notifications": {
+      "focusDone": {
+        "title": "集中セッション完了",
+        "body": "おつかれさまでした。少し休憩しましょう。"
+      },
+      "breakDone": {
+        "title": "休憩が終わりました",
+        "body": "また集中する準備はできましたか？"
+      },
+      "longBreakDone": {
+        "title": "長い休憩が終わりました",
+        "body": "次のラウンドを始めましょうか？"
+      }
     },
     "title_prefix": {
-      "work": "作業",
+      "work": "集中",
       "shortBreak": "休憩",
       "longBreak": "長い休憩"
     },
@@ -98,75 +174,41 @@
     },
     "stats": {
       "today": "今日",
-      "poms": "ポモ",
+      "poms": "ポモドーロ",
       "time": "時間",
       "minutes": "分"
     },
-    "focusMode": "集中モード",
-    "skipped_not_recorded": "セッションをスキップ - 記録されません",
+    "focusMode": "フォーカスモード",
+    "skipped_not_recorded": "セッションをスキップしました。記録されません",
     "skip_confirm": {
       "title": "このセッションをスキップしますか？",
-      "description": "現在のセッションをスキップしてもよろしいですか？50%未満の進捗は記録されません。",
+      "description": "進捗が50%未満の場合、セッションは記録されません。",
       "confirm": "スキップする"
     },
     "mode_switch_confirm": {
       "title": "モードを切り替えますか？",
-      "description": "タイマーが実行中です。モードを切り替えると現在の進捗が失われます。",
+      "description": "このセッションはすでに始まっています。モードを切り替えると進捗が失われます。",
       "confirm": "切り替える"
+    },
+    "reset_confirm": {
+      "title": "タイマーをリセットしますか？",
+      "description_save": "ここまで{time}集中しました。リセットする前に保存するか、保存せずにやり直せます。",
+      "description": "時計をこの区間の最初に戻します。",
+      "save": "ここまでを保存",
+      "discard": "保存せずにリセット"
     },
     "doneAt": "終了予定",
     "breakTask": "次のタスク"
   },
-  "timerGuide": {
-    "title": "ポモドーロの使い方",
-    "subtitle": "効率的に集中しよう",
-    "modes": {
-      "title": "作業サイクル",
-      "work": "作業",
-      "workDesc": "25分間の深い集中",
-      "shortBreak": "短い休憩",
-      "shortBreakDesc": "5分間のリラックス",
-      "longBreak": "長い休憩",
-      "longBreakDesc": "15分（4回後）"
-    },
-    "validSession": {
-      "title": "有効なセッション",
-      "subtitle": "ズルはNG！",
-      "rule": "50%以上",
-      "ruleDesc": "で有効とカウント",
-      "skip": "早期スキップ",
-      "skipDesc": "はカウントされません",
-      "badge": "集中偽装防止システム"
-    },
-    "keyboard": {
-      "title": "クイックヒント",
-      "space": "開始 / 一時停止",
-      "reset": "リセット"
-    },
-    "task": {
-      "title": "タスク連携",
-      "select": "タスクを選択",
-      "auto": "ポモドーロが自動で同期"
-    },
-    "settings": {
-      "title": "設定",
-      "customize": "時間をカスタマイズ",
-      "autoStart": "次のモードを自動開始",
-      "openSettings": "設定を開く"
-    },
-    "dontShowAgain": "次回から表示しない",
-    "gotIt": "集中を始める"
-  },
   "timerSettings": {
     "title": "タイマー設定",
     "labels": {
-      "workDuration": "作業時間（分）",
-      "shortBreakDuration": "短い休憩（分）",
-      "longBreakDuration": "長い休憩（分）",
+      "workDuration": "集中時間",
+      "shortBreakDuration": "短い休憩",
+      "longBreakDuration": "長い休憩",
       "longBreakInterval": "長い休憩までのセッション数",
-      "autoStartBreaks": "休憩を自動開始",
-      "autoStartWork": "作業を自動開始",
-      "showClock": "時計を表示",
+      "autoStartBreaks": "休憩を自動で開始",
+      "autoStartWork": "集中を自動で開始",
       "clockType": "時計スタイル",
       "selectClockType": "時計スタイルを選択",
       "digital": "デジタル",
@@ -181,39 +223,81 @@
       "large": "大",
       "timerDurations": "タイマー時間",
       "behavior": "動作",
+      "dailyGoal": "1日の目標",
+      "dailyGoalOff": "オフ",
       "clockDisplay": "時計表示",
       "clockStyle": "時計スタイル",
       "preview": "プレビュー",
       "selectSize": "サイズを選択",
-      "lowTimeWarning": "残り時間警告（10秒以下）"
+      "lowTimeWarning": "残り10秒未満で警告"
     },
     "actions": {
-      "resetDefaults": "デフォルトに戻す",
-      "cancel": "キャンセル",
-      "save": "設定を保存",
-      "saveChanges": "変更を保存"
+      "resetDefaults": "初期設定に戻す",
+      "cancel": "キャンセル"
     },
     "toasts": {
-      "saved": "タイマー設定を保存しました！",
-      "reset": "タイマー設定をデフォルトに戻しました！"
+      "reset": "タイマー設定を初期設定に戻しました"
+    },
+    "resetConfirm": {
+      "title": "タイマーの設定を初期設定に戻しますか？",
+      "description": "セッションの長さ、時計のスタイル、自動スタート、アラームが初期設定に戻ります。タスクと統計はそのままです。",
+      "confirm": "リセット"
+    },
+    "presets": {
+      "title": "プリセット",
+      "label": "集中 {focus} 分、休憩 {rest} 分",
+      "custom": "カスタム"
+    },
+    "stepper": {
+      "decrease": "{label}を減らす",
+      "increase": "{label}を増やす"
+    },
+    "cycleSummary": "1サイクル：集中セッション{sessions}回、約{total}分。",
+    "bell": {
+      "title": "アラームと通知",
+      "sound": "アラーム音",
+      "soundHint": "集中セッションや休憩が終わったときに鳴ります。",
+      "sounds": {
+        "bell": "ベル",
+        "chime": "チャイム",
+        "digital": "デジタル",
+        "wood": "ウッドブロック",
+        "kitchen": "キッチンタイマー",
+        "none": "なし"
+      },
+      "volume": "音量",
+      "previewLabel": "試し聴き",
+      "previewHint": "この音量でアラーム音を確認できます。",
+      "preview": "再生",
+      "notifications": "ブラウザ通知",
+      "notificationsHint": "タブがバックグラウンドにあるとき、セッションが終わるとシステム通知でお知らせします。",
+      "notificationsTurnOn": "オンにする",
+      "notificationsOn": "オン",
+      "notificationsOnHint": "タブがバックグラウンドにあるとき、セッションが終わるとシステム通知でお知らせします。",
+      "notificationsDenied": "ブロック中",
+      "notificationsDeniedHint": "このサイトの通知はブラウザでブロックされています。アドレスバー横のアイコンからサイトの設定で許可し、ページを再読み込みしてください。",
+      "notificationsUnsupported": "非対応",
+      "notificationsUnsupportedHint": "このブラウザは通知を表示できません。",
+      "keepScreenOn": "集中中は画面をつけたままにする",
+      "keepScreenOnHint": "集中セッション中に画面が自動でスリープしないようにします。電池の消費がやや増えます。"
     }
   },
   "tasks": {
     "title": "タスク",
-    "subtitle": "タスクを管理し、ポモドーロテクニックで進捗を追跡",
+    "subtitle": "タスクを計画し、ポモドーロで進捗を管理します",
     "addTask": "タスクを追加",
     "manageTags": "タグを管理",
     "manageTagsDescription": "タグは整理用です。ここでタグを削除してもタスクには影響しません。",
-    "newTagPlaceholder": "新しいタグ...",
+    "newTagPlaceholder": "新しいタグ…",
     "noTags": "タグがありません",
     "tagsLimit": "タグ",
     "tag": "タグ",
     "editTask": "タスクを編集",
     "deleteTask": "タスクを削除",
     "noTasks": "タスクが見つかりません",
-    "noTasksDescription": "まだタスクがありません。集中セッションを始めるためにタスクを作成しましょう。",
+    "noTasksDescription": "タスクを作成して、最初の集中セッションを始めましょう。",
     "noResults": "結果が見つかりません",
-    "noResultsDescription": "検索やフィルターを調整してみてください。",
+    "noResultsDescription": "検索条件やフィルターを変えてみてください。",
     "focusing": "集中中",
     "overdue": "期限切れ",
     "tomorrow": "明日",
@@ -230,12 +314,12 @@
     "taskName": "タスク名",
     "taskNamePlaceholder": "何に取り組みますか？",
     "taskDescription": "説明",
-    "taskDescriptionPlaceholder": "メモを追加...",
+    "taskDescriptionPlaceholder": "メモを追加…",
     "priority": "優先度",
     "dueDate": "期限",
     "status": "ステータス",
-    "estimated": "見積もりポモドーロ",
-    "estimatedHint": "このタスクを完了するために必要なポモドーロセッション数（各約25分）を見積もります。",
+    "estimated": "見積もり（ポモドーロ数）",
+    "estimatedHint": "このタスクに必要と見込むポモドーロ数です（1回あたり約25分）。",
     "actual": "実績",
     "completed": "完了",
     "progress": "進捗",
@@ -251,7 +335,7 @@
       "done": "完了"
     },
     "filters": {
-      "searchPlaceholder": "タスクを検索...",
+      "searchPlaceholder": "タスクを検索…",
       "status": "ステータス",
       "priority": "優先度",
       "dateRange": "期間",
@@ -268,16 +352,16 @@
       "delete": "タスクを削除",
       "save": "タスクを保存",
       "create": "タスクを作成",
-      "deleting": "削除中...",
+      "deleting": "削除中…",
       "clone": "タスクを複製",
       "saveAsTemplate": "テンプレートとして保存",
       "deletePermanent": "完全に削除"
     },
     "count": "件",
     "confirmDelete": {
-      "title": "本当に削除しますか？",
-      "description": "この操作は元に戻せません。タスクと関連するすべてのセッションデータが完全に削除されます。",
-      "action": "完全に削除"
+      "title": "このタスクを削除しますか？",
+      "description": "このタスクとセッション履歴は完全に削除されます。元に戻せません。",
+      "action": "タスクを削除"
     },
     "templates": {
       "title": "タスクテンプレート",
@@ -288,20 +372,26 @@
       "noTemplates": "テンプレートがありません",
       "createTemplateHint": "タスクをテンプレートとして保存して再利用できます",
       "empty": "テンプレートがありません",
-      "emptyHint": "タスクのブックマークアイコンをクリックしてテンプレートとして保存"
+      "emptyHint": "タスクの「その他の操作」メニューから「テンプレートとして保存」を選んでください。",
+      "toasts": {
+        "saved": "タスクをテンプレートとして保存しました",
+        "saveFailed": "テンプレートを保存できませんでした。もう一度お試しください。",
+        "removed": "テンプレートを削除しました",
+        "removeFailed": "テンプレートを削除できませんでした。もう一度お試しください。"
+      }
     }
   },
   "history": {
     "title": "履歴と統計",
-    "subtitle": "時間の経過とともに集中パフォーマンスを確認",
-    "startNewSession": "新しいセッションを開始",
-    "errorLoading": "データの読み込み中にエラーが発生しました",
+    "subtitle": "集中の推移を確認できます",
+    "startNewSession": "集中セッションを開始",
+    "errorLoading": "データを読み込めませんでした",
     "noData": "データがありません",
-    "noDataDescription": "最初のポモドーロセッションを開始して、ここで統計を確認しましょう",
+    "noDataDescription": "最初の集中セッションを完了すると、ここに統計が表示されます",
     "stats": {
-      "totalFocusTime": "総集中時間",
+      "totalFocusTime": "合計集中時間",
       "completedSessions": "完了セッション",
-      "currentStreak": "現在の連続記録",
+      "currentStreak": "現在の連続日数",
       "days": "日",
       "hours": "時間",
       "minutes": "分",
@@ -322,35 +412,49 @@
       "selectDate": "日付範囲を選択"
     }
   },
-  "leaderboard": {
-    "title": "ランキング",
-    "comingSoon": "近日公開",
-    "description": "StudyBroコミュニティと競争しよう。誰が一番集中できるか！",
-    "tabs": {
-      "focusTime": "集中時間",
-      "completedTasks": "完了タスク"
-    },
-    "empty": "まだデータがありません。最初の一人になろう！",
-    "you": "あなた"
-  },
   "settings": {
     "title": "設定",
-    "subtitle": "好み、タイマー設定、外観を管理します。",
-    "tabs": {
-      "general": "一般",
-      "timer": "タイマー",
-      "background": "背景",
-      "audio": "オーディオ"
+    "account": {
+      "tab": "アカウント",
+      "title": "アカウント",
+      "subtitle": "データのエクスポートやアカウントの削除ができます。",
+      "guestPrompt": "アカウントを管理するにはログインしてください。",
+      "guestLogin": "ログイン",
+      "export": {
+        "title": "データをエクスポート",
+        "description": "アカウント、タスク、セッション、タグを含むJSONファイルをダウンロードします。",
+        "button": "データをダウンロード",
+        "success": "エクスポートの準備ができました。",
+        "error": "データをエクスポートできませんでした。",
+        "rateLimited": "エクスポートの回数が多すぎます。しばらくしてからもう一度お試しください。"
+      },
+      "delete": {
+        "title": "アカウントを削除",
+        "description": "アカウントと関連するすべてのデータを完全に削除します。この操作は元に戻せません。",
+        "button": "アカウントを削除",
+        "confirmTitle": "アカウントを削除しますか？",
+        "confirmDescription": "タスク、セッション、タグが完全に削除されます。確認のため、下に {value} と入力してください。",
+        "confirmLabel": "確認のため入力",
+        "cancel": "キャンセル",
+        "confirmButton": "完全に削除",
+        "success": "アカウントを削除しました。",
+        "error": "アカウントを削除できませんでした。"
+      },
+      "signOut": "ログアウト",
+      "signOutError": "ログアウトできませんでした。もう一度お試しください。",
+      "guest": {
+        "title": "ゲストとして利用中です",
+        "description": "ログインすると、タスクとセッションをすべての端末で使えます。ゲスト時の記録はログイン後も引き継がれます。"
+      }
     },
     "general": {
       "title": "一般設定",
       "appearance": "外観",
       "language": {
-        "title": "言語",
-        "description": "インターフェースの表示言語を選択",
+        "title": "表示言語",
+        "description": "アプリの表示言語を選択します。",
         "sectionTitle": "言語",
         "selectPlaceholder": "言語を選択",
-        "updated": "言語を更新しました",
         "english": "英語",
         "vietnamese": "ベトナム語",
         "japanese": "日本語"
@@ -376,6 +480,8 @@
         "light": "ライト",
         "dark": "ダーク",
         "system": "システム",
+        "colorSection": "カラー",
+        "textSection": "文字",
         "sizes": {
           "small": "小",
           "medium": "中",
@@ -383,30 +489,20 @@
         },
         "themes": {
           "recommended": "推奨",
-          "default": "デフォルト",
-          "rose": "ローズ",
-          "emerald": "フォレスト",
-          "indigo": "ミッドナイト",
-          "violet": "ラベンダー",
-          "amber": "オータム",
-          "cyan": "ミント",
-          "teal": "オーシャン",
-          "pink-light": "桜",
-          "pink-mild": "ベリー",
-          "mono": "モノクロ"
+          "default": "トマト",
+          "mint": "ミント",
+          "butter": "バター",
+          "lavender": "ラベンダー",
+          "sky": "スカイ",
+          "peach": "ピーチ"
         },
         "themeDescriptions": {
-          "default": "ニュートラル＆安心",
-          "rose": "ロマンチック＆愛",
-          "emerald": "自然＆癒し",
-          "indigo": "深い集中モード",
-          "violet": "夢見心地＆穏やか",
-          "amber": "温かいビンテージ",
-          "cyan": "爽やか＆クリーン",
-          "teal": "深いブルーエネルギー",
-          "pink-light": "柔らかな春の雰囲気",
-          "pink-mild": "甘い＆遊び心",
-          "mono": "ミニマル＆プロ"
+          "default": "定番のトマト",
+          "mint": "爽やかで穏やか",
+          "butter": "あたたかく明るい",
+          "lavender": "夢見心地でやわらか",
+          "sky": "広々として澄んだ色",
+          "peach": "やさしく心地よい"
         }
       },
       "notifications": {
@@ -436,33 +532,30 @@
       "systemAuto": "システム",
       "videoBackgrounds": "動画背景",
       "images": "画像",
-      "sliderHint": "ドラッグでプレビュー。保存をクリックして適用。",
+      "sliderHint": "ドラッグでプレビューし、保存で適用します。",
       "sliderDisabledHint": "単色背景ではスライダーは使用できません。",
-      "opacityDescription": "デフォルト: 80%。低い = より透明",
-      "brightnessDescription": "デフォルト: 100%。高い = 明るく、低い = 暗く",
+      "opacityDescription": "初期値 80%。低いほど透明になります。",
+      "brightnessDescription": "初期値 100%。高いほど明るく、低いほど暗くなります。",
       "blur": "ぼかし",
-      "blurDescription": "デフォルト: 0px。高い = よりぼかす",
+      "blurDescription": "初期値 0px。高いほどぼかしが強くなります。",
       "packDescriptions": {
-        "system": "現在のテーマの単色を使用。ミニマル表示と省電力に最適。",
-        "lofiVideo": "Lo-fiループ動画。1本選択。透明度・明るさを調整可能。",
+        "lofiVideo": "Lo-fiのループ動画。1本選択。透明度と明るさを調整できます。",
         "cyberpunk": "サイバーパンク・未来的都市の静止画。",
         "room": "コージーな部屋、勉強スペース、ワークスペース。",
-        "fantasy": "ファンタジー冒険風の静止画。",
-        "space": "宇宙・月・SF都市の静止画。"
+        "fantasy": "ファンタジー冒険風の静止画。"
       },
       "presets": {
-        "systemSolidColor": "テーマの単色",
         "lofiDay": "Lo-fi デイ",
         "lofiNight": "Lo-fi ナイト",
         "nightLight": "夜の灯り",
-        "sunlitStudyRoom": "日差しの勉強部屋 ☀️📚",
+        "sunlitStudyRoom": "日差しの勉強部屋",
         "enchantedForest": "魔法の森",
         "abstractFuturisticCity": "未来都市アブストラクト",
-        "goldenHourHome": "ゴールデンアワーの部屋 🌤️",
-        "cozyLivingSpace": "コージーなリビング 🛋️🌿",
+        "goldenHourHome": "ゴールデンアワーの部屋",
+        "cozyLivingSpace": "コージーなリビング",
         "cyberCity": "サイバーシティ",
-        "quietNightBedroom": "静かな夜の寝室 🌙🛏️",
-        "sunsetWorkspace": "夕焼けのワークスペース 🌇💻",
+        "quietNightBedroom": "静かな夜の寝室",
+        "sunsetWorkspace": "夕焼けのワークスペース",
         "fantasyAdventurers": "冒険者 1",
         "fantasyAdventurers1": "冒険者 2",
         "fantasyAdventurers2": "冒険者 3",
@@ -481,15 +574,13 @@
       },
       "toasts": {
         "saved": "背景を保存しました",
-        "resetInfo": "デフォルトを読み込みました。保存をクリックして適用"
+        "resetInfo": "初期設定に戻しました。保存で適用します。"
       },
       "packs": {
-        "system": "システム",
         "lofiVideo": "動画",
         "cyberpunk": "サイバーパンク",
         "room": "部屋",
-        "fantasy": "ファンタジー",
-        "space": "宇宙"
+        "fantasy": "ファンタジー"
       },
       "topTabs": {
         "static": "静止画",
@@ -507,30 +598,59 @@
         "addUrl": "URLから追加",
         "or": "または",
         "delete": "削除",
-        "fileTooLarge": "ファイルが大きすぎます。最大2MBまで",
-        "invalidType": "画像ファイルのみ対応",
-        "invalidUrl": "無効な画像URL",
-        "limitReached": "カスタム画像は最大5枚まで",
-        "processingError": "画像の処理に失敗しました",
+        "fileTooLarge": "ファイルが大きすぎます。最大2MBです。",
+        "invalidType": "画像ファイルのみ使用できます。",
+        "invalidUrl": "画像のURLが正しくありません。",
+        "limitReached": "カスタム画像は最大5枚まで追加できます。",
+        "processingError": "画像を処理できませんでした。",
+        "storageFull": "この端末の空き容量が足りず、画像を保存できませんでした。",
         "uploadSuccess": "画像を追加しました",
         "deleteSuccess": "画像を削除しました",
-        "urlPlaceholder": "画像URLを貼り付け...",
+        "urlPlaceholder": "画像URLを貼り付け…",
         "limitInfo": "{current}/5枚",
-        "empty": "まだ画像がありません。追加しましょう！",
+        "empty": "まだ画像がありません。追加してみましょう。",
         "current": "現在",
-        "replaceNotice": "新しい画像をアップロードするとこれが置き換わります。",
+        "replaceNotice": "新しい画像をアップロードすると、この画像が置き換わります。",
         "limit2MB": "最大2MB（JPEG、PNG、WebP）"
+      }
+    },
+    "saved": "保存しました",
+    "nav": {
+      "general": "一般",
+      "appearance": "外観",
+      "account": "アカウント"
+    },
+    "shortcuts": {
+      "title": "タイマーとシーン",
+      "timer": {
+        "label": "タイマーと時計",
+        "description": "集中・休憩の長さ、時計スタイル、通知を設定します。",
+        "button": "タイマー設定を開く"
+      },
+      "scene": {
+        "label": "シーン",
+        "description": "タイマーの背後に表示するシーンを選びます。",
+        "button": "シーンを開く"
       }
     }
   },
   "audio": {
-    "selectAudio": "オーディオを選択",
+    "selectAudio": "サウンドを選択",
     "title": "オーディオ設定",
     "volume": "音量",
-    "backgroundMusic": "バックグラウンドミュージック",
+    "backgroundMusic": "BGM",
     "natureSounds": "自然音",
     "connectSpotify": "Spotifyに接続",
     "connectYouTube": "YouTubeに接続",
+    "scrollLeft": "左へスクロール",
+    "scrollRight": "右へスクロール",
+    "mute": "すべての音をミュート",
+    "unmute": "ミュート解除",
+    "master": {
+      "label": "マスター音量",
+      "valueText": "マスター音量 {value}%",
+      "muted": "マスター音量、ミュート中"
+    },
     "tabs": {
       "ambient": "環境音",
       "youtube": "YouTube"
@@ -540,6 +660,9 @@
       "playing": "再生中",
       "stopAll": "すべて停止",
       "active": "有効",
+      "valueText": "{name} {value}%",
+      "valueTextOff": "{name}、オフ",
+      "mixedLabel": "ミックス環境音（{count}種類）",
       "pausedAlert": {
         "title": "YouTubeが有効です",
         "description": "YouTube再生中は、音の重なりを防ぐため環境音が一時停止されます。"
@@ -549,7 +672,8 @@
       "library": "ライブラリ",
       "saveMix": "ミックスを保存",
       "savePresetTitle": "プリセットを保存",
-      "savePresetDescription": "現在のアンビエントミックスから新しいプリセットを作成します（{{count}}サウンド）。",
+      "savePresetDescriptionOne": "現在の環境音ミックスから新しいプリセットを作成します（1種類）。",
+      "savePresetDescription": "現在の環境音ミックスから新しいプリセットを作成します（{count}種類）。",
       "icon": "アイコン",
       "iconPlaceholder": "🎵 またはテキスト",
       "name": "プリセット名",
@@ -561,6 +685,10 @@
       "newNamePlaceholder": "新しいプリセット名",
       "rename": "名前変更",
       "delete": "削除",
+      "renameDescription": "「{name}」の新しい名前を入力してください。",
+      "savedMixes": "保存したミックス",
+      "savedEmpty": "保存したミックスはまだありません。サウンドをいくつかオンにして「ミックスを保存」をタップしてください。",
+      "mixOptions": "{name}のオプション",
       "builtIn": {
         "cafe": "カフェ",
         "rain": "雨",
@@ -569,8 +697,8 @@
         "train-ride": "電車",
         "night": "夜",
         "library": "図書館",
-        "cozy": "居心地",
-        "deep-focus": "集中"
+        "cozy": "くつろぎ",
+        "deep-focus": "深い集中"
       }
     },
     "categories": {
@@ -578,7 +706,7 @@
       "rain": "雨",
       "noise": "ノイズ",
       "study": "学習",
-      "cozy": "心地よい",
+      "cozy": "くつろぎ",
       "transport": "交通",
       "city": "街",
       "machine": "機械"
@@ -586,11 +714,26 @@
     "youtube": {
       "library": "ライブラリ",
       "random": "ランダム",
-      "close": "閉じる / リンク変更",
+      "close": "閉じる / リンクを変更",
       "channelLink": "チャンネルリンク",
       "playBackground": "バックグラウンド再生",
-      "placeholder": "YouTubeリンクを貼り付け...",
-      "invalidLink": "無効なビデオリンクです。",
+      "placeholder": "YouTubeのリンクを貼り付け…",
+      "invalidLink": "動画のリンクが正しくありません。",
+      "errors": {
+        "cannotPlay": "この動画を再生できません。リンクを確認してください。",
+        "playerFailed": "YouTubeプレーヤーを起動できませんでした。もう一度お試しください。",
+        "controlFailed": "再生を操作できませんでした。もう一度お試しください。",
+        "notFound": "この動画は削除されたか、非公開です。別の動画をお試しください。",
+        "embedBlocked": "この動画は、投稿者がYouTube以外での再生を許可していません。別の動画をお試しください。"
+      },
+      "mini": {
+        "label": "YouTubeプレーヤー",
+        "collapse": "プレーヤーを小さくする",
+        "expand": "プレーヤーを大きくする",
+        "close": "プレーヤーを閉じて動画を止める",
+        "previousVideo": "前の動画",
+        "nextVideo": "次の動画"
+      },
       "nowPlaying": "再生中",
       "soundSettings": "サウンド設定",
       "status": {
@@ -598,13 +741,13 @@
         "paused": "一時停止"
       },
       "categories": {
-        "Lofi": "Lofi Hip Hop",
+        "Lofi": "Lo-fi hip hop",
         "Chill VN": "ベトナム・チル",
         "Cafe": "カフェ",
-        "Piano": "ピアノ＆クラシック",
-        "Ambient": "環境音＆フロー",
+        "Piano": "ピアノとクラシック",
+        "Ambient": "アンビエントとフロー",
         "Nature": "自然音",
-        "Coding": "集中作業",
+        "Coding": "プログラミング",
         "Pomodoro": "ポモドーロセッション",
         "Brainwaves": "脳波"
       }
@@ -647,177 +790,14 @@
       "typewriter": "タイプライター"
     }
   },
-  "guide": {
-    "title": "ユーザーガイド",
-    "subtitle": "ポモドーロメソッドとStudy Broを使って学習と仕事の生産性を最適化する方法を学びましょう",
-    "pomodoro": {
-      "badge": "ポモドーロメソッド",
-      "title": "ポモドーロとは？",
-      "description": "<strong>ポモドーロ</strong>は、作業を<strong>25分</strong>のセッション（ポモドーロ）に分割して効率的に仕事や勉強をするシンプルな時間管理法です。各セッションでは1つのタスクに完全に集中します。その後、<strong>5分</strong>の休憩を取ってリラックスとリフレッシュを行います。",
-      "imageAlt": "ポモドーロメソッドの図解"
-    },
-    "howToApply": {
-      "badge": "適用方法",
-      "title": "ポモドーロの適用方法",
-      "steps": {
-        "step1": {
-          "title": "タスクを選んでタイマーをセット",
-          "description": "やるべきタスクを選び、25分のタイマーをセットしてポモドーロセッションを開始します。"
-        },
-        "step2": {
-          "title": "作業に集中",
-          "description": "タイマーが鳴るまで、中断せずに作業に集中します。"
-        },
-        "step3": {
-          "title": "短い休憩",
-          "description": "5分間の休憩を取り、軽く立ち上がったり、リラックスしたりしましょう。"
-        },
-        "step4": {
-          "title": "繰り返しと長い休憩",
-          "description": "サイクルを繰り返します。4回のポモドーロセッション後は、15〜30分の長い休憩を取りましょう。"
-        }
-      }
-    },
-    "benefits": {
-      "badge": "メリット",
-      "title": "なぜポモドーロを使うのか？",
-      "list": [
-        "集中力と作業効率が向上",
-        "長時間作業での疲労を防止",
-        "作業進捗の測定と管理が簡単",
-        "気が散りやすい人に最適",
-        "長期的なエネルギーと効率を維持"
-      ],
-      "tip": "💡 <strong>ヒント：</strong>「時間を小さく区切って集中と休憩を定期的に行う」という原則を守れば、作業時間と休憩時間は自分に合わせて調整できます。"
-    },
-    "howToUse": {
-      "badge": "ウェブサイトガイド",
-      "title": "Study Broの使い方",
-      "description": "Study Broはポモドーロメソッドを効果的に適用するためのツールを提供します。",
-      "features": {
-        "timer": {
-          "title": "タイマー",
-          "subtitle": "ポモドーロカウントダウン時計",
-          "description": "タイマーページはアプリの中心で、ここでは：",
-          "points": [
-            "作業、短い休憩、長い休憩モード",
-            "タスク連携＆ポモドーロ進捗の自動同期",
-            "有効セッションルール：50%以上でカウント",
-            "Space：開始/一時停止 · R：リセット · セッションスキップ"
-          ],
-          "cta": "タイマーへ"
-        },
-        "tasks": {
-          "title": "タスク",
-          "subtitle": "タスクを管理",
-          "description": "タスクページは作業の整理に役立ちます：",
-          "points": [
-            "タスクの作成、編集、削除",
-            "優先度と期限の設定",
-            "ステータスや日付でタスクをフィルター",
-            "必要なポモドーロ数の見積もり"
-          ],
-          "cta": "タスクへ"
-        },
-        "history": {
-          "title": "履歴",
-          "subtitle": "進捗を追跡",
-          "description": "履歴ページは振り返りに役立ちます：",
-          "points": [
-            "ポモドーロセッション履歴",
-            "日別、週別、月別の統計",
-            "総作業時間",
-            "生産性チャート"
-          ],
-          "cta": "履歴へ"
-        },
-        "chatAI": {
-          "title": "AIチャット",
-          "subtitle": "Bro Chat – あなたの勉強仲間",
-          "description": "AIアシスタントとチャット：",
-          "points": [
-            "ポモドーロテクニック＆勉強のヒント",
-            "時間管理のアドバイス",
-            "アプリの使い方ヘルプ",
-            "会話履歴の保存"
-          ],
-          "cta": "Bro Chatを開く"
-        },
-        "entertainment": {
-          "title": "エンタメ",
-          "subtitle": "休憩用ミニゲーム",
-          "description": "ゲームで休憩中にリラックス：",
-          "points": [
-            "スネーク、2048、ブロック崩し",
-            "スペースシューター、神経衰弱",
-            "三目並べ vs AI",
-            "ハイスコアをローカルに保存"
-          ],
-          "cta": "ゲームをプレイ"
-        },
-        "leaderboard": {
-          "title": "ランキング",
-          "subtitle": "競争＆モチベーション維持",
-          "description": "あなたの順位を確認：",
-          "points": [
-            "グローバルポモドーロランキング",
-            "週間＆月間チャート",
-            "健全な競争を築く"
-          ],
-          "cta": "ランキングを見る"
-        },
-        "focus": {
-          "title": "集中モード",
-          "subtitle": "ミニマルで気が散らないUI",
-          "description": "集中モードは以下に役立ちます：",
-          "points": [
-            "フルスクリーンでサイドバーを非表示",
-            "連続記録の追跡＆モチベーション",
-            "専用の集中ワークスペース"
-          ],
-          "cta": "集中モードに入る"
-        },
-        "feedback": {
-          "title": "フィードバック",
-          "subtitle": "改善にご協力ください",
-          "description": "ご意見をお聞かせください：",
-          "points": ["バグを報告", "機能を提案", "体験を評価"],
-          "cta": "フィードバックを送信"
-        },
-        "settings": {
-          "title": "設定",
-          "subtitle": "体験をカスタマイズ",
-          "description": "設定ページでは以下が可能です：",
-          "points": [
-            "ポモドーロと休憩時間の調整",
-            "背景とテーマの選択",
-            "通知音の設定",
-            "個人設定のカスタマイズ"
-          ],
-          "cta": "設定へ"
-        }
-      }
-    },
-    "getStarted": {
-      "badge": "はじめよう",
-      "title": "準備はいいですか？",
-      "description": "Study Broで生産的な作業の旅を始めましょう！",
-      "steps": [
-        "<link>タスク</link>ページで最初のタスクを作成",
-        "必要に応じて設定を調整（オプション）",
-        "<link>タイマー</link>をオンにして最初のポモドーロを開始！"
-      ],
-      "cta": "今すぐ始める"
-    }
-  },
   "feedback": {
     "title": "フィードバックを送信",
-    "subtitle": "バグ報告や新機能の提案でアプリの改善にご協力ください。",
+    "subtitle": "直してほしい点や、次に欲しい機能を教えてください。",
     "form": {
       "name": "お名前（任意）",
-      "namePlaceholder": "お名前を入力...",
-      "email": "メールアドレス（任意）",
-      "emailPlaceholder": "example@email.com",
+      "namePlaceholder": "お名前を入力…",
+      "email": "メールアドレス",
+      "emailPlaceholder": "name@example.com",
       "type": "フィードバックの種類",
       "typeOptions": {
         "feature": "機能リクエスト",
@@ -825,444 +805,164 @@
         "question": "質問",
         "other": "その他"
       },
-      "rating": "体験を評価してください（任意）",
-      "message": "内容",
-      "messagePlaceholder": "フィードバックの詳細を入力...",
+      "rating": "Study Bro の使い心地はいかがですか？",
+      "message": "メッセージ",
+      "messagePlaceholder": "フィードバックの内容を入力…",
       "required": "*",
-      "submit": "フィードバックを送信"
+      "submit": "フィードバックを送信",
+      "starLabel": "5段階中 {n}"
     },
     "success": {
       "title": "ありがとうございます！",
-      "message": "フィードバックを受け付けました。確認してアプリの改善に役立てます。",
-      "cta": "別のフィードバックを送信"
+      "message": "受け取りました！ひとつずつ大切に読みますね。Study Bro をよりよくするご協力に感謝します。",
+      "cta": "続けてフィードバックを送信"
     },
     "errors": {
-      "submitFailed": "エラーが発生しました。後でもう一度お試しください。",
-      "fieldRequired": "この項目は必須です"
+      "submitFailed": "送信できませんでした。しばらくしてからもう一度お試しください。",
+      "fieldRequired": "この項目は必須です",
+      "messageRequired": "内容を入力してください。",
+      "messageTooLong": "{max} 文字以内で入力してください。",
+      "emailInvalid": "正しいメールアドレスを入力するか、空欄のままにしてください。",
+      "rateLimited": "短時間に多くのフィードバックが送信されました。約 {minutes} 分後にもう一度お試しください。"
     },
     "toast": {
-      "success": "フィードバックありがとうございます！",
+      "success": "フィードバックありがとうございます",
       "error": "エラーが発生しました。後でもう一度お試しください。"
-    }
-  },
-  "chat": {
-    "title": "AIチャット",
-    "subtitle": "AIアシスタントとチャット",
-    "placeholder": "メッセージを入力...",
-    "send": "送信",
-    "clear": "チャットをクリア",
-    "newChat": "新しいチャット",
-    "historyTitle": "チャット履歴",
-    "noConversations": "まだ会話がありません。新しいチャットを始めましょう！",
-    "deleteConfirmTitle": "会話を削除しますか？",
-    "deleteConfirmDescription": "この操作は元に戻せません。この会話とすべてのメッセージが完全に削除されます。",
-    "thread": {
-      "welcome": "こんにちは！👋",
-      "welcomeSubtitle": "私はBro Chat - あなたの勉強仲間です！",
-      "scrollToBottom": "一番下にスクロール",
-      "inputPlaceholder": "何でも聞いてください...",
-      "sendMessage": "メッセージを送信",
-      "stopGenerating": "生成を停止",
-      "error": "⚠️ エラー",
-      "copy": "コピー",
-      "exportMarkdown": "Markdownでエクスポート",
-      "refresh": "更新",
-      "edit": "編集",
-      "previous": "前へ",
-      "next": "次へ",
-      "cancel": "キャンセル",
-      "update": "更新",
-      "instruction": "お手伝いできること：ポモドーロメソッド🍅、勉強のヒント📚、時間管理⏰、このアプリの使い方。お気軽にどうぞ！",
-      "conversationGroups": {
-        "older": "古い"
-      },
-      "suggestions": {
-        "pomodoro": {
-          "title": "ポモドーロテクニックを説明して",
-          "label": "生産性向上について",
-          "prompt": "ポモドーロテクニックと、それが生産性と集中力を高める仕組みを説明してください"
-        },
-        "studyTips": {
-          "title": "勉強のヒントを教えて",
-          "label": "長時間集中するための",
-          "prompt": "長時間集中して気が散らないようにするための勉強のヒントを教えてください"
-        },
-        "studyPlan": {
-          "title": "勉強計画を作成して",
-          "label": "私の目標に合わせて",
-          "prompt": "私の学習目標に合わせた効果的なポモドーロセッション付きの勉強計画を作成してください"
-        },
-        "breakActivities": {
-          "title": "休憩中のアクティビティを提案して",
-          "label": "ポモドーロ休憩用",
-          "prompt": "5分間のポモドーロ休憩中にできるリラックスできるアクティビティを提案してください"
-        }
-      }
-    }
-  },
-  "entertainment": {
-    "title": "アーケードゾーン",
-    "subtitle": "休憩して楽しもう！",
-    "gamesCount": "{count}ゲームが利用可能",
-    "yourBest": "ベストスコア",
-    "games": {
-      "spaceShooter": {
-        "title": "スペースシューター",
-        "description": "無限の敵の波を迎え撃つクラシックなシューティングゲーム",
-        "instructions": "マウス/タッチで宇宙船を操作し、敵を避けてパワーアップを集めましょう。自動発射なので位置取りに集中！1000ポイントごとに新しいレベルがアンロックされます。",
-        "tips": "機動性のために中央付近にいましょう"
-      },
-      "memoryMatch": {
-        "title": "神経衰弱",
-        "description": "クラシックなカードマッチングゲームで記憶力をテスト",
-        "instructions": "各ターンで2枚のカードをめくってペアを見つけます。カードの位置を覚えて手数を最小限に！スコアは手数と完了時間に基づきます。脳トレに最適！",
-        "tips": "角から始めて内側へ進む",
-        "clicks": "手数",
-        "time": "時間",
-        "moves": "手",
-        "win": "素晴らしい！",
-        "reset": "もう一度プレイ"
-      },
-      "ticTacToe": {
-        "title": "三目並べ",
-        "description": "AIに戦略的な勝負を挑もう",
-        "instructions": "スマートなAI対戦相手と対戦！クラシックな3x3グリッドか、チャレンジング4x4を選択。AIはミニマックスアルゴリズムを使用します。勝てますか？",
-        "tips": "中央と角を先に押さえよう",
-        "mode3x3": "3x3 グリッド",
-        "mode3x3Desc": "クラシックモード - 簡単",
-        "mode4x4": "4x4 グリッド",
-        "mode4x4Desc": "ハードコア - AIが高度な戦略を使用",
-        "yourTurn": "あなたの番",
-        "aiThinking": "AI思考中...",
-        "gameOver": "ゲームオーバー",
-        "you": "あなた",
-        "ai": "AI",
-        "youWin": "あなたの勝ち！お見事！",
-        "aiWins": "AIの勝ち！再挑戦しよう！",
-        "draw": "引き分け！",
-        "newGame": "新しいゲーム"
-      },
-      "snake": {
-        "title": "スネーク",
-        "description": "ヘビを操作してできるだけ長く伸ばそう",
-        "instructions": "矢印キーまたはWASDでヘビを操作（モバイルはスワイプ）。光るエサを食べて長くなろう。レベルが上がると速度と障害物が増加。壁や自分にぶつからないように！",
-        "tips": "3〜4手先まで経路を計画しよう",
-        "score": "スコア",
-        "length": "長さ",
-        "level": "レベル",
-        "speed": "速度",
-        "obstacles": "障害物"
-      },
-      "game2048": {
-        "title": "2048",
-        "description": "タイルをスライドして結合し2048を目指そう",
-        "instructions": "矢印キーまたはスワイプでタイルをスライド。同じ数字のタイルが触れると結合！2048に到達したら勝ちですが、さらに高得点を目指して続けられます。",
-        "tips": "最大のタイルを角に保とう",
-        "score": "スコア",
-        "best": "ベスト",
-        "youWin": "勝利！",
-        "keepGoing": "さらに高得点を目指せる？",
-        "continue": "続ける",
-        "newGame": "新しいゲーム"
-      },
-      "brickBreaker": {
-        "title": "ブロック崩し",
-        "description": "跳ねるボールですべてのブロックを壊そう",
-        "instructions": "マウス/タッチまたは矢印キーでパドルを動かしてボールを跳ね返します。すべてのブロックを壊して次のレベルへ！連続でブロックを壊すとコンボボーナス！",
-        "tips": "角を狙ってチェーンリアクションを起こそう",
-        "start": "ゲーム開始",
-        "score": "スコア",
-        "level": "レベル",
-        "lives": "ライフ",
-        "gameOver": "ゲームオーバー",
-        "finalScore": "最終スコア",
-        "reachedLevel": "到達レベル",
-        "levelComplete": "レベルクリア！",
-        "nextLevel": "次のレベル",
-        "playAgain": "もう一度プレイ"
-      }
-    },
-    "leaderboard": {
-      "title": "グローバルランキング",
-      "comingSoon": "近日公開",
-      "description": "世界中のプレイヤーと競争！グローバルランキングは間もなく登場。",
-      "features": {
-        "global": "グローバルランキング",
-        "weekly": "週間チャレンジ",
-        "rewards": "限定報酬"
-      }
-    },
-    "playNow": "今すぐプレイ",
-    "backToList": "ゲーム一覧に戻る",
-    "closeGame": "ゲームを閉じる",
-    "controls": "操作方法",
-    "instructions": "マウスまたはタッチで宇宙船を操作。敵を撃ち落とし、衝突を避けよう！",
-    "loading": "ゲームを読み込み中...",
-    "highScore": "ハイスコア",
-    "lastScore": "前回のスコア",
-    "howToPlay": "遊び方",
-    "tips": "プロのヒント",
-    "startGame": "ゲーム開始",
-    "loadingStages": {
-      "initializing": "初期化中",
-      "loadingAssets": "アセット読み込み中",
-      "preparingGraphics": "グラフィック準備中",
-      "settingUpControls": "コントロール設定中",
-      "almostReady": "もうすぐ準備完了",
-      "startingGame": "ゲーム開始中"
-    },
-    "controlTypes": {
-      "keyboard": "キーボード",
-      "mouse": "マウス",
-      "touch": "タッチ"
     }
   },
   "tooltips": {
     "toggleTheme": "テーマを切り替え",
+    "toggleSidebar": "サイドバーを切り替え",
     "timerSettings": "タイマー設定",
     "themeSettings": "テーマ設定",
     "backgroundSetup": "背景設定",
     "backgroundSettings": "背景設定",
     "soundSettings": "サウンド設定",
     "focusAudio": "集中音楽 / 自然音",
-    "enterFocus": "集中モードに入る",
-    "exitFocus": "集中モードを終了"
+    "enterFocus": "フォーカスモードに入る",
+    "exitFocus": "フォーカスモードを終了"
   },
   "errors": {
     "generic": "エラーが発生しました",
     "network": "ネットワークエラー。接続を確認してください。",
     "notFound": "見つかりません",
     "unauthorized": "認証されていません。ログインしてください。",
-    "forbidden": "このリソースにアクセスする権限がありません"
+    "forbidden": "このリソースにアクセスする権限がありません",
+    "fieldRequired": "この項目を入力してください",
+    "tooManyRequests": "リクエストが多すぎます。数分待ってからもう一度お試しください。",
+    "boundary": {
+      "title": "問題が発生しました",
+      "description": "予期しないエラーが発生しました。もう一度お試しいただくか、前のページに戻ってください。",
+      "retry": "もう一度試す",
+      "goHome": "ホームへ",
+      "goTimer": "タイマーへ",
+      "reference": "参照コード: {digest}"
+    }
+  },
+  "timerAnnouncer": {
+    "started": "タイマーを開始しました。{mode}、残り{time}。",
+    "paused": "タイマーを一時停止しました。残り{time}。",
+    "completed": "{mode}が完了しました。次は{next}です。",
+    "remaining": "残り{time}。",
+    "oneMinute": "残り1分です。",
+    "minutes": "{count}分",
+    "minute": "{count}分",
+    "second": "{count}秒",
+    "seconds": "{count}秒",
+    "mode": {
+      "work": "集中",
+      "shortBreak": "短い休憩",
+      "longBreak": "長い休憩"
+    }
   },
   "metadata": {
     "timer": {
-      "title": "タイマー • Study Bro App",
-      "description": "洗練されたポモドーロタイマーと統合設定で作業と休憩セッションを管理。"
+      "title": "タイマー • Study Bro",
+      "description": "洗練されたポモドーロタイマーと統合設定で集中セッションと休憩を管理。"
     },
     "tasks": {
-      "title": "タスク • Study Bro App",
+      "title": "タスク • Study Bro",
       "description": "タスク管理システムでタスクを効率的に整理・管理。"
     },
     "history": {
-      "title": "履歴 • Study Bro App",
+      "title": "履歴 • Study Bro",
       "description": "時間の経過とともに集中パフォーマンスと生産性統計を確認。"
     },
     "guide": {
-      "title": "ユーザーガイド • Study Bro App",
+      "title": "ユーザーガイド • Study Bro",
       "description": "ポモドーロメソッドとStudy Broの機能の使い方を学ぶ。"
     }
   },
   "login": {
     "title": "Study Broにログイン",
-    "description": "おかえりなさい！集中力を高める旅を続けましょう。",
+    "description": "メールに届く6桁のコードでログイン。パスワードは不要です。",
     "form": {
       "email": "メールアドレス",
-      "emailPlaceholder": "your@email.com",
-      "password": "パスワード",
-      "passwordPlaceholder": "パスワードを入力",
-      "forgotPassword": "パスワードを忘れましたか？",
-      "signingIn": "ログイン中...",
+      "emailPlaceholder": "name@example.com",
+      "signingIn": "ログイン中…",
       "signIn": "ログイン",
       "or": "または",
       "continueWithGoogle": "Googleで続行",
-      "noAccount": "アカウントをお持ちでないですか？",
-      "signUpNow": "今すぐ登録",
-      "backToApp": "アプリに戻る"
+      "sendCode": "コードを送信",
+      "sending": "送信中…",
+      "code": "6桁のコード",
+      "codeSent": "{email} に送ったコードを入力してください。",
+      "changeEmail": "別のメールを使う",
+      "resend": "コードを再送"
     },
     "errors": {
-      "supabaseNotConfigured": "Supabaseが設定されていません。環境変数を追加してください。",
-      "emailPasswordRequired": "メールアドレスとパスワードを入力してください。",
-      "loginFailed": "ログインできません。",
-      "loginError": "ログイン中にエラーが発生しました。",
       "googleConnectionFailed": "Googleに接続できません。後でもう一度お試しください。",
-      "googleAuthError": "ログイン開始中にエラーが発生しました。"
+      "invalidEmail": "メールアドレスの形式が正しくありません。ご確認のうえ、もう一度お試しください。",
+      "sendFailed": "コードを送信できませんでした。少し待ってから再試行してください。",
+      "invalidCode": "コードが正しくないか、期限切れです。",
+      "tooManyCodes": "コードのリクエストが多すぎます。10分ほど待ってからもう一度お試しください。",
+      "tooManyCodesForEmail": "このメールアドレスには短時間にコードを送りすぎました。数分待ってからもう一度お試しください。"
     },
-    "success": {
-      "loginSuccess": "ログインしました！",
-      "redirectingToGoogle": "Googleにリダイレクト中..."
-    },
-    "forgot": {
-      "title": "パスワードをリセット",
-      "description": "メールアドレスを入力してください。リセット用のリンクをお送りします。",
-      "emailRequired": "メールアドレスを入力してください。",
-      "sendLink": "リセットリンクを送信",
-      "sending": "送信中...",
-      "success": "メールでリセットリンクをご確認ください。",
-      "error": "リセットメールを送信できません。もう一度お試しください。"
-    }
-  },
-  "resetPassword": {
-    "title": "新しいパスワードを設定",
-    "description": "下に新しいパスワードを入力してください。",
-    "newPassword": "新しいパスワード",
-    "newPasswordPlaceholder": "6文字以上",
-    "confirmPassword": "パスワードを確認",
-    "confirmPasswordPlaceholder": "パスワードを再入力",
-    "submit": "パスワードを更新",
-    "updating": "更新中...",
-    "success": "パスワードを更新しました！ログインできます。",
-    "invalidTitle": "無効または期限切れのリンク",
-    "invalidDescription": "このリセットリンクは無効か期限切れです。ログインページから新しいリンクをリクエストしてください。",
-    "errors": {
-      "passwordTooShort": "パスワードは6文字以上必要です。",
-      "passwordMismatch": "パスワードが一致しません。",
-      "updateFailed": "パスワードを更新できません。もう一度お試しください。"
-    }
-  },
-  "signup": {
-    "title": "Study Broに登録",
-    "description": "集中力と生産性を高める旅を始めましょう。",
-    "form": {
-      "email": "メールアドレス",
-      "emailPlaceholder": "your@email.com",
-      "password": "パスワード",
-      "passwordPlaceholder": "パスワードを作成",
-      "signingUp": "登録中...",
-      "signUp": "登録",
-      "or": "または",
-      "signUpWithGoogle": "Googleで登録",
-      "haveAccount": "すでにアカウントをお持ちですか？",
-      "signInNow": "今すぐログイン",
-      "backToApp": "アプリに戻る"
-    },
-    "errors": {
-      "supabaseNotConfigured": "Supabaseが設定されていません。環境変数を追加してください。",
-      "emailPasswordRequired": "登録にはメールアドレスとパスワードを入力してください。",
-      "signupFailed": "登録できません。",
-      "signupError": "登録中にエラーが発生しました。",
-      "googleConnectionFailed": "Googleに接続できません。後でもう一度お試しください。",
-      "googleAuthError": "ログイン開始中にエラーが発生しました。"
-    },
-    "success": {
-      "checkEmail": "メールを確認してアカウントを認証してください。",
-      "redirectingToGoogle": "Googleにリダイレクト中..."
-    }
+    "guestNote": "ゲストとして作成したタスクとセッションはアカウントに引き継がれます。"
   },
   "notFound": {
     "title": "このページは見つかりませんでした",
     "description": "お探しのページは存在しないか、移動された可能性があります。",
     "backToTimer": "タイマーに戻る",
     "home": "ホーム",
-    "goBack": "戻る"
-  },
-  "progress": {
-    "comingSoon": "近日公開",
-    "description": "統計ページは最終調整中です。間もなく集中の進捗、連続記録、作業時間を追跡できるようになります。",
-    "features": {
-      "focusTime": {
-        "title": "集中時間",
-        "description": "日別/週別/月別"
-      },
-      "pomodoroSessions": {
-        "title": "ポモドーロ＆セッション",
-        "description": "セッション数、完了率"
-      },
-      "streaks": {
-        "title": "連続記録",
-        "description": "連続達成、バッジ獲得"
-      }
-    },
-    "backToTimer": "タイマーに戻る"
-  },
-  "clockDemo": {
-    "title": "時計コンポーネントデモ",
-    "subtitle": "すべてのタイマー時計タイプをライブアニメーションでテスト・比較",
-    "controls": {
-      "title": "タイマーコントロール",
-      "description": "すべての時計のデモタイマーを制御",
-      "pause": "一時停止",
-      "start": "開始",
-      "reset": "リセット",
-      "timeProgress": "時間: {time} | 進捗: {progress}%"
-    },
-    "modes": {
-      "work": "作業",
-      "shortBreak": "短い休憩",
-      "longBreak": "長い休憩"
-    },
-    "tabs": {
-      "animated": "アニメーション",
-      "digital": "デジタル",
-      "analog": "アナログ",
-      "progress": "プログレス",
-      "flip": "フリップ"
-    },
-    "clockTypes": {
-      "digital": {
-        "title": "デジタル時計",
-        "description": "プログレスリングと残り時間警告付きのクラシックなデジタル表示"
-      },
-      "analog": {
-        "title": "アナログ時計",
-        "description": "スイープ針付きの伝統的な時計盤"
-      },
-      "progress": {
-        "title": "プログレスバー時計",
-        "description": "時間表示付きのリニアプログレスバー"
-      },
-      "flip": {
-        "title": "フリップ時計",
-        "description": "レトロなフリップスタイルのデジタル時計アニメーション"
-      },
-      "animated": {
-        "title": "アニメーションカウントダウン",
-        "description": "スムーズなトランジション付きのモダンなアニメーションカウントダウン"
-      }
-    },
-    "animationFeatures": {
-      "title": "アニメーション機能",
-      "breathing": {
-        "title": "ブリージングエフェクト",
-        "description": "落ち着くリズムを作る穏やかなパルスアニメーション"
-      },
-      "colorTransition": {
-        "title": "カラートランジション",
-        "description": "残り時間とモードに基づくスムーズな色の変化"
-      },
-      "progressRing": {
-        "title": "プログレスリング",
-        "description": "タイマーの周りの円形プログレスインジケーター"
-      },
-      "glowEffect": {
-        "title": "グローエフェクト",
-        "description": "時間が少なくなると強くなるソフトな輝き"
-      },
-      "modeIndicator": {
-        "title": "モードインジケーター",
-        "description": "現在のセッションタイプ（集中/休憩）を示すビジュアルバッジ"
-      }
-    }
+    "goBack": "戻る",
+    "tomoAlt": "ぐっすり眠るトマトのマスコット、トモ"
   },
   "timerComponents": {
     "taskSelector": {
       "loginToSelect": "タスクを選択するにはログインしてください",
       "selectToFocus": "集中するタスクを選択",
       "dialogTitle": "集中するタスクを選択",
-      "dialogDescription": "ポモドーロセッション中に取り組むタスクを選択してください",
-      "pendingTasks": "保留中のタスク",
-      "noPendingTasks": "保留中のタスクがありません",
-      "noPendingTasksToday": "保留中のタスクがありません。目標に集中しましょう！",
-      "createTaskPrompt": "新しいタスクを作成して始めましょう",
-      "goToTaskList": "タスク一覧へ",
+      "dialogDescription": "集中セッション中に取り組むタスクを選択してください",
+      "pendingTasks": "未完了のタスク",
+      "noPendingTasks": "未完了のタスクはありません",
+      "noPendingTasksToday": "未完了のタスクはありません。",
+      "createTaskPrompt": "タスクを作成して始めましょう",
+      "goToTaskList": "タスクを開く",
       "startFocus": "集中を開始",
       "stopFocus": "集中を停止",
       "switchConfirm": {
         "title": "タスクを切り替えますか？",
-        "description": "別のタスクに集中中です。本当に切り替えますか？"
+        "description": "別のタスクに集中中です。このタスクに切り替えますか？"
+      },
+      "taskComplete": {
+        "title": "予定のポモドーロを達成しました！",
+        "description": "は予定していたポモドーロをすべて使い切りました。完了にしますか？",
+        "skip": "あとで",
+        "markDone": "完了にする"
       }
     },
     "enhancedTimer": {
       "today": "今日",
-      "poms": "ポモ",
+      "poms": "ポモドーロ",
       "time": "時間",
       "minutes": "分",
-      "focusMode": "集中モード",
+      "focusMode": "フォーカスモード",
       "soundSettings": "サウンド設定",
-      "backgroundSettings": "背景設定",
+      "backgroundSettings": "シーン",
       "timerSettings": "タイマー設定",
-      "exitFocus": "集中モードを終了",
-      "enterFocus": "集中モードに入る"
+      "exitFocus": "全画面を終了",
+      "enterFocus": "全画面にする"
     },
     "animatedCountdown": {
       "modes": {
@@ -1272,308 +972,885 @@
       }
     }
   },
-  "historyComponents": {
-    "dateRangePicker": {
-      "selectRange": "日付範囲を選択",
-      "presets": {
-        "today": "今日",
-        "last3Days": "過去3日間",
-        "last7Days": "過去7日間",
-        "last30Days": "過去30日間",
-        "thisMonth": "今月"
-      }
-    },
-    "distributionChart": {
-      "title": "時間分布",
-      "time": "時間",
-      "total": "合計",
-      "minutes": "{minutes}分"
-    },
-    "focusChart": {
-      "title": "日別集中時間",
-      "minutes": "{minutes}分"
-    },
-    "sessionHistory": {
-      "title": "完了セッション詳細",
-      "modes": {
-        "focus": "集中",
-        "shortBreak": "短い休憩",
-        "longBreak": "長い休憩"
-      },
-      "tableHeaders": {
-        "task": "タスク",
-        "sessionType": "セッションタイプ",
-        "dateTime": "日時",
-        "duration": "時間"
-      },
-      "noTask": "タスクなし",
-      "minutes": "{minutes}分",
-      "noData": "まだセッションデータがありません。"
-    },
-    "statsCards": {
-      "totalFocusTime": "総集中時間",
-      "timeFormat": "{hours}時間{minutes}分",
-      "completedSessions": "完了セッション",
-      "longestStreak": "最長連続記録",
-      "days": "{days}日",
-      "currentStreak": "現在: {current}日"
-    },
-    "statsEmpty": {
-      "title": "データがありません",
-      "description": "この期間中に記録された集中セッションはありません。新しいセッションを始めましょう！",
-      "startFocus": "集中を開始"
-    }
-  },
   "landing": {
-    "nav": {
-      "features": "機能",
-      "testimonials": "成功事例",
-      "contact": "お問い合わせ",
-      "pricing": "料金",
-      "login": "ログイン",
-      "getStarted": "始める"
-    },
-    "hero": {
-      "badge": "AI搭載生産性 🤖",
-      "focusMode": "ディープワークモード",
-      "title": "あなたの",
-      "titleHighlight": "集中力",
-      "subtitle": "タスク連携と有効セッション追跡付きのポモドーロタイマー。Bro Chat AIコーチ、休憩用ミニゲーム、ランキング、集中モード、分析機能—すべてが一箇所に。",
-      "getStarted": "無料で始める",
-      "tryDemo": "デモを見る",
-      "aiChat": "新機能：AI生産性コーチ",
-      "timer": "集中セッション",
-      "stats": {
-        "focusSessions": "集中セッション",
-        "moreProductive": "効率アップ",
-        "focused": "集中時間"
-      },
-      "features": {
-        "ai": {
-          "title": "スマートインサイト",
-          "desc": "AI駆動のセッションサマリーとコーチング。"
-        },
-        "music": {
-          "title": "集中環境",
-          "desc": "ディープワーク用の厳選されたアンビエントサウンドスケープ。"
-        },
-        "tasks": {
-          "title": "タスク同期",
-          "desc": "タスクを集中セッションにシームレスに統合。"
-        },
-        "skins": {
-          "title": "ビジュアルカスタマイズ",
-          "desc": "プロフェッショナルなデジタル、フリップ、アナログインターフェース。"
-        }
-      }
-    },
     "footer": {
-      "madeWith": "愛を込めて作られた",
-      "for": "のための",
-      "focusedMinds": "高い目標を持つ人々",
-      "rightsReserved": "All rights reserved.",
+      "rightsReserved": "すべての権利を保有します。",
       "links": {
-        "features": "機能",
-        "pricing": "料金",
         "privacy": "プライバシーポリシー",
         "terms": "利用規約"
       }
     },
-    "aiChatHighlight": {
-      "title": "AIであなたの可能性を解き放とう",
-      "subtitle": "生産性戦略、勉強テクニック、ワークフロー最適化について即座にパーソナライズされたガイダンスを取得。",
-      "cta": "AIコーチに相談"
-    },
-    "howItWorks": {
-      "badge": "ワークフロー",
-      "title": "マスターするための",
-      "titleHighlight": "3ステップ",
-      "subtitle": "一貫した高パフォーマンスのための実証済みフレームワーク",
-      "steps": {
-        "step1": {
-          "title": "目標を定義",
-          "description": "タスクを入力し、完了に必要なポモドーロ数を見積もります。"
-        },
-        "step2": {
-          "title": "セッションを実行",
-          "description": "25分間の集中作業に没頭します。"
-        },
-        "step3": {
-          "title": "分析と最適化",
-          "description": "詳細な分析を確認して作業習慣を改善します。"
-        }
-      }
-    },
-    "socialProof": {
-      "stats": {
-        "activeUsers": "アクティブプロフェッショナル",
-        "focusHours": "記録された集中時間",
-        "tasksCompleted": "完了タスク",
-        "userRating": "平均評価"
-      },
-      "trustedBy": "信頼されている企業",
-      "highlight": {
-        "title": "ユーザーは40%の生産性向上を報告",
-        "description": "30日後の1,000人以上のアクティブユーザーのパフォーマンス指標に基づく",
-        "verified": "検証済みデータ"
-      }
-    },
     "faq": {
-      "badge": "FAQ",
-      "title": "よくある",
-      "titleHighlight": "質問",
-      "subtitle": "Study Broエコシステムについて知っておくべきすべて",
-      "stillHaveQuestions": "さらにサポートが必要ですか？",
-      "sendMessage": "サポートに連絡",
       "items": {
         "q1": {
-          "question": "このテクニックの科学的根拠は？",
-          "answer": "ポモドーロテクニックは、固定された時間間隔（通常25分）を活用して緊急性の感覚を植え付け、高い認知パフォーマンスを維持します。スケジュールされた休憩により精神的疲労を防ぎます。"
-        },
-        "q2": {
-          "question": "プラットフォームは無料で使えますか？",
-          "answer": "はい。すべての機能が無料です：タスク連携付きポモドーロタイマー、Bro Chat AI、ミニゲーム、ランキング、集中モード、履歴、分析。パワーユーザー向けのプロフェッショナルティアは後日提供予定です。"
-        },
-        "q3": {
-          "question": "ワークフローを自分のニーズに合わせてカスタマイズできますか？",
-          "answer": "もちろんです。セッション時間、休憩間隔、長い休憩の頻度を完全にコントロールでき、個人のサーカディアンリズムと作業スタイルに完璧にマッチさせることができます。"
-        },
-        "q4": {
-          "question": "オフライン使用はサポートされていますか？",
-          "answer": "はい。基本的なタイマーとタスク機能はローカルで動作します。安全な接続が再確立されると、データ同期が自動的に行われます。"
-        },
-        "q5": {
-          "question": "データはどのように保護されていますか？",
-          "answer": "厳格なプライバシー基準を遵守しています。生産性データは暗号化され、安全に保存されます。完全な所有権を保持し、いつでもデータをエクスポートまたは削除できます。"
-        },
-        "q6": {
-          "question": "プラットフォームの互換性は？",
-          "answer": "Study Broは、デスクトップ、タブレット、モバイルデバイスのすべての最新ブラウザに最適化されたプログレッシブウェブアプリケーションです。ネイティブアプリケーションは開発中です。"
+          "question": "このテクニックの科学的根拠は？"
         }
+      }
+    }
+  },
+  "historyUi": {
+    "title": "統計",
+    "description": "集中時間、連続日数、最近のセッションを確認できます。",
+    "rangeLabel": "期間",
+    "ranges": {
+      "today": "今日",
+      "week": "今週",
+      "month": "今月"
+    },
+    "stats": {
+      "focusTime": "集中時間",
+      "sessions": "セッション数",
+      "currentStreak": "現在の連続日数",
+      "bestStreak": "最長の連続日数"
+    },
+    "hoursMinutes": "{hours}時間{minutes}分",
+    "minutesOnly": "{minutes}分",
+    "dayOne": "{count}日",
+    "dayOther": "{count}日",
+    "minutesShort": "{minutes}分",
+    "chart": {
+      "title": "過去7日間",
+      "subtitle": "1日あたりの集中時間（分）",
+      "summary": "過去7日間の集中時間（分）"
+    },
+    "heatmap": {
+      "title": "連続日数",
+      "subtitle": "直近12週間",
+      "less": "少",
+      "more": "多",
+      "cell": "{date}: 集中{minutes}分",
+      "cellNone": "{date}: 集中なし"
+    },
+    "sessions": {
+      "title": "最近のセッション",
+      "none": "この期間のセッションはまだありません。",
+      "noTask": "タスクなし",
+      "modes": {
+        "work": "集中",
+        "shortBreak": "短い休憩",
+        "longBreak": "長い休憩"
+      }
+    },
+    "empty": {
+      "title": "まだセッションがありません",
+      "description": "集中セッションを終えると、ここに履歴が表示されます。",
+      "action": "集中を始める"
+    },
+    "error": "履歴を読み込めませんでした。"
+  },
+  "arcadeUi": {
+    "title": "ゲーム",
+    "description": "休憩時間にぴったりの短いゲーム。",
+    "runningNote": "ゲームをすると集中が中断されます。先にセッションを終えましょう。",
+    "best": "ベストスコア {score}",
+    "miniTimer": {
+      "label": "{phase}：残り{time}",
+      "labelPaused": "{phase}：残り{time}、タイマー一時停止中"
+    },
+    "phaseChanged": {
+      "toWork": "休憩が終わりました。集中に戻りましょう。",
+      "toBreak": "集中セッションが終わりました。ゆっくり休みましょう。",
+      "gamePaused": "ゲームは一時停止中です。",
+      "backToTimer": "タイマーに戻る",
+      "dismiss": "OK"
+    }
+  },
+  "settingsUi": {
+    "unitMin": "分",
+    "unitSessions": "回",
+    "autoStartBreakHint": "集中セッションが終わったらすぐに休憩を始めます。",
+    "autoStartWorkHint": "休憩が終わったらすぐに次の集中セッションを始めます。長い休憩のあとや、席を外しているときは待機します。",
+    "lowTimeWarningHint": "残り10秒で時計が点滅します。",
+    "clockStyleHint": "カウントダウンの見た目です。プレビューはリアルタイムで動きます。",
+    "clockSizeHint": "時計の大きさを変えます。",
+    "dailyGoalHint": "1日の集中時間の目標を設定すると、タイマー中に進捗リングが表示されます。",
+    "adjust": "調整",
+    "selected": "選択中"
+  },
+  "pagesUi": {
+    "guide": {
+      "figureCaption": "1ポモドーロ：集中セッションのあと、短い休憩。",
+      "tip": "集中と休憩の長さはタイマー設定で変えられます。小さな区切りで集中し、こまめに休むリズムを保ちましょう。",
+      "shortcutsTitle": "キーボードショートカット",
+      "shortcutsIntro": "テキスト入力中でないときに使えます。",
+      "colKey": "キー",
+      "colAction": "操作",
+      "keySpace": "Space",
+      "actionStartPause": "タイマーの開始と一時停止",
+      "actionReset": "現在のセッションをリセット"
+    },
+    "feedback": {
+      "optional": "任意",
+      "contactHint": "返信が必要な場合にのみ使用します。"
+    },
+    "leaderboard": {
+      "tasksCount": "{count}件"
+    }
+  },
+  "tasksUi": {
+    "summary": "未着手 {todo} 件、進行中 {doing} 件、完了 {done} 件",
+    "viewList": "リスト",
+    "viewBoard": "ボード",
+    "viewLabel": "タスクの表示形式",
+    "quickAddPlaceholder": "タスクを追加…",
+    "quickAddLabel": "新しいタスク名",
+    "add": "追加",
+    "addDetails": "詳細を指定して追加",
+    "estimateLabel": "見積もり（ポモドーロ数）",
+    "estimateShort": "見積もり",
+    "estimateDecrease": "ポモドーロを減らす",
+    "estimateIncrease": "ポモドーロを増やす",
+    "estimateValue": "{count} ポモドーロ",
+    "estimateValuePlural": "{count} ポモドーロ",
+    "priorityLabel": "優先度",
+    "filterLabel": "タスクを絞り込む",
+    "filterAll": "すべて",
+    "filterToday": "今日",
+    "filterTodo": "未着手",
+    "filterDoing": "進行中",
+    "filterDone": "完了",
+    "searchOpen": "タスクを検索",
+    "searchClose": "検索を閉じる",
+    "searchPlaceholder": "タイトルまたはタグで検索",
+    "showCompletedOne": "完了した 1 件を表示",
+    "showCompleted": "完了した {count} 件を表示",
+    "hideCompleted": "完了したタスクを隠す",
+    "doneCheer": "すごいです！やり遂げた分だけ前に進んでいます。",
+    "focus": "選択",
+    "stopFocus": "選択を解除",
+    "focusingBadge": "選択中",
+    "edit": "編集",
+    "more": "その他の操作",
+    "duplicate": "複製",
+    "saveAsTemplate": "テンプレートとして保存",
+    "delete": "削除",
+    "dueToday": "今日が期限",
+    "dueTomorrow": "明日が期限",
+    "overdue": "期限切れ",
+    "pomodoroProgress": "{done} / {total} ポモドーロ",
+    "emptyTitle": "タスクはまだありません",
+    "emptyAction": "最初のタスクを追加",
+    "emptyDescription": "上の入力欄から最初のタスクを追加し、「選択」を押して集中セッションに紐づけましょう。",
+    "noMatchTitle": "一致するタスクがありません",
+    "noMatchDescription": "別のフィルターやキーワードをお試しください。",
+    "clearFilters": "フィルターを解除",
+    "boardEmpty": "なし",
+    "dragHandle": "ドラッグして並べ替え",
+    "manage": "タグとテンプレートの管理",
+    "page": "{page} / {total} ページ",
+    "pickDate": "日付を選択",
+    "clearDate": "日付をクリア",
+    "estimateMin": "ポモドーロは1以上で入力してください",
+    "tagsLabel": "タグ",
+    "tagsPlaceholder": "タグを追加",
+    "tagSuggestions": "候補",
+    "noTagsHint": "上でタグを追加すると、関連するタスクをまとめられます。",
+    "tagsUsed": "{count}/{max} 個のタグを使用中",
+    "templatesDescription": "保存済みのタスク設定。新しいタスクの作成時に再利用できます。",
+    "errors": {
+      "createFailed": "タスクを作成できませんでした。もう一度お試しください。",
+      "updateFailed": "タスクを更新できませんでした。もう一度お試しください。",
+      "deleteFailed": "タスクを削除できませんでした。もう一度お試しください。",
+      "reorderFailed": "タスクの並べ替えに失敗しました。もう一度お試しください。",
+      "cloneFailed": "タスクを複製できませんでした。もう一度お試しください。",
+      "limitReached": "タスクの上限（{max}件）に達しました。完了したタスクを削除してから追加してください。"
+    }
+  },
+  "timerUi": {
+    "soundOff": "オフ",
+    "modeGroup": "タイマーのモード",
+    "mode": {
+      "work": "集中",
+      "shortBreak": "短い休憩",
+      "longBreak": "長い休憩"
+    },
+    "startFocus": "集中を始める",
+    "startBreak": "休憩を始める",
+    "resume": "再開",
+    "spaceKey": "Space",
+    "hintStart": "{key} で開始",
+    "hintPause": "{key} で一時停止",
+    "hintResume": "{key} で再開",
+    "sessionOf": "セッション {current}/{total}",
+    "sessionsDone": "{done}/{total} セッション完了",
+    "todaySummary": "今日: {count} セッション · {time}",
+    "todaySummaryOne": "今日: {count} セッション · {time}",
+    "dailyGoalProgress": "目標: {focus}/{goal}分",
+    "dailyGoalReached": "本日の目標達成 — {focus}分",
+    "timeHm": "{h}時間{m}分",
+    "timeM": "{m}分",
+    "activeTasks": "進行中のタスク",
+    "noActiveTasks": "進行中のタスクはまだありません。下から追加できます。",
+    "addTaskPlaceholder": "何に取り組みますか？",
+    "addTask": "タスクを追加",
+    "manageTasks": "タスクを管理",
+    "filterAll": "すべて",
+    "dock": {
+      "sounds": "サウンド",
+      "scene": "シーン",
+      "timer": "タイマー",
+      "focus": "フォーカスモード",
+      "exitFocus": "フォーカスモードを終了",
+      "moreAmbient": "+ 環境音 {count}件",
+      "ambientPlaying": "環境音を再生中",
+      "ambientMix": "環境音ミックス（{count}件）"
+    },
+    "realClock": {
+      "aria": "現在時刻: {time}",
+      "view": "現在時刻",
+      "back": "ポモドーロに戻る"
+    }
+  },
+  "shell": {
+    "dock": "パネル",
+    "panelError": {
+      "title": "このパネルを読み込めませんでした",
+      "description": "接続を確認して、もう一度お試しください。"
+    },
+    "openTimer": "タイマーを開く",
+    "streak": "{count}日連続",
+    "panels": {
+      "tasks": "タスク",
+      "sound": "サウンド",
+      "scene": "シーン",
+      "timer": "タイマー",
+      "stats": "統計",
+      "arcade": "ゲーム",
+      "settings": "設定",
+      "feedback": "フィードバック",
+      "login": "ログイン"
+    },
+    "palette": {
+      "open": "コマンドメニューを開く",
+      "short": "検索",
+      "placeholder": "コマンドを入力または検索…",
+      "empty": "一致するコマンドはありません。",
+      "groups": {
+        "timer": "タイマー",
+        "panels": "開く",
+        "language": "言語",
+        "account": "アカウント",
+        "actions": "クイック操作"
+      },
+      "pause": "一時停止",
+      "start": "開始",
+      "reset": "タイマーをリセット",
+      "switchTo": "{mode}に切り替え",
+      "guide": "ポモドーロガイド",
+      "addTask": "タスクを追加",
+      "changeScene": "シーンを変更",
+      "mute": "ミュート",
+      "unmute": "ミュート解除",
+      "skip": "セッションをスキップ",
+      "fullscreen": "全画面の切り替え",
+      "shortcuts": "キーボードショートカット"
+    },
+    "homeHeading": "無料ポモドーロタイマー",
+    "fullscreenShort": "全画面",
+    "sessionsToday": "今日 {count} セッション",
+    "sessionsTodayOne": "今日 {count} セッション",
+    "shortcuts": {
+      "title": "キーボードショートカット",
+      "description": "入力中を除き、どこでもキーで操作できます。",
+      "toggleTimer": "開始 / 一時停止",
+      "reset": "タイマーをリセット",
+      "openPanel": "{panel}を開く",
+      "help": "この一覧を表示"
+    },
+    "liveClock": "現在時刻"
+  },
+  "clockStyles": {
+    "flip3d": "フリップ 3D",
+    "tomato": "トマト",
+    "orbit": "オービット",
+    "solid": "立体",
+    "badge3d": "3D",
+    "webglNote": "3DスタイルはGPUを使用します。利用できない場合はデジタル時計が表示されます。"
+  },
+  "site": {
+    "meta": {
+      "home": {
+        "title": "ポモドーロタイマー（無料・登録不要）| Study Bro",
+        "description": "タスク管理・環境音・休憩ミニゲーム・集中履歴がそろった無料のポモドーロタイマー。登録不要で、ブラウザを開くだけですぐ使えます。"
+      },
+      "guide": {
+        "title": "ポモドーロ・テクニックとは？やり方と時間設定ガイド",
+        "description": "ポモドーロ・テクニックの仕組みと進め方、25/5・50/10・52/17の選び方、中断への対処、タスクの見積もりまで解説します。"
+      },
+      "privacy": {
+        "title": "プライバシーポリシー",
+        "description": "Study Bro が保存するデータ、端末に残るもの、データを処理するサービス、エクスポートと削除の方法。"
+      },
+      "terms": {
+        "title": "利用規約",
+        "description": "タスクと集中用サウンド付きの無料ポモドーロタイマー、Study Bro の利用規約。"
+      },
+      "og": {
+        "tagline": "無料ポモドーロタイマー・タスク管理・環境音",
+        "alt": "Study Bro：タスクと集中サウンド付きの無料ポモドーロタイマー"
+      }
+    },
+    "header": {
+      "nav": "サイト"
+    },
+    "notFound": {
+      "guide": "ガイドを読む"
+    },
+    "footer": {
+      "tagline": "タスク、集中履歴、環境音、休憩ゲーム付きの無料ポモドーロタイマー。アカウントなしで使えます。",
+      "product": "製品",
+      "timer": "タイマー",
+      "learn": "学ぶ",
+      "guide": "ポモドーロガイド",
+      "shortcuts": "キーボードショートカット",
+      "legal": "法的情報"
+    },
+    "features": {
+      "title": "アプリでできること",
+      "lead": "タイマー、タスク、履歴をひとつの画面に。以下はすべて現在のアプリに入っている機能です。",
+      "timer": {
+        "title": "集中・短い休憩・長い休憩",
+        "desc": "長さを調整できる3つのモード（集中は最長120分）、数セッションごとの長い休憩、次のステップの自動開始（任意）、複数の時計スタイル。"
+      },
+      "tasks": {
+        "title": "セッションに紐づくタスク",
+        "desc": "優先度、ステータス、タグ、ポモドーロの見積もり付きでタスクを追加し、実行中のセッションに紐づけます。"
+      },
+      "stats": {
+        "title": "集中履歴と連続日数",
+        "desc": "完了したセッションはすべて記録されます。日・週・月ごとの集中時間を確認し、連続日数を伸ばせます。"
+      },
+      "sound": {
+        "title": "環境音とYouTube",
+        "desc": "自然音、ローファイ、ホワイトノイズ、またはお気に入りのYouTubeリンクを作業中に再生できます。"
+      },
+      "scene": {
+        "title": "シーン",
+        "desc": "背景シーンを選ぶか、自分の画像を使えます。"
+      },
+      "arcade": {
+        "title": "休憩ゲーム",
+        "desc": "タイマーが休憩を告げたときのためのSnake、2048などの小さなゲーム。"
+      },
+      "account": {
+        "title": "アカウント不要",
+        "desc": "ゲストとしてすぐに始められます。メールコードまたはGoogleでログインすると端末をまたいでデータを保持でき、いつでもエクスポート・削除できます。"
+      }
+    },
+    "how": {
+      "title": "ポモドーロの1サイクル",
+      "lead": "決まった長さで作業し、合間に休み、数回ごとに長めに休みます。これは初期設定のリズムで、どの長さも変更できます。",
+      "cycleLabel": "1サイクルの流れ",
+      "cycleUnit": "単位は分。長い休憩の初期値は15分で、一般には15〜30分です。",
+      "focus": {
+        "title": "集中",
+        "duration": "25分",
+        "desc": "ひとつのタスクだけ。タイマーを始めたら、鳴るまでそれに専念します。"
+      },
+      "shortBreak": {
+        "title": "短い休憩",
+        "duration": "5分",
+        "desc": "立ち上がり、水を飲み、画面から目を離します。SNSは見ません。"
+      },
+      "longBreak": {
+        "title": "長い休憩",
+        "duration": "15〜30分",
+        "desc": "集中を4回行ったら、しっかり離れてから新しいサイクルを始めます。"
+      },
+      "defaults": "初期値：25 / 5 / 15分、4セッションごとに長い休憩。タイマー設定で変更できます。"
+    },
+    "why": {
+      "title": "この手法が効く理由",
+      "p1": "決まった時間枠があると、タスクの始まりと終わりがはっきりし、取りかかる心理的な負担が減り、気が散りにくくなります。予定された休憩は、頭が働かなくなるまで作業し続けるのを防ぎます。",
+      "p2": "完了したセッションを数えるとデータにもなります。1週間続ければ、タスクに実際いくつのポモドーロが必要かが見え、見積もりが正確になります。これは保証ではなく手法なので、長さは自分の作業に合わせて調整してください。",
+      "source": "出典：Francesco Cirillo, The Pomodoro Technique (Currency, 2018)。"
+    },
+    "faq": {
+      "title": "よくある質問",
+      "still": "ここにない疑問がありますか？",
+      "contact": "フィードバックを送る",
+      "q1": {
+        "q": "Study Bro は無料ですか。アカウントは必要ですか。",
+        "a": "無料で、アカウントも不要です。ゲストとしてすぐにタイマーを始められます。ログインは任意で、タスクと履歴を端末間で保持できます。ゲスト時のデータはログイン時にアカウントへ移行されます。"
+      },
+      "q2": {
+        "q": "ポモドーロ・テクニックとは何ですか。",
+        "a": "Francesco Cirillo が考案した時間管理法です。決まった時間枠（通常25分）で作業し、5分休憩し、4回ごとに15〜30分の長い休憩を取ります。使い方はポモドーロガイドで解説しています。"
+      },
+      "q3": {
+        "q": "タイマーの長さは変更できますか。",
+        "a": "はい。タイマー設定で、集中は1〜120分、短い休憩は1〜30分、長い休憩は1〜60分、長い休憩までのセッション数は2〜10回に設定できます。25/5、50/10、52/17、90/20のプリセットも用意しています。休憩と集中の自動開始もオン・オフできます。"
+      },
+      "q4": {
+        "q": "タスクはタイマーとどう連携しますか。",
+        "a": "優先度、タグ、ポモドーロ単位の見積もりを付けてタスクを追加し、実行中のセッションに紐づけます。完了したセッションはそのタスクに記録され、見積もりと実績を比べられます。"
+      },
+      "q5": {
+        "q": "どんな音と背景が使えますか。",
+        "a": "自然音、ローファイ、ホワイトノイズなどの環境音と、自分のYouTubeリンクを再生できます。背景はシーンまたは自分の画像から選べ、時計はデジタル、アナログ、フリップ、プログレスから選べます。"
+      },
+      "q6": {
+        "q": "ログインの仕組みと、データの扱いを教えてください。",
+        "a": "メールに届くワンタイムコード、またはGoogleでログインできます。設定の「アカウント」から、データをJSONファイルでエクスポートしたり、タスク・セッション・タグごとアカウントを削除したりできます。詳細はプライバシーポリシーをご覧ください。"
+      },
+      "q7": {
+        "q": "対応言語は何ですか。",
+        "a": "英語、ベトナム語、日本語です。フッターの言語切り替えで変更できます。"
+      },
+      "q8": {
+        "q": "キーボードショートカットはありますか。",
+        "a": "はい。Space で開始・一時停止、R でリセット、T でタスク、S でサウンド、B でシーン、C でタイマー設定、H で統計、G でゲームを開きます。Ctrl K(Mac は ⌘ K)ですべてのコマンドを検索できます。"
+      }
+    }
+  },
+  "legal": {
+    "updated": "最終更新日：2026年10月2日"
+  },
+  "guide2": {
+    "title": "ポモドーロ・テクニック実践ガイド",
+    "lead": "ポモドーロとは何か、セッションの進め方、長さの選び方、そして Study Bro での実践方法。",
+    "toc": "このページの内容",
+    "updated": "最終更新日：2026年10月5日",
+    "what": {
+      "title": "ポモドーロ・テクニックとは",
+      "p1": "ポモドーロ・テクニックは、1980年代後半に Francesco Cirillo が考案した時間管理法です。通常25分の短い固定時間で作業し、その間に短い休憩を挟みます。1つの時間枠を**ポモドーロ**と呼びます。イタリア語でトマトの意味で、Cirillo が学生時代に使っていたトマト型のキッチンタイマーに由来します。",
+      "p2": "大切なのは25という数字ではありません。固定の時間枠によって、始まりと終わりが1つずつ、取り組むことが1つに定まります。そのため始めやすく、気が散りにくくなります。4回行ったら長めに休みます。",
+      "p3": "Study Bro はこのループに沿って作られたポモドーロタイマーです。集中・短い休憩・長い休憩のモード、セッションに紐づけられるタスク、終えたことの履歴を備えています。"
+    },
+    "session": {
+      "title": "集中セッションの進め方",
+      "intro": "1ラウンドは約30分です。次の手順で進めます。",
+      "steps": {
+        "1": "**タスクを1つ選ぶ。** 「論文」のような漠然とした案件ではなく、「第2節のアウトラインを作る」のような次の具体的な一歩にします。",
+        "2": "**セッションに紐づける。** タスク（T）で選ぶと、セッションがそのタスクに記録されます。",
+        "3": "**集中タイマーを始める。** Space を押します。初期値は25分です。",
+        "4": "**そのタスクだけに取り組む。** 他のことが頭に浮かんだら、書き留めて作業に戻ります。",
+        "5": "**短い休憩を取る。** 5分間、画面から離れます。新しいことは始めません。",
+        "6": "**繰り返し、4回ごとに長く休む。** 集中を4回行ったら長い休憩（初期値15分、30分までが一般的）を取り、新しいサイクルを始めます。"
+      },
+      "note": "初期設定では、集中セッションが終わると休憩は自動で始まりますが、次の集中セッションは開始ボタンを押すまで待機します。どちらもタイマー設定（C）で変更できます。"
+    },
+    "rhythm": {
+      "title": "25/5・50/10・52/17・長いブロックの選び方",
+      "intro": "全員に合うリズムはありません。よく使われるのは次のとおりです。",
+      "colName": "リズム",
+      "colTimes": "集中 / 休憩（分）",
+      "colFor": "向いている場面",
+      "classic": {
+        "name": "クラシック",
+        "times": "25 / 5",
+        "for": "取りかかるとき、避けがちなタスク、短い学習。"
+      },
+      "extended": {
+        "name": "延長",
+        "times": "50 / 10",
+        "for": "助走が必要な作業：文章作成、プログラミング、問題演習。"
+      },
+      "ratio": {
+        "name": "52 / 17",
+        "times": "52 / 17",
+        "for": "2014年に、時間計測ツール会社が自社ユーザーのデータを分析して広まった比率です。ルールではなく選択肢のひとつと考えてください。"
+      },
+      "deep": {
+        "name": "ディープワーク・ブロック",
+        "times": "60〜90 / 15〜20",
+        "for": "中断から守りたい負荷の高い作業。90分という数字はウルトラディアンリズムの考え方に由来しますが、根拠は一致していません。"
+      },
+      "how": "選び方：まず1週間 25/5 を使います。調子が出た頃にタイマーが鳴るなら 50/10 へ。始められないなら短くします。どれを選んでも、休憩は必ず取ってください。",
+      "limits": "タイマー設定（C）では、集中は1〜120分、短い休憩は1〜30分、長い休憩は1〜60分、長い休憩は2〜10セッションごとに設定できます。90分のブロックには、90分集中して20分休む「90/20」プリセットを選んでください。"
+    },
+    "interruptions": {
+      "title": "中断への対処",
+      "intro": "Cirillo は中断を2種類に分け、それぞれ対処が違うとしています。",
+      "list": {
+        "1": "**内的な中断**(メールを思い出す、スマホを見たくなる):紙に書くかタスクに追加して戻ります。今切り替えるより、後でやるほうが損失が小さくなります。",
+        "2": "**外的な中断**(同僚、メッセージ):Cirillo の助言は、忙しいと伝え、時間を調整し、予定に入れ、あとで連絡することです。",
+        "3": "**長い中断：** Cirillo のルールでは、1ポモドーロは分割できません。本当に止める必要があるなら、タイマーをリセット（R）して新しいブロックを始め、途切れたものを数えないでください。"
+      },
+      "outro": "ブロックの間は通知を切っておくと、どちらの中断もほとんどなくなります。"
+    },
+    "tasks": {
+      "title": "タスクと見積もりの使い方",
+      "intro": "時間ではなくポモドーロ数で見積もります。始める前に必要なブロック数を予想し、終わったら比べます。予想はすぐに正確になります。",
+      "list": {
+        "1": "5〜7ポモドーロより大きそうなタスクは分割します（Cirillo の目安）。ごく小さなタスクは1つのブロックにまとめます。",
+        "2": "各タスクにポモドーロ単位の見積もりと優先度、必要なら科目やプロジェクトなどのタグを付けます。",
+        "3": "作業中のタスクを実行中のセッションに紐づけると、履歴で各セッションの目的が分かります。",
+        "4": "開始したら「進行中」、終えたら「完了」にし、リストをステータスや日付で絞り込みます。"
+      }
+    },
+    "breaks": {
+      "title": "効果的な休憩の取り方",
+      "intro": "休憩は、注意力が回復して初めて意味があります。",
+      "list": {
+        "1": "立ち上がって、1分でも体を動かします。",
+        "2": "水を飲み、遠くを見て目を休めます。",
+        "3": "フィードやチャットなど、新しい思考の流れを生むものは避けます。",
+        "4": "遊びたいときは、ゲーム（G）に短いゲームがあります。休憩が終わったらやめます。"
+      },
+      "outro": "4セッション後の長い休憩は、散歩、軽食、ストレッチなど、場面をきちんと切り替える時間です。"
+    },
+    "tools": {
+      "title": "サウンド、シーン、履歴",
+      "list": {
+        "1": "**サウンド（S）:** 自然音、ローファイ、ホワイトノイズ、または自分のYouTubeリンク。小さめの音量で試してください。無音も有効です。",
+        "2": "**シーン（B）:** 背景と時計スタイル（デジタル、アナログ、フリップ、プログレス）を変更します。",
+        "3": "**統計（H）:** 日・週・月ごとの集中時間と連続日数。数字を追うためでなく、自分の本当のリズムを知るために使います。",
+        "4": "**アカウント不要：** ゲストのままですべて使えます。端末間でデータを保持するにはログインします。"
+      }
+    },
+    "shortcuts": {
+      "title": "キーボードショートカット",
+      "intro": "ショートカットは、テキスト入力欄にフォーカスがないときに使えます。",
+      "space": "タイマーの開始・一時停止",
+      "reset": "現在のセッションをリセット",
+      "tasks": "タスクを開く",
+      "sound": "サウンドを開く",
+      "scene": "シーンを開く",
+      "timer": "タイマー設定を開く",
+      "stats": "統計を開く",
+      "arcade": "ゲームを開く",
+      "palette": "コマンドを検索して実行"
+    },
+    "sources": {
+      "title": "参考文献",
+      "intro": "このガイドは、以下の資料をもとに実践のポイントをまとめたものです。根拠が弱い部分は、本文でそのように明記しています。",
+      "list": {
+        "1": "**Francesco Cirillo『The Pomodoro Technique』**（Currency、2018年）：25分のブロック、休憩、中断への対処法の出典です。",
+        "2": "**DeskTime**（2014年）：自社ユーザーの利用データを分析した結果で、52/17のリズムの出典です。1社による独自の分析であり、対照実験ではありません。"
       }
     },
     "cta": {
-      "badge": "旅を始めよう 🚀",
-      "title": "達成する準備はできましたか",
-      "titleHighlight": "最高のパフォーマンス？",
-      "subtitle": "今日、ワークフローをマスターしている何千人ものプロフェッショナルに参加しましょう。",
-      "getStarted": "無料で始める",
-      "tryDemo": "デモを見る",
-      "trustedByMany": "業界リーダーに信頼されている",
-      "rating": "4.9/5 平均評価"
+      "title": "最初の1ブロックを始めましょう",
+      "text": "タイマーを開き、タスクを1つ追加して25分のセッションを始めます。アカウントは不要です。",
+      "button": "タイマーを開く"
+    }
+  },
+  "privacy": {
+    "title": "プライバシーポリシー",
+    "lead": "Study Bro は無料のポモドーロタイマーです。このページでは、扱うデータ、その保存場所、管理方法を説明します。",
+    "scope": {
+      "title": "適用範囲",
+      "intro": "本ポリシーは、studywithbro.com の Study Bro のウェブサイトとアプリ（ガイドと法的ページを含む）に適用されます。ご質問はアプリ内のフィードバックからお寄せください。"
     },
-    "features": {
-      "badge": "主要機能",
-      "title": "エコシステム",
-      "titleHighlight": "ディープワーク",
-      "subtitle": "フロー状態を促進し、クリエイティブな出力を最大化するために設計されたツールの包括的なスイート。",
-      "items": {
-        "timer": {
-          "title": "ポモドーロタイマー",
-          "description": "作業、短い休憩、長い休憩モード。タスク連携、有効セッションルール（50%以上）、キーボードショートカット。"
-        },
-        "tasks": {
-          "title": "タスク管理",
-          "description": "タスクを作成、優先度設定し、ポモドーロセッションに連携。ステータスと日付でフィルター。"
-        },
-        "analytics": {
-          "title": "履歴と分析",
-          "description": "セッション履歴、日別/週別/月別の統計、生産性チャート。"
-        },
-        "chatAI": {
-          "title": "Bro Chat AI",
-          "description": "ポモドーロのヒント、勉強アドバイス、時間管理のAIコーチ。会話履歴を保存。"
-        },
-        "entertainment": {
-          "title": "ミニゲーム",
-          "description": "スネーク、2048、ブロック崩し、スペースシューター、神経衰弱、三目並べ—休憩中にプレイ。"
-        },
-        "sounds": {
-          "title": "アコースティックフォーカス",
-          "description": "自然音、Spotify＆YouTube。Lo-fiとホワイトノイズサウンドスケープ。"
-        },
-        "streaks": {
-          "title": "集中モード＆連続記録",
-          "description": "ミニマルUI、連続記録追跡、専用の集中モードでモチベーション維持。"
-        },
-        "themes": {
-          "title": "適応インターフェース",
-          "description": "ライトとダークモード、カスタム背景。複数の時計スタイル。"
-        }
-      }
-    },
-    "chatAI": {
-      "indicator": "AI生産性アシスタント",
-      "prompt": "スケジュールを最適化するには..."
-    },
-    "pricing": {
-      "badge": "価値提案 💎",
-      "title": "透明な",
-      "titleHighlight": "料金",
-      "subtitle": "生産性のニーズに合わせてスケールする柔軟なプラン。",
-      "forever": "永久",
-      "noCreditCard": "クレジットカード不要",
-      "freeForever": "ベーシックプラン",
-      "cancelAnytime": "いつでもキャンセル可能",
-      "free": {
-        "name": "スターター",
-        "description": "集中のための基本ツール",
-        "cta": "始める",
-        "features": {
-          "timer": "ポモドーロタイマー（作業、休憩、タスク連携）",
-          "tasks": "タスク管理＆フィルター",
-          "history": "セッション履歴＆分析",
-          "chatAI": "Bro Chat AIコーチ",
-          "games": "ミニゲーム（スネーク、2048など）",
-          "leaderboard": "グローバルランキング",
-          "focus": "集中モード＆連続記録",
-          "themes": "ライト/ダーク＆背景",
-          "sounds": "サウンド、Spotify＆YouTube",
-          "stats": "コア分析"
-        }
+    "collect": {
+      "title": "サーバーに保存するもの",
+      "intro": "Study Bro はアプリの動作に必要なものだけを保存します。",
+      "list": {
+        "1": "**アカウント情報：** Googleでログインした場合は名前、メールアドレス、プロフィール画像。メールコードでログインした場合はメールアドレス。",
+        "2": "**タスク：** タイトル、説明、優先度、ステータス、タグ、期限、ポモドーロの見積もり。",
+        "3": "**集中セッション：** モード（集中、短い休憩、長い休憩）、長さ、日時、紐づけたタスク（ある場合）。",
+        "4": "**ログインセッション：** ログイン中のブラウザごとのセッション記録（IPアドレスとユーザーエージェントを含む）と、不正利用を抑えるための短期のカウンター。",
+        "5": "**ゲストのデータ：** ログインせずに使うと、タスクとセッションを保存するためのゲストセッションが作られます。メールアドレスは含まれません。後でログインすると、そのデータはアカウントに移行されます。",
+        "6": "**フィードバック：** 送信した内容と種類、任意の評価、入力した場合のみ名前とメール。ログイン中は、フィードバックがアカウントに関連付けられます。"
       },
-      "pro": {
-        "name": "プロフェッショナル",
-        "description": "最高のパフォーマーのために",
-        "cta": "ウェイトリストに参加",
-        "comingSoon": "近日公開",
-        "comingSoonText": "開発中",
-        "brewingTitle": "高度な機能",
-        "brewingSubtitle": "を開発中です。お楽しみに。",
-        "includesEverything": "スターターのすべてに加えて:",
-        "features": {
-          "unlimited": "無制限のタスク管理",
-          "fullHistory": "無制限の履歴保持",
-          "cloudSync": "クロスデバイスクラウド同期",
-          "advanced": "高度なパフォーマンスインサイト",
-          "priority": "優先サポートチャンネル",
-          "sounds": "プレミアムサウンドスケープライブラリ",
-          "themes": "カスタムインターフェーステーマ"
-        }
+      "outro": "お支払い情報は求めず、アプリに広告はありません。"
+    },
+    "device": {
+      "title": "端末に残るもの",
+      "intro": "一部はブラウザに保存され、内容としては当方に送信されません。",
+      "list": {
+        "1": "タイマー設定、時計スタイル、シーン、サウンドの選択と音量などの設定。ブラウザのローカルストレージに保存されます。",
+        "2": "言語を記憶するクッキー。",
+        "3": "ゲストでもアカウントでも、ログイン状態を保つクッキー。"
       }
     },
-    "testimonials": {
-      "badge": "成功事例",
-      "title": "信頼されている",
-      "titleHighlight": "達成者たち",
-      "subtitle": "集中力と作業効率の向上のために何千人もに信頼されています。",
-      "items": {
-        "item1": {
-          "name": "サラ・チェン",
-          "role": "シニアソフトウェアエンジニア",
-          "content": "生産性分析により、最高のパフォーマンス時間を特定できました。今では大幅に速くコードを出荷しています。"
-        },
-        "item2": {
-          "name": "アレックス・リベラ",
-          "role": "プロダクトデザイナー",
-          "content": "厳選されたサウンドスケープは、オープンオフィス環境に欠かせません。集中の深さが著しく向上しました。"
-        },
-        "item3": {
-          "name": "デビッド・キム",
-          "role": "インディー創業者",
-          "content": "エレガントで効果的。ポモドーロテクニックとタスク管理の統合は、まさに私が必要としていた構造を提供してくれます。"
-        }
+    "partners": {
+      "title": "データ処理を委託するサービス",
+      "intro": "Study Bro は次の事業者を利用しています。各社は役割に必要な範囲のみを扱います。",
+      "list": {
+        "1": "**Vercel:** ウェブサイトとAPIのホスティング、およびプライバシーに配慮したページビュー解析。",
+        "2": "**Neon:** アカウント、タスク、セッション、フィードバックを保存するPostgreSQLデータベースのホスティング。",
+        "3": "**Resend:** ワンタイムのログインコードをメールで送信。",
+        "4": "**Google:** Googleでログインする場合、Googleが名前、メール、プロフィール画像を当方に共有します。Google Analytics は、設定されている環境でのみ使用されます。",
+        "5": "**YouTube:** YouTubeリンクを再生すると動画がYouTubeから埋め込まれ、YouTubeが自社のポリシーに基づき独自のクッキーを設定する場合があります。"
+      },
+      "outro": "お客様のデータを販売したり、広告目的で共有したりすることはありません。"
+    },
+    "use": {
+      "title": "データの利用目的",
+      "intro": "データは次の目的で使用します。",
+      "list": {
+        "1": "タイマー、タスク、履歴、連続日数の提供と、ログイン時の端末間同期。",
+        "2": "ログインコードの送信とセッションの安全確保。",
+        "3": "フィードバックの確認によるアプリの改善と、解析による全体的な利用状況の把握。"
       }
+    },
+    "choices": {
+      "title": "お客様の選択",
+      "intro": "データはお客様自身で管理できます。",
+      "list": {
+        "1": "**エクスポート：** 設定の「アカウント」から、アカウント、タスク、セッション、タグをJSONファイルでダウンロードできます。",
+        "2": "**削除：** 同じ場所でアカウントを削除できます。タスク、集中セッション、タグ、ログイン記録が完全に削除されます。送信済みのフィードバックは残りますが、お客様とは関連付けられなくなります。ゲストも同じ方法でゲストデータを削除できます。",
+        "3": "**ローカルデータの消去：** ブラウザのサイトデータを消去すると、端末に保存された設定が削除されます。"
+      },
+      "outro": "メールのログインコードは10分で失効します。"
+    },
+    "children": {
+      "title": "お子様について",
+      "intro": "Study Bro は13歳未満のお子様を対象としておらず、意図的にそのデータを収集することはありません。お子様が登録したと思われる場合は、フィードバックからお知らせください。アカウントを削除します。"
+    },
+    "changes": {
+      "title": "本ポリシーの変更",
+      "intro": "Study Bro のデータの扱いが変わる場合は、このページを更新し、冒頭の日付も変更します。"
+    }
+  },
+  "terms": {
+    "title": "利用規約",
+    "lead": "本規約は、タスク、集中履歴、環境音を備えた無料ポモドーロタイマー Study Bro のご利用に適用されます。アプリを利用することで、本規約に同意したものとみなします。",
+    "service": {
+      "title": "サービスについて",
+      "intro": "Study Bro は無料で提供されます。ゲストでもアカウントでも利用できます。機能は今後、追加、変更、削除されることがあります。"
+    },
+    "use": {
+      "title": "ご利用にあたって",
+      "intro": "誠実にご利用ください。特に次の点にご注意ください。",
+      "list": {
+        "1": "ログイン方法を安全に管理してください。アカウントでの行為はご自身の責任となります。",
+        "2": "サービスへの攻撃、過負荷、探索、またはレート制限などの制限の回避をしないでください。",
+        "3": "フィードバックフォームで、違法、中傷、悪意のある内容を送信しないでください。",
+        "4": "他人のデータやアカウントにアクセスしないでください。"
+      }
+    },
+    "content": {
+      "title": "お客様のコンテンツ",
+      "intro": "作成したタスク、メモ、タグはお客様のものです。当方はプライバシーポリシーに記載のとおり、アプリを提供する目的でのみ保存・処理します。いつでもエクスポートまたは削除できます。"
+    },
+    "thirdParty": {
+      "title": "第三者のコンテンツ",
+      "intro": "YouTubeリンクを再生する場合、そのコンテンツと再生にはYouTube自身の規約が適用されます。Study Bro は第三者のコンテンツを所有も管理もしていません。"
+    },
+    "availability": {
+      "title": "提供状況とバックアップ",
+      "intro": "アプリの稼働維持に努めますが、中断のないサービスを保証するものではありません。大切なデータは、ときどきエクスポートしてください。"
+    },
+    "liability": {
+      "title": "免責と責任",
+      "intro": "ポモドーロタイマーは生産性を支援するツールであり、専門的な助言ではありません。",
+      "list": {
+        "1": "Study Bro は、法律で認められる範囲で、いかなる保証もなく「現状のまま」提供されます。",
+        "2": "法律で認められる範囲で、間接的・派生的な損害、およびアプリの利用に起因するデータの喪失や学習・作業時間の損失について、当方は責任を負いません。"
+      }
+    },
+    "ending": {
+      "title": "利用の終了",
+      "intro": "いつでも Study Bro の利用をやめ、設定からアカウントを削除できます。本規約に違反するアカウントやサービスに害を及ぼすアカウントは、停止または削除することがあります。"
+    },
+    "changes": {
+      "title": "変更とお問い合わせ",
+      "intro": "本規約は更新されることがあります。冒頭の日付が最新版を示し、引き続きアプリを利用した場合は更新に同意したものとみなします。ご質問はアプリ内のフィードバックからお寄せください。"
+    }
+  },
+  "scenes": {
+    "title": "シーン",
+    "tabs": {
+      "scenes": "シーン",
+      "photos": "写真"
+    },
+    "categories": {
+      "label": "雰囲気",
+      "all": "すべて",
+      "calm": "穏やか",
+      "nature": "自然",
+      "space": "宇宙",
+      "cozy": "くつろぎ",
+      "minimal": "ミニマル"
+    },
+    "names": {
+      "pomodoro": "クリーム紙",
+      "aurora": "オーロラ",
+      "rain": "雨の窓辺",
+      "nebula": "星雲",
+      "sunset": "ローファイの夕焼け",
+      "ocean": "夜の海",
+      "fireflies": "ホタル",
+      "grain": "やわらかな粒子",
+      "snow": "降る雪",
+      "planet": "遠い惑星"
+    },
+    "followsTimer": "タイマー連動",
+    "inUse": "使用中",
+    "defaultHint": "クリーム紙は標準の背景で、タイマーのモードに合わせてやさしく色づきます。シーンを選ぶと調整できます。",
+    "brightnessHint": "文字が読みにくいときは下げてください。",
+    "animate": "アニメーション",
+    "animateHint": "オフにすると静止画を1枚だけ描画し、電力を節約します。",
+    "reducedMotionNote": "お使いの端末で動きの軽減が有効なため、シーンは静止します。",
+    "followMode": "タイマーの色に合わせる",
+    "followModeHint": "集中と休憩で色が切り替わります。",
+    "followModeUnsupported": "このシーンは独自の色を保ちます。"
+  },
+  "arcadeKit": {
+    "subtitle": "休憩にぴったりの短いゲーム。",
+    "breakNote": "2〜5分の休憩向け。1ゲーム遊んだら作業に戻りましょう。やり込み要素はありません。",
+    "filterLabel": "ゲームを絞り込む",
+    "category": {
+      "all": "すべて",
+      "action": "アクション",
+      "puzzle": "パズル",
+      "skill": "スキル"
+    },
+    "minutes": "約{min}分",
+    "control": {
+      "keyboard": "キーボード",
+      "mouse": "マウス",
+      "touch": "タッチ"
+    },
+    "controls": "操作",
+    "howToPlay": "遊び方",
+    "tip": "コツ",
+    "play": "プレイ",
+    "start": "スタート",
+    "yourBest": "ベストスコア: {score}",
+    "loading": "ゲームを読み込み中…",
+    "score": "スコア",
+    "best": "ベスト",
+    "bestIs": "ベストスコア: {score}",
+    "newBest": "ベストスコア更新！",
+    "time": "時間",
+    "moves": "手数",
+    "level": "レベル",
+    "lives": "ライフ",
+    "combo": "コンボ",
+    "difficulty": "難易度",
+    "pause": "一時停止",
+    "resume": "再開",
+    "restart": "最初からやり直す",
+    "close": "ゲームを閉じる",
+    "paused": "一時停止中",
+    "pausedHint": "Escでも一時停止と再開ができます。タブを切り替えると自動で一時停止します。",
+    "gameOver": "ゲームオーバー",
+    "playAgain": "もう一度",
+    "backToGames": "ゲーム一覧へ"
+  },
+  "arcadeGames": {
+    "snake": {
+      "title": "スネーク",
+      "description": "エサを食べて長く。自分にはぶつからないで。",
+      "instructions": "矢印キーかWASD、タッチ画面ではスワイプで操作します。赤い点を食べると10点。長くなるほど速くなり、壁や自分の体にぶつかると終了です。",
+      "tip": "序盤は壁沿いに進み、頭の前に空きスペースを残しましょう。",
+      "hint": "矢印 / WASD またはスワイプ · Escで一時停止",
+      "length": "長さ",
+      "summary": "最終の長さ: {length}"
+    },
+    "game2048": {
+      "title": "2048",
+      "description": "タイルをスライドして2048を目指す。",
+      "instructions": "矢印キー、WASD、スワイプで全タイルをスライドします。同じ数字が触れ合うと1つに合体してスコアが入ります。2048で勝利、その後も続けられます。盤面が埋まり合体できなくなると終了です。",
+      "tip": "最大のタイルを角に置き、一辺に大きい順に並べましょう。",
+      "hint": "矢印 / WASD またはスワイプ · Escで一時停止",
+      "reached": "2048に到達！",
+      "reachedHint": "続けてハイスコアを狙うか、ここで終了できます。",
+      "keepGoing": "続ける",
+      "finish": "終了",
+      "highestTile": "最大のタイル: {tile}"
+    },
+    "minesweeper": {
+      "title": "マインスイーパー",
+      "description": "地雷を踏まずに盤面を開けよう。",
+      "instructions": "マスをタップして開けます。数字は周囲8マスにある地雷の数です。地雷だと思うマスには旗を立てます（右クリック、長押し、または旗モード）。安全なマスをすべて開ければ勝ちで、最初の1手は必ず安全です。",
+      "tip": "旗の数が一致した数字をタップすると、残りの周囲マスをまとめて開けます。",
+      "hint": "クリックで開く · 右クリックか長押しで旗 · Escで一時停止",
+      "easy": "かんたん",
+      "medium": "ふつう",
+      "hard": "むずかしい",
+      "mines": "地雷",
+      "flagMode": "旗モード",
+      "boom": "ドカン！",
+      "cleared": "クリア！",
+      "cellHidden": "マス{n}、未開封",
+      "cellFlag": "マス{n}、旗あり",
+      "cellOpen": "マス{n}、周囲に地雷{count}個"
+    },
+    "stack": {
+      "title": "スタック",
+      "description": "動くブロックを落として3Dのタワーを築く。",
+      "instructions": "ブロックがタワーの上を左右に動きます。タップ、クリック、またはスペースキーで落とします。はみ出した部分は切り取られ、ズレるほどタワーが細くなります。下のブロックにほぼ重ねればパーフェクトで、サイズを保てます。",
+      "tip": "ブロックの中央ではなく端を見て、端がそろった瞬間に落としましょう。",
+      "hint": "タップ・クリック・スペースで落とす · Escで一時停止",
+      "floors": "階",
+      "perfect": "パーフェクト！",
+      "perfectCombo": "パーフェクト x{n}！",
+      "summary": "タワーの高さ: {floors}階"
+    },
+    "typingSprint": {
+      "title": "タイピングスプリント",
+      "description": "60秒でできるだけ多くの単語を打とう。",
+      "instructions": "ハイライトされた英単語を入力し、スペースかEnterで送信します。正解すると文字数分のスコア、間違いは0点です。制限時間は60秒。速度はWPM（5文字＝1語）で表示されます。",
+      "tip": "指が今の単語を打っている間に、目は次の単語を見ておきましょう。",
+      "hint": "スペースかEnterで送信 · Escで一時停止",
+      "points": "ポイント",
+      "wpm": "WPM",
+      "accuracy": "正確さ",
+      "words": "単語",
+      "timeUp": "タイムアップ！",
+      "inputLabel": "ハイライトされた単語を入力",
+      "placeholder": "入力を始めましょう…"
+    },
+    "aimTrainer": {
+      "title": "エイムトレーナー",
+      "description": "小さくなって消える前にターゲットを撃ち抜こう。",
+      "instructions": "ターゲットは1つずつ現れます。リングが消える前にクリックまたはタップしましょう。速く、コンボが長いほど高得点です。ミスや時間切れでコンボはリセット。1ラウンドは30秒で、徐々に速くなります。",
+      "tip": "カーソルを画面の中央付近に置くと、どのターゲットにも短い移動で届きます。",
+      "hint": "ターゲットをクリック・タップ · Escで一時停止",
+      "target": "ターゲット",
+      "timeUp": "タイムアップ！",
+      "hits": "ヒット数",
+      "accuracy": "命中率",
+      "reaction": "平均反応"
+    },
+    "brickBreaker": {
+      "title": "ブロック崩し",
+      "description": "ボールを跳ね返して全ブロックを壊そう。",
+      "instructions": "マウス、矢印キー、または指のドラッグでパドルを動かします。タップ、クリック、スペースキーでボールを発射。全ブロックを壊すと次のレベルへ。パドルに触れずに連続で壊すとコンボボーナス。ライフは3つです。",
+      "tip": "パドルの端で受けると、ボールを角へ誘導できます。",
+      "hint": "マウス、← →、ドラッグ · スペースかタップで発射 · Escで一時停止",
+      "launch": "タップかスペースで発射",
+      "summary": "レベル{level}に到達"
+    },
+    "spaceShooter": {
+      "title": "スペースシューター",
+      "description": "避けて、撃って、パワーアップを取ろう。",
+      "instructions": "機体は自動で撃つので、動かすだけです。マウスや指でドラッグ、または矢印キー・WASDで操作します。敵を倒して得点し、敵の弾を避けましょう。時々パワーアップが出ます。Rは連射、3は3方向、Sは1回防ぐシールドです。ライフは3つ、400点ごとに敵が増えます。",
+      "tip": "画面の下半分にいると、反応する時間を稼げます。",
+      "hint": "ドラッグ、矢印、WASDで移動 · Escで一時停止",
+      "summary": "レベル{level}に到達"
+    },
+    "memoryMatch": {
+      "title": "神経衰弱",
+      "description": "できるだけ少ない手数でペアを見つけよう。",
+      "instructions": "1ターンに2枚めくってペアを探します。そろえば開いたまま、違えば裏返るので位置を覚えましょう。手数と時間が増えるほどスコアが下がります。",
+      "tip": "最初は決まった順序でめくると、毎回の情報が無駄になりません。",
+      "hint": "カードをクリック・タップ · Escで一時停止",
+      "easy": "6ペア",
+      "medium": "8ペア",
+      "hard": "10ペア",
+      "cleared": "全ペア発見！",
+      "cardBack": "裏向きのカード",
+      "cardFace": "シンボル{n}のカード"
+    },
+    "ticTacToe": {
+      "title": "三目並べ",
+      "description": "コンピューターと5ラウンド勝負。",
+      "instructions": "コンピューターと5ラウンド対戦します。あなたはXです。3×3は3つ、4×4は4つ並べると勝ち。勝ちは3点、引き分けは1点で、「むずかしい」と4×4はそれぞれ点数が2倍になります。先攻は交互です。",
+      "tip": "最初は中央か角を取りましょう。「むずかしい」では引き分けでも上出来です。",
+      "hint": "マスをクリック・タップ · Escで一時停止",
+      "easy": "かんたん",
+      "hard": "むずかしい",
+      "board": "盤面",
+      "round": "ラウンド",
+      "yourTurn": "あなたの番",
+      "aiThinking": "コンピューターが考え中…",
+      "youWin": "このラウンドはあなたの勝ち！",
+      "aiWins": "このラウンドはコンピューターの勝ち。",
+      "draw": "引き分け。",
+      "nextRound": "次のラウンド",
+      "finish": "結果を見る",
+      "points": "{points}点",
+      "matchOver": "対戦終了",
+      "wins": "勝ち",
+      "draws": "引き分け",
+      "losses": "負け",
+      "emptyCell": "空きマス{n}"
     }
   }
 }

@@ -1,34 +1,19 @@
 "use client"
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { EmptyState } from '@/components/ui/empty-state'
-import { useAuth } from '@/hooks/use-auth'
 
-import { useMemo, useState } from 'react'
-import { Task, useTasksStore, TaskStatus } from '@/stores/task-store'
-import { TaskFilters } from './components/task-filters'
-import { TaskFormModal } from './components/task-form-modal'
-import { TaskList } from './components/task-list'
-import { TaskKanbanBoard } from './components/task-kanban-board'
-import { TaskTable } from './components/task-table'
-import { TaskViewSwitcher } from './components/task-view-switcher'
-import { TagManager } from './components/tag-manager'
-import { useTaskFilters } from '@/hooks/use-task-filters'
-import { useI18n } from '@/contexts/i18n-context'
+import { useMemo, useRef, useState } from 'react'
+import { useSessionRecorder } from '@/lib/timer/use-session-recorder'
+import { closePanel } from '@/features/app-shell/panel-store'
+import { isPast, isToday } from 'date-fns'
+import { BookmarkSimple, CircleNotch, DotsThree, Tag } from '@phosphor-icons/react/dist/ssr'
+import { Task, TaskPriority, TaskStatus, useTasksStore } from '@/stores/task-store'
 import { useTasks } from '@/hooks/use-tasks'
 import { useTags } from '@/hooks/use-tags'
 import { useTemplates } from '@/hooks/use-templates'
-import { Plus, Search, FilterX, AlertCircle, CheckCircle2, Clock, ListTodo, Bookmark, LayoutList, Loader2, Settings, Tag } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { TemplateManager } from './components/template-manager'
-import { useTimerStore } from '@/stores/timer-store'
-import { useQueryClient } from '@tanstack/react-query'
+import { useI18n } from '@/contexts/i18n-context'
+import { Button } from '@/components/ui/button'
+import { EmptyState } from '@/components/ui/empty-state'
+import { FilterChip } from '@/components/ui/filter-chip'
+import { PageHeader } from '@/components/ui/page-header'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,136 +24,75 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { TaskFilters, TaskScope } from './components/task-filters'
+import { TaskFormModal } from './components/task-form-modal'
+import { TaskKanbanBoard } from './components/task-kanban-board'
+import { TaskListView } from './components/task-list-view'
+import { TaskQuickAdd } from './components/task-quick-add'
+import { TagManager } from './components/tag-manager'
+import { TemplateManager } from './components/template-manager'
+
+const TASK_QUERY = { limit: 100 }
+
+function isDueToday(task: Task) {
+  if (!task.dueDate) return false
+  const due = new Date(task.dueDate)
+  return isToday(due) || (task.status !== 'done' && isPast(due))
+}
 
 export function TaskManagement() {
-  const taskFilters = useTaskFilters()
   const userTags = useTags()
-  const {
-    tasks,
-    total,
-    page,
-    setPage,
-    isLoading,
-    createTask,
-    updateTask,
-    hardDeleteTask,
-    reorderTasks,
-    cloneTask,
-    isCreating,
-    isUpdating,
-    isHardDeleting,
-    isCloning,
-  } = useTasks(taskFilters)
-
-  const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
-  const router = useRouter()
-  const { t } = useI18n()
-
-  const { activeTaskId, setActiveTask, viewMode } = useTasksStore()
-  const { editingId, setEditingId, resetEditingState } = useEditingState()
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const { tasks, total, page, setPage, limit, isLoading, createTask, updateTask, hardDeleteTask, reorderTasks, cloneTask, isCreating, isUpdating, isHardDeleting } =
+    useTasks(TASK_QUERY)
   const { saveAsTemplate } = useTemplates()
+  const { t } = useI18n()
+  const { switchActiveTask } = useSessionRecorder()
+  const { activeTaskId, viewMode, setViewMode } = useTasksStore()
 
-  // Delete confirmation state
-
+  const [scope, setScope] = useState<TaskScope>('all')
+  const [query, setQuery] = useState('')
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
   const [togglingTaskIds, setTogglingTaskIds] = useState<Set<string>>(new Set())
+  const [manageDialog, setManageDialog] = useState<'tags' | 'templates' | null>(null)
+  const quickAddRef = useRef<HTMLInputElement>(null)
 
-  const editingTask = useMemo(
-    () => (editingId ? tasks.find((task) => task.id === editingId) ?? null : null),
-    [editingId, tasks],
+  const isBoard = viewMode === 'kanban'
+  const editingTask = useMemo(() => tasks.find((task) => task.id === editingId) ?? null, [editingId, tasks])
+  const uniqueTags = useMemo(() => Array.from(new Set(tasks.flatMap((task) => task.tags))).sort(), [tasks])
+
+  const counts = useMemo<Record<TaskScope, number>>(
+    () => ({
+      all: tasks.length,
+      today: tasks.filter(isDueToday).length,
+      todo: tasks.filter((task) => task.status === 'todo').length,
+      doing: tasks.filter((task) => task.status === 'doing').length,
+      done: tasks.filter((task) => task.status === 'done').length,
+    }),
+    [tasks],
   )
-  const queryClient = useQueryClient()
 
-  const handleFormSubmit = async (payload: any) => {
-    try {
-      if (editingId) {
-        await updateTask({ id: editingId, input: payload })
-        resetEditingState()
-      } else {
-        await createTask(payload)
-        setIsCreateModalOpen(false)
-      }
-    } catch (error) {
-      // Error handled by hook
-    }
-  }
-
-  const handleToggleStatus = async (task: Task) => {
-    const isNowDone = task.status !== 'done'
-    const newStatus: TaskStatus = isNowDone ? 'done' : 'todo'
-
-    // Auto-unfocus logic
-    if (isNowDone && activeTaskId === task.id) {
-      // Record partial session before unfocusing for accuracy
-      const { mode, timeLeft, lastSessionTimeLeft, setLastSessionTimeLeft } = useTimerStore.getState()
-      if (mode === 'work') {
-        const durationSec = Math.max(0, lastSessionTimeLeft - timeLeft)
-        if (durationSec > 0) {
-          try {
-            await fetch('/api/tasks/session-complete', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                taskId: task.id,
-                durationSec,
-                mode: 'work',
-              }),
-            })
-            queryClient.invalidateQueries({ queryKey: ['stats'] })
-            queryClient.invalidateQueries({ queryKey: ['tasks'] })
-          } catch (e) { console.error(e) }
-        }
-        // Reset baseline for the next task
-        setLastSessionTimeLeft(timeLeft)
-      }
-      setActiveTask(null)
-    }
-
-    setTogglingTaskIds(prev => new Set(prev).add(task.id))
-    try {
-      await updateTask({ id: task.id, input: { status: newStatus } })
-    } finally {
-      setTogglingTaskIds(prev => {
-        const next = new Set(prev)
-        next.delete(task.id)
-        return next
-      })
-    }
-  }
+  const visibleTasks = useMemo(() => {
+    const needle = query.trim().toLowerCase()
+    return tasks.filter((task) => {
+      if (scope === 'today' ? !isDueToday(task) : scope !== 'all' && task.status !== scope) return false
+      if (!needle) return true
+      return task.title.toLowerCase().includes(needle) || task.tags.some((tag) => tag.toLowerCase().includes(needle))
+    })
+  }, [tasks, scope, query])
 
   const handleUpdateStatus = async (taskId: string, newStatus: TaskStatus) => {
-    const isNowDone = newStatus === 'done'
+    if (newStatus === 'done' && activeTaskId === taskId) switchActiveTask(null)
 
-    if (isNowDone && activeTaskId === taskId) {
-      const { mode, timeLeft, lastSessionTimeLeft, setLastSessionTimeLeft } = useTimerStore.getState()
-      if (mode === 'work') {
-        const durationSec = Math.max(0, lastSessionTimeLeft - timeLeft)
-        if (durationSec > 0) {
-          try {
-            await fetch('/api/tasks/session-complete', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                taskId,
-                durationSec,
-                mode: 'work',
-              }),
-            })
-            queryClient.invalidateQueries({ queryKey: ['stats'] })
-            queryClient.invalidateQueries({ queryKey: ['tasks'] })
-          } catch (e) { console.error(e) }
-        }
-        setLastSessionTimeLeft(timeLeft)
-      }
-      setActiveTask(null)
-    }
-
-    setTogglingTaskIds(prev => new Set(prev).add(taskId))
+    setTogglingTaskIds((prev) => new Set(prev).add(taskId))
     try {
       await updateTask({ id: taskId, input: { status: newStatus } })
+    } catch {
+      // the mutation already rolled back and showed the error toast
     } finally {
-      setTogglingTaskIds(prev => {
+      setTogglingTaskIds((prev) => {
         const next = new Set(prev)
         next.delete(taskId)
         return next
@@ -176,329 +100,208 @@ export function TaskManagement() {
     }
   }
 
-  const handleToggleActive = (task: Task) => {
-    const { timeLeft, setLastSessionTimeLeft } = useTimerStore.getState()
+  const handleToggleStatus = (task: Task) => handleUpdateStatus(task.id, task.status === 'done' ? 'todo' : 'done')
 
-    if (activeTaskId === task.id) {
-      // Recording when manual unfocus too for accuracy
-      const { mode, lastSessionTimeLeft } = useTimerStore.getState()
-      if (mode === 'work') {
-        const durationSec = Math.max(0, lastSessionTimeLeft - timeLeft)
-        if (durationSec > 0) {
-          fetch('/api/tasks/session-complete', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              taskId: task.id,
-              durationSec,
-              mode: 'work',
-            }),
-          }).then(() => {
-            queryClient.invalidateQueries({ queryKey: ['stats'] })
-            queryClient.invalidateQueries({ queryKey: ['tasks'] })
-          }).catch(console.error)
-        }
-      }
-      setActiveTask(null)
-    } else {
-      // Record time for the PREVIOUS active task if any
-      if (activeTaskId) {
-        const { mode, lastSessionTimeLeft } = useTimerStore.getState()
-        if (mode === 'work') {
-          const durationSec = Math.max(0, lastSessionTimeLeft - timeLeft)
-          if (durationSec > 0) {
-            fetch('/api/tasks/session-complete', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                taskId: activeTaskId,
-                durationSec,
-                mode: 'work',
-              }),
-            }).then(() => {
-              queryClient.invalidateQueries({ queryKey: ['stats'] })
-              queryClient.invalidateQueries({ queryKey: ['tasks'] })
-            }).catch(console.error)
-          }
-        }
-      }
+  const handleStopFocus = () => switchActiveTask(null)
 
-      // Start new baseline for this task
-      setLastSessionTimeLeft(timeLeft)
-      setActiveTask(task.id)
-
-      // If task is todo, move it to doing
-      if (task.status === 'todo') {
-        updateTask({ id: task.id, input: { status: 'doing' } })
-      }
+  const handleFocus = (task: Task) => {
+    if (activeTaskId !== task.id) {
+      switchActiveTask(task.id)
+      if (task.status === 'todo') void updateTask({ id: task.id, input: { status: 'doing' } }).catch(() => undefined)
     }
+    closePanel()
   }
 
-  const handleOpenChange = (open: boolean) => {
-    if (!open) {
-      setIsCreateModalOpen(false)
-      resetEditingState()
-    } else {
-      setIsCreateModalOpen(true)
-    }
+  const handleQuickAdd = async (input: { title: string; priority: TaskPriority; estimatePomodoros: number }) => {
+    await createTask(input)
   }
 
-  const handleDeleteRequest = (id: string) => {
-    setDeleteConfirmId(id)
+  const handleFormSubmit = async (payload: any) => {
+    try {
+      if (editingId) {
+        await updateTask({ id: editingId, input: payload })
+        setEditingId(null)
+      } else {
+        await createTask(payload)
+        setIsCreateOpen(false)
+      }
+    } catch {
+      // surfaced by the mutation toast
+    }
   }
 
   const confirmDelete = async () => {
     if (!deleteConfirmId) return
-
     try {
-      // If deleting the active task, reset active state
-      if (deleteConfirmId === activeTaskId) {
-        setActiveTask(null)
-      }
-
+      if (deleteConfirmId === activeTaskId) switchActiveTask(null)
       await hardDeleteTask(deleteConfirmId)
-
-      if (editingId === deleteConfirmId) {
-        resetEditingState()
-      }
-    } catch (error) {
-      // Error handled by hook
+      if (editingId === deleteConfirmId) setEditingId(null)
+    } catch {
+      // surfaced by the mutation toast
     } finally {
       setDeleteConfirmId(null)
     }
   }
 
-  const handleEdit = (task: Task) => {
-    setEditingId(task.id)
+  const rowHandlers = {
+    onToggleStatus: handleToggleStatus,
+    onFocus: handleFocus,
+    onStopFocus: handleStopFocus,
+    onEdit: (task: Task) => setEditingId(task.id),
+    onDelete: setDeleteConfirmId,
+    onClone: (id: string) => void cloneTask(id).catch(() => undefined),
+    onSaveAsTemplate: (id: string) => void saveAsTemplate(id).catch(() => undefined),
+    togglingTaskIds,
   }
 
-  const handleClone = async (taskId: string) => {
-    try {
-      await cloneTask(taskId)
-    } catch (error) {
-      // Error handled by hook
-    }
-  }
-
-  const handleSaveAsTemplate = async (taskId: string) => {
-    try {
-      await saveAsTemplate(taskId)
-    } catch (error) {
-      // Error handled by hook
-    }
-  }
-
-  const uniqueTags = useMemo(() => {
-    const tags = new Set<string>()
-    tasks.forEach(task => task.tags.forEach(tag => tags.add(tag)))
-    return Array.from(tags).sort()
-  }, [tasks])
-
-  // Task statistics - use filteredTasks to match displayed content
-  const taskStats = useMemo(() => {
-    const todo = tasks.filter(t => t.status === 'todo').length
-    const doing = tasks.filter(t => t.status === 'doing').length
-    const done = tasks.filter(t => t.status === 'done').length
-    return { todo, doing, done, total: tasks.length }
-  }, [tasks])
-
-  if (isAuthLoading) {
-    return null // Or a loading spinner
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="flex flex-col items-center justify-center flex-1 min-h-[60vh]">
-        <EmptyState
-          title={t('auth.signInToManageTasks')}
-          action={
-            <Button onClick={() => router.push('/login?redirect=/tasks')}>
-              {t('auth.signInButton')}
-            </Button>
-          }
-        />
-      </div>
-    )
-  }
+  const totalPages = Math.max(1, Math.ceil(total / limit))
+  const isEmpty = !isLoading && tasks.length === 0
+  const noMatches = !isLoading && tasks.length > 0 && visibleTasks.length === 0
 
   return (
-    <div className="space-y-4">
-      {/* Header Section */}
-      <div className="flex flex-col gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">{t('tasks.title')}</h1>
-          <p className="text-sm text-muted-foreground">
-            {t('tasks.subtitle')}
-          </p>
-        </div>
-
-        {/* Status badges (left) + Actions (right) on same row */}
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2 text-[11px]">
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border bg-background shadow-sm transition-all duration-300">
-              <div className="p-0.5 rounded-full bg-muted">
-                <LayoutList className="h-3 w-3 text-muted-foreground" />
-              </div>
-              <span className="font-bold text-foreground">{taskStats.todo}</span>
-              <span className="text-muted-foreground">{t('tasks.statuses.todo')}</span>
+    <>
+      <PageHeader
+        title={t('tasks.title')}
+        description={tasks.length > 0 ? t('tasksUi.summary', { todo: counts.todo, doing: counts.doing, done: counts.done }) : undefined}
+        actions={
+          <>
+            <div role="group" aria-label={t('tasksUi.viewLabel')} className="flex items-center gap-2">
+              <FilterChip active={!isBoard} onClick={() => setViewMode('table')}>
+                {t('tasksUi.viewList')}
+              </FilterChip>
+              <FilterChip active={isBoard} onClick={() => setViewMode('kanban')}>
+                {t('tasksUi.viewBoard')}
+              </FilterChip>
             </div>
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-blue-500/20 bg-blue-500/5 shadow-sm transition-all duration-300">
-              <div className="p-0.5 rounded-full bg-blue-500/20">
-                <Clock className="h-3 w-3 text-blue-500" />
-              </div>
-              <span className="font-bold text-blue-600 dark:text-blue-400">{taskStats.doing}</span>
-              <span className="text-blue-500 dark:text-blue-400">{t('tasks.statuses.doing')}</span>
-            </div>
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-emerald-500/20 bg-emerald-500/5 shadow-sm transition-all duration-300">
-              <div className="p-0.5 rounded-full bg-emerald-500/20">
-                <CheckCircle2 className="h-3 w-3 text-emerald-500" />
-              </div>
-              <span className="font-bold text-emerald-600 dark:text-emerald-400">{taskStats.done}</span>
-              <span className="text-emerald-500 dark:text-emerald-400">{t('tasks.statuses.done')}</span>
-            </div>
-            {isLoading && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground/50 ml-1" />}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="px-3 gap-2 bg-foreground text-background hover:bg-foreground/90 rounded-md"
-            >
-              <Plus className="h-4 w-4" />
-              <span className="font-semibold hidden sm:inline">{t('tasks.addTask')}</span>
-              {isCreating && <Loader2 className="h-3 w-3 animate-spin" />}
-            </Button>
-            <TaskViewSwitcher />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" className="h-9 w-9" aria-label={t('common.settings')}>
-                  <Settings className="h-4 w-4" />
+                <Button variant="ghost" size="icon" className="text-ink-muted" aria-label={t('tasksUi.manage')}>
+                  <DotsThree size={18} weight="bold" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <TagManager
-                  tags={userTags.tags}
-                  onAddTag={userTags.addTag}
-                  onRemoveTag={userTags.removeTag}
-                  trigger={
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                      <Tag className="h-4 w-4 mr-2" />
-                      {t('tasks.manageTags')}
-                    </DropdownMenuItem>
-                  }
-                />
-                <TemplateManager
-                  trigger={
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                      <Bookmark className="h-4 w-4 mr-2" />
-                      {t('tasks.templates.title')}
-                    </DropdownMenuItem>
-                  }
-                />
+                <DropdownMenuItem onSelect={() => setManageDialog('tags')} className="cursor-pointer gap-2">
+                  <Tag size={15} />
+                  {t('tasks.manageTags')}
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setManageDialog('templates')} className="cursor-pointer gap-2">
+                  <BookmarkSimple size={15} />
+                  {t('tasks.templates.title')}
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <TaskFormModal
-              editingTask={editingTask}
-              isOpen={!!editingId || isCreateModalOpen}
-              isLoading={isCreating || isUpdating}
-              onOpenChange={handleOpenChange}
-              onSave={handleFormSubmit}
-              availableTags={uniqueTags}
-              userTags={userTags.tags}
-            />
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      />
 
-      <section className="space-y-4">
-        <TaskFilters
-          query={taskFilters.query}
-          statusFilter={taskFilters.statusFilter}
-          priorityFilter={taskFilters.priorityFilter}
-          dateRange={taskFilters.dateRange}
-          availableTags={uniqueTags}
-          onQueryChange={taskFilters.setQuery}
-          onStatusChange={taskFilters.setStatusFilter}
-          onPriorityChange={taskFilters.setPriorityFilter}
-          onDateRangeChange={taskFilters.setDateRange}
-          onReload={() => { /* React Query handles caching, but we could invalidate here if needed */ }}
-          onResetFilters={taskFilters.resetFilters}
-        />
+      <div className="space-y-5">
+        <TaskQuickAdd ref={quickAddRef} onCreate={handleQuickAdd} onOpenDetails={() => setIsCreateOpen(true)} />
 
-        {viewMode === 'kanban' ? (
-          <TaskKanbanBoard
-            tasks={tasks}
-            isLoading={isLoading}
-            activeTaskId={activeTaskId}
-            onToggleStatus={handleToggleStatus}
-            onEdit={handleEdit}
-            onDelete={handleDeleteRequest}
-            onClone={handleClone}
-            onReorder={reorderTasks}
-            onUpdateStatus={handleUpdateStatus}
-            onSaveAsTemplate={handleSaveAsTemplate}
-            togglingTaskIds={togglingTaskIds}
+        {isEmpty ? (
+          <EmptyState
+            title={t('tasksUi.emptyTitle')}
+            description={t('tasksUi.emptyDescription')}
+            action={
+              <Button onClick={() => quickAddRef.current?.focus()}>
+                {t('tasksUi.emptyAction')}
+              </Button>
+            }
           />
         ) : (
-          <TaskTable
-            tasks={tasks}
-            isLoading={isLoading}
-            activeTaskId={activeTaskId}
-            total={total}
-            page={page}
-            onPageChange={setPage}
-            onToggleStatus={handleToggleStatus}
-            onEdit={handleEdit}
-            onDelete={handleDeleteRequest}
-            onClone={handleClone}
-            onSaveAsTemplate={handleSaveAsTemplate}
-            onCreate={() => setIsCreateModalOpen(true)}
-            togglingTaskIds={togglingTaskIds}
-          />
+          <>
+            <TaskFilters scope={scope} counts={counts} query={query} onScopeChange={setScope} onQueryChange={setQuery} />
+
+            {noMatches ? (
+              <EmptyState
+                title={t('tasksUi.noMatchTitle')}
+                description={t('tasksUi.noMatchDescription')}
+                face="sleepy"
+                className="min-h-[240px]"
+                action={
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      setScope('all')
+                      setQuery('')
+                    }}
+                  >
+                    {t('tasksUi.clearFilters')}
+                  </Button>
+                }
+              />
+            ) : isBoard ? (
+              <TaskKanbanBoard
+                tasks={visibleTasks}
+                isLoading={isLoading}
+                activeTaskId={activeTaskId}
+                onReorder={reorderTasks}
+                onUpdateStatus={handleUpdateStatus}
+                {...rowHandlers}
+              />
+            ) : (
+              <TaskListView
+                tasks={visibleTasks}
+                isLoading={isLoading}
+                activeTaskId={activeTaskId}
+                forceShowDone={scope === 'done' || query.trim().length > 0}
+                {...rowHandlers}
+              />
+            )}
+
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-3 pt-2">
+                <Button variant="outline" size="sm" onClick={() => setPage(page - 1)} disabled={page === 1 || isLoading}>
+                  {t('common.previous')}
+                </Button>
+                <span className="text-[0.8125rem] font-semibold tabular-nums text-ink-muted">{t('tasksUi.page', { page, total: totalPages })}</span>
+                <Button variant="outline" size="sm" onClick={() => setPage(page + 1)} disabled={page >= totalPages || isLoading}>
+                  {t('common.next')}
+                </Button>
+              </div>
+            )}
+          </>
         )}
-      </section>
+      </div>
+
+      <TagManager
+        open={manageDialog === 'tags'}
+        onOpenChange={(open) => !open && setManageDialog(null)}
+        tags={userTags.tags}
+        onAddTag={userTags.addTag}
+        onRemoveTag={userTags.removeTag}
+      />
+      <TemplateManager open={manageDialog === 'templates'} onOpenChange={(open) => !open && setManageDialog(null)} />
+
+      <TaskFormModal
+        editingTask={editingTask}
+        isOpen={!!editingId || isCreateOpen}
+        isLoading={isCreating || isUpdating}
+        onOpenChange={(open) => {
+          if (open) return setIsCreateOpen(true)
+          setIsCreateOpen(false)
+          setEditingId(null)
+        }}
+        onSave={handleFormSubmit}
+        availableTags={uniqueTags}
+        userTags={userTags.tags}
+      />
 
       <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('tasks.confirmDelete.title')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('tasks.confirmDelete.description')}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{t('tasks.confirmDelete.description')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmDelete}
-              disabled={isHardDeleting}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 min-w-[100px]"
-            >
-              {isHardDeleting ? (
-                <>
-                  <Plus className="mr-2 h-4 w-4 animate-spin rotate-45" />
-                  {t('tasks.actions.deleting')}
-                </>
-              ) : (
-                t('tasks.confirmDelete.action')
-              )}
+            <AlertDialogAction asChild>
+              <Button variant="destructive" onClick={confirmDelete} disabled={isHardDeleting} className="min-w-[100px]">
+                {isHardDeleting ? <CircleNotch size={16} className="animate-spin" /> : t('tasks.confirmDelete.action')}
+              </Button>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </>
   )
-}
-
-function useEditingState() {
-  const [editingId, setEditingId] = useState<string | null>(null)
-
-  const resetEditingState = () => {
-    setEditingId(null)
-  }
-
-  return {
-    editingId,
-    setEditingId,
-    resetEditingState,
-  }
 }

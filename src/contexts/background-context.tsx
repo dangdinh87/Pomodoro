@@ -8,18 +8,15 @@ import React, {
   ReactNode,
 } from 'react';
 import { detectFormatSupport } from '@/lib/format-detection';
-import { findImageById } from '@/data/background-packs';
-import { PATH_TO_ID_MAP, REMOVED_BACKGROUND_IDS } from '@/data/background-migration';
+import { migrateLegacyCustomImages } from '@/lib/custom-background/image-store';
+import {
+  DEFAULT_BACKGROUND,
+  migrateBackground,
+  type BackgroundSettings,
+  type BGType,
+} from '@/data/background-migration';
 
-type BGType = 'none' | 'solid' | 'image' | 'gradient' | 'random';
-
-interface BackgroundSettings {
-  type: BGType;
-  value: string;
-  opacity: number;
-  blur: number;
-  brightness: number;
-}
+export type { BackgroundSettings, BGType };
 
 interface BackgroundContextType {
   background: BackgroundSettings;
@@ -32,13 +29,7 @@ interface BackgroundContextType {
   setBackgroundType: (type: BGType) => void;
 }
 
-const defaultBackground: BackgroundSettings = {
-  type: 'solid',
-  value: 'hsl(var(--background))',
-  opacity: 1,
-  blur: 0,
-  brightness: 100,
-};
+const defaultBackground = DEFAULT_BACKGROUND;
 
 const BackgroundContext = createContext<BackgroundContextType | undefined>(
   undefined,
@@ -62,51 +53,6 @@ const shouldUseLightweightBackground = () => {
   return prefersReducedData || isLowEnd;
 };
 
-/** Migrate old or broken configs to safe defaults */
-const migrateBackground = (bg: BackgroundSettings): BackgroundSettings => {
-  if (!bg?.value || bg.type === 'none') {
-    return {
-      ...bg,
-      type: 'solid',
-      value: 'hsl(var(--background))',
-      opacity: 1,
-      blur: 0,
-      brightness: 100,
-    };
-  }
-
-  if (bg.type === 'random') {
-    return {
-      ...bg,
-      type: 'solid',
-      value: 'hsl(var(--background))',
-      opacity: bg.opacity ?? 1,
-      blur: bg.blur ?? 0,
-      brightness: bg.brightness ?? 100,
-    };
-  }
-
-  // Migrate old path-based values to new pack IDs
-  if (bg.type === 'image' && bg.value) {
-    if (REMOVED_BACKGROUND_IDS.has(bg.value)) {
-      return {
-        ...bg,
-        type: 'solid',
-        value: 'hsl(var(--background))',
-        opacity: 1,
-        blur: 0,
-        brightness: 100,
-      };
-    }
-    if (!findImageById(bg.value)) {
-      const newId = PATH_TO_ID_MAP[bg.value];
-      if (newId) return { ...bg, value: newId };
-    }
-  }
-
-  return bg;
-};
-
 // ---------------------------------------------------------------
 // Provider
 // ---------------------------------------------------------------
@@ -122,6 +68,8 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
     async function init() {
       // Detect AVIF/WebP support before resolving URLs
       await detectFormatSupport();
+      // Older versions kept the uploaded image as base64 in localStorage (twice)
+      await migrateLegacyCustomImages().catch(() => {});
 
       const saved = localStorage.getItem('background-settings');
 
@@ -147,7 +95,7 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
           ? {
             showDottedMap: false,
             type: 'solid' as const,
-            value: 'hsl(var(--background))',
+            value: 'var(--surface-page)',
             opacity: 1,
             blur: 0,
             brightness: 100,

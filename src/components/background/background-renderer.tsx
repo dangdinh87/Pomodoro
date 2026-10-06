@@ -1,11 +1,18 @@
 'use client';
 
 import { useBackground } from '@/contexts/background-context';
+import { DEFAULT_BACKGROUND } from '@/data/background-migration';
 import { findImageById } from '@/data/background-packs';
+import { useCustomImageUrl } from '@/hooks/use-custom-image-url';
+import { parseCustomImageValue } from '@/lib/custom-background/image-store';
 import { getBestImageUrl } from '@/lib/format-detection';
-import { useTheme } from 'next-themes';
+import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
+import { pathWithoutLocale } from '@/lib/i18n/locale-path';
 import { useEffect, useMemo, useState } from 'react';
+
+// Scene shaders only download once a scene is actually selected.
+const SceneCanvas = dynamic(() => import('@/features/scenes/components/scene-canvas'), { ssr: false });
 
 /** Resolve background value (ID, sentinel, path, or data URL) to a displayable URL. */
 function resolveBackgroundUrl(value: string): string {
@@ -15,7 +22,7 @@ function resolveBackgroundUrl(value: string): string {
   // Video paths pass through
   if (value.endsWith('.mp4')) return value;
 
-  // Custom images (data URLs or http URLs) pass through
+  // Custom images (http URLs, or data URLs saved before images moved to IndexedDB) pass through
   if (value.startsWith('data:') || value.startsWith('http')) return value;
 
   // Old-style paths (safety fallback if migration missed something)
@@ -30,30 +37,25 @@ function resolveBackgroundUrl(value: string): string {
 }
 
 export function BackgroundRenderer() {
-  const { background, isLoading } = useBackground();
-  const { theme: currentTheme } = useTheme();
+  const { background, isLoading, setBackground } = useBackground();
   const [loaded, setLoaded] = useState(false);
 
   const pathname = usePathname();
-  const isTimerPage = pathname === '/timer';
+  // The timer stage lives on `/`; content pages keep the plain theme background.
+  const isTimerPage = pathWithoutLocale(pathname) === '/';
 
-  // Resolve theme (light/dark)
-  const resolvedTheme = useMemo<'light' | 'dark'>(() => {
-    if (currentTheme === 'dark') return 'dark';
-    if (currentTheme === 'light') return 'light';
-    if (
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches
-    ) {
-      return 'dark';
-    }
-    return 'light';
-  }, [currentTheme]);
+  // The user's own upload lives in IndexedDB: read it, show nothing until it is ready
+  const customImage = useCustomImageUrl(background.type === 'image' ? background.value : '');
+  const isStoredUpload = background.type === 'image' && parseCustomImageValue(background.value) !== null;
+  // Site data was cleared: the picture is gone for good, so fall back to the default scene
+  useEffect(() => {
+    if (customImage.missing) setBackground({ ...DEFAULT_BACKGROUND });
+  }, [customImage.missing, setBackground]);
 
   // Resolve media src (ID → best format URL)
   const resolvedSrc = useMemo(
-    () => resolveBackgroundUrl(background.value),
-    [background.value],
+    () => (isStoredUpload ? (customImage.url ?? '') : resolveBackgroundUrl(background.value)),
+    [background.value, isStoredUpload, customImage.url],
   );
 
   const isVideo =
@@ -120,6 +122,20 @@ export function BackgroundRenderer() {
     return null;
   }
 
+  if (background.type === 'scene') {
+    return (
+      <div className="fixed inset-0 -z-10 overflow-hidden bg-black">
+        <SceneCanvas
+          key={background.value}
+          sceneId={background.value}
+          brightness={background.brightness ?? 100}
+          animate={background.motion !== false}
+          followMode={background.followMode !== false}
+        />
+      </div>
+    );
+  }
+
   const imageFilter = `blur(${background.blur}px) brightness(${background.brightness ?? 100}%)`;
 
   // --- VIDEO BACKGROUND ---
@@ -179,10 +195,18 @@ export function BackgroundRenderer() {
   };
 
   let style: React.CSSProperties;
+  // The default scene ("Giấy kem") carries the paper doodle (globals.css .paper-bg).
+  let className: string | undefined;
 
   switch (background.type) {
     case 'solid':
-      style = { ...base, backgroundColor: background.value };
+      // The default scene follows the timer mode (see --stage-tint in globals.css).
+      if (background.value === 'var(--surface-page)') {
+        style = { ...base, backgroundColor: 'var(--stage-tint)', transition: 'opacity 800ms ease, background-color 700ms ease' };
+        className = 'paper-bg';
+      } else {
+        style = { ...base, backgroundColor: background.value };
+      }
       break;
     case 'gradient':
       style = { ...base, background: background.value };
@@ -193,5 +217,5 @@ export function BackgroundRenderer() {
       break;
   }
 
-  return <div style={style} />;
+  return <div className={className} style={style} />;
 }

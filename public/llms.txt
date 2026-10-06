@@ -1,53 +1,41 @@
-# Study Bro - Pomodoro Focus App
+# Study Bro
 
-> AI-powered Pomodoro timer for maximum focus and productivity.
-
-## Description
-Study Bro is a comprehensive Pomodoro Timer web application featuring AI-powered insights, task management, ambient sounds, and detailed analytics for focus enhancement and productivity tracking.
+> Free Pomodoro timer for studying and focused work, in one page: focus sessions with short and long breaks, tasks linked to sessions, focus history and streaks, ambient sounds, animated scenes and short break games. Works without an account. Available in English, Vietnamese and Japanese.
 
 ## Website
-https://www.pomodoro-focus.site
+https://studywithbro.com
 
-## Features
-- Precision Pomodoro Timer with customizable intervals (25/5/15 min default)
-- Task Management with session linking
-- Performance Analytics and progress tracking
-- Ambient Soundscapes for deep work (rain, cafe, fireplace, etc.)
-- Consistency Streaks and habit building
-- Light/Dark adaptive interface
-- AI-powered focus insights
-- Leaderboard for competitive focus sessions
-
-## Tech Stack
-- Next.js 14 (App Router)
-- React 18
-- TypeScript
-- Tailwind CSS
-- Supabase (Auth + Database)
-- Framer Motion (Animations)
-
-## Pricing
-- Free tier: Core timer, 5 active tasks, 7-day history
-- Pro tier: Coming soon (unlimited tasks, cloud sync, advanced analytics)
+## What it does
+- Pomodoro timer: focus, short break and long break; presets 25/5, 50/10, 52/17, 90/20 or custom lengths; automatic switching between focus and breaks (optional)
+- Tasks: estimates in Pomodoros, priority, tags, due dates; pick a task before a focus session and its completed Pomodoros are counted
+- Stats: focus time, sessions per day, current and best streak, recent sessions
+- Sounds: ambient sounds that can be mixed, plus YouTube playback
+- Scenes: animated backgrounds and photos behind the timer; clock styles in 2D and 3D
+- Break games: short games meant for a 2–5 minute break
+- Keyboard: Space start/pause, R reset, T tasks, S sounds, B scene, C timer settings, H stats, G games, Cmd/Ctrl+K command menu
+- Accounts are optional: guests can start right away; signing in (email code or Google) keeps tasks and history across devices; data can be exported or deleted from Settings
 
 ## Pages
-- / - Landing page with features overview
-- /timer - Main Pomodoro timer interface
-- /tasks - Task management
-- /progress - Analytics dashboard
-- /leaderboard - Global leaderboard
-- /settings - User preferences
-- /guide - User guide and documentation
-- /feedback - Feedback form
+English (default, no prefix), Vietnamese (/vi) and Japanese (/ja) have the same four pages. Each language has its own URL; link readers to the one that matches their language.
+- https://studywithbro.com/ — the app (everything opens as a panel on this page, e.g. /?panel=tasks)
+- https://studywithbro.com/guide — how to use the Pomodoro technique and the app
+- https://studywithbro.com/privacy — privacy policy
+- https://studywithbro.com/terms — terms of use
 
-## API
-- REST API at /api/*
-- Authentication via Supabase
-- Real-time updates for timer sync
+### Tiếng Việt (Vietnamese)
+- https://studywithbro.com/vi — đồng hồ Pomodoro online miễn phí, hẹn giờ học tập (ứng dụng)
+- https://studywithbro.com/vi/guide — phương pháp Pomodoro là gì và cách dùng
+- https://studywithbro.com/vi/privacy — chính sách quyền riêng tư
+- https://studywithbro.com/vi/terms — điều khoản sử dụng
+
+### 日本語 (Japanese)
+- https://studywithbro.com/ja — 無料のポモドーロタイマー（アプリ本体）
+- https://studywithbro.com/ja/guide — ポモドーロ・テクニックとは？やり方のガイド
+- https://studywithbro.com/ja/privacy — プライバシーポリシー
+- https://studywithbro.com/ja/terms — 利用規約
+
+## Machine-readable
+- Sitemap with language alternates: https://studywithbro.com/sitemap.xml
 
 ## Contact
-- Feedback: https://www.pomodoro-focus.site/feedback
-- GitHub: https://github.com/dangdinh87
-
-## License
-Proprietary - All rights reserved
+- Feedback: https://studywithbro.com/?panel=feedback (https://studywithbro.com/vi?panel=feedback, https://studywithbro.com/ja?panel=feedback)

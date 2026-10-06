@@ -1,74 +1,81 @@
-/**
- * SSR HowItWorks component - steps content rendered server-side for SEO
- */
-import { Timer, ListTodo, BarChart3 } from 'lucide-react';
-import { t } from '@/lib/server-translations';
+import { Armchair, Coffee, Timer } from '@phosphor-icons/react/dist/ssr';
+import { IconTile, type IconTileTone } from '@/components/ui/icon-tile';
+import { StickerCard } from '@/components/ui/sticker-card';
+import type { Lang } from '@/lib/i18n/negotiate-locale';
+import { getT } from '@/lib/server-translations';
 
-export function HowItWorks() {
-  const steps = [
-    {
-      number: '1',
-      icon: ListTodo,
-      title: t('landing.howItWorks.steps.step1.title'),
-      description: t('landing.howItWorks.steps.step1.description'),
-      color: 'bg-orange-500',
-    },
-    {
-      number: '2',
-      icon: Timer,
-      title: t('landing.howItWorks.steps.step2.title'),
-      description: t('landing.howItWorks.steps.step2.description'),
-      color: 'bg-blue-500',
-    },
-    {
-      number: '3',
-      icon: BarChart3,
-      title: t('landing.howItWorks.steps.step3.title'),
-      description: t('landing.howItWorks.steps.step3.description'),
-      color: 'bg-violet-500',
-    },
-  ];
+// Mode colours match the timer stage (spec §3.1): focus tomato, short break mint, long break sky.
+// Text on them is always on-accent, never white.
+const MODES = [
+  { key: 'focus', fill: 'bg-candy-tomato', tone: 'tomato', icon: Timer },
+  { key: 'shortBreak', fill: 'bg-candy-mint', tone: 'mint', icon: Coffee },
+  { key: 'longBreak', fill: 'bg-candy-sky', tone: 'sky', icon: Armchair },
+] as const satisfies readonly { key: string; fill: string; tone: IconTileTone; icon: unknown }[];
 
+// One full default cycle; segment width is proportional to minutes (long break drawn at 20 of its 15-30).
+const CYCLE = [
+  { fill: MODES[0].fill, min: 25, label: '25' },
+  { fill: MODES[1].fill, min: 5, label: '5' },
+  { fill: MODES[0].fill, min: 25, label: '25' },
+  { fill: MODES[1].fill, min: 5, label: '5' },
+  { fill: MODES[0].fill, min: 25, label: '25' },
+  { fill: MODES[1].fill, min: 5, label: '5' },
+  { fill: MODES[0].fill, min: 25, label: '25' },
+  { fill: MODES[2].fill, min: 20, label: '15–30' },
+];
+
+export function HowItWorks({ lang }: { lang: Lang }) {
+  const t = getT(lang);
   return (
-    <section id="how-it-works" className="py-20 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-5xl">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
-            {t('landing.howItWorks.title')}{' '}
-            <span className="bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">
-              {t('landing.howItWorks.titleHighlight')}
-            </span>
-          </h2>
+    <section id="how-it-works" className="scroll-mt-24 px-[clamp(16px,4vw,32px)] pb-16 lg:pb-24">
+      <div className="mx-auto max-w-[1180px]">
+        <div className="mb-10 max-w-2xl">
+          <h2 className="font-heading text-3xl font-extrabold leading-[1.1] tracking-[-0.02em] text-ink sm:text-4xl">{t('site.how.title')}</h2>
+          <p className="mt-4 text-base leading-relaxed text-ink-secondary">{t('site.how.lead')}</p>
         </div>
 
-        {/* Steps */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {steps.map((step) => (
-            <div
-              key={step.number}
-              className="relative flex flex-col items-center text-center p-6 rounded-2xl bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 transition-colors cursor-pointer group"
-            >
-              {/* Step number badge */}
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-bold flex items-center justify-center">
-                {step.number}
+        <StickerCard className="p-5 sm:p-6">
+          <p className="mb-3 font-heading text-sm font-bold text-ink-secondary">{t('site.how.cycleLabel')}</p>
+          <div aria-hidden="true" className="flex h-11 gap-1 sm:gap-1.5">
+            {CYCLE.map((s, i) => (
+              <div
+                key={i}
+                style={{ flexGrow: s.min, flexBasis: 0 }}
+                // min-w keeps each piece wide enough for its label on a phone: 5 minutes is one or two digits, the long
+                // break reads "15–30" and must not wrap at the dash
+                className={`flex items-center justify-center whitespace-nowrap rounded-[10px] border-2 border-outline font-heading text-xs font-extrabold tabular-nums text-on-accent ${s.label.length > 2 ? 'min-w-12' : 'min-w-6 sm:min-w-9'} ${s.fill}`}
+              >
+                {s.label}
               </div>
+            ))}
+          </div>
+          <p className="mt-3 text-sm text-ink-muted">{t('site.how.cycleUnit')}</p>
+        </StickerCard>
 
-              {/* Icon */}
-              <div className={`${step.color} p-3 rounded-xl mb-4 mt-2`}>
-                <step.icon className="h-6 w-6 text-white" />
-              </div>
-
-              {/* Content */}
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
-                {step.title}
-              </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                {step.description}
-              </p>
-            </div>
+        <ul className="mt-8 grid gap-6 md:grid-cols-3">
+          {MODES.map(({ key, tone, icon }, i) => (
+            <li key={key} className="flex">
+              <StickerCard tilt={i % 2 === 0 ? 'left' : 'right'} className="w-full p-5">
+                <div className="flex items-center gap-3">
+                  <IconTile icon={icon} tone={tone} size="md" />
+                  <h3 className="font-heading text-xl font-bold leading-tight tracking-[-0.01em] text-ink">{t(`site.how.${key}.title`)}</h3>
+                  <span className="ml-auto whitespace-nowrap rounded-full border-2 border-outline bg-surface-raised px-2.5 py-0.5 font-heading text-sm font-bold tabular-nums text-ink">
+                    {t(`site.how.${key}.duration`)}
+                  </span>
+                </div>
+                <p className="mt-3 text-sm leading-relaxed text-ink-secondary">{t(`site.how.${key}.desc`)}</p>
+              </StickerCard>
+            </li>
           ))}
-        </div>
+        </ul>
+        <p className="mt-6 text-sm text-ink-muted">{t('site.how.defaults')}</p>
+
+        <figure className="mt-12 max-w-[68ch]">
+          <h3 className="font-heading text-2xl font-bold tracking-[-0.02em] text-ink">{t('site.why.title')}</h3>
+          <p className="mt-3 text-base leading-[1.75] text-ink-secondary">{t('site.why.p1')}</p>
+          <p className="mt-3 text-base leading-[1.75] text-ink-secondary">{t('site.why.p2')}</p>
+          <figcaption className="mt-4 text-sm text-ink-muted">{t('site.why.source')}</figcaption>
+        </figure>
       </div>
     </section>
   );

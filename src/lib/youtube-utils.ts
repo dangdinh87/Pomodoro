@@ -33,3 +33,21 @@ export const fetchYouTubeOEmbed = async (url: string): Promise<YouTubeOEmbedResp
         return null;
     }
 };
+
+/**
+ * i18n key of the toast for an IFrame API `onError` code
+ * (https://developers.google.com/youtube/iframe_api_reference#onError):
+ * 100 = removed or private, 101/150 = the owner does not allow embedding,
+ * 2 (bad parameter), 5 (HTML5 player error) and anything else = generic.
+ */
+export const youtubeErrorKey = (code: number | undefined): string => {
+    switch (code) {
+        case 100:
+            return 'audio.youtube.errors.notFound';
+        case 101:
+        case 150:
+            return 'audio.youtube.errors.embedBlocked';
+        default:
+            return 'audio.youtube.errors.cannotPlay';
+    }
+};

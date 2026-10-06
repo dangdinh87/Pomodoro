@@ -29,7 +29,7 @@ function mergeRefs<T>(
       if (typeof ref === 'function') {
         ref(node);
       } else {
-        (ref as React.RefObject<T | null>).current = node;
+        (ref as React.MutableRefObject<T | null>).current = node;
       }
     });
   };
@@ -65,13 +65,15 @@ const Slot = React.forwardRef<HTMLElement, Omit<SlotProps, 'ref'>>(
       children.type !== null &&
       isMotionComponent(children.type);
 
-    const Base = React.useMemo(
+    // Narrowed: with react-three-fiber's JSX elements in scope, inference over
+    // React.ElementType collapses to `never`.
+    const Base: React.ComponentType<AnyProps> = React.useMemo(
       () =>
         isAlreadyMotion
           ? (children.type as React.ElementType)
           : motion.create(children.type as React.ElementType),
       [isAlreadyMotion, children.type],
-    );
+    ) as React.ComponentType<AnyProps>;
 
     if (!React.isValidElement(children)) return null;
 

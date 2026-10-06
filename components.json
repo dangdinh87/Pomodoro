@@ -4,13 +4,13 @@
   "rsc": true,
   "tsx": true,
   "tailwind": {
-    "config": "tailwind.config.js",
+    "config": "",
     "css": "src/app/globals.css",
     "baseColor": "neutral",
     "cssVariables": true,
     "prefix": ""
   },
-  "iconLibrary": "lucide",
+  "iconLibrary": "phosphor",
   "aliases": {
     "components": "@/components",
     "utils": "@/lib/utils",
@@ -21,8 +21,6 @@
   "registries": {
     "@magicui": "https://magicui.design/r/{name}.json",
     "@animate-ui": "https://animate-ui.com/r/{name}.json",
-    "@aceternity": "https://ui.aceternity.com/registry/{name}.json",
-    "@assistant-ui": "https://r.assistant-ui.com/{name}.json",
-    "@skiper-ui": "https://skiper-ui.com/registry/{name}.json"
+    "@aceternity": "https://ui.aceternity.com/registry/{name}.json"
   }
 }

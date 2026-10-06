@@ -1,0 +1,2 @@
+ALTER TABLE "focus_sessions" ADD COLUMN "client_session_id" text;--> statement-breakpoint
+CREATE UNIQUE INDEX "focus_sessions_user_client_session_uidx" ON "focus_sessions" USING btree ("user_id","client_session_id");

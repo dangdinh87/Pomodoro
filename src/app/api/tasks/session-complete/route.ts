@@ -1,161 +1,101 @@
-import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase-server'
+import { NextResponse } from 'next/server';
+import { and, eq, gt, lte, sql, sum } from 'drizzle-orm';
+import { db } from '@/db';
+import { focusSessions, tasks } from '@/db/schema';
+import { SESSION_LIMIT_CODE, SESSION_MAX_TOTAL_SEC_PER_DAY } from '@/config/constants';
+import { getSessionUser } from '@/lib/auth/session-user';
+import { badRequest, readJson, serverError, unauthorized } from '@/lib/api/responses';
+import { resolveSessionEnd, validateSessionCompletion } from './session-schemas';
 
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
+// Client-reported sessions (phase 02). Replaced by server-issued sessions with
+// heartbeats in plans/261001-2241-study-bro-v2/phase-04.
 export async function POST(request: Request) {
-  const supabase = await createClient()
+  const user = await getSessionUser();
+  if (!user) return unauthorized();
+
+  const body = await readJson(request);
+  if (body === undefined) return badRequest('Request body must be valid JSON');
+  const parsed = validateSessionCompletion(body);
+  if (!parsed.success) return NextResponse.json({ error: parsed.error }, { status: 400 });
+  const { taskId, durationSec, mode, completedFullSession, clientSessionId } = parsed.data;
+  const endedAt = resolveSessionEnd(parsed.data.endedAt, Date.now());
 
   try {
-    // 1. Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const outcome = await db.transaction(async (tx) => {
+      // One writer per user at a time: the cap check below and the insert must
+      // not interleave with another request of the same user (parallel POSTs
+      // would all read the same total and slip past the cap). Released at commit.
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${user.id}))`);
 
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 },
-      )
-    }
-
-    const userId = user.id
-    const body = await request.json()
-    const {
-      taskId,
-      durationSec,
-      mode,
-    }: {
-      taskId?: string | null
-      durationSec: number
-      mode: 'work' | 'shortBreak' | 'longBreak'
-    } = body
-
-    const duration = Math.max(0, Math.round(durationSec))
-
-    // 2. Validate taskId if provided
-    let validatedTaskId: string | null = null
-
-    if (taskId) {
-      const { data: taskData, error: taskError } = await supabase
-        .from('tasks')
-        .select('id')
-        .eq('id', taskId)
-        .eq('user_id', userId)
-        .single()
-
-      if (taskError || !taskData) {
-        console.warn(`Invalid taskId ${taskId} for user ${userId}: ${taskError?.message || 'not found'}`)
-        validatedTaskId = null
-      } else {
-        validatedTaskId = taskId
-      }
-    }
-
-    // 3. Record session
-    const { data: sessionData, error: sessionError } = await supabase
-      .from('sessions')
-      .insert({
-        user_id: userId,
-        task_id: validatedTaskId,
-        duration,
-        mode, // 'work', 'shortBreak', or 'longBreak'
-      })
-      .select('*')
-      .single()
-
-    if (sessionError) {
-      console.error('Error creating session', sessionError)
-      return NextResponse.json(
-        { error: 'Failed to record session completion' },
-        { status: 500 },
-      )
-    }
-
-    // 4. Update Task progress (if applicable)
-    if (validatedTaskId && mode === 'work') {
-      const { error: incError } = await supabase.rpc('increment_task_pomodoro', {
-        task_id_input: validatedTaskId,
-        user_id_input: userId,
-        duration_ms_input: duration * 1000,
-      })
-
-      if (incError) {
-        console.error('Error updating task progress', incError)
-      }
-    }
-
-    // 5. Update Streak (only for 'work' sessions)
-    if (mode === 'work') {
-      // Fetch current streak
-      const { data: streakData, error: streakFetchError } = await supabase
-        .from('streaks')
-        .select('*')
-        .eq('user_id', userId)
-        .single()
-
-      const today = new Date().toISOString().split('T')[0]
-
-      if (streakFetchError && streakFetchError.code !== 'PGRST116') { // PGRST116 is "Row not found"
-        console.error('Error fetching streak', streakFetchError)
+      // A retry of a session already stored (lost response, two tabs): acknowledge
+      // without touching the task counters again.
+      if (clientSessionId) {
+        const [existing] = await tx
+          .select({ id: focusSessions.id })
+          .from(focusSessions)
+          .where(and(eq(focusSessions.userId, user.id), eq(focusSessions.clientSessionId, clientSessionId)))
+          .limit(1);
+        if (existing) return { duplicate: true } as const;
       }
 
-      let newCurrent = 1
-      let newLongest = 1
-      let shouldUpdate = false
+      // 24 hours of focus per rolling day, counted in the window that ends when
+      // this session did (so backdating cannot dodge the cap)
+      const [{ logged }] = await tx
+        .select({ logged: sum(focusSessions.durationSec).mapWith(Number) })
+        .from(focusSessions)
+        .where(
+          and(
+            eq(focusSessions.userId, user.id),
+            gt(focusSessions.createdAt, new Date(endedAt.getTime() - ONE_DAY_MS)),
+            lte(focusSessions.createdAt, endedAt),
+          ),
+        );
+      if ((logged ?? 0) + durationSec > SESSION_MAX_TOTAL_SEC_PER_DAY) return { limited: true } as const;
 
-      if (streakData) {
-        const lastSessionDate = streakData.last_session ? new Date(streakData.last_session).toISOString().split('T')[0] : null
+      // An unknown or foreign task id is not an error: the session is kept without a task.
+      const ownedTask = taskId
+        ? (
+            await tx
+              .select({ id: tasks.id })
+              .from(tasks)
+              .where(and(eq(tasks.id, taskId), eq(tasks.userId, user.id)))
+          )[0]
+        : undefined;
 
-        if (lastSessionDate === today) {
-          // Already recorded for today, don't increment streak, but update last_session timestamp
-          shouldUpdate = true
-          newCurrent = streakData.current
-          newLongest = streakData.longest
-        } else {
-          // Check if yesterday
-          const yesterday = new Date()
-          yesterday.setDate(yesterday.getDate() - 1)
-          const yesterdayStr = yesterday.toISOString().split('T')[0]
+      const [row] = await tx
+        .insert(focusSessions)
+        .values({
+          userId: user.id,
+          taskId: ownedTask?.id ?? null,
+          mode,
+          durationSec,
+          clientSessionId,
+          createdAt: endedAt,
+        })
+        .onConflictDoNothing({ target: [focusSessions.userId, focusSessions.clientSessionId] })
+        .returning();
+      if (!row) return { duplicate: true } as const;
 
-          if (lastSessionDate === yesterdayStr) {
-            // Consecutive day
-            newCurrent = streakData.current + 1
-            newLongest = Math.max(newCurrent, streakData.longest)
-            shouldUpdate = true
-          } else {
-            // Streak broken
-            newCurrent = 1
-            // Longest remains same
-            newLongest = streakData.longest
-            shouldUpdate = true
-          }
-        }
-      } else {
-        // No streak record exists, create one
-        shouldUpdate = true
+      if (ownedTask && mode === 'work') {
+        await tx
+          .update(tasks)
+          .set({
+            // Only a focus period that ran to its end counts as a pomodoro
+            ...(completedFullSession && { actualPomodoros: sql`${tasks.actualPomodoros} + 1` }),
+            timeSpentMs: sql`${tasks.timeSpentMs} + ${durationSec * 1000}`,
+          })
+          .where(eq(tasks.id, ownedTask.id));
       }
+      return { session: row } as const;
+    });
 
-      if (shouldUpdate) {
-        const { error: streakUpdateError } = await supabase
-          .from('streaks')
-          .upsert({
-            user_id: userId,
-            current: newCurrent,
-            longest: newLongest,
-            last_session: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          }, { onConflict: 'user_id' })
-
-        if (streakUpdateError) {
-          console.error('Error updating streak', streakUpdateError)
-        }
-      }
+    if ('limited' in outcome) {
+      return NextResponse.json({ error: 'Daily session limit exceeded', code: SESSION_LIMIT_CODE }, { status: 429 });
     }
-
-    return NextResponse.json({ session: sessionData })
+    return NextResponse.json(outcome);
   } catch (error) {
-    console.error('Error recording session completion', error)
-    return NextResponse.json(
-      { error: 'Failed to record session completion' },
-      { status: 500 },
-    )
+    return serverError('Failed to record session completion', error);
   }
 }
-

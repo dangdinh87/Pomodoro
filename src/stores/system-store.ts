@@ -26,10 +26,6 @@ interface SystemState {
   // Focus mode actions
   setFocusMode: (isFocusMode: boolean) => void
 
-  // Chat panel state
-  isChatPanelOpen: boolean
-  setChatPanelOpen: (isOpen: boolean) => void
-
   // Timer settings modal state
   isTimerSettingsOpen: boolean
   setTimerSettingsOpen: (isOpen: boolean) => void
@@ -37,7 +33,7 @@ interface SystemState {
 
 const defaultBackgroundSettings: BackgroundSettings = {
   backgroundType: 'solid',
-  backgroundStyle: 'hsl(var(--background))',
+  backgroundStyle: 'var(--surface-page)',
   backgroundOpacity: 100,
 }
 
@@ -49,7 +45,6 @@ export const useSystemStore = create<SystemState>()(
       backgroundSettings: defaultBackgroundSettings,
       isLoading: false,
       isFocusMode: false,
-      isChatPanelOpen: false,
       isTimerSettingsOpen: false,
 
       updateBackgroundSettings: (newSettings) =>
@@ -72,9 +67,6 @@ export const useSystemStore = create<SystemState>()(
       setFocusMode: (isFocusMode) =>
         set({ isFocusMode }),
 
-      setChatPanelOpen: (isOpen) =>
-        set({ isChatPanelOpen: isOpen }),
-        
       setTimerSettingsOpen: (isOpen) =>
         set({ isTimerSettingsOpen: isOpen }),
     }),
@@ -83,7 +75,6 @@ export const useSystemStore = create<SystemState>()(
       // Don't persist loading state
       partialize: (state) => ({
         backgroundSettings: state.backgroundSettings,
-        isChatPanelOpen: state.isChatPanelOpen,
       }),
     }
   )

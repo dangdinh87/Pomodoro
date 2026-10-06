@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils"
 
 const Tabs = TabsPrimitive.Root
 
+// Segmented control: a raised, outlined pill tray; the active tab floats on it as a small sticker.
+// p-1.5 leaves room inside the scroll box for the active tab's shadow and the focus ring.
 const TabsList = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.List>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
@@ -14,7 +16,7 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex h-10 items-center justify-center rounded-md bg-muted/70 p-1 text-muted-foreground backdrop-blur supports-[backdrop-filter]:bg-muted/60",
+      "flex w-full items-center gap-1 overflow-x-auto rounded-full border-sticker bg-surface-raised p-1.5 scrollbar-hide",
       className
     )}
     {...props}
@@ -29,11 +31,8 @@ const TabsTrigger = React.forwardRef<
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-      // Active state emphasis
-      "data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm",
-      // Inactive subtle
-      "text-muted-foreground",
+      "focus-ring relative inline-flex h-9 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full border-2 border-transparent px-4 font-heading text-[0.9375rem] font-bold leading-none text-ink-secondary transition-[background-color,color,box-shadow,transform] duration-100 hover:text-ink focus-visible:outline-offset-0 disabled:pointer-events-none disabled:opacity-50",
+      "data-[state=active]:border-outline data-[state=active]:bg-surface data-[state=active]:text-ink data-[state=active]:shadow-[2px_2px_0_var(--outline)]",
       className
     )}
     {...props}
@@ -48,7 +47,7 @@ const TabsContent = React.forwardRef<
   <TabsPrimitive.Content
     ref={ref}
     className={cn(
-      "mt-2 ring-offset-background focus-visible:ring-2 focus:ring-ring focus:ring-offset-2",
+      "mt-4 focus-visible:outline-hidden",
       className
     )}
     {...props}

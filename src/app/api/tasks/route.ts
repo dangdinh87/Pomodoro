@@ -1,206 +1,113 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase-server';
-import { validateCreateTask, type CreateTaskPayload } from './task-schemas';
+import { and, arrayContains, asc, count, desc, eq, gte, ilike, lte, or, type SQL } from 'drizzle-orm';
+import { db } from '@/db';
+import { TASK_PRIORITIES, TASK_STATUSES, tasks } from '@/db/schema';
+import { getSessionUser } from '@/lib/auth/session-user';
+import { badRequest, readJson, serverError, unauthorized } from '@/lib/api/responses';
+import { isTaskLimitReached, taskLimitResponse } from '@/lib/tasks/task-limit';
+import { toTaskJson } from '@/lib/tasks/task-json';
+import { isValidTagFilter, sanitizeSearchTerm, validateCreateTask } from './task-schemas';
 
-const API_ROUTE_TOKEN = process.env.API_ROUTE_TOKEN;
+const DEFAULT_PAGE_SIZE = 10;
+const MAX_PAGE_SIZE = 100;
+// Far beyond any real task list; keeps the computed offset sane
+const MAX_PAGE = 10_000;
+const DATE_FIELDS = {
+  created_at: tasks.createdAt,
+  updated_at: tasks.updatedAt,
+  due_date: tasks.dueDate,
+} as const;
 
-function missingSupabaseResponse() {
-  return NextResponse.json(
-    { error: 'Supabase client is not configured' },
-    { status: 500 },
-  );
+function parsePositiveInt(value: string | null, fallback: number, max: number) {
+  const parsed = Number.parseInt(value ?? '', 10);
+  if (!Number.isFinite(parsed) || parsed < 1) return fallback;
+  return Math.min(parsed, max);
 }
 
-function unauthorizedResponse() {
-  return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+function parseDate(value: string | null) {
+  return value && !Number.isNaN(Date.parse(value)) ? new Date(value) : null;
 }
 
-function isAuthorized(request: Request) {
-  if (!API_ROUTE_TOKEN) return true;
-  const header = request.headers.get('authorization') || '';
-  if (!header.startsWith('Bearer ')) return false;
-  const token = header.slice(7);
-  return token === API_ROUTE_TOKEN;
-}
-
-function validationErrorResponse(error: {
-  message: string;
-  details?: Record<string, string[]>;
-}) {
-  return NextResponse.json(
-    { error: error.message, details: error.details },
-    { status: 400 },
-  );
-}
-
-function buildInsertPayload(userId: string, payload: CreateTaskPayload) {
-  // Ensure user_id is a string (UUID from auth is already a string, but ensure consistency)
-  // Base payload with required fields that always exist
-  // Note: status is NOT included - database has a DEFAULT value
-  const basePayload: Record<string, any> = {
-    user_id: String(userId),
-    title: payload.title,
-    description: payload.description,
-    priority: payload.priority,
-    estimate_pomodoros: payload.estimate_pomodoros,
-    tags: payload.tags,
-  };
-
-  // Only add new fields if they have values (prevents errors if columns don't exist yet)
-  if (payload.due_date) {
-    basePayload.due_date = payload.due_date;
-  }
-  if (payload.parent_task_id) {
-    basePayload.parent_task_id = payload.parent_task_id;
-  }
-  if (payload.is_template) {
-    basePayload.is_template = payload.is_template;
-  }
-
-  return basePayload;
+function pick<T extends string>(values: readonly T[], raw: string | null): T | null {
+  const upper = raw?.toUpperCase();
+  return values.find((v) => v === upper) ?? null;
 }
 
 export async function GET(request: Request) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return unauthorizedResponse();
-  }
-
-  const userId = user.id;
+  const user = await getSessionUser();
+  if (!user) return unauthorized();
 
   const { searchParams } = new URL(request.url);
-  const limit = parseInt(searchParams.get('limit') || '10');
-  const page = parseInt(searchParams.get('page') || '1');
-  const offset = (page - 1) * limit;
-
-  // Filter parameters
-  const q = searchParams.get('q');
-  const status = searchParams.get('status');
-  const priority = searchParams.get('priority');
+  const limit = parsePositiveInt(searchParams.get('limit'), DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE);
+  const page = parsePositiveInt(searchParams.get('page'), 1, MAX_PAGE);
+  const q = sanitizeSearchTerm(searchParams.get('q'));
   const tag = searchParams.get('tag');
-  const from = searchParams.get('from');
-  const to = searchParams.get('to');
-  const dateField = searchParams.get('dateField') || 'created_at'; // Default to created_at
+  const status = pick(TASK_STATUSES, searchParams.get('status'));
+  const priority = pick(TASK_PRIORITIES, searchParams.get('priority'));
+  const dateField =
+    DATE_FIELDS[searchParams.get('dateField') as keyof typeof DATE_FIELDS] ?? DATE_FIELDS.created_at;
+  const from = parseDate(searchParams.get('from'));
+  const to = parseDate(searchParams.get('to'));
 
-  // Simple query that works with or without new columns
-  let query = supabase
-    .from('tasks')
-    .select('*', { count: 'exact' })
-    .eq('user_id', String(userId))
-    .eq('is_deleted', false);
-
-  if (q) {
-    query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%`);
-  }
-  if (status && status !== 'all') {
-    query = query.eq('status', status.toUpperCase());
-  }
-  if (priority && priority !== 'all') {
-    query = query.eq('priority', priority.toUpperCase());
-  }
-  if (tag && tag !== 'all') {
-    query = query.contains('tags', [tag]);
-  }
-  if (from) {
-    query = query.gte(dateField, from);
-  }
-  if (to) {
-    query = query.lte(dateField, to);
+  if (tag && tag !== 'all' && !isValidTagFilter(tag)) {
+    return badRequest('Invalid tag filter');
   }
 
-  const { data, error, count } = await query
-    .order('display_order', { ascending: true })
-    .order('created_at', { ascending: false })
-    .range(offset, offset + limit - 1);
+  const conditions: (SQL | undefined)[] = [eq(tasks.userId, user.id), eq(tasks.isDeleted, false)];
+  if (q) conditions.push(or(ilike(tasks.title, `%${q}%`), ilike(tasks.description, `%${q}%`)));
+  if (status) conditions.push(eq(tasks.status, status));
+  if (priority) conditions.push(eq(tasks.priority, priority));
+  if (tag && tag !== 'all') conditions.push(arrayContains(tasks.tags, [tag]));
+  if (from) conditions.push(gte(dateField, from));
+  if (to) conditions.push(lte(dateField, to));
+  const where = and(...conditions);
 
-  if (error) {
-    console.error('Error fetching tasks:', {
-      error,
-      message: error.message,
-      details: error.details,
-      hint: error.hint,
-      code: error.code,
-      userId,
-    });
-    return NextResponse.json(
-      { error: 'Failed to fetch tasks' },
-      { status: 500 },
-    );
+  try {
+    const [rows, [{ total }]] = await Promise.all([
+      db
+        .select()
+        .from(tasks)
+        .where(where)
+        .orderBy(asc(tasks.displayOrder), desc(tasks.createdAt))
+        .limit(limit)
+        .offset((page - 1) * limit),
+      db.select({ total: count() }).from(tasks).where(where),
+    ]);
+    return NextResponse.json({ tasks: rows.map(toTaskJson), total, page, limit });
+  } catch (error) {
+    return serverError('Failed to fetch tasks', error);
   }
-
-  return NextResponse.json({
-    tasks: data ?? [],
-    total: count ?? 0,
-    page,
-    limit,
-  });
 }
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSessionUser();
+  if (!user) return unauthorized();
 
-  if (!user) {
-    if (!isAuthorized(request)) {
-      return unauthorizedResponse();
-    }
-    // If authorized by token, we still need a user_id to create the task for.
-    // The current implementation relies on user.id.
-    // If we want to support token-based creation, we'd need to pass user_id in body.
-    // For now, I will keep the restriction that user MUST be present.
-    // The issue was that isAuthorized was running BEFORE checking for user session, potentially blocking valid users if they didn't have the token.
-    return unauthorizedResponse();
-  }
+  const body = await readJson(request);
+  if (body === undefined) return badRequest('Request body must be valid JSON');
 
-  const userId = user.id;
+  const parsed = validateCreateTask(body);
+  if (!parsed.success) return badRequest(parsed.error.message, parsed.error.details);
 
+  const { title, description, priority, estimate_pomodoros, tags: taskTags, due_date, is_template } =
+    parsed.data;
   try {
-    const body = await request.json();
-    const parsed = validateCreateTask(body);
-
-    if (!parsed.success) {
-      return validationErrorResponse(parsed.error);
-    }
-
-    const payload = buildInsertPayload(userId, parsed.data);
-
-    const { data, error } = await supabase
-      .from('tasks')
-      .insert(payload)
-      .select('*')
-      .single();
-
-    if (error) {
-      console.error('Error creating task:', {
-        error,
-        message: error.message,
-        details: error.details,
-        hint: error.hint,
-        code: error.code,
-        userId,
-        payload,
-      });
-      return NextResponse.json(
-        {
-          error: 'Failed to create task',
-          details: error.message,
-        },
-        { status: 500 },
-      );
-    }
-
-    return NextResponse.json({ task: data }, { status: 201 });
+    if (await isTaskLimitReached(user.id)) return taskLimitResponse();
+    const [task] = await db
+      .insert(tasks)
+      .values({
+        userId: user.id,
+        title,
+        description,
+        priority,
+        estimatePomodoros: estimate_pomodoros,
+        tags: taskTags,
+        dueDate: due_date ? new Date(due_date) : null,
+        isTemplate: Boolean(is_template),
+      })
+      .returning();
+    return NextResponse.json({ task: toTaskJson(task) }, { status: 201 });
   } catch (error) {
-    console.error('Error creating task', error);
-    return NextResponse.json(
-      { error: 'Failed to create task' },
-      { status: 500 },
-    );
+    return serverError('Failed to create task', error);
   }
 }

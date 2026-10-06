@@ -1,166 +1,197 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import {
+  compressImage,
+  validateImageFile,
+  type ImageErrorKey,
+} from '@/lib/custom-background/image-processing';
+import {
+  customImageValue,
+  deleteImage,
+  loadImage,
+  readMeta,
+  saveImage,
+  writeMeta,
+  type ImageMeta,
+} from '@/lib/custom-background/image-store';
 
-const STORAGE_KEY = 'custom-background-images';
-const MAX_IMAGES = 1;
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+/** Keys under `settings.background.customImages.*` */
+export type CustomImageError = ImageErrorKey | 'invalidUrl' | 'storageFull';
 
 export interface CustomImage {
-    id: string;
-    name: string;
-    dataUrl: string;
+  id: string;
+  name: string;
+  /** What `background.value` holds when this image is the background. */
+  value: string;
+  /** Something an <img> can show now: an object URL for a stored file, the link itself otherwise. */
+  previewUrl: string;
 }
 
+type AddResult = { success: true; image: CustomImage } | { success: false; error: CustomImageError };
+
 interface UseCustomBackgroundsReturn {
-    images: CustomImage[];
-    isLoading: boolean;
-    addImage: (file: File) => Promise<{ success: boolean; error?: string; image?: CustomImage }>;
-    addImageByUrl: (url: string) => Promise<{ success: boolean; error?: string; image?: CustomImage }>;
-    removeImage: (id: string) => void;
-    canAddMore: boolean;
+  images: CustomImage[];
+  isLoading: boolean;
+  addImage: (file: File) => Promise<AddResult>;
+  addImageByUrl: (url: string) => Promise<AddResult>;
+  removeImage: (id: string) => void;
+  canAddMore: boolean;
 }
 
 function generateId(): string {
-    return `custom-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-}
-
-function fileToDataUrl(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-    });
+  return `custom-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 }
 
 function isValidImageUrl(url: string): boolean {
-    try {
-        const parsed = new URL(url);
-        return parsed.protocol === 'http:' || parsed.protocol === 'https:';
-    } catch {
-        return false;
-    }
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
 }
 
+/**
+ * The user's own background image (one slot: a new one replaces the old).
+ * The file is compressed and kept in IndexedDB; localStorage only lists it by name.
+ */
 export function useCustomBackgrounds(): UseCustomBackgroundsReturn {
-    const [images, setImages] = useState<CustomImage[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+  const [images, setImages] = useState<CustomImage[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  // Mirror of `images` for the callbacks (they must not do side effects inside setState updaters)
+  const imagesRef = useRef<CustomImage[]>([]);
+  const commit = useCallback((next: CustomImage[]) => {
+    imagesRef.current = next;
+    setImages(next);
+  }, []);
+  // Object URLs handed out for stored files, released when replaced or on unmount
+  const objectUrls = useRef<string[]>([]);
 
-    // Load from localStorage on mount
-    useEffect(() => {
-        try {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                const parsed = JSON.parse(saved) as CustomImage[];
-                setImages(parsed);
-            }
-        } catch (error) {
-            console.error('Failed to load custom backgrounds:', error);
-        } finally {
-            setIsLoading(false);
+  const makeObjectUrl = useCallback((blob: Blob) => {
+    const url = URL.createObjectURL(blob);
+    objectUrls.current.push(url);
+    return url;
+  }, []);
+
+  const releaseObjectUrls = useCallback(() => {
+    objectUrls.current.forEach((url) => URL.revokeObjectURL(url));
+    objectUrls.current = [];
+  }, []);
+
+  useEffect(() => {
+    let live = true;
+    (async () => {
+      const loaded: CustomImage[] = [];
+      for (const meta of readMeta()) {
+        if (meta.dataUrl) {
+          // Not migrated yet (see migrateLegacyCustomImages): still shows and still works
+          loaded.push({ id: meta.id, name: meta.name, value: meta.dataUrl, previewUrl: meta.dataUrl });
+        } else if (meta.url) {
+          loaded.push({ id: meta.id, name: meta.name, value: meta.url, previewUrl: meta.url });
+        } else {
+          const stored = await loadImage(meta.id);
+          if (stored.ok && stored.value && live) {
+            loaded.push({
+              id: meta.id,
+              name: meta.name,
+              value: customImageValue(meta.id),
+              previewUrl: makeObjectUrl(stored.value.blob),
+            });
+          }
         }
-    }, []);
-
-    // Save to localStorage
-    const saveToStorage = useCallback((newImages: CustomImage[]) => {
-        try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(newImages));
-        } catch (error) {
-            console.error('Failed to save custom backgrounds:', error);
-        }
-    }, []);
-
-    // Add image from file
-    const addImage = useCallback(
-        async (file: File): Promise<{ success: boolean; error?: string; image?: CustomImage }> => {
-            // Check limit (Skipped for replacement mode)
-            // if (images.length >= MAX_IMAGES) { return { success: false, error: 'limitReached' }; }
-
-            // Validate file type
-            if (!file.type.startsWith('image/')) {
-                return { success: false, error: 'invalidType' };
-            }
-
-            // Validate file size
-            if (file.size > MAX_FILE_SIZE) {
-                return { success: false, error: 'fileTooLarge' };
-            }
-
-            try {
-                const dataUrl = await fileToDataUrl(file);
-                const newImage: CustomImage = {
-                    id: generateId(),
-                    name: file.name,
-                    dataUrl,
-                };
-
-                const newImages = [newImage]; // Replace existing images (Single slot mode)
-                setImages(newImages);
-                saveToStorage(newImages);
-
-                return { success: true, image: newImage };
-            } catch (error) {
-                console.error('Failed to process image:', error);
-                return { success: false, error: 'processingError' };
-            }
-        },
-        [images, saveToStorage]
-    );
-
-    // Add image from URL
-    const addImageByUrl = useCallback(
-        async (url: string): Promise<{ success: boolean; error?: string }> => {
-            // Check limit (Skipped for replacement mode)
-            // if (images.length >= MAX_IMAGES) { return { success: false, error: 'limitReached' }; }
-
-            // Validate URL format
-            if (!isValidImageUrl(url)) {
-                return { success: false, error: 'invalidUrl' };
-            }
-
-            try {
-                // Extract filename from URL
-                const urlObj = new URL(url);
-                const pathParts = urlObj.pathname.split('/');
-                const name = pathParts[pathParts.length - 1] || 'image';
-
-                const newImage: CustomImage = {
-                    id: generateId(),
-                    name,
-                    dataUrl: url, // Store URL directly instead of base64
-                };
-
-                const newImages = [newImage]; // Replace existing images
-                setImages(newImages);
-                saveToStorage(newImages);
-
-                return { success: true, image: newImage };
-            } catch (error) {
-                console.error('Failed to add image by URL:', error);
-                return { success: false, error: 'processingError' };
-            }
-        },
-        [images, saveToStorage]
-    );
-
-    // Remove image
-    const removeImage = useCallback(
-        (id: string) => {
-            const newImages = images.filter((img) => img.id !== id);
-            setImages(newImages);
-            saveToStorage(newImages);
-        },
-        [images, saveToStorage]
-    );
-
-    return {
-        images,
-        isLoading,
-        addImage,
-        addImageByUrl,
-        removeImage,
-        canAddMore: true, // Always allow adding for replacement mode
+      }
+      if (!live) return;
+      commit(loaded);
+      setIsLoading(false);
+    })();
+    return () => {
+      live = false;
+      releaseObjectUrls();
     };
+  }, [commit, makeObjectUrl, releaseObjectUrls]);
+
+  /** Single slot: the file stored before (and its preview) is no longer needed. */
+  const discard = useCallback((previous: CustomImage[]) => {
+    for (const image of previous) {
+      if (image.value === customImageValue(image.id)) void deleteImage(image.id);
+      if (image.previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(image.previewUrl);
+        objectUrls.current = objectUrls.current.filter((url) => url !== image.previewUrl);
+      }
+    }
+  }, []);
+
+  const addImage = useCallback(
+    async (file: File): Promise<AddResult> => {
+      const invalid = validateImageFile(file);
+      if (invalid) return { success: false, error: invalid };
+
+      let compressed: Awaited<ReturnType<typeof compressImage>>;
+      try {
+        compressed = await compressImage(file);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : '';
+        return { success: false, error: message === 'fileTooLarge' ? 'fileTooLarge' : 'processingError' };
+      }
+
+      const id = generateId();
+      const saved = await saveImage({ id, name: file.name, blob: compressed.blob, width: compressed.width, height: compressed.height });
+      if (!saved.ok) {
+        return { success: false, error: saved.reason === 'quota' ? 'storageFull' : 'processingError' };
+      }
+
+      if (!writeMeta([{ id, name: file.name }])) {
+        // The list is what makes the file reachable: without it the file is dead weight
+        void deleteImage(id);
+        return { success: false, error: 'storageFull' };
+      }
+
+      const image: CustomImage = { id, name: file.name, value: customImageValue(id), previewUrl: makeObjectUrl(compressed.blob) };
+      discard(imagesRef.current);
+      commit([image]);
+      return { success: true, image };
+    },
+    [commit, discard, makeObjectUrl],
+  );
+
+  const addImageByUrl = useCallback(async (url: string): Promise<AddResult> => {
+    if (!isValidImageUrl(url)) return { success: false, error: 'invalidUrl' };
+
+    const pathParts = new URL(url).pathname.split('/');
+    const name = pathParts[pathParts.length - 1] || 'image';
+    const id = generateId();
+    if (!writeMeta([{ id, name, url }])) return { success: false, error: 'storageFull' };
+
+    const image: CustomImage = { id, name, value: url, previewUrl: url };
+    discard(imagesRef.current);
+    commit([image]);
+    return { success: true, image };
+  }, [commit, discard]);
+
+  const removeImage = useCallback(
+    (id: string) => {
+      const previous = imagesRef.current;
+      const remaining = previous.filter((image) => image.id !== id);
+      discard(previous.filter((image) => image.id === id));
+      writeMeta(remaining.map((image) => toMeta(image)));
+      commit(remaining);
+    },
+    [commit, discard],
+  );
+
+  return {
+    images,
+    isLoading,
+    addImage,
+    addImageByUrl,
+    removeImage,
+    canAddMore: true, // one slot: adding replaces
+  };
 }
 
+function toMeta(image: CustomImage): ImageMeta {
+  if (image.value === customImageValue(image.id)) return { id: image.id, name: image.name };
+  if (image.value.startsWith('data:')) return { id: image.id, name: image.name, dataUrl: image.value };
+  return { id: image.id, name: image.name, url: image.value };
+}

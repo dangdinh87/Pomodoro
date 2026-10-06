@@ -1,502 +1,302 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { useEffect, useRef, useState } from 'react';
+import { Wall } from '@phosphor-icons/react/dist/ssr';
+
 import { useI18n } from '@/contexts/i18n-context';
-import { Play, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { GameCanvas, GameFrame } from './game-overlay';
+import { useCanvasStage, useGamePalette, useGameSession, useHeldKeys, useRafLoop, type GameProps, type GamePalette } from './game-kit';
 
-interface BrickBreakerGameProps {
-  onGameEnd?: (score: number) => void;
-  fullscreen?: boolean;
-}
+const W = 360;
+const H = 520;
+const PADDLE_W = 68;
+const PADDLE_H = 10;
+const PADDLE_Y = H - 36;
+const BALL_R = 6;
+const COLS = 8;
+const BRICK_GAP = 3;
+const BRICK_H = 18;
+const FIELD_X = 16;
+const BRICK_W = (W - FIELD_X * 2 - BRICK_GAP * (COLS - 1)) / COLS;
+const TOP = 60;
+const MAX_LIVES = 3;
 
-interface Ball {
-  x: number;
-  y: number;
-  dx: number;
-  dy: number;
-  radius: number;
-}
-
-interface Paddle {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
+const KEYS: Record<string, string> = { ArrowLeft: 'left', ArrowRight: 'right', a: 'left', d: 'right' };
+const ROW_COLORS: (keyof GamePalette)[] = ['rose', 'amber', 'green', 'cyan', 'blue', 'purple'];
 
 interface Brick {
   x: number;
   y: number;
-  width: number;
-  height: number;
-  hits: number;
-  color: string;
-  glowColor: string;
+  hp: number;
+  maxHp: number;
+  color: keyof GamePalette;
 }
 
-const CANVAS_WIDTH = 480;
-const CANVAS_HEIGHT = 640;
-const PADDLE_WIDTH = 100;
-const PADDLE_HEIGHT = 14;
-const BALL_RADIUS = 8;
-const BRICK_ROWS = 6;
-const BRICK_COLS = 8;
-const BRICK_WIDTH = 54;
-const BRICK_HEIGHT = 22;
-const BRICK_PADDING = 4;
-const BRICK_OFFSET_TOP = 60;
-const BRICK_OFFSET_LEFT = (CANVAS_WIDTH - (BRICK_COLS * (BRICK_WIDTH + BRICK_PADDING) - BRICK_PADDING)) / 2;
+export function ballSpeed(level: number): number {
+  return Math.min(470, 290 + (level - 1) * 22);
+}
 
-const LEVEL_CONFIGS = [
-  { speed: 10, lives: 3, brickHits: 1 },
-  { speed: 12, lives: 3, brickHits: 1 },
-  { speed: 14, lives: 3, brickHits: 2 },
-  { speed: 16, lives: 2, brickHits: 2 },
-  { speed: 18, lives: 2, brickHits: 2 },
-];
+/** Level layouts: a different silhouette every level, tougher bricks as you climb. */
+export function buildLevel(level: number): Brick[] {
+  const rows = Math.min(3 + level, 8);
+  const bricks: Brick[] = [];
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const pattern = (level - 1) % 4;
+      if (pattern === 1 && (r + c) % 2 === 1) continue;
+      if (pattern === 2 && (c < r - 2 || c > COLS - 1 - (r - 2)) && r > 2) continue;
+      if (pattern === 3 && r % 2 === 1 && (c === 0 || c === COLS - 1)) continue;
+      const maxHp = level >= 6 ? (r < 2 ? 3 : 2) : level >= 3 && r < Math.ceil(level / 2) ? 2 : 1;
+      bricks.push({
+        x: FIELD_X + c * (BRICK_W + BRICK_GAP),
+        y: TOP + r * (BRICK_H + BRICK_GAP),
+        hp: maxHp,
+        maxHp,
+        color: ROW_COLORS[r % ROW_COLORS.length],
+      });
+    }
+  }
+  return bricks;
+}
 
-const BRICK_COLORS = [
-  { color: '#ef4444', glow: '#dc2626' },
-  { color: '#f97316', glow: '#ea580c' },
-  { color: '#eab308', glow: '#ca8a04' },
-  { color: '#22c55e', glow: '#16a34a' },
-  { color: '#3b82f6', glow: '#2563eb' },
-  { color: '#8b5cf6', glow: '#7c3aed' },
-];
+function newGame() {
+  return {
+    paddleX: W / 2,
+    ball: { x: W / 2, y: PADDLE_Y - BALL_R - 1, vx: 0, vy: 0 },
+    serving: true,
+    bricks: buildLevel(1),
+    level: 1,
+    lives: MAX_LIVES,
+    combo: 0,
+    score: 0,
+    banner: { text: '', left: 0 },
+  };
+}
 
-export function BrickBreakerGame({ onGameEnd, fullscreen }: BrickBreakerGameProps) {
+export function BrickBreakerGame(props: GameProps) {
   const { t } = useI18n();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number | null>(null);
+  const session = useGameSession(props);
+  const { statusRef, setScore, finish } = session;
+  const stage = useCanvasStage(W, H);
+  const palette = useGamePalette();
+  const held = useHeldKeys(KEYS);
+  const g = useRef(newGame());
+  const drag = useRef<{ startX: number; startPaddle: number } | null>(null);
+  const [hud, setHud] = useState({ lives: MAX_LIVES, level: 1 });
+  const levelLabel = t('arcadeKit.level');
 
-  const [gameState, setGameState] = useState<'menu' | 'playing' | 'paused' | 'gameover' | 'levelup'>('menu');
-  const [score, setScore] = useState(0);
-  const [level, setLevel] = useState(1);
-  const [lives, setLives] = useState(3);
-  const [combo, setCombo] = useState(0);
+  const sync = () => setHud({ lives: g.current.lives, level: g.current.level });
 
-  const ballRef = useRef<Ball>({
-    x: CANVAS_WIDTH / 2,
-    y: CANVAS_HEIGHT - 100,
-    dx: 6,
-    dy: -6,
-    radius: BALL_RADIUS,
-  });
+  const launch = () => {
+    const s = g.current;
+    if (!s.serving || statusRef.current !== 'playing') return;
+    s.serving = false;
+    const speed = ballSpeed(s.level);
+    const angle = (Math.random() * 0.5 - 0.25) * Math.PI * 0.5;
+    s.ball.vx = Math.sin(angle) * speed;
+    s.ball.vy = -Math.cos(angle) * speed;
+  };
 
-  const paddleRef = useRef<Paddle>({
-    x: (CANVAS_WIDTH - PADDLE_WIDTH) / 2,
-    y: CANVAS_HEIGHT - 40,
-    width: PADDLE_WIDTH,
-    height: PADDLE_HEIGHT,
-  });
-
-  const bricksRef = useRef<Brick[]>([]);
-  const keysRef = useRef<Set<string>>(new Set());
-
-  const initBricks = useCallback((levelNum: number) => {
-    const bricks: Brick[] = [];
-    const config = LEVEL_CONFIGS[Math.min(levelNum - 1, LEVEL_CONFIGS.length - 1)];
-
-    for (let row = 0; row < BRICK_ROWS; row++) {
-      for (let col = 0; col < BRICK_COLS; col++) {
-        const colorIndex = row % BRICK_COLORS.length;
-        bricks.push({
-          x: BRICK_OFFSET_LEFT + col * (BRICK_WIDTH + BRICK_PADDING),
-          y: BRICK_OFFSET_TOP + row * (BRICK_HEIGHT + BRICK_PADDING),
-          width: BRICK_WIDTH,
-          height: BRICK_HEIGHT,
-          hits: config.brickHits,
-          color: BRICK_COLORS[colorIndex].color,
-          glowColor: BRICK_COLORS[colorIndex].glow,
-        });
-      }
-    }
-    bricksRef.current = bricks;
-  }, []);
-
-  const resetBall = useCallback(() => {
-    const config = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
-    ballRef.current = {
-      x: CANVAS_WIDTH / 2,
-      y: CANVAS_HEIGHT - 100,
-      dx: config.speed * (Math.random() > 0.5 ? 1 : -1),
-      dy: -config.speed,
-      radius: BALL_RADIUS,
-    };
-  }, [level]);
-
-  const startGame = useCallback(() => {
+  const begin = () => {
+    g.current = newGame();
+    g.current.banner = { text: `${levelLabel} 1`, left: 1.2 };
     setScore(0);
-    setLevel(1);
-    setLives(LEVEL_CONFIGS[0].lives);
-    setCombo(0);
-    initBricks(1);
-    resetBall();
-    paddleRef.current.x = (CANVAS_WIDTH - PADDLE_WIDTH) / 2;
-    setGameState('playing');
-  }, [initBricks, resetBall]);
+    sync();
+    session.start();
+  };
 
-  const nextLevel = useCallback(() => {
-    const newLevel = level + 1;
-    setLevel(newLevel);
-    const config = LEVEL_CONFIGS[Math.min(newLevel - 1, LEVEL_CONFIGS.length - 1)];
-    setLives(prev => Math.min(prev + 1, config.lives));
-    initBricks(newLevel);
-    resetBall();
-    setGameState('playing');
-  }, [level, initBricks, resetBall]);
-
-  // Touch controls
-  const movePaddle = useCallback((direction: 'left' | 'right') => {
-    const paddle = paddleRef.current;
-    const moveSpeed = 30;
-    if (direction === 'left') {
-      paddle.x = Math.max(0, paddle.x - moveSpeed);
-    } else {
-      paddle.x = Math.min(CANVAS_WIDTH - paddle.width, paddle.x + moveSpeed);
+  const onPointerDown = (e: React.PointerEvent) => {
+    const s = g.current;
+    if (e.pointerType === 'mouse') s.paddleX = stage.toLogical(e.clientX, e.clientY).x;
+    else drag.current = { startX: e.clientX, startPaddle: s.paddleX };
+    launch();
+  };
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (statusRef.current !== 'playing') return;
+    const s = g.current;
+    if (e.pointerType === 'mouse') {
+      s.paddleX = stage.toLogical(e.clientX, e.clientY).x;
+    } else if (drag.current) {
+      const scale = W / (stage.canvasRef.current?.getBoundingClientRect().width || W);
+      s.paddleX = drag.current.startPaddle + (e.clientX - drag.current.startX) * scale;
     }
-  }, []);
+  };
+  const clearDrag = () => {
+    drag.current = null;
+  };
 
-  // Game loop
+  // Space launches; kept on window so it works wherever focus is.
+  const launchRef = useRef(launch);
   useEffect(() => {
-    if (gameState !== 'playing') return;
-
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const gameLoop = () => {
-      const ball = ballRef.current;
-      const paddle = paddleRef.current;
-      const bricks = bricksRef.current;
-
-      // Handle keyboard input
-      if (keysRef.current.has('ArrowLeft') || keysRef.current.has('a')) {
-        paddle.x = Math.max(0, paddle.x - 8);
+    launchRef.current = launch;
+  });
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.key === ' ' || e.key === 'ArrowUp') && statusRef.current === 'playing') {
+        e.preventDefault();
+        launchRef.current();
       }
-      if (keysRef.current.has('ArrowRight') || keysRef.current.has('d')) {
-        paddle.x = Math.min(CANVAS_WIDTH - paddle.width, paddle.x + 8);
-      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [statusRef]);
 
-      // Move ball
-      ball.x += ball.dx;
-      ball.y += ball.dy;
+  useRafLoop((dt) => {
+    const s = g.current;
+    const playing = statusRef.current === 'playing';
+    if (playing) {
+      if (s.banner.left > 0) s.banner.left -= dt;
+      const dir = (held.current.has('right') ? 1 : 0) - (held.current.has('left') ? 1 : 0);
+      if (dir) s.paddleX += dir * 430 * dt;
+      s.paddleX = Math.max(PADDLE_W / 2, Math.min(W - PADDLE_W / 2, s.paddleX));
 
-      // Wall collision
-      if (ball.x - ball.radius <= 0 || ball.x + ball.radius >= CANVAS_WIDTH) {
-        ball.dx = -ball.dx;
-      }
-      if (ball.y - ball.radius <= 0) {
-        ball.dy = -ball.dy;
-      }
-
-      // Bottom - lose life
-      if (ball.y + ball.radius >= CANVAS_HEIGHT) {
-        setLives(prev => {
-          const newLives = prev - 1;
-          if (newLives <= 0) {
-            setGameState('gameover');
-            onGameEnd?.(score);
-          } else {
-            resetBall();
+      if (s.serving) {
+        s.ball.x = s.paddleX;
+        s.ball.y = PADDLE_Y - BALL_R - 1;
+      } else {
+        const speed = Math.hypot(s.ball.vx, s.ball.vy);
+        const steps = Math.max(1, Math.ceil((speed * dt) / 4));
+        const sub = dt / steps;
+        for (let i = 0; i < steps; i++) {
+          const b = s.ball;
+          b.x += b.vx * sub;
+          b.y += b.vy * sub;
+          if (b.x < BALL_R) {
+            b.x = BALL_R;
+            b.vx = Math.abs(b.vx);
+          } else if (b.x > W - BALL_R) {
+            b.x = W - BALL_R;
+            b.vx = -Math.abs(b.vx);
           }
-          return newLives;
-        });
-        setCombo(0);
-      }
-
-      // Paddle collision
-      if (
-        ball.y + ball.radius >= paddle.y &&
-        ball.y - ball.radius <= paddle.y + paddle.height &&
-        ball.x >= paddle.x &&
-        ball.x <= paddle.x + paddle.width
-      ) {
-        ball.dy = -Math.abs(ball.dy);
-        // Angle based on where it hit the paddle
-        const hitPos = (ball.x - paddle.x) / paddle.width;
-        ball.dx = (hitPos - 0.5) * 10;
-      }
-
-      // Brick collision
-      let bricksRemaining = 0;
-      for (const brick of bricks) {
-        if (brick.hits <= 0) continue;
-        bricksRemaining++;
-
-        if (
-          ball.x + ball.radius >= brick.x &&
-          ball.x - ball.radius <= brick.x + brick.width &&
-          ball.y + ball.radius >= brick.y &&
-          ball.y - ball.radius <= brick.y + brick.height
-        ) {
-          brick.hits--;
-          ball.dy = -ball.dy;
-
-          if (brick.hits <= 0) {
-            setCombo(prev => prev + 1);
-            setScore(prev => {
-              const comboBonus = Math.floor(combo / 3) * 10;
-              return prev + 10 + comboBonus;
-            });
+          if (b.y < BALL_R) {
+            b.y = BALL_R;
+            b.vy = Math.abs(b.vy);
           }
-          break;
+
+          if (b.vy > 0 && b.y + BALL_R >= PADDLE_Y && b.y + BALL_R <= PADDLE_Y + PADDLE_H + 6 && Math.abs(b.x - s.paddleX) <= PADDLE_W / 2 + BALL_R) {
+            const offset = Math.max(-1, Math.min(1, (b.x - s.paddleX) / (PADDLE_W / 2)));
+            const angle = offset * (Math.PI / 3);
+            const sp = ballSpeed(s.level);
+            b.vx = Math.sin(angle) * sp;
+            b.vy = -Math.cos(angle) * sp;
+            b.y = PADDLE_Y - BALL_R;
+            s.combo = 0;
+          }
+
+          const hit = s.bricks.find(
+            (br) => b.x + BALL_R > br.x && b.x - BALL_R < br.x + BRICK_W && b.y + BALL_R > br.y && b.y - BALL_R < br.y + BRICK_H,
+          );
+          if (hit) {
+            const ox = BRICK_W / 2 + BALL_R - Math.abs(b.x - (hit.x + BRICK_W / 2));
+            const oy = BRICK_H / 2 + BALL_R - Math.abs(b.y - (hit.y + BRICK_H / 2));
+            if (ox < oy) {
+              b.vx = b.x < hit.x + BRICK_W / 2 ? -Math.abs(b.vx) : Math.abs(b.vx);
+              b.x += b.x < hit.x + BRICK_W / 2 ? -ox : ox;
+            } else {
+              b.vy = b.y < hit.y + BRICK_H / 2 ? -Math.abs(b.vy) : Math.abs(b.vy);
+              b.y += b.y < hit.y + BRICK_H / 2 ? -oy : oy;
+            }
+            hit.hp -= 1;
+            s.combo += 1;
+            s.score += hit.hp <= 0 ? 10 + 5 * Math.min(s.combo - 1, 10) : 5;
+            if (hit.hp <= 0) s.bricks = s.bricks.filter((br) => br !== hit);
+            setScore(s.score);
+            break;
+          }
+        }
+
+        if (s.bricks.length === 0) {
+          s.level += 1;
+          s.score += 100;
+          s.bricks = buildLevel(s.level);
+          s.serving = true;
+          s.combo = 0;
+          s.banner = { text: `${levelLabel} ${s.level}`, left: 1.4 };
+          setScore(s.score);
+          sync();
+        } else if (s.ball.y - BALL_R > H) {
+          s.lives -= 1;
+          s.combo = 0;
+          sync();
+          if (s.lives <= 0) finish(s.score);
+          else {
+            s.serving = true;
+            s.ball.vx = 0;
+            s.ball.vy = 0;
+          }
         }
       }
+    }
 
-      // Check level complete
-      if (bricksRemaining === 0) {
-        setGameState('levelup');
-        return;
-      }
+    const ctx = stage.getCtx();
+    if (!ctx) return;
+    const p = palette.current;
+    ctx.fillStyle = p.surface;
+    ctx.fillRect(0, 0, W, H);
 
-      // Draw
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = p.border;
+    ctx.beginPath();
+    ctx.moveTo(0, PADDLE_Y + 22);
+    ctx.lineTo(W, PADDLE_Y + 22);
+    ctx.stroke();
 
-      // Draw grid pattern
-      ctx.strokeStyle = 'rgba(100, 116, 139, 0.1)';
-      ctx.lineWidth = 1;
-      for (let i = 0; i < CANVAS_WIDTH; i += 30) {
-        ctx.beginPath();
-        ctx.moveTo(i, 0);
-        ctx.lineTo(i, CANVAS_HEIGHT);
-        ctx.stroke();
-      }
-      for (let i = 0; i < CANVAS_HEIGHT; i += 30) {
-        ctx.beginPath();
-        ctx.moveTo(0, i);
-        ctx.lineTo(CANVAS_WIDTH, i);
-        ctx.stroke();
-      }
-
-      // Draw bricks
-      for (const brick of bricks) {
-        if (brick.hits <= 0) continue;
-
-        // Glow effect
-        ctx.shadowColor = brick.glowColor;
-        ctx.shadowBlur = 10;
-
-        // Brick
-        const opacity = brick.hits === 1 ? 1 : 0.7;
-        ctx.fillStyle = brick.color;
-        ctx.globalAlpha = opacity;
-        ctx.beginPath();
-        ctx.roundRect(brick.x, brick.y, brick.width, brick.height, 4);
-        ctx.fill();
-        ctx.globalAlpha = 1;
-
-        // Border
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-
-        ctx.shadowBlur = 0;
-      }
-
-      // Draw paddle with glow
-      ctx.shadowColor = '#06b6d4';
-      ctx.shadowBlur = 15;
-      const paddleGradient = ctx.createLinearGradient(paddle.x, paddle.y, paddle.x + paddle.width, paddle.y);
-      paddleGradient.addColorStop(0, '#06b6d4');
-      paddleGradient.addColorStop(0.5, '#22d3ee');
-      paddleGradient.addColorStop(1, '#06b6d4');
-      ctx.fillStyle = paddleGradient;
+    for (const br of s.bricks) {
+      ctx.globalAlpha = 0.45 + 0.55 * (br.hp / br.maxHp);
+      ctx.fillStyle = p[br.color];
       ctx.beginPath();
-      ctx.roundRect(paddle.x, paddle.y, paddle.width, paddle.height, 7);
+      ctx.roundRect(br.x, br.y, BRICK_W, BRICK_H, 4);
       ctx.fill();
-      ctx.shadowBlur = 0;
+    }
+    ctx.globalAlpha = 1;
 
-      // Draw ball with glow
-      ctx.shadowColor = '#f472b6';
-      ctx.shadowBlur = 20;
-      const ballGradient = ctx.createRadialGradient(ball.x, ball.y, 0, ball.x, ball.y, ball.radius);
-      ballGradient.addColorStop(0, '#fdf4ff');
-      ballGradient.addColorStop(0.5, '#f472b6');
-      ballGradient.addColorStop(1, '#db2777');
-      ctx.fillStyle = ballGradient;
-      ctx.beginPath();
-      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0;
+    ctx.fillStyle = p.ink;
+    ctx.beginPath();
+    ctx.roundRect(s.paddleX - PADDLE_W / 2, PADDLE_Y, PADDLE_W, PADDLE_H, 5);
+    ctx.fill();
 
-      // Draw HUD
-      ctx.fillStyle = '#f8fafc';
-      ctx.font = 'bold 16px system-ui';
-      ctx.textAlign = 'left';
-      ctx.fillText(`Level ${level}`, 10, 25);
-      ctx.textAlign = 'center';
-      ctx.fillText(`Score: ${score}`, CANVAS_WIDTH / 2, 25);
-      ctx.textAlign = 'right';
-      ctx.fillText(`❤️ ${lives}`, CANVAS_WIDTH - 10, 25);
+    ctx.fillStyle = p.accent;
+    ctx.beginPath();
+    ctx.arc(s.ball.x, s.ball.y, BALL_R, 0, Math.PI * 2);
+    ctx.fill();
 
-      if (combo >= 3) {
-        ctx.fillStyle = '#fbbf24';
-        ctx.font = 'bold 14px system-ui';
-        ctx.textAlign = 'center';
-        ctx.fillText(`🔥 x${combo} Combo!`, CANVAS_WIDTH / 2, 45);
-      }
-
-      animationRef.current = requestAnimationFrame(gameLoop);
-    };
-
-    animationRef.current = requestAnimationFrame(gameLoop);
-
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
-  }, [gameState, level, score, combo, onGameEnd, resetBall, lives]);
-
-  // Keyboard handlers
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (['ArrowLeft', 'ArrowRight', 'a', 'd'].includes(e.key)) {
-        e.preventDefault();
-        keysRef.current.add(e.key);
-      }
-      if (e.key === ' ' && gameState === 'menu') {
-        startGame();
-      }
-    };
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-      keysRef.current.delete(e.key);
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, [gameState, startGame]);
-
-  // Mouse/Touch paddle control
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const handleMove = (clientX: number) => {
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = CANVAS_WIDTH / rect.width;
-      const x = (clientX - rect.left) * scaleX;
-      paddleRef.current.x = Math.max(0, Math.min(CANVAS_WIDTH - PADDLE_WIDTH, x - PADDLE_WIDTH / 2));
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (gameState === 'playing') {
-        handleMove(e.clientX);
-      }
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (gameState === 'playing' && e.touches.length > 0) {
-        e.preventDefault();
-        handleMove(e.touches[0].clientX);
-      }
-    };
-
-    canvas.addEventListener('mousemove', handleMouseMove);
-    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
-    return () => {
-      canvas.removeEventListener('mousemove', handleMouseMove);
-      canvas.removeEventListener('touchmove', handleTouchMove);
-    };
-  }, [gameState]);
+    ctx.textAlign = 'center';
+    if (s.banner.left > 0) {
+      ctx.fillStyle = p.ink;
+      ctx.font = '700 26px ui-sans-serif, system-ui, sans-serif';
+      ctx.fillText(s.banner.text, W / 2, H / 2 + 20);
+    } else if (s.serving && playing) {
+      ctx.fillStyle = p.inkMuted;
+      ctx.font = '500 14px ui-sans-serif, system-ui, sans-serif';
+      ctx.fillText(t('arcadeGames.brickBreaker.launch'), W / 2, PADDLE_Y - 40);
+    }
+    if (s.combo >= 3 && !s.serving) {
+      ctx.fillStyle = p.gold;
+      ctx.font = '700 14px ui-sans-serif, system-ui, sans-serif';
+      ctx.fillText(`x${s.combo}`, W / 2, H - 8);
+    }
+  });
 
   return (
-    <div className={`flex flex-col items-center justify-center gap-4 ${fullscreen ? 'h-full bg-slate-950' : ''}`}>
-      <div className="relative">
-        <canvas
-          ref={canvasRef}
-          width={CANVAS_WIDTH}
-          height={CANVAS_HEIGHT}
-          className="rounded-xl border-2 border-cyan-500/30 shadow-[0_0_30px_rgba(6,182,212,0.2)] max-w-full"
-          style={{ maxHeight: fullscreen ? '75vh' : '60vh', width: 'auto' }}
-        />
-
-        {/* Menu Overlay */}
-        {gameState === 'menu' && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/90 rounded-xl backdrop-blur-sm">
-            <h2 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-500 mb-2">
-              {t('entertainment.games.brickBreaker.title')}
-            </h2>
-            <p className="text-slate-400 text-sm mb-6 text-center max-w-xs px-4">
-              {t('entertainment.games.brickBreaker.instructions')}
-            </p>
-            <Button
-              onClick={startGame}
-              className="bg-gradient-to-r from-cyan-500 to-pink-500 hover:from-cyan-600 hover:to-pink-600 text-white font-bold px-8 py-3"
-            >
-              <Play className="w-5 h-5 mr-2" />
-              {t('entertainment.games.brickBreaker.start')}
-            </Button>
-          </div>
-        )}
-
-        {/* Level Up Overlay */}
-        {gameState === 'levelup' && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/90 rounded-xl backdrop-blur-sm">
-            <h2 className="text-3xl font-black text-green-400 mb-2">
-              {t('entertainment.games.brickBreaker.levelComplete')}
-            </h2>
-            <p className="text-slate-400 mb-4">{t('entertainment.games.brickBreaker.score')}: {score}</p>
-            <Button
-              onClick={nextLevel}
-              className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold px-8 py-3"
-            >
-              {t('entertainment.games.brickBreaker.nextLevel')} {level + 1}
-            </Button>
-          </div>
-        )}
-
-        {/* Game Over Overlay */}
-        {gameState === 'gameover' && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/90 rounded-xl backdrop-blur-sm">
-            <h2 className="text-3xl font-black text-red-500 mb-2">
-              {t('entertainment.games.brickBreaker.gameOver')}
-            </h2>
-            <p className="text-slate-400 mb-1">{t('entertainment.games.brickBreaker.finalScore')}: {score}</p>
-            <p className="text-slate-500 text-sm mb-4">{t('entertainment.games.brickBreaker.reachedLevel')} {level}</p>
-            <Button
-              onClick={startGame}
-              className="bg-gradient-to-r from-cyan-500 to-pink-500 hover:from-cyan-600 hover:to-pink-600 text-white font-bold px-8 py-3"
-            >
-              <RotateCcw className="w-5 h-5 mr-2" />
-              {t('entertainment.games.brickBreaker.playAgain')}
-            </Button>
-          </div>
-        )}
-      </div>
-
-      {/* Mobile touch controls */}
-      {gameState === 'playing' && (
-        <div className="flex gap-4 md:hidden">
-          <Button
-            variant="outline"
-            size="lg"
-            className="w-20 h-14 border-cyan-500/50 text-cyan-400"
-            onTouchStart={() => movePaddle('left')}
-            aria-label={t('entertainment.controls.left')}
-          >
-            <ChevronLeft className="w-8 h-8" />
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            className="w-20 h-14 border-cyan-500/50 text-cyan-400"
-            onTouchStart={() => movePaddle('right')}
-            aria-label={t('entertainment.controls.right')}
-          >
-            <ChevronRight className="w-8 h-8" />
-          </Button>
-        </div>
-      )}
-    </div>
+    <GameFrame
+      title={t('arcadeGames.brickBreaker.title')}
+      icon={Wall}
+      description={t('arcadeGames.brickBreaker.instructions')}
+      hint={t('arcadeGames.brickBreaker.hint')}
+      session={session}
+      onRestart={begin}
+      onStart={begin}
+      stats={[
+        { label: t('arcadeKit.level'), value: hud.level },
+        { label: t('arcadeKit.lives'), value: hud.lives },
+      ]}
+      overSummary={
+        <p className="text-sm text-ink-secondary" suppressHydrationWarning>
+          {t('arcadeGames.brickBreaker.summary', { level: hud.level })}
+        </p>
+      }
+    >
+      <GameCanvas stage={stage} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={clearDrag} onPointerCancel={clearDrag} />
+    </GameFrame>
   );
 }

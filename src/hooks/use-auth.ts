@@ -1,18 +1,20 @@
+import { signOut } from '@/lib/auth-client';
 import { useAuthStore } from '@/stores/auth-store';
-import { supabase } from '@/lib/supabase-client';
 
 export function useAuth() {
-    const { user, setUser } = useAuthStore();
+  const user = useAuthStore((state) => state.user);
+  const isLoading = useAuthStore((state) => state.isLoading);
 
-    const signOut = async () => {
-        await supabase.auth.signOut();
-        setUser(null);
-    };
-
-    return {
-        user,
-        isAuthenticated: !!user,
-        isLoading: useAuthStore((state) => state.isLoading),
-        signOut,
-    };
+  return {
+    user,
+    /** Any session, including a guest one: the user has data on the server. */
+    hasSession: !!user,
+    /** A real account (email or Google), not a guest session. */
+    isAuthenticated: !!user && !user.isAnonymous,
+    isLoading,
+    signOut: async () => {
+      await signOut();
+      useAuthStore.getState().setUser(null);
+    },
+  };
 }

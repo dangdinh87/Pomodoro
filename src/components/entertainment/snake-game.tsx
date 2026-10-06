@@ -1,597 +1,208 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback, memo } from 'react';
-import { Button } from '@/components/ui/button';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Lightning } from '@phosphor-icons/react/dist/ssr';
+
 import { useI18n } from '@/contexts/i18n-context';
-import { cn } from '@/lib/utils';
-import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Zap, Skull } from 'lucide-react';
+import { GameCanvas, GameFrame } from './game-overlay';
+import { useCanvasStage, useGamePalette, useGameSession, useRafLoop, useSwipe, type GameProps, type SwipeDir } from './game-kit';
 
-interface SnakeGameProps {
-  fullscreen?: boolean;
-  onGameEnd?: (score: number) => void;
-}
+const COLS = 16;
+const ROWS = 16;
+const CELL = 24;
+const W = COLS * CELL;
+const H = ROWS * CELL;
 
-interface Point {
+interface Pt {
   x: number;
   y: number;
 }
 
-type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
+const VECTORS: Record<SwipeDir, Pt> = {
+  up: { x: 0, y: -1 },
+  down: { x: 0, y: 1 },
+  left: { x: -1, y: 0 },
+  right: { x: 1, y: 0 },
+};
 
-// Bigger cells for better visibility
-const CELL_SIZE = 28;
-const GRID_COLS = 16;
-const GRID_ROWS = 14;
+const KEY_DIRS: Record<string, SwipeDir> = {
+  ArrowUp: 'up',
+  ArrowDown: 'down',
+  ArrowLeft: 'left',
+  ArrowRight: 'right',
+  w: 'up',
+  s: 'down',
+  a: 'left',
+  d: 'right',
+  W: 'up',
+  S: 'down',
+  A: 'left',
+  D: 'right',
+};
 
-// Level configuration
-const LEVEL_CONFIG = [
-  { speed: 180, obstacles: 0, name: 'Level 1' },
-  { speed: 150, obstacles: 3, name: 'Level 2' },
-  { speed: 130, obstacles: 5, name: 'Level 3' },
-  { speed: 110, obstacles: 7, name: 'Level 4' },
-  { speed: 90, obstacles: 10, name: 'Level 5' },
-  { speed: 75, obstacles: 12, name: 'Level 6' },
-  { speed: 60, obstacles: 15, name: 'MAX' },
-];
+/** Speeds up as the snake grows, with a floor so it stays playable on a phone. */
+export function tickInterval(eaten: number): number {
+  return Math.max(75, 150 - eaten * 3);
+}
 
-const POINTS_PER_LEVEL = 50;
+function placeFood(snake: Pt[]): Pt {
+  const free: Pt[] = [];
+  for (let x = 0; x < COLS; x++)
+    for (let y = 0; y < ROWS; y++) if (!snake.some((s) => s.x === x && s.y === y)) free.push({ x, y });
+  return free[Math.floor(Math.random() * free.length)] ?? { x: 0, y: 0 };
+}
 
-export const SnakeGame = memo(function SnakeGame({
-  fullscreen = false,
-  onGameEnd,
-}: SnakeGameProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const gameLoopRef = useRef<NodeJS.Timeout | null>(null);
-  const directionRef = useRef<Direction>('RIGHT');
-  const nextDirectionRef = useRef<Direction>('RIGHT');
+function newState() {
+  const snake: Pt[] = [
+    { x: 8, y: 8 },
+    { x: 7, y: 8 },
+    { x: 6, y: 8 },
+  ];
+  return {
+    snake,
+    prev: snake.map((s) => ({ ...s })),
+    dir: 'right' as SwipeDir,
+    queue: [] as SwipeDir[],
+    food: placeFood(snake),
+    acc: 0,
+    eaten: 0,
+  };
+}
 
-  // Game state refs for performance (avoids re-renders on every tick)
-  const snakeRef = useRef<Point[]>([{ x: 5, y: 7 }]);
-  const foodRef = useRef<Point>({ x: 10, y: 7 });
-  const obstaclesRef = useRef<Point[]>([]);
-  const scoreRef = useRef(0);
-  const levelRef = useRef(1);
+const OPPOSITE: Record<SwipeDir, SwipeDir> = { up: 'down', down: 'up', left: 'right', right: 'left' };
 
-  // UI state
-  const [isRunning, setIsRunning] = useState(false);
-  const [isGameOver, setIsGameOver] = useState(false);
-  const [score, setScore] = useState(0);
-  const [level, setLevel] = useState(1);
-  const [obstacleCount, setObstacleCount] = useState(0);
-  const [showInstructions, setShowInstructions] = useState(true);
-
+export function SnakeGame(props: GameProps) {
   const { t } = useI18n();
+  const session = useGameSession(props);
+  const { statusRef, setScore, finish } = session;
+  const stage = useCanvasStage(W, H);
+  const palette = useGamePalette();
+  const game = useRef(newState());
+  const [length, setLength] = useState(3);
 
-  const generateFood = useCallback((currentSnake: Point[], currentObstacles: Point[]): Point => {
-    const occupied = new Set([
-      ...currentSnake.map(s => `${s.x}-${s.y}`),
-      ...currentObstacles.map(o => `${o.x}-${o.y}`),
-    ]);
+  const turn = useCallback(
+    (dir: SwipeDir) => {
+      if (statusRef.current !== 'playing') return;
+      const g = game.current;
+      const last = g.queue[g.queue.length - 1] ?? g.dir;
+      if (dir === last || dir === OPPOSITE[last] || g.queue.length >= 2) return;
+      g.queue.push(dir);
+    },
+    [statusRef],
+  );
 
-    let newFood: Point;
-    let attempts = 0;
-    do {
-      newFood = {
-        x: Math.floor(Math.random() * GRID_COLS),
-        y: Math.floor(Math.random() * GRID_ROWS),
-      };
-      attempts++;
-    } while (occupied.has(`${newFood.x}-${newFood.y}`) && attempts < 100);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const dir = KEY_DIRS[e.key];
+      if (!dir || e.metaKey || e.ctrlKey || e.altKey) return;
+      e.preventDefault();
+      turn(dir);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [turn]);
 
-    return newFood;
-  }, []);
+  useSwipe(stage.containerRef, turn, 22);
 
-  const generateObstacles = useCallback((count: number, currentSnake: Point[], currentFood: Point): Point[] => {
-    const newObstacles: Point[] = [];
-    const occupied = new Set([
-      ...currentSnake.map(s => `${s.x}-${s.y}`),
-      `${currentFood.x}-${currentFood.y}`,
-    ]);
+  const begin = () => {
+    game.current = newState();
+    setScore(0);
+    setLength(3);
+    session.start();
+  };
 
-    // Exclude safe zone around snake head (3x3 area)
-    const head = currentSnake[0];
-    for (let dx = -2; dx <= 2; dx++) {
-      for (let dy = -2; dy <= 2; dy++) {
-        occupied.add(`${head.x + dx}-${head.y + dy}`);
-      }
-    }
-
-    for (let i = 0; i < count; i++) {
-      let attempts = 0;
-      let point: Point;
-      do {
-        point = {
-          x: Math.floor(Math.random() * GRID_COLS),
-          y: Math.floor(Math.random() * GRID_ROWS),
-        };
-        attempts++;
-      } while (occupied.has(`${point.x}-${point.y}`) && attempts < 50);
-
-      if (attempts < 50) {
-        newObstacles.push(point);
-        occupied.add(`${point.x}-${point.y}`);
-      }
-    }
-
-    return newObstacles;
-  }, []);
-
-  const drawGame = useCallback(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext('2d');
-    if (!canvas || !ctx) return;
-
-    const width = GRID_COLS * CELL_SIZE;
-    const height = GRID_ROWS * CELL_SIZE;
-
-    // Use refs directly for drawing
-    const snake = snakeRef.current;
-    const food = foodRef.current;
-    const obstacles = obstaclesRef.current;
-
-    // Clear canvas
-    ctx.fillStyle = '#0f172a';
-    ctx.fillRect(0, 0, width, height);
-
-    // Draw grid lines (subtle)
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-    ctx.lineWidth = 1;
-    for (let x = 0; x <= GRID_COLS; x++) {
-      ctx.beginPath();
-      ctx.moveTo(x * CELL_SIZE, 0);
-      ctx.lineTo(x * CELL_SIZE, height);
-      ctx.stroke();
-    }
-    for (let y = 0; y <= GRID_ROWS; y++) {
-      ctx.beginPath();
-      ctx.moveTo(0, y * CELL_SIZE);
-      ctx.lineTo(width, y * CELL_SIZE);
-      ctx.stroke();
-    }
-
-    // Draw obstacles
-    obstacles.forEach(obs => {
-      ctx.fillStyle = '#64748b';
-      ctx.shadowBlur = 8;
-      ctx.shadowColor = '#475569';
-
-      const x = obs.x * CELL_SIZE + 3;
-      const y = obs.y * CELL_SIZE + 3;
-      const size = CELL_SIZE - 6;
-
-      ctx.beginPath();
-      ctx.roundRect(x, y, size, size, 4);
-      ctx.fill();
-
-      // X pattern on obstacle
-      ctx.strokeStyle = '#94a3b8';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(x + 5, y + 5);
-      ctx.lineTo(x + size - 5, y + size - 5);
-      ctx.moveTo(x + size - 5, y + 5);
-      ctx.lineTo(x + 5, y + size - 5);
-      ctx.stroke();
-    });
-
-    ctx.shadowBlur = 0;
-
-    // Draw snake
-    snake.forEach((segment, index) => {
-      const isHead = index === 0;
-      const x = segment.x * CELL_SIZE + 2;
-      const y = segment.y * CELL_SIZE + 2;
-      const size = CELL_SIZE - 4;
-
-      // Gradient color based on position
-      const hue = 140 - (index / snake.length) * 20;
-      const saturation = 70 + (index / snake.length) * 20;
-      const lightness = isHead ? 55 : 45 - (index / snake.length) * 15;
-
-      ctx.fillStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-      ctx.shadowBlur = isHead ? 15 : 6;
-      ctx.shadowColor = '#4ade80';
-
-      ctx.beginPath();
-      ctx.roundRect(x, y, size, size, isHead ? 8 : 6);
-      ctx.fill();
-
-      // Draw eyes on head
-      if (isHead) {
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = '#fff';
-        const eyeSize = 4;
-
-        let eye1X = x + size / 2;
-        let eye1Y = y + size / 2;
-        let eye2X = x + size / 2;
-        let eye2Y = y + size / 2;
-
-        switch (directionRef.current) {
-          case 'RIGHT':
-            eye1X = x + size - 8; eye1Y = y + 8;
-            eye2X = x + size - 8; eye2Y = y + size - 8;
-            break;
-          case 'LEFT':
-            eye1X = x + 8; eye1Y = y + 8;
-            eye2X = x + 8; eye2Y = y + size - 8;
-            break;
-          case 'UP':
-            eye1X = x + 8; eye1Y = y + 8;
-            eye2X = x + size - 8; eye2Y = y + 8;
-            break;
-          case 'DOWN':
-            eye1X = x + 8; eye1Y = y + size - 8;
-            eye2X = x + size - 8; eye2Y = y + size - 8;
-            break;
+  useRafLoop((dt) => {
+    const g = game.current;
+    if (statusRef.current === 'playing') {
+      g.acc += dt * 1000;
+      const interval = tickInterval(g.eaten);
+      while (g.acc >= interval && statusRef.current === 'playing') {
+        g.acc -= interval;
+        const next = g.queue.shift();
+        if (next) g.dir = next;
+        const v = VECTORS[g.dir];
+        const head = { x: g.snake[0].x + v.x, y: g.snake[0].y + v.y };
+        const ate = head.x === g.food.x && head.y === g.food.y;
+        const body = ate ? g.snake : g.snake.slice(0, -1);
+        const hit = head.x < 0 || head.y < 0 || head.x >= COLS || head.y >= ROWS || body.some((s) => s.x === head.x && s.y === head.y);
+        if (hit) {
+          g.acc = 0;
+          finish(g.eaten * 10);
+          break;
         }
-
-        ctx.beginPath();
-        ctx.arc(eye1X, eye1Y, eyeSize, 0, Math.PI * 2);
-        ctx.arc(eye2X, eye2Y, eyeSize, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Pupils
-        ctx.fillStyle = '#000';
-        ctx.beginPath();
-        ctx.arc(eye1X + 1, eye1Y + 1, 2, 0, Math.PI * 2);
-        ctx.arc(eye2X + 1, eye2Y + 1, 2, 0, Math.PI * 2);
-        ctx.fill();
+        g.prev = g.snake.map((s) => ({ ...s }));
+        g.snake.unshift(head);
+        if (ate) {
+          g.eaten += 1;
+          g.food = placeFood(g.snake);
+          setScore(g.eaten * 10);
+          setLength(g.snake.length);
+        } else {
+          g.snake.pop();
+        }
       }
-    });
+    }
 
-    // Draw food with pulsing effect
-    const pulse = Math.sin(Date.now() / 150) * 0.15 + 0.85;
-    const foodX = food.x * CELL_SIZE + CELL_SIZE / 2;
-    const foodY = food.y * CELL_SIZE + CELL_SIZE / 2;
-    const foodRadius = (CELL_SIZE / 2 - 4) * pulse;
+    const ctx = stage.getCtx();
+    if (!ctx) return;
+    const p = palette.current;
+    const interval = tickInterval(g.eaten);
+    const alpha = statusRef.current === 'playing' ? Math.min(1, g.acc / interval) : 1;
 
-    ctx.fillStyle = '#ef4444';
-    ctx.shadowBlur = 20 * pulse;
-    ctx.shadowColor = '#ef4444';
+    ctx.fillStyle = p.surface;
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = p.raised;
+    for (let x = 0; x < COLS; x++)
+      for (let y = 0; y < ROWS; y++) if ((x + y) % 2 === 1) ctx.fillRect(x * CELL, y * CELL, CELL, CELL);
+
+    ctx.fillStyle = p.rose;
     ctx.beginPath();
-    ctx.arc(foodX, foodY, foodRadius, 0, Math.PI * 2);
+    ctx.arc(g.food.x * CELL + CELL / 2, g.food.y * CELL + CELL / 2, CELL * 0.34, 0, Math.PI * 2);
     ctx.fill();
 
-    // Apple stem
-    ctx.strokeStyle = '#84cc16';
-    ctx.lineWidth = 3;
-    ctx.shadowBlur = 0;
-    ctx.beginPath();
-    ctx.moveTo(foodX, foodY - foodRadius + 2);
-    ctx.lineTo(foodX + 3, foodY - foodRadius - 4);
-    ctx.stroke();
-  }, []);
-
-  const gameLoop = useCallback(() => {
-    const prevSnake = snakeRef.current;
-    const obstacles = obstaclesRef.current;
-    const food = foodRef.current;
-
-    directionRef.current = nextDirectionRef.current;
-    const head = { ...prevSnake[0] };
-
-    switch (directionRef.current) {
-      case 'UP': head.y -= 1; break;
-      case 'DOWN': head.y += 1; break;
-      case 'LEFT': head.x -= 1; break;
-      case 'RIGHT': head.x += 1; break;
-    }
-
-    // Check collisions
-    if (head.x < 0 || head.x >= GRID_COLS || head.y < 0 || head.y >= GRID_ROWS ||
-        prevSnake.some(seg => seg.x === head.x && seg.y === head.y) ||
-        obstacles.some(obs => obs.x === head.x && obs.y === head.y)) {
-
-      setIsGameOver(true);
-      setIsRunning(false);
-      if (gameLoopRef.current) clearInterval(gameLoopRef.current);
-      onGameEnd?.(scoreRef.current);
-      return;
-    }
-
-    const newSnake = [head, ...prevSnake];
-
-    // Check food
-    if (head.x === food.x && head.y === food.y) {
-      // Score update
-      const newScore = scoreRef.current + 10;
-      scoreRef.current = newScore;
-      setScore(newScore); // Update UI state
-
-      const newLevel = Math.min(LEVEL_CONFIG.length, Math.floor(newScore / POINTS_PER_LEVEL) + 1);
-
-      if (newLevel > levelRef.current) {
-        levelRef.current = newLevel;
-        setLevel(newLevel); // Update UI state
-
-        const levelConfig = LEVEL_CONFIG[newLevel - 1];
-        const newObstacles = generateObstacles(levelConfig.obstacles, newSnake, food);
-        obstaclesRef.current = newObstacles;
-        setObstacleCount(newObstacles.length); // Update UI state
+    const inset = 2;
+    for (let i = g.snake.length - 1; i >= 0; i--) {
+      const cur = g.snake[i];
+      const prev = g.prev[i] ?? cur;
+      const x = (prev.x + (cur.x - prev.x) * alpha) * CELL;
+      const y = (prev.y + (cur.y - prev.y) * alpha) * CELL;
+      ctx.fillStyle = i === 0 ? p.accent : p.accentSolid;
+      ctx.beginPath();
+      ctx.roundRect(x + inset, y + inset, CELL - inset * 2, CELL - inset * 2, i === 0 ? 8 : 6);
+      ctx.fill();
+      if (i === 0) {
+        const v = VECTORS[g.dir];
+        const cx = x + CELL / 2;
+        const cy = y + CELL / 2;
+        const px = -v.y;
+        const py = v.x;
+        ctx.fillStyle = p.surface;
+        for (const side of [-1, 1]) {
+          ctx.beginPath();
+          ctx.arc(cx + v.x * 4 + px * side * 4.5, cy + v.y * 4 + py * side * 4.5, 2.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
-
-      foodRef.current = generateFood(newSnake, obstaclesRef.current);
-    } else {
-      newSnake.pop();
     }
-
-    snakeRef.current = newSnake;
-  }, [generateFood, generateObstacles, onGameEnd]);
-
-  const startGame = useCallback(() => {
-    const initialSnake = [{ x: 3, y: Math.floor(GRID_ROWS / 2) }];
-    const initialFood = generateFood(initialSnake, []);
-
-    snakeRef.current = initialSnake;
-    foodRef.current = initialFood;
-    obstaclesRef.current = [];
-    scoreRef.current = 0;
-    levelRef.current = 1;
-
-    setScore(0);
-    setLevel(1);
-    setObstacleCount(0);
-    setIsGameOver(false);
-    setIsRunning(true);
-    setShowInstructions(false);
-    directionRef.current = 'RIGHT';
-    nextDirectionRef.current = 'RIGHT';
-  }, [generateFood]);
-
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (!isRunning) return;
-
-    const currentDir = directionRef.current;
-    switch (e.key) {
-      case 'ArrowUp':
-      case 'w':
-      case 'W':
-        e.preventDefault();
-        if (currentDir !== 'DOWN') nextDirectionRef.current = 'UP';
-        break;
-      case 'ArrowDown':
-      case 's':
-      case 'S':
-        e.preventDefault();
-        if (currentDir !== 'UP') nextDirectionRef.current = 'DOWN';
-        break;
-      case 'ArrowLeft':
-      case 'a':
-      case 'A':
-        e.preventDefault();
-        if (currentDir !== 'RIGHT') nextDirectionRef.current = 'LEFT';
-        break;
-      case 'ArrowRight':
-      case 'd':
-      case 'D':
-        e.preventDefault();
-        if (currentDir !== 'LEFT') nextDirectionRef.current = 'RIGHT';
-        break;
-    }
-  }, [isRunning]);
-
-  const handleDirectionButton = useCallback((direction: Direction) => {
-    if (!isRunning) return;
-
-    const currentDir = directionRef.current;
-    if (
-      (direction === 'UP' && currentDir !== 'DOWN') ||
-      (direction === 'DOWN' && currentDir !== 'UP') ||
-      (direction === 'LEFT' && currentDir !== 'RIGHT') ||
-      (direction === 'RIGHT' && currentDir !== 'LEFT')
-    ) {
-      nextDirectionRef.current = direction;
-    }
-  }, [isRunning]);
-
-  // Game loop effect
-  useEffect(() => {
-    if (isRunning) {
-      const levelConfig = LEVEL_CONFIG[Math.min(level - 1, LEVEL_CONFIG.length - 1)];
-      gameLoopRef.current = setInterval(gameLoop, levelConfig.speed);
-    }
-    return () => {
-      if (gameLoopRef.current) clearInterval(gameLoopRef.current);
-    };
-  }, [isRunning, gameLoop, level]);
-
-  // Continuous draw for animations
-  useEffect(() => {
-    let animationId: number;
-    const animate = () => {
-      drawGame();
-      animationId = requestAnimationFrame(animate);
-    };
-    animationId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationId);
-  }, [drawGame]);
-
-  // Event listeners
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      if (gameLoopRef.current) clearInterval(gameLoopRef.current);
-    };
-  }, [handleKeyDown]);
-
-  const canvasWidth = GRID_COLS * CELL_SIZE;
-  const canvasHeight = GRID_ROWS * CELL_SIZE;
+  });
 
   return (
-    <div
-      ref={containerRef}
-      className={cn(
-        "relative flex flex-col items-center justify-center overflow-hidden",
-        fullscreen ? "w-full h-full p-4" : "w-full h-[600px] rounded-lg p-4"
-      )}
-      style={{ background: '#0f172a' }}
+    <GameFrame
+      title={t('arcadeGames.snake.title')}
+      icon={Lightning}
+      description={t('arcadeGames.snake.instructions')}
+      hint={t('arcadeGames.snake.hint')}
+      session={session}
+      onRestart={begin}
+      onStart={begin}
+      stats={[{ label: t('arcadeGames.snake.length'), value: length }]}
+      overSummary={
+        <p className="text-sm text-ink-secondary" suppressHydrationWarning>
+          {t('arcadeGames.snake.summary', { length })}
+        </p>
+      }
     >
-      {/* HUD */}
-      {isRunning && (
-        <div className="flex items-center justify-between w-full max-w-md mb-3">
-          <div className="flex gap-3">
-            <div className="bg-gray-800/80 rounded-lg px-3 py-1.5 text-center">
-              <div className="text-gray-400 text-[10px] uppercase">Điểm</div>
-              <div className="text-green-400 font-bold text-lg">{score}</div>
-            </div>
-            <div className="bg-gray-800/80 rounded-lg px-3 py-1.5 text-center">
-              <div className="text-gray-400 text-[10px] uppercase flex items-center gap-1">
-                <Zap className="h-3 w-3" /> Level
-              </div>
-              <div className="text-yellow-400 font-bold text-lg">{level}</div>
-            </div>
-          </div>
-          {obstacleCount > 0 && (
-            <div className="flex items-center gap-1 text-gray-400 text-sm">
-              <Skull className="h-4 w-4" />
-              <span>{obstacleCount}</span>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Game canvas */}
-      <div className="relative rounded-xl overflow-hidden shadow-2xl border-2 border-gray-700/50">
-        <canvas
-          ref={canvasRef}
-          width={canvasWidth}
-          height={canvasHeight}
-          style={{ display: 'block' }}
-        />
-      </div>
-
-      {/* Mobile controls */}
-      {isRunning && (
-        <div className="flex flex-col items-center gap-2 mt-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="w-12 h-12 bg-white/10 hover:bg-white/20 text-white rounded-xl active:scale-95"
-            onClick={() => handleDirectionButton('UP')}
-            aria-label={t('entertainment.controls.up')}
-          >
-            <ArrowUp className="h-6 w-6" />
-          </Button>
-          <div className="flex gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-12 h-12 bg-white/10 hover:bg-white/20 text-white rounded-xl active:scale-95"
-              onClick={() => handleDirectionButton('LEFT')}
-              aria-label={t('entertainment.controls.left')}
-            >
-              <ArrowLeft className="h-6 w-6" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-12 h-12 bg-white/10 hover:bg-white/20 text-white rounded-xl active:scale-95"
-              onClick={() => handleDirectionButton('DOWN')}
-              aria-label={t('entertainment.controls.down')}
-            >
-              <ArrowDown className="h-6 w-6" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-12 h-12 bg-white/10 hover:bg-white/20 text-white rounded-xl active:scale-95"
-              onClick={() => handleDirectionButton('RIGHT')}
-              aria-label={t('entertainment.controls.right')}
-            >
-              <ArrowRight className="h-6 w-6" />
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* Start Screen with Instructions */}
-      {!isRunning && !isGameOver && (
-        <div className="absolute inset-0 bg-black/85 backdrop-blur-sm flex flex-col justify-center items-center z-10 p-6">
-          <h1
-            className="text-white uppercase tracking-widest text-center font-bold mb-6 text-3xl md:text-4xl"
-            style={{ textShadow: '0 0 20px #4ade80' }}
-            suppressHydrationWarning
-          >
-            🐍 {t('entertainment.games.snake.title')}
-          </h1>
-
-          {/* How to play */}
-          <div className="bg-gray-800/60 rounded-xl p-4 mb-6 max-w-sm w-full">
-            <h3 className="text-green-400 font-bold mb-3 text-center">Cách chơi</h3>
-            <ul className="text-gray-300 text-sm space-y-2">
-              <li className="flex items-start gap-2">
-                <span className="text-green-400">⌨️</span>
-                <span>Dùng <strong>phím mũi tên</strong> hoặc <strong>WASD</strong> để điều khiển</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-red-400">🍎</span>
-                <span>Ăn táo đỏ để ghi <strong>+10 điểm</strong> và dài thêm</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-yellow-400">⚡</span>
-                <span>Mỗi <strong>50 điểm</strong> = lên 1 level, rắn chạy nhanh hơn</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-gray-400">💀</span>
-                <span>Từ Level 2: xuất hiện <strong>chướng ngại vật</strong></span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-red-500">⚠️</span>
-                <span>Tránh đâm <strong>tường, thân</strong> và <strong>chướng ngại vật</strong></span>
-              </li>
-            </ul>
-          </div>
-
-          <Button
-            onClick={startGame}
-            className={cn(
-              "bg-green-500 hover:bg-green-600 text-white uppercase tracking-wider font-bold",
-              "px-8 py-3 text-lg rounded-xl",
-              "hover:shadow-[0_0_30px_rgba(74,222,128,0.5)] hover:scale-105 transition-all"
-            )}
-            suppressHydrationWarning
-          >
-            {t('entertainment.playNow')}
-          </Button>
-        </div>
-      )}
-
-      {/* Game Over Screen */}
-      {isGameOver && (
-        <div className="absolute inset-0 bg-black/85 backdrop-blur-sm flex flex-col justify-center items-center z-10 p-6">
-          <h1
-            className="text-white uppercase tracking-widest text-center font-bold mb-2 text-3xl md:text-4xl"
-            style={{ textShadow: '0 0 20px #ef4444' }}
-          >
-            Game Over!
-          </h1>
-
-          <div className="bg-gray-800/60 rounded-xl p-4 my-4 text-center">
-            <div className="text-green-400 text-5xl font-bold mb-2" style={{ textShadow: '0 0 15px #4ade80' }}>
-              {score}
-            </div>
-            <div className="flex justify-center gap-6 text-gray-300 text-sm">
-              <span>Level: <strong className="text-yellow-400">{level}</strong></span>
-              <span>Độ dài: <strong className="text-green-400">{snakeRef.current.length}</strong></span>
-            </div>
-          </div>
-
-          <Button
-            onClick={startGame}
-            className={cn(
-              "bg-green-500 hover:bg-green-600 text-white uppercase tracking-wider font-bold",
-              "px-8 py-3 text-lg rounded-xl",
-              "hover:shadow-[0_0_30px_rgba(74,222,128,0.5)] hover:scale-105 transition-all"
-            )}
-            suppressHydrationWarning
-          >
-            Chơi lại
-          </Button>
-        </div>
-      )}
-    </div>
+      <GameCanvas stage={stage} />
+    </GameFrame>
   );
-});
+}

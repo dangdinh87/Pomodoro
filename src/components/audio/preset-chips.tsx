@@ -1,8 +1,9 @@
 'use client'
 
-import { memo, useState, useRef, useCallback, useEffect } from 'react'
-import { Plus, Trash2, Edit2, MoreVertical, ChevronLeft, ChevronRight } from 'lucide-react'
+import { memo, useState, useRef, useCallback, useEffect, useMemo } from 'react'
+import { Plus, Trash, PencilSimple, DotsThreeVertical, CaretLeft, CaretRight } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '@/components/ui/button'
+import { FilterChip } from '@/components/ui/filter-chip'
 import {
   Dialog,
   DialogContent,
@@ -22,8 +23,8 @@ import { Label } from '@/components/ui/label'
 import { useAudioStore } from '@/stores/audio-store'
 import { builtInPresets } from '@/data/sound-presets'
 import type { SoundPreset } from '@/stores/audio-store'
-import { cn } from '@/lib/utils'
 import { useTranslation } from '@/contexts/i18n-context'
+import { getPresetIcon } from './sound-icons'
 
 function useScrollArrows() {
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -60,28 +61,32 @@ function useScrollArrows() {
   return { scrollRef, canScrollLeft, canScrollRight, scrollLeft, scrollRight }
 }
 
+function PresetIcon({ preset }: { preset: SoundPreset }) {
+  const Icon = getPresetIcon(preset.id)
+  return <Icon size={16} aria-hidden="true" />
+}
+
 export const PresetChips = memo(function PresetChips() {
   const { t } = useTranslation()
   const activeAmbientSounds = useAudioStore((s) => s.activeAmbientSounds)
-  const userPresets = useAudioStore((s) => s.presets.filter(p => !p.isBuiltIn))
+  const presets = useAudioStore((s) => s.presets)
+  const userPresets = useMemo(() => presets.filter((p) => !p.isBuiltIn), [presets])
   const loadPreset = useAudioStore((s) => s.loadPreset)
   const savePreset = useAudioStore((s) => s.savePreset)
   const deletePreset = useAudioStore((s) => s.deletePreset)
   const renamePreset = useAudioStore((s) => s.renamePreset)
   const stopAllAmbient = useAudioStore((s) => s.stopAllAmbient)
 
-  const builtInScroll = useScrollArrows()
+  const { scrollRef, canScrollLeft, canScrollRight, scrollLeft, scrollRight } = useScrollArrows()
 
   const [saveDialogOpen, setSaveDialogOpen] = useState(false)
   const [presetName, setPresetName] = useState('')
-  const [presetIcon, setPresetIcon] = useState('🎵')
 
   const [renameDialogOpen, setRenameDialogOpen] = useState(false)
   const [renamingPreset, setRenamingPreset] = useState<SoundPreset | null>(null)
   const [newPresetName, setNewPresetName] = useState('')
 
   // Combine built-in + user presets
-
 
   // Filter only sounds with volume > 0 for comparison
   const activeAmbientWithVolume = activeAmbientSounds.filter(s => s.volume > 0)
@@ -105,9 +110,8 @@ export const PresetChips = memo(function PresetChips() {
 
   const handleSavePreset = () => {
     if (!presetName.trim()) return
-    savePreset(presetName.trim(), presetIcon)
+    savePreset(presetName.trim())
     setPresetName('')
-    setPresetIcon('🎵')
     setSaveDialogOpen(false)
   }
 
@@ -132,107 +136,126 @@ export const PresetChips = memo(function PresetChips() {
 
   const allPresets = [...builtInPresets, ...userPresets]
   const isAnyPresetActive = allPresets.some(isPresetActive)
+  const canSave = activeAmbientWithVolume.length > 0 && userPresets.length < 10 && !isAnyPresetActive
 
   return (
     <>
-      {/* Unified presets card */}
-      <div className="bg-background/40 border rounded-lg overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between px-2.5 py-1.5 border-b bg-background/60">
+      {/* Library: built-in presets as chips, saved mixes as a list under them */}
+      <section aria-label={t('audio.presets.library')} className="sticker-sm overflow-hidden">
+        <div className="flex items-center justify-between gap-2 px-3 pb-1 pt-3">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-bold text-foreground/90">{t('audio.presets.library')}</h3>
-            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-semibold">
-              {allPresets.length}
+            <h3 className="font-heading text-[1.0625rem] font-bold text-ink">{t('audio.presets.library')}</h3>
+            <span className="rounded-full bg-surface-raised px-2 py-0.5 text-xs font-bold tabular-nums text-ink-secondary">
+              {builtInPresets.length}
             </span>
           </div>
           <Button
-            variant="ghost"
+            variant="secondary"
             size="sm"
             onClick={() => setSaveDialogOpen(true)}
-            disabled={activeAmbientWithVolume.length === 0 || userPresets.length >= 10 || isAnyPresetActive}
-            className="h-6 gap-1 text-[10px] font-semibold hover:bg-primary/10 hover:text-primary px-2"
+            disabled={!canSave}
+            className="gap-1"
           >
-            <Plus className="h-3 w-3" />
+            <Plus size={14} weight="bold" aria-hidden="true" />
             {t('audio.presets.saveMix')}
           </Button>
         </div>
+
         {/* Scrollable chips with arrows */}
         <div className="relative">
-          {builtInScroll.canScrollLeft && (
-            <Button variant="ghost" size="icon" onClick={builtInScroll.scrollLeft}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-background/80 hover:bg-background shadow-sm">
-              <ChevronLeft className="h-4 w-4" />
+          {canScrollLeft && (
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={scrollLeft}
+              aria-label={t('audio.scrollLeft')}
+              className="absolute left-1 top-1/2 z-10 size-8 -translate-y-1/2"
+            >
+              <CaretLeft size={16} weight="bold" aria-hidden="true" />
             </Button>
           )}
-          {builtInScroll.canScrollRight && (
-            <Button variant="ghost" size="icon" onClick={builtInScroll.scrollRight}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-background/80 hover:bg-background shadow-sm">
-              <ChevronRight className="h-4 w-4" />
+          {canScrollRight && (
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={scrollRight}
+              aria-label={t('audio.scrollRight')}
+              className="absolute right-1 top-1/2 z-10 size-8 -translate-y-1/2"
+            >
+              <CaretRight size={16} weight="bold" aria-hidden="true" />
             </Button>
           )}
-          <div ref={builtInScroll.scrollRef} className="flex gap-2 overflow-x-auto p-1.5 scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}>
-            {allPresets.map((preset) => {
-              const isActive = isPresetActive(preset)
-              const isUserPreset = !preset.isBuiltIn
-              // Use translation for built-in presets, original name for user presets
-              const displayName = preset.isBuiltIn
-                ? t(`audio.presets.builtIn.${preset.id}`)
-                : preset.name
-
-              return (
-                <div key={preset.id} className="flex-shrink-0 flex items-center gap-1">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleLoadPreset(preset)}
-                    className={cn(
-                      'h-8 px-3 text-sm font-medium whitespace-nowrap transition-all border',
-                      isActive
-                        ? 'bg-primary text-primary-foreground hover:bg-primary/90 border-primary shadow-md'
-                        : 'hover:bg-accent hover:text-accent-foreground border-input',
-                      isUserPreset && !isActive && 'border-dashed border-primary/30'
-                    )}
-                  >
-                    {preset.icon && <span>{preset.icon}</span>}
-                    {displayName}
-                    {isUserPreset && (
-                      <span className="ml-1 w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0" />
-                    )}
-                  </Button>
-
-                  {/* User preset actions dropdown */}
-                  {isUserPreset && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 shrink-0 text-muted-foreground hover:text-foreground"
-                        >
-                          <MoreVertical className="h-3.5 w-3.5" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleOpenRenameDialog(preset)}>
-                          <Edit2 className="mr-2 h-4 w-4" />
-                          {t('audio.presets.rename')}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleDeletePreset(preset.id)}
-                          className="text-destructive focus:text-destructive"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          {t('audio.presets.delete')}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
-                </div>
-              )
-            })}
+          <div
+            ref={scrollRef}
+            role="group"
+            aria-label={t('audio.presets.library')}
+            className="flex items-center gap-2 overflow-x-auto scroll-smooth px-3 py-2.5 scrollbar-hide"
+          >
+            {builtInPresets.map((preset) => (
+              <FilterChip
+                key={preset.id}
+                active={isPresetActive(preset)}
+                onClick={() => handleLoadPreset(preset)}
+              >
+                <PresetIcon preset={preset} />
+                {t(`audio.presets.builtIn.${preset.id}`)}
+              </FilterChip>
+            ))}
           </div>
         </div>
-      </div>
+
+        <div className="border-t-2 border-border px-3 py-3">
+          <div className="mb-2 flex items-center gap-2">
+            <h4 className="font-heading text-[0.9375rem] font-bold text-ink">{t('audio.presets.savedMixes')}</h4>
+            <span className="rounded-full bg-surface-raised px-2 py-0.5 text-xs font-bold tabular-nums text-ink-secondary">
+              {userPresets.length}/10
+            </span>
+          </div>
+          {userPresets.length === 0 ? (
+            <p className="text-[0.8125rem] leading-snug text-ink-muted">{t('audio.presets.savedEmpty')}</p>
+          ) : (
+            <ul className="space-y-2">
+              {userPresets.map((preset) => (
+                <li key={preset.id} className="flex items-center gap-2">
+                  <FilterChip
+                    active={isPresetActive(preset)}
+                    onClick={() => handleLoadPreset(preset)}
+                    className="min-w-0 flex-1 justify-start"
+                  >
+                    <PresetIcon preset={preset} />
+                    <span className="truncate">{preset.name}</span>
+                  </FilterChip>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="shrink-0"
+                        aria-label={t('audio.presets.mixOptions', { name: preset.name })}
+                      >
+                        <DotsThreeVertical size={18} weight="bold" aria-hidden="true" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleOpenRenameDialog(preset)}>
+                        <PencilSimple size={16} className="mr-2" aria-hidden="true" />
+                        {t('audio.presets.rename')}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleDeletePreset(preset.id)}
+                        className="text-danger-ink focus:text-danger-ink"
+                      >
+                        <Trash size={16} className="mr-2" aria-hidden="true" />
+                        {t('audio.presets.delete')}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </section>
 
       {/* Save Preset Dialog */}
       <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
@@ -240,24 +263,12 @@ export const PresetChips = memo(function PresetChips() {
           <DialogHeader>
             <DialogTitle>{t('audio.presets.savePresetTitle')}</DialogTitle>
             <DialogDescription>
-              {t('audio.presets.savePresetDescription', {
-                count: activeAmbientWithVolume.length,
-                plural: activeAmbientWithVolume.length !== 1 ? 's' : ''
-              })}
+              {activeAmbientWithVolume.length === 1
+                ? t('audio.presets.savePresetDescriptionOne')
+                : t('audio.presets.savePresetDescription', { count: activeAmbientWithVolume.length })}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="preset-icon">{t('audio.presets.icon')}</Label>
-              <Input
-                id="preset-icon"
-                value={presetIcon}
-                onChange={(e) => setPresetIcon(e.target.value)}
-                placeholder={t('audio.presets.iconPlaceholder')}
-                maxLength={10}
-                className="text-base w-full"
-              />
-            </div>
             <div className="grid gap-2">
               <Label htmlFor="preset-name">{t('audio.presets.name')}</Label>
               <Input
@@ -287,7 +298,7 @@ export const PresetChips = memo(function PresetChips() {
           <DialogHeader>
             <DialogTitle>{t('audio.presets.renameTitle')}</DialogTitle>
             <DialogDescription>
-              Enter a new name for &quot;{renamingPreset?.name}&quot;.
+              {t('audio.presets.renameDescription', { name: renamingPreset?.name ?? '' })}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">

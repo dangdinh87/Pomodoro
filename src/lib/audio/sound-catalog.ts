@@ -17,6 +17,11 @@ export interface SoundItem {
   vn?: string;
   icon: string; // emoji
   url: string;
+  /**
+   * The mp3 is a silent placeholder (a copy of silence.mp3), so the sound is kept out of
+   * every listing and out of the lookup. Drop the flag once a real recording replaces the file.
+   */
+  hidden?: boolean;
 }
 
 export interface AlarmItem {
@@ -83,6 +88,7 @@ const nature: SoundItem[] = [
     vn: 'Chim hót',
     icon: '🐦',
     url: '/sounds/nature/birds.mp3',
+    hidden: true,
   },
   {
     id: 'night-crickets',
@@ -91,6 +97,7 @@ const nature: SoundItem[] = [
     vn: 'Dế đêm',
     icon: '🦗',
     url: '/sounds/nature/night-crickets.mp3',
+    hidden: true,
   },
   {
     id: 'fireplace',
@@ -99,6 +106,7 @@ const nature: SoundItem[] = [
     vn: 'Lò sưởi',
     icon: '🪵',
     url: '/sounds/nature/fireplace.mp3',
+    hidden: true,
   },
 ];
 
@@ -180,6 +188,7 @@ const study: SoundItem[] = [
     vn: 'Thư viện',
     icon: '📚',
     url: '/sounds/study/library.mp3',
+    hidden: true,
   },
   {
     id: 'coffee-shop',
@@ -188,6 +197,7 @@ const study: SoundItem[] = [
     vn: 'Quán cà phê',
     icon: '☕',
     url: '/sounds/study/coffee-shop.mp3',
+    hidden: true,
   },
   {
     id: 'coworking',
@@ -196,6 +206,7 @@ const study: SoundItem[] = [
     vn: 'Văn phòng',
     icon: '🏢',
     url: '/sounds/study/coworking.mp3',
+    hidden: true,
   },
 ];
 
@@ -239,6 +250,7 @@ const cozy: SoundItem[] = [
     vn: 'Mèo kêu',
     icon: '🐱',
     url: '/sounds/cozy/cat-purring.mp3',
+    hidden: true,
   },
 ];
 
@@ -331,8 +343,8 @@ const machine: SoundItem[] = [
   },
 ];
 
-// Category definitions with display order
-export const soundCategories: {
+// Category definitions with display order (hidden sounds included; filtered below)
+const allCategories: {
   key: SoundCategory;
   label: string;
   vn: string;
@@ -353,7 +365,18 @@ export const soundCategories: {
   { key: 'machine', label: 'Machine', vn: 'Máy móc', sounds: machine },
 ];
 
-// Alarm sounds
+// What the mixer lists: playable sounds only, and no empty categories
+export const soundCategories = allCategories
+  .map((c) => ({ ...c, sounds: c.sounds.filter((s) => !s.hidden) }))
+  .filter((c) => c.sounds.length > 0);
+
+// Placeholders waiting for a real recording (see SoundItem.hidden)
+export const hiddenAmbientSounds: ReadonlyArray<SoundItem> = allCategories.flatMap((c) =>
+  c.sounds.filter((s) => s.hidden),
+);
+
+// Alarm sounds. Each file is synthesized by scripts/generate-alarm-sounds.sh and must stay
+// different from the others (guarded by sound-assets.test.ts).
 export const alarmSounds: AlarmItem[] = [
   { id: 'bell', label: 'Bell', vn: 'Chuông', url: '/sounds/alarms/bell.mp3' },
   {
@@ -363,24 +386,45 @@ export const alarmSounds: AlarmItem[] = [
     url: '/sounds/alarms/chime.mp3',
   },
   {
-    id: 'gong',
-    label: 'Gong',
-    vn: 'Chuông đồng',
-    url: '/sounds/alarms/gong.mp3',
-  },
-  {
     id: 'digital',
     label: 'Digital',
     vn: 'Kỹ thuật số',
     url: '/sounds/alarms/digital.mp3',
   },
   {
-    id: 'soft',
-    label: 'Soft',
-    vn: 'Nhẹ nhàng',
-    url: '/sounds/alarms/soft.mp3',
+    id: 'wood',
+    label: 'Wood',
+    vn: 'Mõ gỗ',
+    url: '/sounds/alarms/wood.mp3',
+  },
+  {
+    id: 'kitchen',
+    label: 'Kitchen timer',
+    vn: 'Đồng hồ bếp',
+    url: '/sounds/alarms/kitchen.mp3',
   },
 ];
+
+/** `alarmType` value that turns the bell off. */
+export const ALARM_NONE = 'none';
+
+const DEFAULT_ALARM = 'bell';
+
+// Ids saved by earlier versions, mapped to the closest sound that replaced them
+const legacyAlarmIds: Readonly<Record<string, string>> = {
+  gong: 'bell',
+  soft: 'chime',
+};
+
+/**
+ * The stored `alarmType` as an id the picker and the player know: ids from earlier versions
+ * (gong, soft) map to their replacement, anything unknown becomes the bell.
+ */
+export function resolveAlarmType(alarmType: string): string {
+  if (alarmType === ALARM_NONE) return ALARM_NONE;
+  const id = legacyAlarmIds[alarmType] ?? alarmType;
+  return alarmSounds.some((a) => a.id === id) ? id : DEFAULT_ALARM;
+}
 
 // Backward-compatible: flat catalog object for existing code
 // soundCatalog.ambient returns all ambient sounds as flat array

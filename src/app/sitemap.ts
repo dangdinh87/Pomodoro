@@ -1,50 +1,24 @@
-import { MetadataRoute } from 'next';
+import type { MetadataRoute } from 'next';
+import { SUPPORTED_LANGS } from '@/lib/i18n/negotiate-locale';
+import { INDEXABLE_PAGES } from '@/lib/seo/pages';
+import { languageAlternates, pageUrl } from '@/lib/seo/urls';
 
-// Force static generation at build time - no dynamic dates per request
+// Static generation at build time. Dates are the fixed per-page ones in `lib/seo/pages`.
 export const dynamic = 'force-static';
 
+/**
+ * One entry per page per language. Each entry carries the whole hreflang cluster (itself
+ * included, plus x-default), so the sitemap says the same thing as the <link rel="alternate">
+ * tags in the page head. App panels live on `/` and are not separate pages.
+ */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://www.pomodoro-focus.site';
-  // Static date - update on each meaningful deploy
-  const lastModified = '2026-02-08';
-
-  return [
-    {
-      url: baseUrl,
+  return INDEXABLE_PAGES.flatMap(({ path, lastModified, changeFrequency, priority }) =>
+    SUPPORTED_LANGS.map((lang) => ({
+      url: pageUrl(lang, path),
       lastModified,
-      changeFrequency: 'weekly',
-      priority: 1,
-    },
-    {
-      url: `${baseUrl}/guide`,
-      lastModified,
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/leaderboard`,
-      lastModified,
-      changeFrequency: 'daily',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/feedback`,
-      lastModified,
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/privacy`,
-      lastModified,
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
-    {
-      url: `${baseUrl}/terms`,
-      lastModified,
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
-    // login/signup removed - auth pages waste crawl budget
-  ];
+      changeFrequency,
+      priority,
+      alternates: { languages: languageAlternates(path) },
+    })),
+  );
 }

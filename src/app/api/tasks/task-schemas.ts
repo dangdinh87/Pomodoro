@@ -1,8 +1,11 @@
-const priorityValues = ['LOW', 'MEDIUM', 'HIGH'] as const
-const statusValues = ['TODO', 'DOING', 'DONE'] as const
+import { TASK_PRIORITIES as priorityValues, TASK_STATUSES as statusValues } from '@/db/schema'
+import { MAX_TAG_LENGTH, MAX_TAGS_PER_TASK } from '@/lib/tasks/tag-limits'
 
 export type TaskPriorityDb = (typeof priorityValues)[number]
 export type TaskStatusDb = (typeof statusValues)[number]
+
+/** Largest value of the int4 `display_order` column. */
+export const MAX_DISPLAY_ORDER = 2_147_483_647
 
 export interface CreateTaskPayload {
   title: string
@@ -11,7 +14,6 @@ export interface CreateTaskPayload {
   estimate_pomodoros: number
   tags: string[]
   due_date?: string | null
-  parent_task_id?: string | null
   is_template?: boolean
 }
 
@@ -40,6 +42,32 @@ type ValidationResult<T> = ValidationSuccess<T> | ValidationFailure
 const isObject = (value: unknown): value is Record<string, any> =>
   !!value && typeof value === 'object' && !Array.isArray(value)
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+export const isUuid = (value: unknown): value is string =>
+  typeof value === 'string' && UUID_PATTERN.test(value)
+
+const isValidDateString = (value: unknown): value is string =>
+  typeof value === 'string' && !Number.isNaN(Date.parse(value))
+
+// Validates optional nullable fields that are stored as-is (ids, dates).
+// Records an issue and returns undefined when the value is present but invalid.
+function parseOptionalField(
+  value: unknown,
+  isValid: (value: unknown) => value is string,
+  field: string,
+  message: string,
+  issues: Record<string, string[]>,
+): string | null | undefined {
+  if (value === undefined) return undefined
+  if (value === null || value === '') return null
+  if (!isValid(value)) {
+    issues[field] = [message]
+    return undefined
+  }
+  return value
+}
+
 const normalizeDescription = (value: unknown): string | null => {
   if (typeof value !== 'string') return null
   const trimmed = value.trim()
@@ -50,13 +78,42 @@ const normalizeDescription = (value: unknown): string | null => {
   return trimmed
 }
 
-const normalizeTags = (value: unknown): string[] => {
+/**
+ * Trimmed, de-duplicated tags. Blank or non-string entries are ignored; a tag over the length
+ * limit or more than the allowed number of distinct tags is recorded as an issue (HTTP 400).
+ */
+const parseTags = (value: unknown, issues: Record<string, string[]>): string[] | undefined => {
   if (!Array.isArray(value)) return []
-  const normalized = value
-    .map((tag) => (typeof tag === 'string' ? tag.trim() : ''))
-    .filter((tag) => tag.length > 0)
-    .slice(0, 10)
-  return Array.from(new Set(normalized))
+  const tags = Array.from(
+    new Set(
+      value
+        .map((tag) => (typeof tag === 'string' ? tag.trim() : ''))
+        .filter((tag) => tag.length > 0),
+    ),
+  )
+  if (tags.some((tag) => tag.length > MAX_TAG_LENGTH)) {
+    issues.tags = [`Each tag must be at most ${MAX_TAG_LENGTH} characters`]
+    return undefined
+  }
+  if (tags.length > MAX_TAGS_PER_TASK) {
+    issues.tags = [`At most ${MAX_TAGS_PER_TASK} tags per task`]
+    return undefined
+  }
+  return tags
+}
+
+/** A whole number in 0..MAX_DISPLAY_ORDER; anything else is recorded as an issue instead of reaching the database. */
+const parseDisplayOrder = (value: unknown, issues: Record<string, string[]>): number | undefined => {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    issues.display_order = ['Display order must be a number']
+    return undefined
+  }
+  const rounded = Math.round(value)
+  if (rounded < 0 || rounded > MAX_DISPLAY_ORDER) {
+    issues.display_order = [`Display order must be between 0 and ${MAX_DISPLAY_ORDER}`]
+    return undefined
+  }
+  return rounded
 }
 
 const parsePriority = (value: unknown): TaskPriorityDb => {
@@ -85,6 +142,22 @@ const parseEstimate = (value: unknown): number => {
   return Math.min(64, Math.max(1, rounded))
 }
 
+const MAX_SEARCH_LENGTH = 100
+
+/**
+ * The term is bound as a parameter (no injection risk), but `%` and `*` are
+ * stripped so a search is always a plain substring match, and the length is capped.
+ */
+export function sanitizeSearchTerm(value: string | null): string {
+  if (!value) return ''
+  return value.replace(/[,()"\\%*]/g, ' ').trim().slice(0, MAX_SEARCH_LENGTH)
+}
+
+/** Tags containing these characters can't be created through the UI, so reject them as filters. */
+export function isValidTagFilter(value: string): boolean {
+  return value.length > 0 && value.length <= 50 && !/[,{}"\\]/.test(value)
+}
+
 function formatError(message: string, details?: Record<string, string[]>) {
   return {
     success: false as const,
@@ -103,9 +176,14 @@ export function validateCreateTask(body: unknown): ValidationResult<CreateTaskPa
     issues.title = ['Title is required']
   }
 
-  if (body.title && body.title.trim().length > 200) {
+  if (typeof body.title === 'string' && body.title.trim().length > 200) {
     issues.title = ['Title must be shorter than 200 characters']
   }
+
+  const dueDate = parseOptionalField(
+    body.due_date, isValidDateString, 'due_date', 'Due date is invalid', issues,
+  )
+  const tags = parseTags(body.tags, issues)
 
   if (Object.keys(issues).length) {
     return formatError('Invalid task data', issues)
@@ -117,9 +195,8 @@ export function validateCreateTask(body: unknown): ValidationResult<CreateTaskPa
       description: normalizeDescription(body.description ?? null),
       priority: parsePriority(body.priority),
       estimate_pomodoros: parseEstimate(body.estimate_pomodoros),
-      tags: normalizeTags(body.tags),
-      due_date: body.due_date ? String(body.due_date) : null,
-      parent_task_id: body.parent_task_id ? String(body.parent_task_id) : null,
+      tags: tags ?? [],
+      due_date: dueDate ?? null,
       is_template: Boolean(body.is_template),
     }
 
@@ -164,7 +241,8 @@ export function validateUpdateTask(body: unknown): ValidationResult<UpdateTaskPa
   }
 
   if (body.tags !== undefined) {
-    normalized.tags = normalizeTags(body.tags)
+    const tags = parseTags(body.tags, issues)
+    if (tags) normalized.tags = tags
   }
 
   if (body.status !== undefined) {
@@ -176,19 +254,16 @@ export function validateUpdateTask(body: unknown): ValidationResult<UpdateTaskPa
     }
   }
 
-  if (body.due_date !== undefined) {
-    normalized.due_date = body.due_date ? String(body.due_date) : null
-  }
-
-  if (body.parent_task_id !== undefined) {
-    normalized.parent_task_id = body.parent_task_id ? String(body.parent_task_id) : null
+  const dueDate = parseOptionalField(
+    body.due_date, isValidDateString, 'due_date', 'Due date is invalid', issues,
+  )
+  if (dueDate !== undefined) {
+    normalized.due_date = dueDate
   }
 
   if (body.display_order !== undefined) {
-    const order = Number(body.display_order)
-    if (!Number.isNaN(order)) {
-      normalized.display_order = Math.max(0, Math.round(order))
-    }
+    const order = parseDisplayOrder(body.display_order, issues)
+    if (order !== undefined) normalized.display_order = order
   }
 
   if (body.is_template !== undefined) {

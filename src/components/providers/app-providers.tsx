@@ -1,100 +1,51 @@
 'use client';
 
 /**
- * Consolidated app providers wrapper
- * Used for authenticated app sections (main, auth) - NOT for landing page
- * This allows landing page to be SSR while app sections remain CSR
+ * Providers of the app itself: the timer stage, its panels and what they share (TanStack Query, the
+ * Better Auth session sync, the scene background, motion settings, toasts, tooltips, the route loader).
+ * They load with the app's code, after the page has hydrated (AppHomeClientOnly -> app-runtime), so
+ * the server-rendered parts of `/` (H1, the 25:00 placeholder, features, FAQ, footer) and the content
+ * pages never wait for them. The theme and the saved UI preferences are not here: they style the
+ * server HTML too, so the (main) layout applies them on hydration.
  */
-import { ThemeProvider } from '@/components/layout/theme-provider';
+import { createPortal } from 'react-dom';
 import { QueryProvider } from '@/components/providers/query-provider';
-import { I18nProvider } from '@/contexts/i18n-context';
-import { SupabaseAuthProvider } from '@/components/providers/supabase-auth-provider';
+import { AuthSessionSync } from '@/components/providers/auth-session-sync';
 import { BackgroundRenderer } from '@/components/background/background-renderer';
-import { ThemeRestorer } from '@/components/providers/theme-restorer';
 import { AudioCleanupProvider } from '@/components/providers/audio-cleanup-provider';
-import { FloatingPlayerBar } from '@/components/audio/youtube/floating-player-bar';
-import { useYouTubePlayer } from '@/hooks/use-youtube-player';
-import { useAudioStore } from '@/stores/audio-store';
-import { getYouTubeThumbnailUrl } from '@/data/youtube-suggestions';
-import { Toaster } from 'sonner';
+import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { BackgroundProvider } from '@/contexts/background-context';
 import NextTopLoader from 'nextjs-toploader';
+import { MotionConfig } from 'motion/react';
 
 interface AppProvidersProps {
   children: React.ReactNode;
 }
 
-/**
- * YouTube Floating Player - renders the floating player bar at the bottom
- * Must be inside QueryProvider to use hooks
- */
-function YouTubeFloatingPlayer() {
-  const { playerState, togglePlayback } = useYouTubePlayer();
-  const currentlyPlaying = useAudioStore((s) => s.currentlyPlaying);
-  const audioSettings = useAudioStore((s) => s.audioSettings);
-  const updateVolume = useAudioStore((s) => s.updateVolume);
-
-  // Only show when YouTube is active and has a source
-  const isVisible =
-    currentlyPlaying?.type === 'youtube' &&
-    playerState.currentSource !== null &&
-    playerState.status !== 'stopped';
-
-  // Get video title and thumbnail
-  const title = currentlyPlaying?.name || 'YouTube';
-  const thumbnailUrl = playerState.currentSource?.videoId
-    ? getYouTubeThumbnailUrl(playerState.currentSource.videoId)
-    : undefined;
-
-  const isPlaying = playerState.status === 'playing';
-
-  return (
-    <FloatingPlayerBar
-      isVisible={isVisible}
-      title={title}
-      thumbnailUrl={thumbnailUrl}
-      isPlaying={isPlaying}
-      volume={audioSettings.masterVolume}
-      onTogglePlay={() => {
-        const source = playerState.currentSource;
-        if (source) {
-          togglePlayback(source.videoId, source.listId, source.isChannel);
-        }
-      }}
-      onVolumeChange={updateVolume}
-    />
-  );
-}
-
 export function AppProviders({ children }: AppProvidersProps) {
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="dark"
-      forcedTheme="dark"
-      enableSystem={false}
-      disableTransitionOnChange
-    >
+    <BackgroundProvider>
       <NextTopLoader
-        color="hsl(var(--primary))"
+        color="var(--accent-solid)"
         showSpinner={false}
         height={3}
         crawlSpeed={200}
         speed={200}
       />
-      <I18nProvider>
-        <TooltipProvider>
-          <QueryProvider>
-            <SupabaseAuthProvider />
-            <ThemeRestorer />
-            <AudioCleanupProvider />
-            <BackgroundRenderer />
+      <TooltipProvider>
+        <QueryProvider>
+          <AuthSessionSync />
+          <AudioCleanupProvider />
+          {/* fixed, -z-10: behind everything wherever it sits in the DOM */}
+          <BackgroundRenderer />
+          <MotionConfig reducedMotion="user">
             {children}
-            <Toaster />
-            {/* <YouTubeFloatingPlayer /> */}
-          </QueryProvider>
-        </TooltipProvider>
-      </I18nProvider>
-    </ThemeProvider>
+          </MotionConfig>
+          {/* At the end of <body> as before (after the page and its footer in tab order), not inside <main> */}
+          {createPortal(<Toaster />, document.body)}
+        </QueryProvider>
+      </TooltipProvider>
+    </BackgroundProvider>
   );
 }

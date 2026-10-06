@@ -1,7 +1,5 @@
 "use client"
 
-import { soundCatalog } from './sound-catalog'
-
 export type PlayOptions = {
   loop?: boolean;
   volume?: number;
@@ -21,7 +19,6 @@ export interface AudioSource {
   url?: string
   volume: number
   loop: boolean
-  metadata?: Record<string, any>
 }
 
 interface AudioPlayer {
@@ -96,165 +93,30 @@ class HTMLAudioPlayer implements AudioPlayer {
   }
 }
 
-class YouTubePlayer implements AudioPlayer {
-  private player: any = null
-  private source: AudioSource
-  private containerId = 'youtube-global-container'
-
-  constructor(source: AudioSource) {
-    this.source = source
-  }
-
-  private getOrCreateContainer(): HTMLDivElement {
-    let el = document.getElementById(this.containerId) as HTMLDivElement | null
-    if (!el) {
-      el = document.createElement('div')
-      el.id = this.containerId
-      el.style.position = 'fixed'
-      el.style.width = '0px'
-      el.style.height = '0px'
-      el.style.left = '-9999px'
-      el.style.top = '0'
-      el.style.display = 'none'
-      document.body.appendChild(el)
-    }
-    return el
-  }
-
-  private ensureYouTubeAPI(): Promise<any> {
-    return new Promise((resolve) => {
-      const w = window as any
-      if (w.YT && w.YT.Player) {
-        resolve(w.YT)
-        return
-      }
-      const prev = document.getElementById('youtube-iframe-api') as HTMLScriptElement | null
-      if (!prev) {
-        const tag = document.createElement('script')
-        tag.id = 'youtube-iframe-api'
-        tag.src = 'https://www.youtube.com/iframe_api'
-        document.body.appendChild(tag)
-      }
-      w.onYouTubeIframeAPIReady = () => resolve(w.YT)
-    })
-  }
-
-  async play(): Promise<void> {
-    const YT = await this.ensureYouTubeAPI()
-    const container = this.getOrCreateContainer()
-
-    if (!this.player) {
-      this.player = new YT.Player(container, {
-        videoId: this.source.metadata?.videoId,
-        playerVars: {
-          rel: 0,
-          modestbranding: 1,
-          controls: 1,
-          ...(this.source.metadata?.listId && { list: this.source.metadata.listId })
-        },
-        events: {
-          onReady: () => {
-            this.player.unMute()
-            this.player.setVolume(this.source.volume)
-            this.player.playVideo()
-          }
-        }
-      })
-    } else {
-      this.player.unMute()
-      this.player.setVolume(this.source.volume)
-      this.player.playVideo()
-    }
-  }
-
-  async pause(): Promise<void> {
-    if (this.player) {
-      this.player.pauseVideo()
-    }
-  }
-
-  async stop(): Promise<void> {
-    if (this.player) {
-      this.player.stopVideo()
-    }
-  }
-
-  setVolume(volume: number): void {
-    if (this.player) {
-      this.player.setVolume(volume)
-    }
-  }
-
-  getStatus(): AudioStatus {
-    if (!this.player) return 'stopped'
-    const state = this.player.getPlayerState?.()
-    if (state === 1) return 'playing'
-    if (state === 2) return 'paused'
-    if (state === 3) return 'loading'
-    return 'stopped'
-  }
-
-  getCurrentTime(): number {
-    return this.player ? this.player.getCurrentTime?.() || 0 : 0
-  }
-
-  getDuration(): number {
-    return this.player ? this.player.getDuration?.() || 0 : 0
-  }
-}
-
 export class AudioManager {
   private currentPlayer: AudioPlayer | null = null
   private currentSource: AudioSource | null = null
   private ambientPlayers: Map<string, HTMLAudioPlayer> = new Map()
   private ambientVolumes: Map<string, number> = new Map() // per-sound volumes (0-100)
+  // Sounds whose Audio element exists but play() has not settled yet. A second
+  // request for the same id joins this attempt instead of creating another element
+  // (a double click or a slider drag would otherwise leave an orphan looping forever).
+  private pendingAmbient: Map<string, Promise<boolean>> = new Map()
+  // Pending sounds that were stopped before they finished starting
+  private cancelledAmbient: Set<string> = new Set()
   private masterVolume = 50
   private isMuted = false
   private fadeInMs = 300
   private fadeOutMs = 300
 
-  parseYouTubeUrl(url: string): { videoId?: string; listId?: string; isChannel?: boolean } {
-    if (!url) return {}
-    try {
-      const u = new URL(url)
-      if (u.hostname === 'youtu.be') {
-        const id = u.pathname.split('/').filter(Boolean)[0]
-        return id ? { videoId: id } : {}
-      }
-      if (u.hostname.includes('youtube.com')) {
-        if (u.pathname.startsWith('/watch')) {
-          const vid = u.searchParams.get('v') || undefined
-          const list = u.searchParams.get('list') || undefined
-          return { videoId: vid, listId: list }
-        }
-        if (u.pathname.startsWith('/shorts/')) {
-          const id = u.pathname.split('/').filter(Boolean)[1]
-          return id ? { videoId: id } : {}
-        }
-        if (u.pathname.startsWith('/live/')) {
-          const id = u.pathname.split('/').filter(Boolean)[1]
-          return id ? { videoId: id } : {}
-        }
-        if (u.pathname.startsWith('/playlist')) {
-          const list = u.searchParams.get('list') || undefined
-          return { listId: list }
-        }
-        if (u.pathname.startsWith('/c/') || u.pathname.startsWith('/channel/')) {
-          return { isChannel: true }
-        }
-      }
-      return {}
-    } catch {
-      return {}
-    }
-  }
-
   async play(source: AudioSource): Promise<boolean> {
     try {
-      // If playing YouTube, stop current main player but KEEP ambients
+      // YouTube has its own player, shown in the mini player (lib/audio/youtube-controller.ts)
       if (source.type === 'youtube') {
-        await this.stop()
-      } else if (source.type === 'ambient') {
+        console.error('YouTube is played by the mini player, not by AudioManager')
+        return false
+      }
+      if (source.type === 'ambient') {
         // For ambient sounds, use the mix system
         return await this.playAmbient(source)
       } else {
@@ -264,17 +126,7 @@ export class AudioManager {
 
       this.currentSource = source
 
-      // Create appropriate player based on source type
-      if (source.type === 'youtube') {
-        const ytData = this.parseYouTubeUrl(source.url || '')
-        if (!ytData.videoId && !ytData.listId) {
-          throw new Error('Invalid YouTube URL')
-        }
-        source.metadata = ytData
-        this.currentPlayer = new YouTubePlayer(source)
-      } else {
-        this.currentPlayer = new HTMLAudioPlayer(source)
-      }
+      this.currentPlayer = new HTMLAudioPlayer(source)
 
       // Start playback first (required before any volume manipulation)
       this.currentPlayer.setVolume(this.isMuted ? 0 : 0) // start silent for fade
@@ -419,14 +271,31 @@ export class AudioManager {
 
   // Ambient mixing methods
   async playAmbient(source: AudioSource): Promise<boolean> {
+    const soundId = source.id
+
+    // If already playing, just return true
+    if (this.ambientPlayers.has(soundId)) {
+      return true
+    }
+
+    // Still starting: join that attempt. A stop that arrived meanwhile is withdrawn.
+    const pending = this.pendingAmbient.get(soundId)
+    if (pending) {
+      this.cancelledAmbient.delete(soundId)
+      return pending
+    }
+
+    const attempt = this.startAmbient(source).finally(() => {
+      this.pendingAmbient.delete(soundId)
+    })
+    this.pendingAmbient.set(soundId, attempt)
+    return attempt
+  }
+
+  private async startAmbient(source: AudioSource): Promise<boolean> {
+    const soundId = source.id
+    let player: HTMLAudioPlayer | null = null
     try {
-      const soundId = source.id
-
-      // If already playing, just return true
-      if (this.ambientPlayers.has(soundId)) {
-        return true
-      }
-
       // Store per-sound volume (clamped)
       const soundVolume = Math.max(0, Math.min(100, source.volume))
       this.ambientVolumes.set(soundId, soundVolume)
@@ -436,10 +305,17 @@ export class AudioManager {
 
       // Create player with effective volume
       const effectiveSource = { ...source, volume: effectiveVolume }
-      const player = new HTMLAudioPlayer(effectiveSource)
+      player = new HTMLAudioPlayer(effectiveSource)
 
       // Play the sound
       await player.play()
+
+      // Stopped while it was starting: do not let it sound
+      if (this.cancelledAmbient.delete(soundId)) {
+        await player.stop()
+        this.ambientVolumes.delete(soundId)
+        return false
+      }
 
       // Store in map
       this.ambientPlayers.set(soundId, player)
@@ -447,11 +323,19 @@ export class AudioManager {
       return true
     } catch (error) {
       console.error('Failed to play ambient sound:', error)
+      this.cancelledAmbient.delete(soundId)
+      this.ambientVolumes.delete(soundId)
+      // The element exists even though play() was refused: release it
+      await player?.stop().catch(() => {})
       return false
     }
   }
 
   async stopAmbient(soundId: string): Promise<void> {
+    // Not playing yet: flag it so it never starts sounding
+    if (this.pendingAmbient.has(soundId)) {
+      this.cancelledAmbient.add(soundId)
+    }
     const player = this.ambientPlayers.get(soundId)
     if (player) {
       try {
@@ -475,8 +359,8 @@ export class AudioManager {
   }
 
   async stopAllAmbient(): Promise<void> {
-    const promises = Array.from(this.ambientPlayers.keys()).map(id => this.stopAmbient(id))
-    await Promise.all(promises)
+    const ids = new Set([...this.ambientPlayers.keys(), ...this.pendingAmbient.keys()])
+    await Promise.all(Array.from(ids).map(id => this.stopAmbient(id)))
     this.ambientPlayers.clear()
     this.ambientVolumes.clear()
   }
@@ -502,10 +386,6 @@ export class AudioManager {
       audio.src = ''
       audio.remove()
     })
-
-    // Stop all YouTube iframes
-    const ytIframes = document.querySelectorAll('iframe[src*="youtube.com"]')
-    ytIframes.forEach(iframe => iframe.remove())
 
     // Clear AudioManager's internal state
     this.ambientPlayers.clear()
@@ -555,46 +435,3 @@ export class AudioManager {
 // Singleton instance
 export const audioManager = new AudioManager()
 export default audioManager
-
-// Helper functions for common operations
-export const playAmbientSound = async (soundId: string, volume = 50): Promise<boolean> => {
-  const sound = soundCatalog.ambient.find((s: any) => s.id === soundId)
-  if (!sound) return false
-
-  const source: AudioSource = {
-    id: sound.id,
-    type: 'ambient',
-    name: sound.label,
-    vn: sound.vn,
-    url: sound.url,
-    volume,
-    loop: true
-  }
-
-  return await audioManager.play(source)
-}
-
-export const playYouTube = async (url: string, volume = 50): Promise<boolean> => {
-  const source: AudioSource = {
-    id: 'youtube-custom',
-    type: 'youtube',
-    name: 'YouTube Video',
-    url,
-    volume,
-    loop: false
-  }
-
-  return await audioManager.play(source)
-}
-
-export const stopAllAudio = async (): Promise<void> => {
-  await audioManager.stop()
-}
-
-export const setAudioVolume = (volume: number): void => {
-  audioManager.setVolume(volume)
-}
-
-export const setAudioMute = (muted: boolean): void => {
-  audioManager.setMute(muted)
-}

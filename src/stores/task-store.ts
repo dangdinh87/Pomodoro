@@ -17,7 +17,6 @@ export interface Task {
   updatedAt: string;
   // New fields
   dueDate?: string | null;
-  parentTaskId?: string | null;
   displayOrder: number;
   isTemplate: boolean;
 }
@@ -29,7 +28,6 @@ export interface CreateTaskInput {
   estimatePomodoros?: number;
   tags?: string[];
   dueDate?: string | null;
-  parentTaskId?: string | null;
   isTemplate?: boolean;
 }
 
@@ -41,7 +39,6 @@ export interface UpdateTaskInput {
   tags?: string[];
   status?: TaskStatus;
   dueDate?: string | null;
-  parentTaskId?: string | null;
   displayOrder?: number;
   isTemplate?: boolean;
 }

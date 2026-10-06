@@ -1,16 +1,18 @@
 import { MetadataRoute } from 'next';
+import { SITE_URL } from '@/config/site';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = 'https://www.pomodoro-focus.site';
-
   return {
     rules: [
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/', '/timer/', '/tasks/', '/history/', '/chat/', '/settings/'],
+        // Only non-page paths are disallowed. App/auth pages carry
+        // `robots: { index: false }` metadata, which crawlers must be able to
+        // fetch to see.
+        disallow: ['/api/', '/auth/', '/dev/'],
       },
     ],
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }

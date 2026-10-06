@@ -7,29 +7,26 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Bookmark, Loader2, Trash2 } from 'lucide-react'
+import { CircleNotch, Trash } from '@phosphor-icons/react/dist/ssr';
 import { useI18n } from '@/contexts/i18n-context'
 import { TaskTemplate, useTemplates } from '@/hooks/use-templates'
-import { TaskPriority } from '@/stores/task-store'
 
 interface TemplateManagerProps {
   trigger?: React.ReactNode
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
-const priorityVariants: Record<TaskPriority, "destructive" | "default" | "secondary"> = {
-  high: "destructive",
-  medium: "default",
-  low: "secondary",
-}
-
-export function TemplateManager({ trigger }: TemplateManagerProps) {
+export function TemplateManager({ trigger, open, onOpenChange }: TemplateManagerProps) {
   const { t } = useI18n()
   const { templates, isLoading, removeTemplate } = useTemplates()
-  const [isOpen, setIsOpen] = useState(false)
+  const [innerOpen, setInnerOpen] = useState(false)
+  const isOpen = open ?? innerOpen
+  const setIsOpen = onOpenChange ?? setInnerOpen
   const [removingId, setRemovingId] = useState<string | null>(null)
 
   const handleRemove = async (id: string) => {
@@ -43,96 +40,62 @@ export function TemplateManager({ trigger }: TemplateManagerProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        {trigger || (
-          <Button variant="outline" className="h-10 px-4 gap-2">
-            <Bookmark className="h-4 w-4" />
-            {t('tasks.templates.title')}
-          </Button>
-        )}
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] overflow-hidden">
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
+      <DialogContent className="sm:max-w-[520px]">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Bookmark className="h-5 w-5 text-amber-500 fill-amber-500/20" />
-            {t('tasks.templates.title')}
-          </DialogTitle>
+          <DialogTitle>{t('tasks.templates.title')}</DialogTitle>
+          <DialogDescription>{t('tasksUi.templatesDescription')}</DialogDescription>
         </DialogHeader>
 
-        <div className="py-2 overflow-hidden">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-            </div>
-          ) : templates.length === 0 ? (
-            <div className="text-center py-8">
-              <Bookmark className="h-8 w-8 mx-auto text-muted-foreground/30 mb-2" />
-              <p className="text-sm text-muted-foreground">{t('tasks.templates.empty')}</p>
-              <p className="text-xs text-muted-foreground/70 mt-1">{t('tasks.templates.emptyHint')}</p>
-            </div>
-          ) : (
-            <ScrollArea className="max-h-[400px]">
-              <div className="space-y-2 pr-3">
-                {templates.map((template) => (
-                  <div
-                    key={template.id}
-                    className="grid grid-cols-[1fr_auto] gap-3 p-3 rounded-lg border bg-card"
-                  >
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="font-medium text-sm truncate">{template.title}</span>
-                        <Badge
-                          variant={priorityVariants[template.priority]}
-                          className="text-[10px] h-5 shrink-0"
-                        >
-                          {t(`tasks.priorityLevels.${template.priority}`)}
-                        </Badge>
-                      </div>
-                      {template.description && (
-                        <p className="text-xs text-muted-foreground truncate mt-1">
-                          {template.description}
-                        </p>
-                      )}
-                      <div className="flex items-center gap-2 mt-1.5">
-                        <span className="text-[10px] text-muted-foreground">
-                          {template.estimatePomodoros} pomodoro{template.estimatePomodoros > 1 ? 's' : ''}
-                        </span>
-                        {template.tags.length > 0 && (
-                          <div className="flex gap-1 flex-wrap">
-                            {template.tags.slice(0, 3).map((tag) => (
-                              <Badge key={tag} variant="secondary" className="text-[9px] h-4 px-1.5">
-                                {tag}
-                              </Badge>
-                            ))}
-                            {template.tags.length > 3 && (
-                              <span className="text-[10px] text-muted-foreground">
-                                +{template.tags.length - 3}
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive self-start"
-                      onClick={() => handleRemove(template.id)}
-                      disabled={removingId === template.id}
-                      aria-label={t('common.delete')}
-                    >
-                      {removingId === template.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="h-4 w-4" />
-                      )}
-                    </Button>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <CircleNotch size={20} className="animate-spin text-ink-muted" />
+          </div>
+        ) : templates.length === 0 ? (
+          <div className="rounded-lg border-2 border-dashed border-ink-faint px-4 py-8 text-center">
+            <p className="text-sm font-medium text-ink">{t('tasks.templates.empty')}</p>
+            <p className="mx-auto mt-1 max-w-[32ch] text-[0.8125rem] text-ink-muted">{t('tasks.templates.emptyHint')}</p>
+          </div>
+        ) : (
+          <ul className="sticker-sm max-h-[400px] divide-y-2 divide-border overflow-y-auto">
+            {templates.map((template) => (
+              <li key={template.id} className="flex items-start gap-3 py-3 pl-4 pr-2">
+                <div className="min-w-0 flex-1 space-y-1">
+                  <p className="truncate text-sm font-medium text-ink">{template.title}</p>
+                  {template.description && <p className="truncate text-[0.8125rem] text-ink-muted">{template.description}</p>}
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-muted">
+                    {template.priority !== 'low' && (
+                      <Badge variant={template.priority === 'high' ? 'destructive' : 'warning'}>
+                        {t(`tasks.priorityLevels.${template.priority}`)}
+                      </Badge>
+                    )}
+                    <span className="tabular-nums">
+                      {t(template.estimatePomodoros === 1 ? 'tasksUi.estimateValue' : 'tasksUi.estimateValuePlural', {
+                        count: template.estimatePomodoros,
+                      })}
+                    </span>
+                    {template.tags.slice(0, 3).map((tag) => (
+                      <Badge key={tag} variant="outline">
+                        {tag}
+                      </Badge>
+                    ))}
+                    {template.tags.length > 3 && <span className="font-bold text-ink-muted">+{template.tags.length - 3}</span>}
                   </div>
-                ))}
-              </div>
-            </ScrollArea>
-          )}
-        </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 shrink-0 text-ink-muted hover:text-danger-ink"
+                  onClick={() => handleRemove(template.id)}
+                  disabled={removingId === template.id}
+                  aria-label={`${t('common.delete')} ${template.title}`}
+                >
+                  {removingId === template.id ? <CircleNotch size={16} className="animate-spin" /> : <Trash size={16} />}
+                </Button>
+              </li>
+            ))}
+          </ul>
+        )}
       </DialogContent>
     </Dialog>
   )

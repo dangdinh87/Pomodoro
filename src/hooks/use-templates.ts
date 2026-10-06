@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Task, TaskPriority } from '@/stores/task-store'
 import { toast } from 'sonner'
+import { useAuthStore } from '@/stores/auth-store'
+import { useI18n } from '@/contexts/i18n-context'
 
 export interface TaskTemplate {
   id: string
@@ -52,9 +54,13 @@ async function removeTemplate(taskId: string): Promise<void> {
 
 export function useTemplates() {
   const queryClient = useQueryClient()
+  const { t } = useI18n()
+
+  const hasSession = useAuthStore((state) => !!state.user)
 
   const templatesQuery = useQuery({
     queryKey: ['templates'],
+    enabled: hasSession,
     queryFn: fetchTemplates,
   })
 
@@ -63,10 +69,10 @@ export function useTemplates() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['templates'] })
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      toast.success('Task saved as template')
+      toast.success(t('tasks.templates.toasts.saved'))
     },
     onError: () => {
-      toast.error('Failed to save as template')
+      toast.error(t('tasks.templates.toasts.saveFailed'))
     },
   })
 
@@ -75,10 +81,10 @@ export function useTemplates() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['templates'] })
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      toast.success('Template removed')
+      toast.success(t('tasks.templates.toasts.removed'))
     },
     onError: () => {
-      toast.error('Failed to remove template')
+      toast.error(t('tasks.templates.toasts.removeFailed'))
     },
   })
 

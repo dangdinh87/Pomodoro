@@ -1,18 +1,13 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { toast } from 'sonner';
-import { useAudioStore } from '@/stores/audio-store';
-import { fetchYouTubeOEmbed } from '@/lib/youtube-utils';
+import { useCallback, useMemo } from 'react';
+import { nextYouTubeVideo, playYouTube, previousYouTubeVideo, stopYouTube, toggleYouTubePlayback } from '@/lib/audio/youtube-controller';
+import { useYouTubeStore, type YouTubeSource, type YouTubeStatus } from '@/stores/youtube-player-store';
 
-// Type definitions
-export interface YouTubeSource {
-  videoId?: string;
-  listId?: string;
-}
+export type { YouTubeSource };
 
 export interface YouTubePlayerState {
-  status: 'stopped' | 'playing' | 'paused' | 'buffering';
+  status: YouTubeStatus;
   currentSource: YouTubeSource | null;
 }
 
@@ -21,80 +16,6 @@ export interface ParsedYouTubeUrl {
   listId?: string;
   isChannel?: boolean;
 }
-
-// Global YouTube player management
-const GLOBAL_YT_PLAYER_KEY = '__globalYTPlayer';
-const GLOBAL_YT_SOURCE_KEY = '__globalYTSource';
-const GLOBAL_YT_CONTAINER_ID = 'youtube-global-container';
-const GLOBAL_YT_TIMEOUT_KEY = '__globalYTTimeout';
-
-// YouTube player state mapping
-const YT_STATE_MAP: Record<number, YouTubePlayerState['status']> = {
-  '-1': 'buffering', // Unstarted
-  0: 'stopped',      // Ended
-  1: 'playing',
-  2: 'paused',
-  3: 'buffering',
-  5: 'buffering',    // Video cued
-};
-
-declare global {
-  interface Window {
-    [GLOBAL_YT_PLAYER_KEY]?: any;
-    [GLOBAL_YT_SOURCE_KEY]?: YouTubeSource | null;
-    [GLOBAL_YT_TIMEOUT_KEY]?: number;
-    onYouTubeIframeAPIReady?: () => void;
-    YT?: any;
-  }
-}
-
-// Helper functions
-const getOrCreateGlobalYTContainer = (): HTMLDivElement => {
-  let el = document.getElementById(GLOBAL_YT_CONTAINER_ID) as HTMLDivElement | null;
-  if (!el) {
-    el = document.createElement('div');
-    el.id = GLOBAL_YT_CONTAINER_ID;
-    Object.assign(el.style, {
-      position: 'fixed',
-      width: '0px',
-      height: '0px',
-      left: '-9999px',
-      top: '0',
-      display: 'none',
-    });
-    document.body.appendChild(el);
-  }
-  return el;
-};
-
-const setGlobalYT = (player: any): void => {
-  window[GLOBAL_YT_PLAYER_KEY] = player;
-};
-
-const getGlobalYT = (): any => window[GLOBAL_YT_PLAYER_KEY] || null;
-
-const setGlobalYTSource = (source: YouTubeSource | null): void => {
-  window[GLOBAL_YT_SOURCE_KEY] = source;
-};
-
-const getGlobalYTSource = (): YouTubeSource | null => window[GLOBAL_YT_SOURCE_KEY] || null;
-
-const setGlobalYTTimeout = (timeoutId: number | undefined): void => {
-  // Clear existing timeout first
-  const existing = window[GLOBAL_YT_TIMEOUT_KEY];
-  if (existing) {
-    window.clearTimeout(existing);
-  }
-  window[GLOBAL_YT_TIMEOUT_KEY] = timeoutId;
-};
-
-const clearGlobalYTTimeout = (): void => {
-  const existing = window[GLOBAL_YT_TIMEOUT_KEY];
-  if (existing) {
-    window.clearTimeout(existing);
-    window[GLOBAL_YT_TIMEOUT_KEY] = undefined;
-  }
-};
 
 // YouTube URL parsing utility
 export const parseYouTubeUrl = (url: string): ParsedYouTubeUrl => {
@@ -108,7 +29,7 @@ export const parseYouTubeUrl = (url: string): ParsedYouTubeUrl => {
       return id ? { videoId: id } : {};
     }
 
-    if (u.hostname.includes('youtube.com')) {
+    if (u.hostname === 'youtube.com' || u.hostname.endsWith('.youtube.com')) {
       if (u.pathname.startsWith('/watch')) {
         return {
           videoId: u.searchParams.get('v') || undefined,
@@ -132,300 +53,38 @@ export const parseYouTubeUrl = (url: string): ParsedYouTubeUrl => {
   }
 };
 
-// YouTube API loading utility
-const ensureYouTubeAPI = (): Promise<any> => {
-  return new Promise((resolve) => {
-    if (window.YT?.Player) {
-      resolve(window.YT);
-      return;
-    }
-
-    if (!document.getElementById('youtube-iframe-api')) {
-      const script = document.createElement('script');
-      script.id = 'youtube-iframe-api';
-      script.src = 'https://www.youtube.com/iframe_api';
-      document.body.appendChild(script);
-    }
-
-    window.onYouTubeIframeAPIReady = () => resolve(window.YT);
-  });
-};
-
-// Helper to update audio store with YouTube info
-const updateAudioStoreForYouTube = (
-  source: YouTubeSource,
-  isPlaying: boolean,
-  setCurrentlyPlaying: (audio: any) => void
-) => {
-  const current = useAudioStore.getState().currentlyPlaying;
-  const id = source.videoId ? `video-${source.videoId}` : source.listId ? `playlist-${source.listId}` : '';
-
-  // Skip if same video and same play state
-  if (current?.id === id && current.isPlaying === isPlaying && current.type === 'youtube') return;
-
-  const name = source.videoId ? 'YouTube Video' : 'YouTube Playlist';
-  const url = source.videoId
-    ? `https://www.youtube.com/watch?v=${source.videoId}`
-    : `https://www.youtube.com/playlist?list=${source.listId}`;
-
-  // If it's already playing this video but the state changed (e.g. isPlaying), preserve the existing name
-  const finalName = (current?.id === id && current.type === 'youtube') ? current.name : name;
-
-  setCurrentlyPlaying({
-    type: 'youtube',
-    id,
-    name: finalName,
-    volume: 50,
-    isPlaying,
-    source: { type: 'youtube', id, name: finalName, url, volume: 50, loop: false }
-  });
-
-  // Fetch real title only if it's generic
-  if (finalName.startsWith('YouTube')) {
-    fetchYouTubeOEmbed(url).then(data => {
-      if (data?.title) {
-        const latest = useAudioStore.getState().currentlyPlaying;
-        if (latest?.id === id && latest.name !== data.title) {
-          setCurrentlyPlaying({ ...latest, name: data.title });
-        }
-      }
-    });
-  }
-};
-
-// Main YouTube player hook
+/**
+ * The Sounds panel's handle on the YouTube player. The player itself is shown by the mini player card
+ * (always mounted in AppProviders), so playing from here makes that card appear; nothing plays unseen.
+ */
 export const useYouTubePlayer = () => {
-  const setCurrentlyPlaying = useAudioStore((state) => state.setCurrentlyPlaying);
-  const updatePlayingStatus = useAudioStore((state) => state.updatePlayingStatus);
-  const clearCurrentlyPlaying = useAudioStore((state) => state.clearCurrentlyPlaying);
+  const status = useYouTubeStore((state) => state.status);
+  const currentSource = useYouTubeStore((state) => state.source);
 
-  const [playerState, setPlayerState] = useState<YouTubePlayerState>({
-    status: 'stopped',
-    currentSource: null,
-  });
+  const playerState = useMemo<YouTubePlayerState>(() => ({ status, currentSource }), [status, currentSource]);
 
-  // Update player state from global player
-  const updatePlayerState = useCallback(() => {
-    try {
-      const yt = getGlobalYT();
-      const state = yt?.getPlayerState?.();
-      const mappedStatus = state !== undefined ? YT_STATE_MAP[state] || 'stopped' : 'stopped';
-      const source = getGlobalYTSource();
-
-      setPlayerState(prev => {
-        const isSameSource = prev.currentSource?.videoId === source?.videoId &&
-          prev.currentSource?.listId === source?.listId;
-        if (prev.status === mappedStatus && isSameSource) {
-          return prev;
-        }
-        return {
-          status: mappedStatus,
-          currentSource: source,
-        };
-      });
-
-      const currentPlaying = useAudioStore.getState().currentlyPlaying;
-
-      // Sync audio store with YouTube player state
-      if (mappedStatus === 'stopped' || !source) {
-        // Only clear if current audio is YouTube
-        if (currentPlaying?.type === 'youtube') {
-          clearCurrentlyPlaying();
-        }
-      } else if (mappedStatus === 'playing' || mappedStatus === 'paused') {
-        if (currentPlaying?.type === 'youtube') {
-          // Update playing status for existing YouTube audio
-          updatePlayingStatus(mappedStatus === 'playing');
-        } else if (!currentPlaying) {
-          // No audio playing - set YouTube as current
-          updateAudioStoreForYouTube(source, mappedStatus === 'playing', setCurrentlyPlaying);
-        }
-      }
-    } catch {
-      setPlayerState(prev => ({ ...prev, status: 'stopped' }));
-    }
-  }, [updatePlayingStatus, clearCurrentlyPlaying, setCurrentlyPlaying]);
-
-  // Poll for player state changes
-  useEffect(() => {
-    const interval = window.setInterval(updatePlayerState, 800);
-    return () => window.clearInterval(interval);
-  }, [updatePlayerState]);
-
-  // Create or update YouTube player
-  const createOrUpdatePlayer = useCallback(async (
-    videoIdOrListId: string,
-    autoPlay: boolean,
-    options?: { isPlaylist?: boolean }
-  ) => {
-    try {
-      const YT = await ensureYouTubeAPI();
-      const existingPlayer = getGlobalYT();
-      const isPlaylist = options?.isPlaylist;
-      const source: YouTubeSource = isPlaylist
-        ? { listId: videoIdOrListId }
-        : { videoId: videoIdOrListId };
-
-      // Playback timeout - stop and notify if not playing within 5s
-      const startPlaybackTimeout = () => {
-        const timeoutId = window.setTimeout(() => {
-          const yt = getGlobalYT();
-          const state = yt?.getPlayerState?.();
-          // If still not playing after 5s (state 1 = playing)
-          if (state !== 1) {
-            try { yt?.stopVideo?.(); } catch { /* ignore */ }
-            setPlayerState({ status: 'stopped', currentSource: null });
-            setGlobalYTSource(null);
-            clearCurrentlyPlaying();
-            toast.error('Không thể phát video này. Vui lòng kiểm tra lại link.');
-          }
-          // Clear the timeout reference after it fires
-          clearGlobalYTTimeout();
-        }, 5000);
-        setGlobalYTTimeout(timeoutId);
-        return timeoutId;
-      };
-
-      if (existingPlayer) {
-        if (autoPlay) {
-          try { existingPlayer.unMute?.(); } catch { /* ignore */ }
-        }
-
-        if (isPlaylist) {
-          existingPlayer.loadPlaylist?.({ list: videoIdOrListId }) ||
-            existingPlayer.cuePlaylist?.({ list: videoIdOrListId });
-        } else {
-          existingPlayer.loadVideoById(videoIdOrListId);
-        }
-
-        if (autoPlay) existingPlayer.playVideo?.();
-        setGlobalYTSource(source);
-        setPlayerState(prev => ({ ...prev, status: 'buffering', currentSource: source }));
-        updateAudioStoreForYouTube(source, autoPlay, setCurrentlyPlaying);
-        if (autoPlay) startPlaybackTimeout();
-        return;
-      }
-
-      // Create new player
-      const container = getOrCreateGlobalYTContainer();
-      const player = new YT.Player(container, {
-        videoId: isPlaylist ? undefined : videoIdOrListId,
-        playerVars: {
-          rel: 0,
-          modestbranding: 1,
-          controls: 1,
-          ...(isPlaylist && { list: videoIdOrListId })
-        },
-        events: {
-          onReady: () => {
-            if (autoPlay) {
-              try { player.unMute?.(); } catch { /* ignore */ }
-              try { player.playVideo?.(); } catch { /* ignore */ }
-              startPlaybackTimeout();
-            }
-          },
-          onStateChange: (e: any) => {
-            const state = e?.data;
-            const mappedStatus = state !== undefined ? YT_STATE_MAP[state] || 'stopped' : 'stopped';
-            setPlayerState(prev => ({ ...prev, status: mappedStatus }));
-          },
-        },
-      });
-
-      setGlobalYT(player);
-      setGlobalYTSource(source);
-      setPlayerState(prev => ({ ...prev, status: 'buffering', currentSource: source }));
-      updateAudioStoreForYouTube(source, autoPlay, setCurrentlyPlaying);
-    } catch (error) {
-      console.error('Failed to create or update YouTube player:', error);
-      toast.error('Không thể tạo trình phát YouTube. Vui lòng thử lại.');
-    }
-  }, [setCurrentlyPlaying]);
-
-  // Toggle playback - only toggle if same source, otherwise play new source
+  // Same source: pause or resume. Another source: play it.
   const togglePlayback = useCallback(async (videoId?: string, listId?: string, isChannel?: boolean) => {
     if (isChannel || (!videoId && !listId)) return;
 
-    try {
-      const yt = getGlobalYT();
-      const currentSource = getGlobalYTSource();
-
-      // Check if requested source matches current source
-      const isSameSource = currentSource && (
-        (videoId && currentSource.videoId === videoId) ||
-        (listId && !videoId && currentSource.listId === listId)
-      );
-
-      if (!yt || !isSameSource) {
-        // No player or different source -> play new source
-        if (listId && !videoId) {
-          await createOrUpdatePlayer(listId, true, { isPlaylist: true });
-        } else if (videoId) {
-          await createOrUpdatePlayer(videoId, true);
-        }
-        return;
-      }
-
-      // Same source - toggle play/pause
-      const state = yt.getPlayerState?.();
-      if (state === 1) {
-        // Set to buffering first for smooth transition
-        setPlayerState(prev => ({ ...prev, status: 'buffering' }));
-        yt.pauseVideo();
-        // Let the polling mechanism update to paused
-      } else {
-        // Set to buffering first for smooth transition
-        setPlayerState(prev => ({ ...prev, status: 'buffering' }));
-        yt.playVideo();
-        // Let the polling mechanism update to playing
-      }
-    } catch (error) {
-      console.error('Failed to toggle playback:', error);
-      toast.error('Không thể điều khiển trình phát. Vui lòng thử lại.');
+    const current = useYouTubeStore.getState().source;
+    const isSameSource = Boolean(current && (videoId ? current.videoId === videoId : current.listId === listId));
+    if (isSameSource) {
+      toggleYouTubePlayback();
+      return;
     }
-  }, [createOrUpdatePlayer, updatePlayingStatus]);
+    await playYouTube(listId && !videoId ? { listId } : { videoId });
+  }, []);
 
-  // Stop playback
-  const stopPlayback = useCallback(() => {
-    // Clear any pending timeout to prevent error toast
-    clearGlobalYTTimeout();
-
-    try {
-      getGlobalYT()?.stopVideo();
-    } catch {
-      // Ignore errors when stopping
-    }
-    setPlayerState({
-      status: 'stopped',
-      currentSource: null,
-    });
-    setGlobalYTSource(null);
-    // Clear audio store
-    clearCurrentlyPlaying();
-  }, [clearCurrentlyPlaying]);
-
-  // Sync volume and mute state with global audio settings
-  const audioSettings = useAudioStore((state) => state.audioSettings);
-
-  useEffect(() => {
-    const player = getGlobalYT();
-    if (player && typeof player.setVolume === 'function') {
-      player.setVolume(audioSettings.masterVolume);
-    }
-    if (player && typeof player.mute === 'function' && typeof player.unMute === 'function') {
-      if (audioSettings.isMuted) {
-        player.mute();
-      } else {
-        player.unMute();
-      }
-    }
-  }, [audioSettings.masterVolume, audioSettings.isMuted]);
+  const stopPlayback = useCallback(() => stopYouTube(), []);
 
   return {
     playerState,
-    createOrUpdatePlayer,
+    /** Plays a video or playlist (replacing what plays now). */
+    play: playYouTube,
     togglePlayback,
     stopPlayback,
-    updatePlayerState,
+    nextVideo: nextYouTubeVideo,
+    previousVideo: previousYouTubeVideo,
   };
 };

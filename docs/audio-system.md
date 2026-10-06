@@ -66,7 +66,6 @@ interface SoundPreset {
 interface AudioSettings {
   masterVolume: number       // 0-100 (main volume control)
   isMuted: boolean          // Global mute toggle
-  fadeInOut: boolean        // Fade in/out on play/stop
   activeSource: 'ambient' | 'youtube' | 'none'  // Current audio source
   alarmType: string         // Selected alarm type ('bell', 'chime', etc.)
   alarmVolume: number       // 0-100, independent alarm volume
@@ -104,21 +103,20 @@ effectiveVolume = (soundVolume / 100) * (masterVolume / 100)
 interface AudioState {
   // Current playback
   currentlyPlaying: CurrentlyPlayingAudio | null
-  audioHistory: CurrentlyPlayingAudio[]
 
   // Settings & Configuration
   audioSettings: AudioSettings
 
   // Ambient sounds
-  activeAmbientSounds: AmbientSoundState[]    // Currently playing sounds
-  savedAmbientState: AmbientSoundState[]      // Saved when switching to YouTube
+  activeAmbientSounds: AmbientSoundState[]    // Currently playing sounds (persisted)
+  ambientRestore: 'none' | 'autoplay' | 'paused'  // Runtime only: what a restored mix still has to do
 
-  // Presets & Favorites
   presets: SoundPreset[]
-  favorites: string[]
-  recentlyPlayed: string[]
 }
 ```
+
+Persisted under `audio-storage-v2` (store version 4). Version 4 dropped `audioHistory`, `favorites`,
+`recentlyPlayed`, `savedAmbientState` and `audioSettings.fadeInOut`: no screen ever used them.
 
 ### Key Actions
 
@@ -134,7 +132,6 @@ playAmbient(soundId, volume?: 50)   // Play a single ambient sound
 toggleAmbient(soundId)              // Play/stop a sound
 stopAmbient(soundId)                // Stop specific sound
 stopAllAmbient()                    // Clear all active sounds
-playAudio(source)                   // Play AudioSource with effective volume
 togglePlayPause()                   // Toggle current playback
 ```
 
@@ -143,19 +140,11 @@ togglePlayPause()                   // Toggle current playback
 setActiveSource(source)             // Switch between 'ambient', 'youtube', 'none'
 ```
 
-When switching to YouTube:
-1. Current ambient state is saved to `savedAmbientState`
-2. All ambients are stopped
-3. YouTube playback begins
-
-When switching back to ambient:
-1. YouTube stops
-2. Saved ambient state is restored from `savedAmbientState`
+`setActiveSource` only records which source the panel shows; it does not stop or restore ambients.
 
 #### State Persistence
 ```typescript
 updateAudioSettings(Partial<AudioSettings>)  // Merge settings
-resetAudioSettings()                         // Restore defaults
 ```
 
 ---

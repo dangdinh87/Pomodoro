@@ -1,6 +1,8 @@
 "use client"
 
 import { useState, useEffect, useCallback } from 'react'
+import { ensureSession } from '@/lib/auth-client'
+import { useAuthStore } from '@/stores/auth-store'
 
 interface UseTagsResult {
     tags: string[]
@@ -12,11 +14,17 @@ interface UseTagsResult {
 }
 
 export function useTags(): UseTagsResult {
+    const userId = useAuthStore((state) => state.user?.id)
     const [tags, setTags] = useState<string[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
     const fetchTags = useCallback(async () => {
+        if (!userId) {
+            setTags([])
+            setIsLoading(false)
+            return
+        }
         try {
             setIsLoading(true)
             setError(null)
@@ -31,7 +39,7 @@ export function useTags(): UseTagsResult {
         } finally {
             setIsLoading(false)
         }
-    }, [])
+    }, [userId])
 
     useEffect(() => {
         fetchTags()
@@ -40,6 +48,7 @@ export function useTags(): UseTagsResult {
     const addTag = useCallback(async (tag: string): Promise<boolean> => {
         try {
             setError(null)
+            await ensureSession()
             const res = await fetch('/api/tags', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
