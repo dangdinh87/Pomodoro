@@ -3,13 +3,17 @@ import { and, desc, eq, type SQL } from 'drizzle-orm';
 import { db } from '@/db';
 import { focusSessions, tasks } from '@/db/schema';
 import { getSessionUser } from '@/lib/auth/session-user';
-import { serverError, unauthorized } from '@/lib/api/responses';
+import { serverError, unauthorized, notFound } from '@/lib/api/responses';
+import { isFeatureEnabled } from '@/config/feature-flags';
 import { parseStudyQuery, windowConditions } from '@/lib/stats/study-query';
 
 const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 1000;
 
 export async function GET(request: Request) {
+  // NEXT_PUBLIC_FEATURE_HISTORY also hides the UI; without this check, turning the flag off would
+  // only hide the panel while the data stayed reachable by calling the route directly.
+  if (!isFeatureEnabled('history')) return notFound();
   const user = await getSessionUser();
   if (!user) return unauthorized();
 
