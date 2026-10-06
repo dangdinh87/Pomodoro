@@ -2,8 +2,8 @@
 
 | # | Việc | Nguồn | Gợi ý |
 |---|---|---|---|
-| 1 | `src/hooks/use-confetti.ts` còn bắn confetti cũ khi Skip ≥ 50% (trùng với SessionCelebration) | 2.4b | Bỏ hook hoặc chỉ giữ cho SessionCelebration |
-| 2 | Index `(user_id, mode, created_at)` cho focus sessions | 1B | Migration ở phase 4 (DB hardening) |
+| 1 | `src/hooks/use-confetti.ts` còn bắn confetti cũ khi Skip ≥ 50% (trùng với SessionCelebration) | 2.4b | **Xong (sẵn có)**: `use-confetti.ts` không còn tồn tại, chỉ còn `fire-celebration-confetti.ts` dùng riêng cho SessionCelebration. |
+| 2 | Index `(user_id, mode, created_at)` cho focus sessions | 1B | **Xong (sẵn có, phase 4b)**: index `focus_sessions_user_mode_created_idx` và `focus_sessions_task_id_idx` đã có trong schema. |
 | 3 | `AppearanceSettings` cũ trong `general-settings.tsx` là code chết; file có WIP thời tiết | 2.1 | Chỉ xoá khi WIP thời tiết đã commit, hoặc stage hunk riêng |
 | 4 | `general-settings.tsx` còn 2 `t() \|\| fallback` (test đang whitelist file này) | 1D | Như #3 |
 | 5 | Comment cũ ở `src/stores/audio-store.ts:42` | 1F | **Xong (4a)**: dọn 2 comment cũ khi store lên v4 |
@@ -17,10 +17,10 @@
 | 13 | Nhóm trong `general-settings` và `weather-settings` cùng IconTile sliders màu butter; cần truyền `icon`/`tone` riêng | 2.5a | Sau khi WIP thời tiết được commit |
 | 14 | Heatmap theo `--accent-solid` (bộ màu người dùng) thay vì cứng cà chua — **đã quyết giữ** (mặc định vẫn là cà chua) | 2.5a | Ghi vào design-system doc |
 | 15 | Không dùng bí danh icon kiểu `ArmchairIcon`: `modularizeImports` làm build lỗi mà tsc không bắt | 2.6 | Thêm lint rule/kiểm trong CI build (phase 4) |
-| 16 | `DialogPanel id="login"` có `overflow-y-auto` cắt viền thẻ; đang tạm `m-1.5` | 2.6 | Sửa gốc ở panel host (rà soát cuối) |
+| 16 | `DialogPanel id="login"` có `overflow-y-auto` cắt viền thẻ; đang tạm `m-1.5` | 2.6 | **Xong (sẵn có)**: đã sửa gốc bằng `p-2` trên shell dialog bare (panel-host.tsx), không còn `m-1.5` tạm. |
 | 17 | Chưa chụp `/terms`, 404 tiếng Nhật, login dark | 2.6 | Rà soát cuối |
-| 18 | **P1-8 YouTube vẫn phát qua iframe ẩn** (rủi ro ToS); `floating-player-bar.tsx` bị comment trong `app-providers.tsx`, `youtube-suggestions.tsx` không ai render, còn chuỗi cứng | audit, 2.5b | Batch 2.7: mini player hiển thị, thu gọn được, `onError` |
-| 19 | `timer-settings.tsx` + `bell-notifications*` chưa batch nào restyle chủ động (chỉ ăn theo `SettingsSection`) | 2.5a, 2.5b | Batch 2.7 |
+| 18 | **P1-8 YouTube vẫn phát qua iframe ẩn** (rủi ro ToS); `floating-player-bar.tsx` bị comment trong `app-providers.tsx`, `youtube-suggestions.tsx` không ai render, còn chuỗi cứng | audit, 2.5b | **Xong (2.7)**: mini player hiển thị được, `youtube-mini-player.tsx`, không còn iframe ẩn. |
+| 19 | `timer-settings.tsx` + `bell-notifications*` chưa batch nào restyle chủ động (chỉ ăn theo `SettingsSection`) | 2.5a, 2.5b | **Xong (2.5a/2.5b)**: `bell-notifications-section.tsx` và timer-settings đã theo Sticker pop. |
 | 20 | 2048: ô trống gần trùng màu bàn cờ ở chế độ sáng (màu in-game) | 2.5b | Bỏ qua (luật: không đổi màu trong game) |
 | 21 | Lệnh ⌘K "Skip" bấm nút theo aria-label (dễ gãy) | 2.4a | **Xong (4a)**: nút và ⌘K cùng gọi `requestTimerSkip()` (`features/timer/lib/request-skip.ts`) |
 | 22 | `app-home.tsx` (WIP thời tiết) còn ghi cứng `data-theme="dark"` — vô hại vì selector là `:root[data-theme]` | 2.4a | Dọn khi WIP thời tiết commit |
@@ -29,7 +29,7 @@
 | 25 | 404 lồng (`/vi/nope`) HTML là vỏ lỗi Next, UI VI dựng sau hydrate | 3a | Kiểm ở preview; noindex nên SEO không ảnh hưởng |
 | 26 | File sót chưa xoá được (lệnh `rm` bị chặn quyền): `migrations/`, `supabase_schema.sql`, `fix_sessions_rls.sql`, `public/images/` (png 3,9 MB + `file.svg`); đã grep 0 tham chiếu | 4a | Chủ dự án cho phép rồi chạy `git rm -r migrations supabase_schema.sql fix_sessions_rls.sql public/images` |
 | 27 | `.Jules/palette.md` vs `.jules/palette.md` trùng tên trên đĩa không phân biệt hoa thường; chỉ khác 3 dòng trống, sửa bằng `git rm --cached .Jules/palette.md` | 4a | Một commit riêng khi phiên khác đã commit xong `.Jules/palette.md` |
-| 28 | `NEXT_PUBLIC_FEATURE_HISTORY` chỉ ẩn UI, không chặn `/api/history` và `/api/stats` (`feature-gate.ts` chưa từng được nối, đã xoá) | 4a | Nối cờ vào 2 route hoặc bỏ cờ |
+| 28 | `NEXT_PUBLIC_FEATURE_HISTORY` chỉ ẩn UI, không chặn `/api/history` và `/api/stats` (`feature-gate.ts` chưa từng được nối, đã xoá) | 4a | **Xong (rà soát 2026-10-07)**: `/api/history` 404 khi cờ tắt. Không chặn `/api/stats` (always-on cho tiến độ ngày + tâm trạng Tomo). |
 | 29 | Video gợi ý `04RM0CQPLHQ` trong `src/data/youtube-suggestions.ts` trả 404 thumbnail | 4a | Thay bằng video còn sống — **Xong (1787696)**: thay bằng `rUxyKA_-grg` |
 | 30 | Xoá `migrations/`, `supabase_schema.sql`, `fix_sessions_rls.sql`, `public/images/` (0 tham chiếu) — **bị bộ kiểm quyền chặn**, không lách | 4a | Chủ dự án tự chạy `git rm -r …` hoặc cấp quyền |
 | 31 | `.Jules/palette.md` vs `.jules/palette.md` va chạm hoa/thường | 4a | `git rm --cached .Jules/palette.md` (chủ dự án quyết) |
