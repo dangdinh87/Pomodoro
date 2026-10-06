@@ -30,7 +30,9 @@
     "language": "Language",
     "total": "Total",
     "item": "item",
-    "items": "items"
+    "items": "items",
+    "scrollLeft": "Scroll left",
+    "scrollRight": "Scroll right"
   },
   "skipLink": {
     "label": "Skip to main content"

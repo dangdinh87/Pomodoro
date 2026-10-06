@@ -30,7 +30,9 @@
     "language": "Ngôn ngữ",
     "total": "Tổng",
     "item": "mục",
-    "items": "mục"
+    "items": "mục",
+    "scrollLeft": "Cuộn sang trái",
+    "scrollRight": "Cuộn sang phải"
   },
   "skipLink": {
     "label": "Chuyển đến nội dung chính"

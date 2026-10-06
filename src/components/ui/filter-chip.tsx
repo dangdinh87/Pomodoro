@@ -1,5 +1,8 @@
+'use client';
+
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import { useScrollArrows } from '@/hooks/use-scroll-arrows';
 
 /** Filter / state toggle. Outlined pill; selected = accent-solid with on-accent text and a small hard shadow. Navigation uses TabsList instead. */
 export function FilterChip({
@@ -33,9 +36,21 @@ export function FilterChip({
 }
 
 export function FilterChipGroup({ label, className, children }: { label: string; className?: string; children: ReactNode }) {
+  // Same element, same classes as before either way (zero layout risk for the many call sites that pass
+  // their own sizing classes here) — only a data attribute toggles, which globals.css reads to fade the
+  // edge where there's more to scroll to. Rows that wrap (className="flex-wrap") never overflow
+  // horizontally, so canScroll* stay false there and this is a no-op for them.
+  const { scrollRef, canScrollLeft, canScrollRight } = useScrollArrows<HTMLDivElement>();
   return (
     // p-1/-m-1: overflow-x-auto also clips on Y, which cut the chips' focus ring; pad it back, offset the layout.
-    <div role="group" aria-label={label} className={cn('-m-1 flex items-center gap-2 overflow-x-auto p-1 scrollbar-hide', className)}>
+    <div
+      ref={scrollRef}
+      role="group"
+      aria-label={label}
+      data-scroll-left={canScrollLeft || undefined}
+      data-scroll-right={canScrollRight || undefined}
+      className={cn('-m-1 flex items-center gap-2 overflow-x-auto p-1 scrollbar-hide chip-scroll-fade', className)}
+    >
       {children}
     </div>
   );

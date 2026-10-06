@@ -30,7 +30,9 @@
     "language": "言語",
     "total": "合計",
     "item": "件",
-    "items": "件"
+    "items": "件",
+    "scrollLeft": "左にスクロール",
+    "scrollRight": "右にスクロール"
   },
   "skipLink": {
     "label": "メインコンテンツへスキップ"

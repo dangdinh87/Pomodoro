@@ -563,6 +563,19 @@
     display: none;
   }
 
+  /* FilterChipGroup: fades whichever edge still has hidden chips, so a scrollable row never just cuts a
+     chip off mid-pill with no sign there's more. The data attributes come from useScrollArrows; a row
+     that fits entirely (or wraps instead of scrolling) gets neither, so the mask is a no-op for it. */
+  .chip-scroll-fade[data-scroll-left] {
+    mask-image: linear-gradient(to right, transparent, black 24px);
+  }
+  .chip-scroll-fade[data-scroll-right] {
+    mask-image: linear-gradient(to left, transparent, black 24px);
+  }
+  .chip-scroll-fade[data-scroll-left][data-scroll-right] {
+    mask-image: linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent);
+  }
+
   /* Custom macOS-style scrollbar for audio modal - visible & scrollable */
   .custom-scrollbar::-webkit-scrollbar {
     width: 8px;
