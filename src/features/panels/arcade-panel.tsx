@@ -193,8 +193,10 @@ function InstructionSheet({ game, best, onStart, onClose }: { game: GameConfig; 
         aria-modal="true"
         aria-label={t(`arcadeGames.${game.i18nKey}.title`)}
         className="sticker-lg relative max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-b-none sm:rounded-b-xl"
-        initial={reduceMotion ? false : { y: 24, scale: 0.96, opacity: 0 }}
-        animate={{ y: 0, scale: 1, opacity: 1 }}
+        // No `scale` here: this card is full-width on mobile, so scaling up from <100% width during
+        // the spring briefly revealed a sliver of the dimmed panel behind it at both edges.
+        initial={reduceMotion ? false : { y: 24, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 420, damping: 26 }}
       >
         <Button
