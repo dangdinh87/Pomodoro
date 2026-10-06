@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { Palette, Keyboard, Globe } from "@phosphor-icons/react/dist/ssr"
 import { SettingsSection, SettingsRow } from "@/components/settings/settings-section"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useI18n, LANGS } from "@/contexts/i18n-context"
@@ -63,7 +64,7 @@ export function AppearanceSettings() {
     }
 
     return (
-        <SettingsSection title={t('settings.general.appearance')} action={<SavedIndicator show={saved} />}>
+        <SettingsSection title={t('settings.general.appearance')} icon={Palette} tone="lilac" action={<SavedIndicator show={saved} />}>
                 <SettingsRow
                     label={t('settings.general.theme.colorTheme')}
                     description={t('settings.general.theme.colorThemeDescription')}
@@ -147,7 +148,7 @@ export function GeneralSettings() {
 
     return (
         <div className="space-y-8">
-            <SettingsSection title={t('settings.shortcuts.title')}>
+            <SettingsSection title={t('settings.shortcuts.title')} icon={Keyboard} tone="mint">
                 <SettingsRow label={t('settings.shortcuts.timer.label')} description={t('settings.shortcuts.timer.description')}>
                     <Button variant="outline" className="w-full" onClick={() => openPanel('timer')}>
                         {t('settings.shortcuts.timer.button')}
@@ -160,7 +161,7 @@ export function GeneralSettings() {
                 </SettingsRow>
             </SettingsSection>
 
-            <SettingsSection title={t('settings.general.language.sectionTitle')} action={<SavedIndicator show={saved} />}>
+            <SettingsSection title={t('settings.general.language.sectionTitle')} icon={Globe} tone="sky" action={<SavedIndicator show={saved} />}>
                 <SettingsRow
                     label={t('settings.general.language.title')}
                     description={t('settings.general.language.description')}
